@@ -53,13 +53,20 @@ CHARACTERS = [
     'aman', 'cemas', 'menghindar', 'cemas_menghindar',
 ]
 
-# id CharacterAccessory -> file sumber 3D. Aksesori lain tetap digambar painter.
+# id CharacterAccessory -> file sumber 3D (semua 26 aksesori).
 CHAR_ACCESSORIES = {
     'beanie': 'topi_rajut.png',
     'scarf': 'syal_hangat.png',
     'roundGlasses': 'kacamata_bulat.png',
     'halo': 'halo.png',
     'wings': 'sayap.png',
+    'headphones': 'headphone.png',
+    **{a: f'aksesori/{a}.png' for a in [
+        'ribbon', 'flower', 'witchHat', 'starStickers', 'sunglasses', 'necklace', 'backpack', 'cape',
+        'jungCrown', 'jungMask', 'jungCompass', 'jungLantern',
+        'tempFlame', 'tempMonocle', 'tempLeaf', 'tempWave',
+        'attNightCap', 'attHeartCharm', 'attBlanket', 'attCompanion',
+    ]},
 }
 
 

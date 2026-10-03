@@ -67,23 +67,14 @@ class _AccessoryImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rule = AccessoryArt.of(accessory)!;
-    final double ax;
-    final double ay;
-    final double w;
-    switch (rule.anchor) {
-      case AccessoryAnchor.headTop:
-        ax = art.eyeX;
-        ay = art.top + rule.offsetY * art.bodyHeight;
-        w = rule.width * art.bodyWidth;
-      case AccessoryAnchor.eyes:
-        ax = art.eyeX;
-        ay = art.eyeY + rule.offsetY * art.bodyHeight;
-        w = rule.width * art.eyeDx;
-      case AccessoryAnchor.body:
-        ax = art.eyeX;
-        ay = art.top + rule.offsetY * art.bodyHeight;
-        w = rule.width * art.bodyWidth;
-    }
+    final unitX = rule.eyeScaled ? art.eyeDx : art.bodyWidth;
+    final w = rule.width * unitX;
+    final ax = art.eyeX + rule.offsetX * unitX;
+    final base = switch (rule.anchor) {
+      AccessoryAnchor.headTop || AccessoryAnchor.body => art.top,
+      AccessoryAnchor.eyes => art.eyeY,
+    };
+    final ay = base + rule.offsetY * art.bodyHeight;
     final width = w * size;
     final height = width / rule.aspect;
     return Positioned(

@@ -66,36 +66,77 @@ class CharacterArt {
   };
 }
 
-/// Aturan tempel aksesori yang punya art 3D (`assets/characters/accessories/`).
-/// Aksesori lain tetap digambar painter memakai geometri [CharacterArt].
+/// Aturan tempel aksesori ber-art 3D (`assets/characters/accessories/`).
+/// Semua posisi relatif terhadap geometri [CharacterArt]; aksesori tanpa
+/// aturan di sini digambar painter.
 class AccessoryArt {
-  const AccessoryArt._(this.anchor, {required this.width, required this.aspect, required this.pivotX, required this.pivotY, this.offsetY = 0});
+  const AccessoryArt._(
+    this.anchor, {
+    required this.width,
+    required this.aspect,
+    this.pivotX = 0.5,
+    this.pivotY = 0.5,
+    this.offsetX = 0,
+    this.offsetY = 0,
+    this.eyeScaled = false,
+  });
 
   final AccessoryAnchor anchor;
 
-  /// Lebar sebagai kelipatan lebar badan (atau jarak mata untuk [AccessoryAnchor.eyes]).
+  /// Lebar sebagai kelipatan lebar badan, atau kelipatan [CharacterArt.eyeDx]
+  /// bila [eyeScaled] (barang di wajah).
   final double width;
 
-  /// Rasio lebar/tinggi gambar.
+  /// Rasio lebar/tinggi gambar (dari `tools/build_3d_assets.py`).
   final double aspect;
 
   /// Titik di gambar (0–1) yang ditempel ke anchor.
   final double pivotX;
   final double pivotY;
 
+  /// Geser horizontal: kelipatan [CharacterArt.eyeDx] bila [eyeScaled],
+  /// selain itu kelipatan lebar badan.
+  final double offsetX;
+
   /// Geser vertikal sebagai fraksi tinggi badan.
   final double offsetY;
+  final bool eyeScaled;
 
   String asset(CharacterAccessory a) => 'assets/characters/accessories/${a.name}.webp';
 
   static AccessoryArt? of(CharacterAccessory a) => _all[a];
 
   static const Map<CharacterAccessory, AccessoryArt> _all = {
-    CharacterAccessory.beanie: AccessoryArt._(AccessoryAnchor.headTop, width: 0.78, aspect: 1.1034, pivotX: 0.5, pivotY: 0.82, offsetY: 0.12),
-    CharacterAccessory.halo: AccessoryArt._(AccessoryAnchor.headTop, width: 0.5, aspect: 1.1925, pivotX: 0.5, pivotY: 0.6, offsetY: -0.2),
-    CharacterAccessory.roundGlasses: AccessoryArt._(AccessoryAnchor.eyes, width: 4.2, aspect: 2.087, pivotX: 0.5, pivotY: 0.5),
-    CharacterAccessory.scarf: AccessoryArt._(AccessoryAnchor.body, width: 0.62, aspect: 1.035, pivotX: 0.5, pivotY: 0.22, offsetY: 0.7),
-    CharacterAccessory.wings: AccessoryArt._(AccessoryAnchor.body, width: 1.55, aspect: 2.6301, pivotX: 0.5, pivotY: 0.5, offsetY: 0.42),
+    // ── Kepala ──
+    CharacterAccessory.beanie: AccessoryArt._(AccessoryAnchor.headTop, width: 0.78, aspect: 1.1034, pivotY: 0.82, offsetY: 0.12),
+    CharacterAccessory.ribbon: AccessoryArt._(AccessoryAnchor.headTop, width: 0.42, aspect: 1.3913, offsetX: -0.26, offsetY: 0.06),
+    CharacterAccessory.flower: AccessoryArt._(AccessoryAnchor.headTop, width: 0.36, aspect: 1.259, offsetX: 0.26, offsetY: 0.07),
+    CharacterAccessory.witchHat: AccessoryArt._(AccessoryAnchor.headTop, width: 0.95, aspect: 1.2347, pivotY: 0.86, offsetY: 0.1),
+    CharacterAccessory.headphones: AccessoryArt._(AccessoryAnchor.eyes, width: 1.45, aspect: 1.0787, pivotY: 0.64),
+    CharacterAccessory.halo: AccessoryArt._(AccessoryAnchor.headTop, width: 0.5, aspect: 1.1925, pivotY: 0.6, offsetY: -0.2),
+    CharacterAccessory.jungCrown: AccessoryArt._(AccessoryAnchor.headTop, width: 0.72, aspect: 1.6696, pivotY: 0.75, offsetY: 0.02),
+    CharacterAccessory.tempFlame: AccessoryArt._(AccessoryAnchor.headTop, width: 0.3, aspect: 0.7891, pivotY: 0.95, offsetY: 0.05),
+    CharacterAccessory.attNightCap: AccessoryArt._(AccessoryAnchor.headTop, width: 0.92, aspect: 1.6991, pivotY: 0.8, offsetY: 0.14),
+    // ── Wajah ──
+    CharacterAccessory.roundGlasses: AccessoryArt._(AccessoryAnchor.eyes, width: 4.2, aspect: 2.087, eyeScaled: true),
+    CharacterAccessory.sunglasses: AccessoryArt._(AccessoryAnchor.eyes, width: 4.4, aspect: 2.6122, eyeScaled: true),
+    CharacterAccessory.starStickers: AccessoryArt._(AccessoryAnchor.eyes, width: 3.6, aspect: 2.3133, offsetY: 0.13, eyeScaled: true),
+    CharacterAccessory.jungMask: AccessoryArt._(AccessoryAnchor.eyes, width: 4.4, aspect: 2.2197, eyeScaled: true),
+    CharacterAccessory.tempMonocle: AccessoryArt._(AccessoryAnchor.eyes, width: 2.3, aspect: 0.9531, pivotX: 0.42, pivotY: 0.36, offsetX: 1.0, eyeScaled: true),
+    CharacterAccessory.attHeartCharm: AccessoryArt._(AccessoryAnchor.eyes, width: 1.0, aspect: 0.4896, offsetX: 2.4, offsetY: -0.02, eyeScaled: true),
+    // ── Leher ──
+    CharacterAccessory.scarf: AccessoryArt._(AccessoryAnchor.body, width: 0.62, aspect: 1.035, pivotY: 0.22, offsetY: 0.7),
+    CharacterAccessory.necklace: AccessoryArt._(AccessoryAnchor.body, width: 0.56, aspect: 1.2632, pivotY: 0.05, offsetY: 0.6),
+    CharacterAccessory.jungCompass: AccessoryArt._(AccessoryAnchor.body, width: 0.34, aspect: 0.7005, pivotY: 0.04, offsetY: 0.58),
+    CharacterAccessory.tempLeaf: AccessoryArt._(AccessoryAnchor.body, width: 0.66, aspect: 1.3287, pivotY: 0.05, offsetY: 0.62),
+    CharacterAccessory.attBlanket: AccessoryArt._(AccessoryAnchor.body, width: 0.9, aspect: 1.0909, pivotY: 0.12, offsetY: 0.58),
+    // ── Punggung (di belakang badan) ──
+    CharacterAccessory.wings: AccessoryArt._(AccessoryAnchor.body, width: 1.55, aspect: 2.6301, offsetY: 0.42),
+    CharacterAccessory.backpack: AccessoryArt._(AccessoryAnchor.body, width: 0.46, aspect: 0.8906, offsetX: 0.4, offsetY: 0.55),
+    CharacterAccessory.cape: AccessoryArt._(AccessoryAnchor.body, width: 1.2, aspect: 1.4275, pivotY: 0.08, offsetY: 0.42),
+    CharacterAccessory.jungLantern: AccessoryArt._(AccessoryAnchor.body, width: 0.24, aspect: 0.4948, pivotY: 0.1, offsetX: 0.62, offsetY: 0.28),
+    CharacterAccessory.tempWave: AccessoryArt._(AccessoryAnchor.body, width: 0.7, aspect: 0.875, pivotY: 0.7, offsetX: 0.5, offsetY: 1.0),
+    CharacterAccessory.attCompanion: AccessoryArt._(AccessoryAnchor.body, width: 0.34, aspect: 1.1963, pivotY: 0.9, offsetX: -0.66, offsetY: 1.0),
   };
 }
 
