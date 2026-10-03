@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:56px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Onboarding &amp; asesmen</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">39 layar — welcome → 17 pertanyaan → jawaban bebas → nama → analisis → reality check → masalahmu → dampak → cara Riung membantu → hasil → rate us → paywall</div>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:16px">
+  <h2 style="margin:0;font-size:20px;font-weight:700;color:#B4BAE0">Welcome</h2>
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Welcome" style="min-height:100%;background:radial-gradient(circle at 50% 18%,rgba(124,140,255,0.22),rgba(13,16,48,0) 60%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:8px">
+          <div style="display:flex;align-items:flex-end;gap:2px">
+            <div style="width:74px;height:78px"><riung-monster monster="waswas" state="tamed"></riung-monster></div>
+            <div style="width:120px;height:126px;margin:0 -8px"><riung-monster monster="hakim" state="tamed"></riung-monster></div>
+            <div style="width:74px;height:78px"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          </div>
+          <div style="font-size:28px;font-weight:800;text-align:center;line-height:1.25;letter-spacing:-0.4px;margin-top:14px;text-wrap:pretty">Ada monster di kepalamu.<br>Yuk, kenalan.</div>
+          <div style="font-size:15px;color:#B4BAE0;text-align:center;line-height:1.55;max-width:300px;text-wrap:pretty">Pikiran negatif itu bukan musuh — dia cuma monster kecil yang belum jinak. Riung menemanimu mengenali, menghadapi, dan menjinakkannya.</div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:10px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Mulai kenalan (2 menit)</div>
+          <div style="text-align:center;font-size:13px;color:#7E85B0">Sudah punya akun? <span style="color:#7C8CFF;font-weight:600">Masuk</span></div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:16px">
+  <h2 style="margin:0;font-size:20px;font-weight:700;color:#B4BAE0">Asesmen — Q1 s.d. Q17</h2>
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+    <sc-for list="{{ questions }}" as="q" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:13px;font-weight:600;color:#B4BAE0">Q{{ q.n }} · {{ q.tag }}</div>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+          <div data-screen-label="Q{{ q.n }}" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+            <div style="display:flex;align-items:center;gap:14px;padding:12px 20px">
+              <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+              <div style="flex:1;height:8px;border-radius:999px;background:#1E2450;overflow:hidden"><div style="width:{{ q.pct }}%;height:100%;border-radius:999px;background:#7C8CFF"></div></div>
+              <div style="font-size:12px;font-weight:600;color:#7E85B0">{{ q.n }}/17</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:16px 24px;display:flex;flex-direction:column;gap:18px">
+              <div>
+                <div style="font-size:23px;font-weight:800;line-height:1.3;letter-spacing:-0.3px;text-wrap:pretty">{{ q.q }}</div>
+                <div style="font-size:13.5px;color:#7E85B0;margin-top:7px">{{ q.sub }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;padding-bottom:8px">
+                <sc-for list="{{ q.options }}" as="op" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:13px;border-radius:16px;padding:14px 15px;background:{{ op.bg }};border:{{ op.border }}">
+                    <div style="font-size:20px;width:28px;text-align:center">{{ op.emoji }}</div>
+                    <div style="flex:1;font-size:14.5px;font-weight:600;line-height:1.4">{{ op.label }}</div>
+                    <sc-if value="{{ op.isMulti }}" hint-placeholder-val="{{ false }}">
+                      <div style="width:22px;height:22px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:{{ op.boxBg }};border:{{ op.boxBorder }}">
+                        <sc-if value="{{ op.sel }}" hint-placeholder-val="{{ false }}"><riung-icon name="check" size="14" color="#0D1030" stroke="3"></riung-icon></sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ op.isSingle }}" hint-placeholder-val="{{ false }}">
+                      <div style="width:22px;height:22px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:{{ op.boxBorder }}">
+                        <sc-if value="{{ op.sel }}" hint-placeholder-val="{{ false }}"><div style="width:11px;height:11px;border-radius:999px;background:#7C8CFF"></div></sc-if>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding:12px 24px 18px">
+              <div style="height:54px;border-radius:16px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;background:{{ q.ctaBg }};color:{{ q.ctaColor }};opacity:{{ q.ctaOpacity }}">Lanjut</div>
+            </div>
+          </div>
+        </x-import>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:16px">
+  <h2 style="margin:0;font-size:20px;font-weight:700;color:#B4BAE0">Jawaban bebas &amp; nama</h2>
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Jawaban bebas — kosong</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" keyboard="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Jawaban bebas kosong" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 20px">
+            <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+            <div style="flex:1;height:8px;border-radius:999px;background:#1E2450;overflow:hidden"><div style="width:98%;height:100%;border-radius:999px;background:#7C8CFF"></div></div>
+          </div>
+          <div style="flex:1;padding:16px 24px;display:flex;flex-direction:column;gap:16px">
+            <div style="font-size:23px;font-weight:800;line-height:1.3;text-wrap:pretty">Ceritakan dengan katamu sendiri — apa yang paling ingin kamu ubah?</div>
+            <div style="flex:1;min-height:120px;border:1.5px solid #2A3160;border-radius:16px;background:#151A3A;padding:16px;font-size:15px;color:#7E85B0">Tulis di sini… bebas, tidak dinilai siapa pun.<span style="color:#7C8CFF">|</span></div>
+            <div style="height:54px;border-radius:16px;background:#1E2450;color:#7E85B0;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;opacity:0.6">Kirim</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Jawaban bebas — terisi</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" keyboard="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Jawaban bebas terisi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 20px">
+            <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+            <div style="flex:1;height:8px;border-radius:999px;background:#1E2450;overflow:hidden"><div style="width:98%;height:100%;border-radius:999px;background:#7C8CFF"></div></div>
+          </div>
+          <div style="flex:1;padding:16px 24px;display:flex;flex-direction:column;gap:16px">
+            <div style="font-size:23px;font-weight:800;line-height:1.3;text-wrap:pretty">Ceritakan dengan katamu sendiri — apa yang paling ingin kamu ubah?</div>
+            <div style="flex:1;min-height:120px;border:1.5px solid #7C8CFF;border-radius:16px;background:#151A3A;padding:16px;font-size:15px;line-height:1.6;color:#F4F6FF">Aku pengin berhenti overthinking tiap malam sebelum tidur. Capek rasanya mikirin omongan orang dan takut salah terus.<span style="color:#7C8CFF">|</span></div>
+            <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Kirim</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Nama — kosong</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" keyboard="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Nama kosong" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;gap:16px">
+            <div style="width:88px;height:92px"><riung-monster monster="mengelak" state="tamed"></riung-monster></div>
+            <div style="font-size:24px;font-weight:800;line-height:1.3;text-wrap:pretty">Satu lagi — kami harus manggil kamu siapa?</div>
+            <div style="border:1.5px solid #2A3160;border-radius:16px;background:#151A3A;padding:16px;font-size:16px;color:#7E85B0">Nama panggilanmu<span style="color:#7C8CFF">|</span></div>
+            <div style="height:54px;border-radius:16px;background:#1E2450;color:#7E85B0;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;opacity:0.6">Simpan</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Nama — terisi</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" keyboard="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Nama terisi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;gap:16px">
+            <div style="width:88px;height:92px"><riung-monster monster="mengelak" state="tamed"></riung-monster></div>
+            <div style="font-size:24px;font-weight:800;line-height:1.3;text-wrap:pretty">Satu lagi — kami harus manggil kamu siapa?</div>
+            <div style="border:1.5px solid #7C8CFF;border-radius:16px;background:#151A3A;padding:16px;font-size:16px;color:#F4F6FF">{{ userName }}<span style="color:#7C8CFF">|</span></div>
+            <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Simpan</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:16px">
+  <h2 style="margin:0;font-size:20px;font-weight:700;color:#B4BAE0">Analisis · Reality check · Masalahmu · Dampak · Cara Riung membantu</h2>
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Menganalisis…</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Menganalisis" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center">
+            <div style="position:absolute;inset:0;border-radius:999px;border:5px solid #1E2450;border-top-color:#7C8CFF;animation:spin 1.2s linear infinite"></div>
+            <div style="width:88px;height:92px"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+          </div>
+          <div style="font-size:21px;font-weight:800;text-align:center">Menyusun profil monstermu, {{ userName }}…</div>
+          <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:290px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:#B4BAE0"><riung-icon name="check" size="17" color="#5FD08A"></riung-icon>Membaca pola jawabanmu</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:#B4BAE0"><riung-icon name="check" size="17" color="#5FD08A"></riung-icon>Mencocokkan dengan 7 pola sabotase</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:#7E85B0"><div style="width:17px;height:17px;border-radius:999px;border:2.5px solid #2A3160;border-top-color:#7C8CFF;animation:spin 1s linear infinite"></div>Menyiapkan rencana latihanmu…</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <sc-for list="{{ infoScreens }}" as="s" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:13px;font-weight:600;color:#B4BAE0">{{ s.label }}</div>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+          <div data-screen-label="{{ s.label }}" style="min-height:100%;background:radial-gradient(circle at 50% 12%,{{ s.glow }},rgba(13,16,48,0) 62%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="display:flex;justify-content:flex-end;padding:12px 20px"><div style="font-size:13px;font-weight:600;color:#7E85B0">Lewati</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 28px;gap:14px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:{{ s.accent }}">{{ s.kicker }}</div>
+            <sc-if value="{{ s.big }}" hint-placeholder-val="{{ false }}"><div style="font-size:58px;font-weight:800;line-height:1;letter-spacing:-1px;color:{{ s.accent }}">{{ s.big }}</div></sc-if>
+            <sc-if value="{{ s.monster }}" hint-placeholder-val="{{ false }}"><div style="width:{{ s.mw }}px;height:{{ s.mh }}px"><riung-monster monster="{{ s.monster }}" state="{{ s.mstate }}"></riung-monster></div></sc-if>
+            <sc-if value="{{ s.monsterRow }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:flex-end;gap:2px;flex-wrap:wrap">
+                <sc-for list="{{ s.rowMonsters }}" as="rm" hint-placeholder-count="6">
+                  <div style="width:62px;height:65px"><riung-monster monster="{{ rm }}" state="wild" detail="low"></riung-monster></div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <div style="font-size:22px;font-weight:800;line-height:1.32;letter-spacing:-0.3px;text-wrap:pretty">{{ s.title }}</div>
+            <div style="font-size:15px;color:#B4BAE0;line-height:1.6;text-wrap:pretty">{{ s.body }}</div>
+            <sc-if value="{{ s.src }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-start;font-size:11px;font-weight:600;color:#7E85B0;border:1px solid #2A3160;border-radius:999px;padding:4px 12px">{{ s.src }}</div></sc-if>
+          </div>
+          <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:center;gap:6px">
+              <sc-for list="{{ s.dots }}" as="d" hint-placeholder-count="4"><div style="width:7px;height:7px;border-radius:999px;background:{{ d }}"></div></sc-for>
+            </div>
+            <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.cta }}</div>
+          </div>
+          </div>
+        </x-import>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:16px">
+  <h2 style="margin:0;font-size:20px;font-weight:700;color:#B4BAE0">Hasil asesmen · Rate us · Paywall</h2>
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Hasil asesmen — scroll panjang</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Hasil asesmen" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="flex:1;overflow:auto">
+            <div style="background:radial-gradient(circle at 50% 0%,rgba(139,92,246,0.3),rgba(13,16,48,0) 65%);padding:18px 24px 8px;text-align:center">
+              <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#B39BF9">Profil monstermu</div>
+              <div style="font-size:24px;font-weight:800;margin-top:8px;text-wrap:pretty">{{ userName }}, kenalkan bos para monstermu:</div>
+              <div style="width:170px;height:178px;margin:8px auto 0"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:22px;font-weight:800">Si Hakim</span><span style="font-size:10px;font-weight:700;color:#B39BF9;border:1px solid #8B5CF6;border-radius:999px;padding:2px 9px">SANG BOS</span></div>
+              <div style="font-size:13px;color:#B4BAE0;margin-top:4px;padding-bottom:10px;text-wrap:pretty">Kritik batinmu — dialah yang membangunkan monster lainnya</div>
+            </div>
+            <div style="padding:14px 20px 20px;display:flex;flex-direction:column;gap:14px">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:46px;height:48px;flex-shrink:0"><riung-monster monster="hakim" state="wild" detail="low"></riung-monster></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+                    <div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="font-weight:700">Si Hakim <span style="font-size:9px;font-weight:700;color:#B39BF9;border:1px solid #8B5CF6;border-radius:999px;padding:1px 7px;margin-left:4px">SANG BOS</span></span><span style="font-weight:700;color:#8B5CF6">71%</span></div>
+                    <div style="height:7px;border-radius:999px;background:#0D1030;overflow:hidden"><div style="width:71%;height:100%;border-radius:999px;background:linear-gradient(90deg,#8B5CF6,#B39BF9)"></div></div>
+                  </div>
+                </div>
+                <div style="height:1px;background:#2A3160"></div>
+                <div style="font-size:13px;font-weight:700;color:#B4BAE0">Anak buahnya — dari yang paling aktif</div>
+                <sc-for list="{{ resultBars }}" as="rb" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:34px;height:36px;flex-shrink:0"><riung-monster monster="{{ rb.id }}" state="wild" detail="low"></riung-monster></div>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+                      <div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="font-weight:600">{{ rb.name }}</span><span style="font-weight:700;color:{{ rb.color }}">{{ rb.pct }}%</span></div>
+                      <div style="height:7px;border-radius:999px;background:#0D1030;overflow:hidden"><div style="width:{{ rb.pct }}%;height:100%;border-radius:999px;background:{{ rb.color }}"></div></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#1E2450;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:8px"><riung-icon name="sparkChat" size="16" color="#4FD1C5"></riung-icon><span style="font-size:12px;font-weight:700;color:#4FD1C5">Tahukah kamu?</span></div>
+                <div style="font-size:13px;line-height:1.5">Hanya sekitar 1 dari 10 anak muda dengan depresi yang mencari bantuan. Kamu sudah selangkah lebih maju hari ini.</div>
+                <div style="align-self:flex-start;font-size:10px;font-weight:600;color:#7E85B0;border:1px solid #2A3160;border-radius:999px;padding:2px 9px">SKI 2023, Kemenkes</div>
+              </div>
+              <div style="background:rgba(242,124,134,0.08);border:1px solid rgba(242,124,134,0.3);border-radius:16px;padding:14px;display:flex;gap:10px">
+                <riung-icon name="info" size="18" color="#F27C86"></riung-icon>
+                <div style="font-size:12px;line-height:1.55;color:#B4BAE0">Hasil ini bukan diagnosis. Aplikasi ini bukan alat diagnosis atau pengganti bantuan profesional. <span style="color:#F27C86;font-weight:600">Cari bantuan profesional</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 20px 16px"><div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Mulai jinakkan Si Hakim</div></div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Rate us 1/3 — dipicu momen nilai (monster pertama jinak / streak 7), bukan mid-onboarding</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Rate us ajakan" style="min-height:100%;background:radial-gradient(circle at 50% 22%,rgba(154,162,184,0.18),rgba(13,16,48,0) 55%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:16px;text-align:center">
+            <div style="width:120px;height:126px"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:1.4px;color:#9AA2B8">SI KABUT BARU SAJA JINAK</div>
+            <div style="font-size:23px;font-weight:800;line-height:1.3;text-wrap:pretty">Boleh minta bantuan kecil, {{ userName }}?</div>
+            <div style="font-size:14px;color:#B4BAE0;line-height:1.55;max-width:300px;text-wrap:pretty">Kalau Riung membantumu sampai sini, ulasanmu di Play Store membantu orang lain yang senasib menemukannya.</div>
+          </div>
+          <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+            <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Boleh, lanjutkan</div>
+            <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:6px">Nanti saja</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Rate us 2/3 — lembar resmi Google Play In-App Review (tanpa gerbang bintang)</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Rate us lembar Google Play" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:16px;text-align:center;opacity:0.3">
+            <div style="width:120px;height:126px"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+            <div style="font-size:23px;font-weight:800;line-height:1.3;text-wrap:pretty">Boleh minta bantuan kecil, {{ userName }}?</div>
+          </div>
+          <div style="background:#20222B;border-radius:24px 24px 0 0;padding:20px 22px 26px;display:flex;flex-direction:column;gap:14px;font-family:'Roboto','Plus Jakarta Sans',sans-serif">
+            <div style="width:40px;height:4px;border-radius:999px;background:#3C4049;align-self:center"></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#7C8CFF,#4FD1C5);display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:30px;height:32px"><riung-monster monster="hakim" state="tamed" detail="low"></riung-monster></div></div>
+              <div style="flex:1;text-align:left"><div style="font-size:15px;font-weight:600;color:#E8EAED">Nikmati Riung?</div><div style="font-size:12px;color:#9AA0A6;margin-top:2px">Ketuk bintang di Google Play</div></div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:10px">
+              <riung-icon name="star" size="36" color="#FDD663" stroke="1.6"></riung-icon>
+              <riung-icon name="star" size="36" color="#FDD663" stroke="1.6"></riung-icon>
+              <riung-icon name="star" size="36" color="#FDD663" stroke="1.6"></riung-icon>
+              <riung-icon name="star" size="36" color="#FDD663" stroke="1.6"></riung-icon>
+              <riung-icon name="star" size="36" color="#FDD663" stroke="1.6"></riung-icon>
+            </div>
+            <div style="background:#2A2D36;border:1px solid #3C4049;border-radius:10px;padding:12px 14px;text-align:left;font-size:13px;color:#E8EAED;line-height:1.5">Monster pertamaku jinak minggu ini. Latihannya nggak terasa kayak "terapi" — malah ditungguin tiap pagi.<span style="color:#8AB4F8">|</span></div>
+            <div style="font-size:11px;color:#9AA0A6;text-align:left;line-height:1.45">Ulasan dapat dilihat publik beserta nama dan foto profil Google Play kamu.</div>
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <div style="font-size:13px;font-weight:600;color:#8AB4F8;padding:10px 16px">Nanti</div>
+              <div style="font-size:13px;font-weight:600;color:#202124;background:#8AB4F8;border-radius:999px;padding:10px 20px">Kirim</div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Rate us 3/3 — terima kasih</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Rate us terima kasih" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:16px;text-align:center">
+            <div style="display:flex;align-items:flex-end">
+              <div style="width:64px;height:67px"><riung-monster monster="mengelak" state="tamed" detail="low"></riung-monster></div>
+              <div style="width:90px;height:94px;margin:0 -6px"><riung-monster monster="hakim" state="tamed"></riung-monster></div>
+              <div style="width:64px;height:67px"><riung-monster monster="meronta" state="tamed" detail="low"></riung-monster></div>
+            </div>
+            <div style="font-size:23px;font-weight:800;line-height:1.3;text-wrap:pretty">Makasih, {{ userName }} 💜</div>
+            <div style="font-size:14px;color:#B4BAE0;line-height:1.55;max-width:300px;text-wrap:pretty">Ulasanmu membantu lebih banyak orang menemukan jalan pulang ke pikirannya sendiri.</div>
+          </div>
+          <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+            <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Kembali ke petualanganmu</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:600;color:#B4BAE0">Paywall onboarding</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div data-screen-label="Paywall onboarding" style="min-height:100%;background:radial-gradient(circle at 50% 0%,rgba(255,184,119,0.16),rgba(13,16,48,0) 55%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+          <div style="display:flex;justify-content:flex-end;padding:12px 20px"><riung-icon name="close" size="22" color="#7E85B0"></riung-icon></div>
+          <div style="flex:1;overflow:auto;padding:0 24px;display:flex;flex-direction:column;gap:16px">
+            <div style="text-align:center">
+              <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,184,119,0.14);border-radius:999px;padding:6px 14px"><riung-icon name="crown" size="16" color="#FFB877"></riung-icon><span style="font-size:12px;font-weight:700;color:#FFB877">Riung Premium</span></div>
+              <div style="font-size:25px;font-weight:800;line-height:1.28;margin-top:12px;text-wrap:pretty">Rencana penjinakanmu sudah siap, {{ userName }}</div>
+              <div style="font-size:14px;color:#B4BAE0;margin-top:6px">Coba gratis 7 hari — batalkan kapan saja</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ paywallBenefits }}" as="pb" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:11px"><riung-icon name="check" size="18" color="#5FD08A"></riung-icon><div style="font-size:14px;color:#F4F6FF">{{ pb }}</div></div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="position:relative;border:2px solid #FFB877;border-radius:18px;padding:16px;background:rgba(255,184,119,0.07);display:flex;align-items:center;gap:12px">
+                <div style="position:absolute;top:-10px;left:16px;background:#FFB877;color:#0D1030;font-size:10px;font-weight:800;border-radius:999px;padding:3px 10px">HEMAT 44%</div>
+                <div style="width:22px;height:22px;border-radius:999px;border:2px solid #FFB877;display:flex;align-items:center;justify-content:center"><div style="width:11px;height:11px;border-radius:999px;background:#FFB877"></div></div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700">Tahunan</div><div style="font-size:12px;color:#B4BAE0">Rp399.000/tahun · ≈Rp33.250/bulan</div></div>
+                <div style="font-size:11px;font-weight:700;color:#FFB877">Trial 7 hari</div>
+              </div>
+              <div style="border:1.5px solid #2A3160;border-radius:18px;padding:16px;display:flex;align-items:center;gap:12px">
+                <div style="width:22px;height:22px;border-radius:999px;border:2px solid #7E85B0"></div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700">Bulanan</div><div style="font-size:12px;color:#B4BAE0">Rp59.000/bulan</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+            <div style="height:54px;border-radius:16px;background:#FFB877;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Mulai trial gratis 7 hari</div>
+            <div style="text-align:center;font-size:12px;color:#7E85B0">Lanjut versi gratis · Pulihkan pembelian</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Raka&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Konten&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const userName = this.props.userName ?? 'Raka';
+    const MC = { meronta:'#6E7BA6', waswas:'#E8A94E', kabut:'#9AA2B8', cermin:'#B39DDB', sempurna:'#F2766F', mengelak:'#5FB0A0', hakim:'#8B5CF6' };
+    const N = { meronta:'Si Meronta', waswas:'Si Waswas', kabut:'Si Kabut', cermin:'Si Cermin', sempurna:'Si Sempurna', mengelak:'Si Mengelak', hakim:'Si Hakim' };
+    // q: [tag, question, sub, multi, options[[emoji,label,sel]], answered]
+    const QS = [
+      ['Tahap hidup','Sekarang kegiatan utamamu apa?','Biar Riung bisa menyesuaikan bahasanya',0,[['🏫','Masih sekolah',0],['🎓','Kuliah',1],['💼','Kerja',0],['🔀','Di antara keduanya / lainnya',0]],1],
+      ['Usia','Berapa usiamu?','',0,[['🌱','15–17 tahun',0],['🌿','18–24 tahun',1],['🌳','25–32 tahun',0],['🌲','33–40 tahun',0]],1],
+      ['Isi kepala','Kalau lagi banyak pikiran, apa yang paling sering muncul di kepalamu?','Pilih semua yang terasa relevan',1,[['😰','Takut hasilnya nggak sesuai harapan',1],['📱','Hidup orang lain kelihatan lebih oke',1],['🌫️','Bingung mau mulai dari mana',0],['🧠','Nyalahin diri sendiri terus-terusan',1],['😮‍💨','Merasa keadaan nggak pernah berpihak padaku',1],['🛌','Susah tidur karena kepikiran',0]],1],
+      ['Kecemasan','Seminggu terakhir, seberapa sering kamu merasa cemas atau tegang?','',0,[['🙂','Hampir nggak pernah',0],['😕','Kadang-kadang',0],['😟','Sering',1],['😖','Hampir setiap hari',0]],1],
+      ['Prokrastinasi','Saat ada tugas penting yang harus dimulai, biasanya kamu…','',0,[['✅','Langsung mengerjakan',0],['📱','Buka HP dulu "sebentar"',1],['🌫️','Bingung dan akhirnya nggak mulai-mulai',0],['😤','Panik dan lembur di menit terakhir',0]],1],
+      ['Media sosial','Setelah scroll medsos lama, biasanya kamu merasa…','',0,[['😊','Terhibur, biasa saja',0],['😐','Kosong, waktunya kebuang',0],['😞','Minder lihat hidup orang lain',1],['😠','Kesel sama diri sendiri',0]],1],
+      ['Pemicu stres','Situasi mana yang paling sering bikin kamu stres?','Pilih semua yang relevan — geser untuk lihat semua',1,[['📚','Tugas / ujian menumpuk',1],['💼','Beban kerja & lembur',0],['🚇','Perjalanan pergi-pulang yang panjang',0],['💬','Omongan / ekspektasi orang tua',1],['👥','Lingkungan pertemanan',0],['💸','Kondisi keuangan',1],['❤️','Hubungan / percintaan',0],['🔮','Masa depan yang belum jelas',1]],1],
+      ['Tidur','Gimana kualitas tidurmu belakangan ini?','',0,[['😴','Nyenyak, bangun segar',0],['🌗','Lumayan, kadang kebangun',0],['🌙','Susah mulai tidur karena overthinking',1],['🥱','Sering begadang, bangun capek',0]],1],
+      ['Kritik batin','Saat hasil kerja atau nilaimu keluar, suara di kepalamu biasanya bilang…','',0,[['🎉','"Lumayan, aku sudah berusaha"',0],['🤏','"Harusnya bisa lebih baik"',1],['👎','"Aku memang nggak becus"',0],['🤷','"Yang penting selesai"',0]],1],
+      ['Takut gagal','Seberapa sering kamu menunda sesuatu karena takut hasilnya jelek?','',0,[['🙂','Jarang',0],['😬','Kadang-kadang',0],['😖','Sering banget',1],['🙈','Sampai ada yang nggak pernah kumulai',0]],1],
+      ['Coping','Selama ini, apa yang kamu lakukan saat pikiran lagi berat?','Pilih semua yang relevan — geser untuk lihat semua',1,[['📱','Scroll medsos sampai lupa waktu',1],['🎮','Main game / nonton maraton',1],['🍜','Makan / jajan',0],['😶','Dipendam sendiri',1],['🗣️','Cerita ke teman',0],['🏃','Olahraga',0],['📓','Nulis jurnal',0],['🧘','Meditasi / latihan napas',0]],1],
+      ['Perbandingan','Kalau lihat teman seumuranmu lebih "maju", kamu merasa…','',0,[['💪','Terpacu, ikut semangat',0],['😐','Biasa saja',0],['😔','Tertinggal jauh',1],['😞','Mempertanyakan hidupku sendiri',0]],1],
+      ['Rencana gagal','Kalau rencana penting tiba-tiba gagal, pikiran pertamamu biasanya…','',0,[['😮‍💨','"Kenapa selalu aku sih"',0],['🧠','"Pasti ada yang salah sama caraku"',1],['🤷','"Ya sudah, cari jalan lain"',0],['🚪','"Mending nggak usah coba lagi"',0]],1],
+      ['Menghakimi diri','Seberapa keras kamu menghakimi dirimu sendiri?','Jujur saja — nggak ada jawaban yang salah',0,[['🕊️','Aku cukup berdamai dengan diriku',0],['🤔','Kadang keras, kadang longgar',0],['⚖️','Keras — standarku tinggi banget',1],['🔨','Sangat keras, nggak pernah puas',0]],1],
+      ['Tujuan','Apa yang paling ingin kamu capai bersama Riung?','Pilih semua yang relevan',1,[['😌','Lebih tenang, nggak gampang cemas',1],['🌙','Tidur lebih nyenyak',1],['🎯','Fokus, berhenti menunda',1],['💜','Lebih sayang sama diri sendiri',0],['🔥','Bangun kebiasaan yang konsisten',0]],1],
+      ['Komitmen','Berapa menit per hari yang realistis buat latihanmu?','Sedikit tapi rutin lebih ampuh daripada banyak tapi sekali',0,[['⏱️','5 menit',0],['⏲️','10 menit',1],['🕐','15 menit',0],['🕑','20+ menit',0]],1],
+      ['Waktu latihan','Kapan waktu paling pas buat check-in harianmu?','',0,[['🌅','Pagi, sebelum mulai aktivitas',1],['☀️','Siang, saat istirahat',0],['🌆','Sore, setelah aktivitas',0],['🌙','Malam, sebelum tidur',0]],1],
+    ];
+    const questions = QS.map(([tag,q,sub,multi,ops,answered],i) => ({
+      n: i+1, tag, q, sub: sub || (multi ? 'Pilih semua yang relevan' : 'Pilih satu'),
+      pct: Math.round(((i+1)/17)*100),
+      ctaBg: answered ? '#7C8CFF' : '#1E2450', ctaColor: answered ? '#0D1030' : '#7E85B0', ctaOpacity: answered ? 1 : 0.6,
+      options: ops.map(([emoji,label,sel]) => ({
+        emoji, label, sel: !!sel, isMulti: !!multi, isSingle: !multi,
+        bg: sel ? 'rgba(124,140,255,0.12)' : '#151A3A',
+        border: sel ? '1.5px solid #7C8CFF' : '1.5px solid #2A3160',
+        boxBg: sel ? '#7C8CFF' : 'transparent',
+        boxBorder: sel ? '2px solid #7C8CFF' : '2px solid #7E85B0',
+      })),
+    }));
+    const dots = (total,on) => Array.from({length:total},(_,i)=> i===on ? '#7C8CFF' : '#2A3160');
+    const IS = [
+      // Reality check (4)
+      {label:'Reality check 1/4', kicker:'Kamu nggak sendirian', big:'1 dari 3', title:'remaja Indonesia punya setidaknya satu masalah kesehatan mental', body:'Itu sekitar 15,5 juta orang — teman sekelasmu, rekan kerjamu, mungkin orang di sebelahmu di KRL. Ini bukan kelemahan; ini hal yang sangat umum.', src:'I-NAMHS 2022', glow:'rgba(124,140,255,0.2)', accent:'#7C8CFF', dot:0, dtot:4, cta:'Lanjut'},
+      {label:'Reality check 2/4', kicker:'Yang paling umum', big:'28,2%', title:'remaja perempuan dan 25,4% laki-laki mengalami kecemasan', body:'Kecemasan adalah masalah kesehatan mental paling umum di Indonesia. Rasa waswas yang kamu ceritakan tadi? Sangat, sangat normal.', src:'I-NAMHS 2022', glow:'rgba(232,169,78,0.18)', accent:'#E8A94E', dot:1, dtot:4, cta:'Lanjut'},
+      {label:'Reality check 3/4', kicker:'Tapi ada yang timpang', big:'1 dari 10', title:'anak muda dengan depresi yang mencari bantuan', body:'Prevalensi depresi paling tinggi justru di usia 15–24 tahun — tapi hampir semuanya diam. Dengan berada di sini, kamu sudah melakukan hal yang jarang orang berani lakukan.', src:'SKI 2023, Kemenkes', glow:'rgba(242,124,134,0.16)', accent:'#F27C86', dot:2, dtot:4, cta:'Lanjut'},
+      {label:'Reality check 4/4', kicker:'Ada kabar baiknya', big:'20–30%', title:'risiko cemas & depresi naik karena scroll berlebihan — artinya, itu bisa diturunkan', body:'Layar berlebihan juga mengganggu tidur yang meregulasi mood. Kabar baiknya: pola ini bisa diubah, dan pekerja muda di bawah 40 dengan risiko 2,5× lebih tinggi paling merasakan efeknya.', src:'Studi nasional 2025', glow:'rgba(79,209,197,0.16)', accent:'#4FD1C5', dot:3, dtot:4, cta:'Aku siap'},
+      // Your problem (3)
+      {label:'Masalahmu 1/3', kicker:'Dari jawabanmu', title:'Bukan kamu yang "rusak" — ada pola yang berulang', body:'Overthinking sebelum tidur, menunda karena takut jelek, membandingkan diri… Itu bukan kepribadianmu. Itu pola pikir yang bisa dikenali — dan diubah.', glow:'rgba(154,162,184,0.16)', accent:'#9AA2B8', dot:0, dtot:3, cta:'Lanjut', monster:'kabut', mstate:'wild', mw:130, mh:136},
+      {label:'Masalahmu 2/3', kicker:'Pola itu punya nama', title:'Kenalkan: monster-monster batinmu', body:'Psikologi CBT menyebutnya distorsi kognitif. Di Riung, mereka jadi tujuh monster yang bisa kamu lihat, hadapi, dan jinakkan satu per satu.', glow:'rgba(139,92,246,0.16)', accent:'#B39BF9', dot:1, dtot:3, cta:'Lanjut', monsterRow:true, rowMonsters:['meronta','waswas','kabut','cermin','sempurna','mengelak']},
+      {label:'Masalahmu 3/3', kicker:'Dan bos di balik semuanya', title:'Si Hakim — kritik batin yang membangunkan monster lainnya', body:'Dialah suara "kamu nggak becus" itu. Dari vonisnya lahir cemas, minder, dan menunda — dialah bos yang akan kita jinakkan pelan-pelan.', glow:'rgba(139,92,246,0.22)', accent:'#B39BF9', dot:2, dtot:3, cta:'Lihat dampaknya', monster:'hakim', mstate:'wild', mw:150, mh:157},
+      // Impact (1)
+      {label:'Analisis dampak', kicker:'Kalau dibiarkan', title:'Pola ini saling menguatkan', body:'Cemas → susah tidur → capek → makin gampang menunda → makin keras menghakimi diri → makin cemas. Lingkarannya nyata, tapi bisa diputus dari titik mana pun — 10 menit sehari cukup untuk mulai.', glow:'rgba(242,124,134,0.14)', accent:'#F27C86', dot:0, dtot:1, cta:'Putus lingkarannya', monster:'meronta', mstate:'wild', mw:120, mh:126},
+      // How Riung helps (3)
+      {label:'Cara Riung membantu 1/3', kicker:'Metode yang terbukti', title:'Berbasis CBT — metode paling efektif di aplikasi', body:'Komponen aktifnya: menata ulang pikiran (cognitive restructuring), aktivasi perilaku, dan penetapan tujuan. Latihan pernapasan rutin juga terbukti mempercepat turunnya kecemasan.', src:'Riset CBT', glow:'rgba(79,209,197,0.16)', accent:'#4FD1C5', dot:0, dtot:3, cta:'Lanjut', monster:'sempurna', mstate:'tamed', mw:110, mh:115},
+      {label:'Cara Riung membantu 2/3', kicker:'Rutinitas kecil harian', title:'Check-in pagi, meditasi, jurnal, afirmasi & tidur', body:'Sesuai pilihanmu: 10 menit tiap pagi. Ada juga Mode Fokus untuk mengistirahatkan pikiranmu dari scroll — lengkap dengan sesi "Jeda di Tengah Kerja".', glow:'rgba(124,140,255,0.18)', accent:'#7C8CFF', dot:1, dtot:3, cta:'Lanjut', monster:'waswas', mstate:'tamed', mw:110, mh:115},
+      {label:'Cara Riung membantu 3/3', kicker:'Dan serunya', title:'Tiap latihan menjinakkan monstermu', body:'Kumpulkan koin, jaga streak, dan saksikan monster liar berubah jinak satu per satu di Vault — sampai akhirnya Si Hakim pun takluk.', glow:'rgba(255,184,119,0.16)', accent:'#FFB877', dot:2, dtot:3, cta:'Lihat hasilku', monster:'mengelak', mstate:'tamed', mw:110, mh:115},
+    ];
+    const infoScreens = IS.map(s => ({ ...s, big: s.big || false, monster: s.monster || false, monsterRow: s.monsterRow || false, rowMonsters: s.rowMonsters || [], src: s.src || false, dots: dots(s.dtot, s.dot) }));
+    /* PETA SKOR Q → MONSTER
+       Setiap opsi terpilih menambah bobot ke monsternya; opsi berskala (jarang…selalu) memberi
+       bobot sesuai intensitas (0 / 0.33 / 0.66 / 1). Skor akhir = jumlah bobot ÷ bobot maksimum monster itu.
+       hakim    ← Q3 "Nyalahin diri sendiri" · Q9 "Harusnya lebih baik"(0.5)/"nggak becus"(1) · Q13 "salah sama caraku" · Q14 skala menghakimi diri
+       waswas   ← Q3 "Takut hasilnya nggak sesuai" · Q4 skala cemas · Q8 "overthinking sebelum tidur" · Q10 skala takut gagal(0.5)
+       kabut    ← Q3 "Bingung mau mulai" · Q5 "bingung nggak mulai-mulai" · Q7 "masa depan belum jelas" · Q11 "dipendam sendiri"
+       cermin   ← Q3 "hidup orang lain lebih oke" · Q6 "minder lihat hidup orang" · Q12 skala perbandingan
+       sempurna ← Q9 "Harusnya lebih baik"(0.5) · Q10 skala menunda takut jelek(0.5) · Q14 "standarku tinggi banget"
+       mengelak ← Q5 "buka HP dulu" · Q11 coping menghindar (scroll 0.5 / game 0.5) · Q13 "mending nggak usah coba lagi"
+       meronta  ← Q3 "keadaan nggak pernah berpihak" · Q13 "kenapa selalu aku sih"
+       Persona contoh (jawaban terpilih di atas): waswas 78 · cermin 55 · sempurna 49 · mengelak 44 · kabut 42 · meronta 26 (1 dari 2 sinyal) · hakim (bos) 71. */
+    const resultBars = [
+      ['waswas',78],['cermin',55],['sempurna',49],['mengelak',44],['kabut',42],['meronta',26],
+    ].map(([id,pct]) => ({ id, pct, name:N[id], color:MC[id] }));
+    const paywallBenefits = [
+      'Semua meditasi, cerita tidur & jurnal tanpa batas',
+      'Program "Better me" lengkap (22 sesi)',
+      'Semua 7 monster & latihan penjinakannya',
+      'Konten kerja: Jeda di Tengah Kerja & anti-burnout',
+    ];
+    return { userName, questions, infoScreens, resultBars, paywallBenefits };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Izin pengingat check-in pagi (IzinNotifikasiScreen) — wajib dideklarasikan
+         eksplisit di Android 13+ (API 33) supaya permission_handler bisa memicu
+         dialog sistem. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Data tidur dari Health Connect (jam tangan) — hanya dibaca di perangkat
+         untuk laporan refleksi, opsional, tidak dikirim ke server. -->
+    <uses-permission android:name="android.permission.health.READ_SLEEP"/>
+    <!-- Biometrik untuk buka kunci Jurnal (JurnalPINScreen), lihat local_auth. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <!-- Aplikasi Beku (M6) — baca menit pemakaian aplikasi lain lewat
+         UsageStatsManager. Deklarasi ini TIDAK otomatis memberi izin — user
+         tetap harus mengaktifkannya manual di Settings → Akses data
+         penggunaan (lihat AppBekuPermissionScreen), Android sengaja bikin
+         izin app-op ini tidak bisa lewat dialog runtime biasa. -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
+    <!-- flutter_local_notifications (Fix 2/3) — pengingat check-in
+         pagi/misi harian/streak saver & notifikasi limit AppBeku perlu
+         reschedule ulang tiap device reboot (lihat ScheduledNotificationBootReceiver
+         di bawah). Cuma inexact scheduling yang dipakai (androidScheduleMode:
+         inexactAllowWhileIdle), jadi SCHEDULE_EXACT_ALARM sengaja tidak diminta. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Firebase Auth/Firestore/Remote Config/Analytics & Play Billing (M5)
+         butuh ini di manifest utama — manifest debug (src/debug/) sudah
+         punya izin ini tapi HANYA berlaku untuk build debug, build
+         release/profile tidak akan bisa akses internet sama sekali tanpa
+         ini di sini. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Aplikasi Beku mode kunci: service foreground pemantau aplikasi di depan
+         + izin "Tampil di atas aplikasi lain", satu-satunya cara Android
+         membolehkan Riung membuka layar jeda di depan aplikasi lain dari
+         background (Android 10+). Tidak ada overlay yang digambar. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <application
+        android:label="@string/app_name"
+        android:name="${applicationName}"
+        android:icon="@mipmap/launcher_icon">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- Health Connect (Android 13 ke bawah) menampilkan alasan izin lewat sini. -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+            </intent-filter>
+            <!-- Deep link riung:// (M6) — dasar buat notifikasi FCM nanti
+                 (mis. riung://checkin buka langsung ke Check-in). Belum ada
+                 handler Dart yang membaca linknya, ini baru wiring
+                 manifest-nya. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="riung"/>
+            </intent-filter>
+        </activity>
+        <!-- Health Connect (Android 14+): tautan "cara data dipakai" mengarah ke Riung. -->
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE"/>
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS"/>
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+        <!-- flutter_local_notifications (Fix 2/3) — wajib dideklarasikan manual
+             sejak plugin v16+ (lihat README § AndroidManifest.xml setup),
+             plugin tidak lagi otomatis merge receiver-nya sendiri. -->
+        <!-- Penjaga kunci Aplikasi Beku (utama): sistem yang menjaganya tetap
+             hidup, tahan digeser dari recents. Tidak bisa membaca isi layar,
+             lihat res/xml/accessibility_service_config.xml. -->
+        <service
+            android:name=".AppLockAccessibilityService"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config"/>
+        </service>
+        <service
+            android:name=".AppLockService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Memantau aplikasi di depan untuk menegakkan batas pemakaian harian yang dipilih pengguna (Aplikasi Beku)." />
+        </service>
+        <receiver android:exported="false" android:name=".LockBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="com.riung.riung.action.RESTART_LOCK"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata"/>
+        <intent>
+            <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- url_launcher (M6) — tel: buat "Telepon 119 ext. 8" di
+             BantuanKrisisScreen, https buat link Into The Light/IPK Indonesia. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="tel"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+    </queries>
+</manifest>

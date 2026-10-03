@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:1}}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Tidur</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">6 layar — beranda tidur · detail cerita · pemutar malam · pengingat tidur · laporan pagi · pertama kali</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Beranda tidur</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Beranda tidur" style="min-height:100%;background:linear-gradient(180deg,#0A0C28 0%,#0D1030 45%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1"><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Tidur</div><div style="font-size:13px;color:#7E85B0">Antar pikiranmu pelan-pelan ke jam istirahat</div></div>
+            <div style="display:flex;align-items:center;gap:5px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:6px 12px"><riung-icon name="moon" size="14" color="#7C8CFF"></riung-icon><span style="font-size:12px;font-weight:700;color:#7C8CFF">22:30</span></div>
+          </div>
+          <div style="background:linear-gradient(160deg,#151A45,#0E1235);border:1px solid #2A3160;border-radius:20px;padding:18px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:14px;right:22px;width:5px;height:5px;border-radius:999px;background:#F4F6FF;animation:twinkle 3s ease-in-out infinite"></div>
+            <div style="position:absolute;top:32px;right:60px;width:3px;height:3px;border-radius:999px;background:#F4F6FF;animation:twinkle 4s ease-in-out infinite 1s"></div>
+            <div style="position:absolute;top:52px;right:34px;width:4px;height:4px;border-radius:999px;background:#B39BF9;animation:twinkle 3.5s ease-in-out infinite 0.5s"></div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="flex:1;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:#B39BF9">CERITA MALAM INI</div>
+                <div style="font-size:17px;font-weight:800;text-wrap:pretty">Kereta Malam ke Yogyakarta</div>
+                <div style="font-size:12px;color:#B4BAE0;line-height:1.45">Perjalanan pelan menyusuri rel, hujan tipis di jendela.</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:2px"><div style="background:#7C8CFF;color:#0D1030;font-size:12px;font-weight:700;border-radius:11px;padding:8px 14px;display:flex;align-items:center;gap:6px"><riung-icon name="play" size="13" color="#0D1030"></riung-icon>Putar</div><span style="font-size:11px;color:#7E85B0">32 mnt · Bara Putra</span></div>
+              </div>
+              <div style="width:82px;height:86px;flex-shrink:0"><riung-monster monster="meronta" state="tamed"></riung-monster></div>
+            </div>
+          </div>
+          <div style="font-size:15px;font-weight:700">Cerita tidur</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ sleepStories }}" as="s" hint-placeholder-count="3">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px;display:flex;align-items:center;gap:12px">
+                <div style="width:44px;height:44px;border-radius:14px;background:{{ s.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="{{ s.icon }}" size="21" color="{{ s.color }}"></riung-icon></div>
+                <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ s.title }}</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">{{ s.meta }}</div></div>
+                <riung-icon name="play" size="18" color="#7C8CFF"></riung-icon>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:15px;font-weight:700">Suasana suara</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px">
+            <sc-for list="{{ soundscapes }}" as="ss" hint-placeholder-count="3">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center">
+                <riung-icon name="{{ ss.icon }}" size="22" color="{{ ss.color }}"></riung-icon>
+                <div style="font-size:12px;font-weight:700">{{ ss.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Detail cerita</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Detail cerita tidur" style="min-height:100%;background:linear-gradient(180deg,#0A0C28 0%,#0D1030 50%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="display:flex;align-items:center;gap:6px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:6px 12px"><riung-icon name="download" size="14" color="#B4BAE0"></riung-icon><span style="font-size:12px;font-weight:600;color:#B4BAE0">Unduh</span></div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px">
+            <div style="width:118px;height:124px"><riung-monster monster="meronta" state="tamed"></riung-monster></div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:#B39BF9">CERITA TIDUR · 32 MENIT</div>
+            <div style="font-size:23px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Kereta Malam ke Yogyakarta</div>
+            <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:310px;text-wrap:pretty">Kamu duduk di kursi dekat jendela. Gerimis tipis, lampu gerbong redup, dan suara rel yang berulang pelan-pelan membawa matamu berat. Cerita ini sengaja makin lambat — nggak apa-apa kalau kamu tertidur di tengahnya.</div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;border-radius:999px;background:linear-gradient(135deg,#7C8CFF,#4FD1C5);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#0D1030">BP</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700">Dibacakan Bara Putra</div><div style="font-size:11px;color:#7E85B0">Suara rendah, tempo lambat</div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:700">Timer layar mati</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">Audio memudar, layar redup otomatis</div></div>
+            <div style="display:flex;align-items:center;gap:6px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:6px 12px"><span style="font-size:12px;font-weight:700;color:#7C8CFF">Ikuti cerita</span><riung-icon name="chevR" size="14" color="#7E85B0"></riung-icon></div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="play" size="17" color="#0D1030"></riung-icon>Putar cerita</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pemutar malam</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pemutar tidur" style="min-height:100%;background:#080A20;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="close" size="20" color="#565B7A"></riung-icon>
+          <div style="font-size:12px;font-weight:600;color:#565B7A">Mode malam · layar redup</div>
+          <riung-icon name="moon" size="17" color="#565B7A"></riung-icon>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px">
+          <div style="width:104px;height:110px;opacity:0.8;animation:breathe 9s ease-in-out infinite"><riung-monster monster="meronta" state="tamed"></riung-monster></div>
+          <div style="text-align:center;display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:18px;font-weight:700;color:#B4BAE0">Kereta Malam ke Yogyakarta</div>
+            <div style="font-size:12px;color:#565B7A">Bara Putra · memudar dalam 12 menit</div>
+          </div>
+          <div style="font-size:44px;font-weight:800;letter-spacing:-1px;color:#7E85B0">19:48</div>
+        </div>
+        <div style="padding:0 24px 22px;display:flex;flex-direction:column;gap:14px">
+          <div style="height:4px;border-radius:999px;background:#151A3A;overflow:hidden"><div style="width:62%;height:100%;background:#3E477F"></div></div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:26px">
+            <div style="font-size:12px;font-weight:600;color:#565B7A">-30 dtk</div>
+            <div style="width:60px;height:60px;border-radius:999px;background:#1E2450;border:1px solid #2A3160;display:flex;align-items:center;justify-content:center"><riung-icon name="pause" size="22" color="#B4BAE0"></riung-icon></div>
+            <div style="font-size:12px;font-weight:600;color:#565B7A">volume</div>
+          </div>
+          <div style="text-align:center;font-size:11px;color:#3E477F">Audio berhenti sendiri setelah cerita selesai. Selamat tidur 🌙</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pengingat tidur</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pengingat tidur" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Pengingat tidur</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;text-wrap:pretty">Riung bakal ngingetin kamu pelan-pelan — sekali saja, tanpa nada bersalah kalau kamu lewatkan.</div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:20px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="font-size:12px;font-weight:700;color:#7E85B0">TARGET MULAI TIDUR</div>
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <div style="font-size:48px;font-weight:800;letter-spacing:-1px;color:#7C8CFF">22:30</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #2A3160;color:#B4BAE0">-15 mnt</div>
+              <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #2A3160;color:#B4BAE0">+15 mnt</div>
+            </div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:700">Ingatkan 30 menit sebelumnya</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">"Waktunya mulai melambat, {{ userName }} 🌙"</div></div>
+            <div style="width:44px;height:26px;border-radius:999px;background:#7C8CFF;position:relative"><div style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:999px;background:#0D1030"></div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:700">Hari aktif</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">Senin–Jumat</div></div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ reminderDays }}" as="d" hint-placeholder-count="7">
+                <div style="width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:{{ d.bg }};color:{{ d.color }}">{{ d.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.25);border-radius:16px;padding:14px;display:flex;gap:10px">
+            <riung-icon name="info" size="17" color="#4FD1C5"></riung-icon>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">Streak kamu nggak putus karena telat tidur. Pengingat ini cuma bantuan, bukan penilaian.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Simpan pengingat</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Laporan pagi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Laporan tidur pagi" style="min-height:100%;background:linear-gradient(180deg,#161B4A 0%,#0D1030 40%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Tidur semalam</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px">
+            <div style="width:72px;height:76px;flex-shrink:0"><riung-monster monster="meronta" state="tamed"></riung-monster></div>
+            <div style="flex:1"><div style="font-size:13px;color:#7E85B0">Senin, 27 Juli</div><div style="font-size:20px;font-weight:800;margin-top:2px">Sekitar 6,5 jam</div><div style="font-size:12px;color:#B4BAE0;margin-top:3px;line-height:1.45">Kamu mulai cerita jam 22:41 dan bangun cek aplikasi jam 05:12.</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Gimana rasanya bangun tadi?</div>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;text-align:center;border-radius:14px;padding:14px 0;border:1.5px solid #2A3160;display:flex;flex-direction:column;align-items:center;gap:5px"><span style="font-size:22px">🥱</span><span style="font-size:11px;font-weight:600;color:#B4BAE0">Masih capek</span></div>
+              <div style="flex:1;text-align:center;border-radius:14px;padding:14px 0;border:1.5px solid #7C8CFF;background:rgba(124,140,255,0.12);display:flex;flex-direction:column;align-items:center;gap:5px"><span style="font-size:22px">🙂</span><span style="font-size:11px;font-weight:700;color:#7C8CFF">Lumayan</span></div>
+              <div style="flex:1;text-align:center;border-radius:14px;padding:14px 0;border:1.5px solid #2A3160;display:flex;flex-direction:column;align-items:center;gap:5px"><span style="font-size:22px">😌</span><span style="font-size:11px;font-weight:600;color:#B4BAE0">Segar</span></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">7 malam terakhir</div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:16px;display:flex;align-items:flex-end;gap:8px;height:110px">
+              <sc-for list="{{ sleepBars }}" as="sb" hint-placeholder-count="7">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                  <div style="width:100%;border-radius:6px 6px 3px 3px;background:{{ sb.color }};height:{{ sb.h }}"></div>
+                  <div style="font-size:9px;color:#7E85B0">{{ sb.day }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:rgba(124,140,255,0.08);border:1px solid rgba(124,140,255,0.25);border-radius:16px;padding:14px;display:flex;gap:10px">
+            <riung-icon name="sparkChat" size="17" color="#7C8CFF"></riung-icon>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">Tiga malam terakhir kamu tidur lebih awal dari biasanya. Si Meronta makin jarang muncul di catatanmu — kerja bagus, pelan-pelan.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Lanjut check-in pagi</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pertama kali — belum ada data</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Tidur pertama kali" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Tidur semalam</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="width:116px;height:122px;opacity:0.85"><riung-monster monster="meronta" state="tamed"></riung-monster></div>
+          <div style="font-size:19px;font-weight:800;text-wrap:pretty">Belum ada catatan tidur</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:300px;text-wrap:pretty">Mulai malam ini: putar satu cerita tidur atau atur pengingat, dan besok pagi kamu bisa lihat pola tidurmu di sini.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:300px;margin-top:6px">
+            <div style="height:50px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="play" size="15" color="#0D1030"></riung-icon>Coba cerita malam ini</div>
+            <div style="height:50px;border-radius:16px;border:1.5px solid #2A3160;color:#B4BAE0;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="bell" size="15" color="#B4BAE0"></riung-icon>Atur pengingat tidur</div>
+          </div>
+          <div style="font-size:11px;color:#7E85B0;max-width:280px;line-height:1.5;margin-top:4px">Riung nggak melacak tidurmu lewat sensor — semua catatan berasal dari yang kamu isi sendiri.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Raka&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Konten&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const userName = this.props.userName ?? 'Raka';
+    const navItems = [
+      ['home','Beranda','#7E85B0'],['compass','Jelajah','#7C8CFF'],['focus','Fokus','#7E85B0'],['monster','Monster','#7E85B0'],['user','Profil','#7E85B0'],
+    ].map(([icon,label,color]) => ({ icon, label, color }));
+    const sleepStories = [
+      { title:'Warung Kopi di Kaki Gunung', meta:'28 mnt · Dinda Ayu', icon:'sun', bg:'rgba(255,184,119,0.15)', color:'#FFB877' },
+      { title:'Perahu Pelan di Danau Toba', meta:'35 mnt · Bara Putra', icon:'moon', bg:'rgba(124,140,255,0.15)', color:'#7C8CFF' },
+      { title:'Hujan di Atap Rumah Nenek', meta:'40 mnt · Dinda Ayu', icon:'heart', bg:'rgba(179,157,219,0.18)', color:'#B39DDB' },
+    ];
+    const soundscapes = [
+      { label:'Hujan', icon:'moon', color:'#7C8CFF' },
+      { label:'Ombak', icon:'compass', color:'#4FD1C5' },
+      { label:'Kipas angin', icon:'sun', color:'#FFB877' },
+    ];
+    const reminderDays = ['S','S','R','K','J','S','M'].map((label, i) => ({
+      label, bg: i < 5 ? '#7C8CFF' : '#1E2450', color: i < 5 ? '#0D1030' : '#7E85B0',
+    }));
+    const sleepBars = [
+      { day:'Sel', h:'52%', color:'#3E477F' },{ day:'Rab', h:'44%', color:'#3E477F' },{ day:'Kam', h:'60%', color:'#3E477F' },
+      { day:'Jum', h:'38%', color:'#3E477F' },{ day:'Sab', h:'72%', color:'#5A66B8' },{ day:'Min', h:'78%', color:'#5A66B8' },
+      { day:'Sen', h:'65%', color:'#7C8CFF' },
+    ];
+    return { userName, navItems, sleepStories, soundscapes, reminderDays, sleepBars };
+  }
+}
+</script>
+</body>
+</html>

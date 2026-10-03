@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Meditasi</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">7 layar — perpustakaan · detail sesi · pemutar · sesi selesai · memuat · offline · pencarian kosong</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Perpustakaan meditasi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Perpustakaan meditasi" style="min-height:100%;background:linear-gradient(180deg,#12163F 0%,#0D1030 30%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1"><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Meditasi</div><div style="font-size:13px;color:#7E85B0">Pilih sesi yang pas buat kamu hari ini</div></div>
+            <div style="width:40px;height:40px;border-radius:13px;background:#1E2450;border:1px solid #2A3160;display:flex;align-items:center;justify-content:center"><riung-icon name="search" size="19" color="#B4BAE0"></riung-icon></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ medCategories }}" as="cat" hint-placeholder-count="5">
+              <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 14px;background:{{ cat.bg }};color:{{ cat.color }};border:1px solid {{ cat.border }}">{{ cat.label }}</div>
+            </sc-for>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(79,209,197,0.18),rgba(30,36,80,0.9));border:1px solid rgba(79,209,197,0.4);border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:#4FD1C5">UNTUK JAM KERJAMU</div>
+              <div style="font-size:17px;font-weight:800;text-wrap:pretty">Jeda di Tengah Kerja</div>
+              <div style="font-size:12px;color:#B4BAE0;line-height:1.45">5 menit melepas tegang di antara rapat — tanpa perlu ruang khusus.</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:2px"><div style="background:#4FD1C5;color:#0D1030;font-size:12px;font-weight:700;border-radius:11px;padding:8px 14px;display:flex;align-items:center;gap:6px"><riung-icon name="play" size="13" color="#0D1030"></riung-icon>Putar</div><span style="font-size:11px;color:#7E85B0">5 mnt · +3 koin</span></div>
+            </div>
+            <div style="width:84px;height:88px;flex-shrink:0"><riung-monster monster="waswas" state="tamed"></riung-monster></div>
+          </div>
+          <div style="font-size:15px;font-weight:700">Redakan cemas</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ medListCemas }}" as="m" hint-placeholder-count="3">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px;display:flex;align-items:center;gap:12px">
+                <div style="width:44px;height:44px;border-radius:14px;background:{{ m.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="{{ m.icon }}" size="21" color="{{ m.color }}"></riung-icon></div>
+                <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ m.title }}</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">{{ m.meta }}</div></div>
+                <sc-if value="{{ m.downloaded }}" hint-placeholder-val="{{ false }}"><riung-icon name="check" size="15" color="#5FD08A"></riung-icon></sc-if>
+                <riung-icon name="play" size="18" color="#4FD1C5"></riung-icon>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:15px;font-weight:700">Buat pelajar &amp; mahasiswa</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+            <sc-for list="{{ medListPelajar }}" as="m" hint-placeholder-count="2">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px;display:flex;align-items:center;gap:12px">
+                <div style="width:44px;height:44px;border-radius:14px;background:{{ m.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="{{ m.icon }}" size="21" color="{{ m.color }}"></riung-icon></div>
+                <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ m.title }}</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">{{ m.meta }}</div></div>
+                <riung-icon name="play" size="18" color="#4FD1C5"></riung-icon>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Detail sesi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Detail sesi meditasi" style="min-height:100%;background:linear-gradient(180deg,#12163F 0%,#0D1030 40%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="display:flex;align-items:center;gap:6px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:6px 12px"><riung-icon name="download" size="14" color="#B4BAE0"></riung-icon><span style="font-size:12px;font-weight:600;color:#B4BAE0">Unduh</span></div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px">
+            <div style="width:120px;height:126px"><riung-monster monster="waswas" state="wild"></riung-monster></div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:#E8A94E">MELAWAN SI WASWAS</div>
+            <div style="font-size:23px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Napas 4-7-8 untuk Meredakan Cemas</div>
+            <div style="font-size:13px;color:#B4BAE0;line-height:1.55;max-width:300px;text-wrap:pretty">Teknik pernapasan sederhana yang menenangkan sistem sarafmu. Cocok saat dada terasa sesak sebelum ujian atau presentasi.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Durasi</div>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;text-align:center;border-radius:14px;padding:12px 0;border:1.5px solid #2A3160;color:#B4BAE0;font-size:14px;font-weight:600">5 mnt</div>
+              <div style="flex:1;text-align:center;border-radius:14px;padding:12px 0;border:1.5px solid #4FD1C5;background:rgba(79,209,197,0.12);color:#4FD1C5;font-size:14px;font-weight:700">10 mnt</div>
+              <div style="flex:1;text-align:center;border-radius:14px;padding:12px 0;border:1.5px solid #2A3160;color:#B4BAE0;font-size:14px;font-weight:600">15 mnt</div>
+            </div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;border-radius:999px;background:linear-gradient(135deg,#7C8CFF,#B39BF9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#0D1030">DA</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700">Dipandu Dinda Ayu</div><div style="font-size:11px;color:#7E85B0">Suara pelan, Bahasa Indonesia</div></div>
+            <riung-icon name="play" size="16" color="#7E85B0"></riung-icon><span style="font-size:11px;color:#7E85B0">contoh</span>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;align-items:center"><riung-icon name="coin" size="18" color="#FFB877"></riung-icon><div style="font-size:13px;font-weight:800;color:#FFB877">+{{ medReward }} koin</div><div style="font-size:10px;color:#7E85B0">saat selesai</div></div>
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;align-items:center"><riung-icon name="monster" size="18" color="#E8A94E"></riung-icon><div style="font-size:13px;font-weight:800;color:#E8A94E">+3%</div><div style="font-size:10px;color:#7E85B0">jinakkan Si Waswas</div></div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#4FD1C5;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="play" size="17" color="#0D1030"></riung-icon>Mulai sesi</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pemutar — sesi berjalan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pemutar meditasi" style="min-height:100%;background:radial-gradient(circle at 50% 32%,rgba(79,209,197,0.16),rgba(13,16,48,0) 60%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="close" size="20" color="#7E85B0"></riung-icon>
+          <div style="font-size:13px;font-weight:600;color:#B4BAE0">Napas 4-7-8</div>
+          <riung-icon name="moon" size="18" color="#7E85B0"></riung-icon>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px">
+          <div style="position:relative;width:230px;height:230px;display:flex;align-items:center;justify-content:center">
+            <div style="position:absolute;inset:0;border-radius:999px;background:rgba(79,209,197,0.1);animation:breathe 8s ease-in-out infinite"></div>
+            <div style="position:absolute;inset:26px;border-radius:999px;background:rgba(79,209,197,0.14);animation:breathe 8s ease-in-out infinite"></div>
+            <div style="width:118px;height:124px;animation:breathe 8s ease-in-out infinite"><riung-monster monster="waswas" state="tamed"></riung-monster></div>
+          </div>
+          <div style="font-size:19px;font-weight:700;color:#4FD1C5">Tahan… 7 detik</div>
+          <div style="font-size:13px;color:#B4BAE0;text-align:center;line-height:1.55;max-width:280px;text-wrap:pretty">Ikuti lingkarannya. Si Waswas melunak tiap kali napasmu melambat.</div>
+        </div>
+        <div style="padding:0 24px 22px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="height:5px;border-radius:999px;background:#1E2450;overflow:hidden"><div style="width:42%;height:100%;background:#4FD1C5"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#7E85B0"><span>04:12</span><span>10:00</span></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:26px">
+            <div style="font-size:12px;font-weight:600;color:#7E85B0">-15 dtk</div>
+            <div style="width:64px;height:64px;border-radius:999px;background:#4FD1C5;display:flex;align-items:center;justify-content:center"><riung-icon name="pause" size="24" color="#0D1030"></riung-icon></div>
+            <div style="font-size:12px;font-weight:600;color:#7E85B0">+15 dtk</div>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Sesi selesai</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Meditasi selesai" style="min-height:100%;background:radial-gradient(circle at 50% 20%,rgba(95,208,138,0.16),rgba(13,16,48,0) 55%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="width:132px;height:139px"><riung-monster monster="waswas" state="tamed"></riung-monster></div>
+          <div style="font-size:24px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">10 menit buat dirimu sendiri 💙</div>
+          <div style="font-size:14px;color:#B4BAE0;line-height:1.55;max-width:300px;text-wrap:pretty">Nggak semua orang berani berhenti sejenak. Kamu barusan melakukannya.</div>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="coin" size="20" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800;color:#FFB877">+{{ medReward }}</div><div style="font-size:10px;color:#7E85B0">koin</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="monster" size="20" color="#E8A94E"></riung-icon><div style="font-size:16px;font-weight:800;color:#E8A94E">+3%</div><div style="font-size:10px;color:#7E85B0">Si Waswas</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="lotus" size="20" color="#4FD1C5"></riung-icon><div style="font-size:16px;font-weight:800;color:#4FD1C5">29</div><div style="font-size:10px;color:#7E85B0">total sesi</div></div>
+          </div>
+          <div style="background:#1E2450;border:1px solid #2A3160;border-radius:16px;padding:14px 16px;margin-top:6px;max-width:320px">
+            <div style="font-size:12px;font-weight:700;color:#4FD1C5;margin-bottom:4px">Gimana rasanya sekarang?</div>
+            <div style="display:flex;gap:8px;justify-content:center">
+              <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #2A3160;color:#B4BAE0">Masih tegang</div>
+              <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #4FD1C5;background:rgba(79,209,197,0.12);color:#4FD1C5">Lebih ringan</div>
+              <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #2A3160;color:#B4BAE0">Tenang</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Selesai</div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:6px">Ulangi sesi ini</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Memuat sesi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Memuat sesi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;padding:12px 20px"><riung-icon name="close" size="20" color="#7E85B0"></riung-icon></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:28px;text-align:center">
+          <div style="position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center">
+            <div style="position:absolute;inset:0;border-radius:999px;border:4px solid #1E2450;border-top-color:#4FD1C5;animation:spin 1s linear infinite"></div>
+            <div style="width:52px;height:55px"><riung-monster monster="waswas" state="tamed" detail="low"></riung-monster></div>
+          </div>
+          <div style="font-size:17px;font-weight:700">Menyiapkan sesimu…</div>
+          <div style="font-size:13px;color:#7E85B0;max-width:280px;line-height:1.55;text-wrap:pretty">Mengunduh audio (2,1 MB). Setelah ini, sesi bisa diputar tanpa internet.</div>
+          <div style="width:220px;height:5px;border-radius:999px;background:#1E2450;overflow:hidden"><div style="width:64%;height:100%;background:#4FD1C5"></div></div>
+        </div>
+        <div style="padding:14px 24px 18px"><div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:6px">Batalkan</div></div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Offline</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Meditasi offline" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="background:rgba(255,184,119,0.12);border-bottom:1px solid rgba(255,184,119,0.3);padding:10px 20px;display:flex;align-items:center;gap:9px">
+          <riung-icon name="wifiOff" size="16" color="#FFB877"></riung-icon>
+          <div style="font-size:12px;font-weight:600;color:#FFB877">Kamu lagi offline — sesi terunduh tetap bisa diputar</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Meditasi</div>
+          <div style="font-size:15px;font-weight:700">Tersimpan di perangkatmu</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ medOffline }}" as="m" hint-placeholder-count="3">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px;display:flex;align-items:center;gap:12px">
+                <div style="width:44px;height:44px;border-radius:14px;background:{{ m.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="{{ m.icon }}" size="21" color="{{ m.color }}"></riung-icon></div>
+                <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ m.title }}</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">{{ m.meta }}</div></div>
+                <riung-icon name="check" size="15" color="#5FD08A"></riung-icon>
+                <riung-icon name="play" size="18" color="#4FD1C5"></riung-icon>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#151A3A;border:1px dashed #2A3160;border-radius:18px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+            <riung-icon name="wifiOff" size="26" color="#7E85B0"></riung-icon>
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Sesi lain butuh koneksi</div>
+            <div style="font-size:12px;color:#7E85B0;line-height:1.5;max-width:260px;text-wrap:pretty">Progres dan koinmu tetap tercatat — semuanya tersinkron otomatis begitu kamu online lagi.</div>
+          </div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pencarian — tidak ada hasil</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pencarian kosong" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="padding:14px 20px;display:flex;align-items:center;gap:10px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;display:flex;align-items:center;gap:9px;background:#1E2450;border:1px solid #2A3160;border-radius:14px;padding:11px 14px">
+            <riung-icon name="search" size="17" color="#7E85B0"></riung-icon>
+            <span style="font-size:14px;font-weight:600">meditasi tidur bayi</span>
+            <span style="width:2px;height:16px;background:#7C8CFF"></span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="width:110px;height:116px;opacity:0.75"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          <div style="font-size:18px;font-weight:800">Belum ketemu yang itu</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;max-width:290px;text-wrap:pretty">Nggak ada hasil untuk "meditasi tidur bayi". Coba kata yang lebih umum, atau intip yang sering dicari:</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:300px">
+            <div style="font-size:12px;font-weight:600;border-radius:999px;padding:8px 14px;border:1px solid #2A3160;color:#B4BAE0">tidur nyenyak</div>
+            <div style="font-size:12px;font-weight:600;border-radius:999px;padding:8px 14px;border:1px solid #2A3160;color:#B4BAE0">sebelum ujian</div>
+            <div style="font-size:12px;font-weight:600;border-radius:999px;padding:8px 14px;border:1px solid #2A3160;color:#B4BAE0">overthinking</div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:#7C8CFF;margin-top:4px">Usulkan topik ke tim Riung</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;medReward&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:3,&quot;min&quot;:0,&quot;max&quot;:50,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const medReward = this.props.medReward ?? 3;
+    const navItems = [
+      ['home','Beranda','#7E85B0'],['compass','Jelajah','#7C8CFF'],['focus','Fokus','#7E85B0'],['monster','Monster','#7E85B0'],['user','Profil','#7E85B0'],
+    ].map(([icon,label,color]) => ({ icon, label, color }));
+    const medCategories = [
+      { label:'Semua', bg:'#7C8CFF', color:'#0D1030', border:'#7C8CFF' },
+      { label:'Cemas', bg:'transparent', color:'#B4BAE0', border:'#2A3160' },
+      { label:'Stres kerja', bg:'transparent', color:'#B4BAE0', border:'#2A3160' },
+      { label:'Fokus belajar', bg:'transparent', color:'#B4BAE0', border:'#2A3160' },
+      { label:'Pemula', bg:'transparent', color:'#B4BAE0', border:'#2A3160' },
+    ];
+    const medListCemas = [
+      { title:'Napas 4-7-8 untuk Meredakan Cemas', meta:'10 mnt · Dinda Ayu · vs Si Waswas', icon:'lotus', bg:'rgba(79,209,197,0.15)', color:'#4FD1C5', downloaded:true },
+      { title:'Body Scan: Turunkan Tegang di Bahu', meta:'12 mnt · Bara Putra', icon:'user', bg:'rgba(124,140,255,0.15)', color:'#7C8CFF', downloaded:false },
+      { title:'Menonton Pikiran Lewat', meta:'8 mnt · Dinda Ayu · vs Si Kabut', icon:'sparkChat', bg:'rgba(154,162,184,0.18)', color:'#9AA2B8', downloaded:false },
+    ];
+    const medListPelajar = [
+      { title:'Tenang Sebelum Ujian', meta:'7 mnt · Bara Putra · vs Si Waswas', icon:'journal', bg:'rgba(255,184,119,0.15)', color:'#FFB877' },
+      { title:'Berhenti Membandingkan Diri', meta:'11 mnt · Dinda Ayu · vs Si Cermin', icon:'heart', bg:'rgba(179,157,219,0.18)', color:'#B39DDB' },
+    ];
+    const medOffline = [
+      { title:'Napas 4-7-8 untuk Meredakan Cemas', meta:'10 mnt · terunduh', icon:'lotus', bg:'rgba(79,209,197,0.15)', color:'#4FD1C5' },
+      { title:'Jeda di Tengah Kerja', meta:'5 mnt · terunduh', icon:'focus', bg:'rgba(79,209,197,0.15)', color:'#4FD1C5' },
+      { title:'Tenang Sebelum Ujian', meta:'7 mnt · terunduh', icon:'journal', bg:'rgba(255,184,119,0.15)', color:'#FFB877' },
+    ];
+    return { medReward, navItems, medCategories, medListCemas, medListPelajar, medOffline };
+  }
+}
+</script>
+</body>
+</html>

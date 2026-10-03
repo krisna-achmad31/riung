@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Riung</string>
+    <string name="lock_accessibility_summary">Frozen Apps lock</string>
+    <string name="lock_accessibility_description">Riung uses this permission only to know when an app you froze is opened, so it can show a pause screen when its daily limit is reached. Riung does not read your screen, chats, or what you type, and sends none of this data anywhere. Turn it off here anytime.</string>
+</resources>

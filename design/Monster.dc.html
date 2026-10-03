@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+@keyframes wobble{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Monster &amp; Mini-game</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">8 layar — brankas monster · detail Si Waswas · detail bos Si Hakim · intro serangan · mini-game aktif · menang · kalah · monster jinak</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Brankas monster</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Brankas monster" style="min-height:100%;background:linear-gradient(180deg,#12163F 0%,#0D1030 30%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1"><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Monstermu</div><div style="font-size:13px;color:#7E85B0">2 dari 7 sudah jinak</div></div>
+            <div style="display:flex;align-items:center;gap:5px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:6px 12px"><riung-icon name="ticket" size="15" color="#4FD1C5"></riung-icon><span style="font-size:13px;font-weight:700;color:#4FD1C5">×3</span></div>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(139,92,246,0.18),rgba(30,36,80,0.9));border:1.5px solid #8B5CF6;border-radius:22px;padding:18px;display:flex;align-items:center;gap:14px">
+            <div style="width:112px;height:118px;flex-shrink:0;animation:wobble 5s ease-in-out infinite"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:7px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:17px;font-weight:800">Si Hakim</span><span style="font-size:10px;font-weight:700;color:#B39BF9;border:1px solid #8B5CF6;border-radius:999px;padding:2px 8px">BOS</span></div>
+              <div style="font-size:12px;color:#B4BAE0;line-height:1.45">Suara yang bilang kamu "pasti gagal". Enam anak buahnya melemah kalau dia melemah.</div>
+              <div style="height:7px;border-radius:999px;background:#0D1030;overflow:hidden"><div style="width:38%;height:100%;background:linear-gradient(90deg,#8B5CF6,#B39BF9)"></div></div>
+              <div style="font-size:11px;color:#7E85B0">38% menuju jinak</div>
+            </div>
+          </div>
+          <div style="font-size:15px;font-weight:700">Anak buahnya</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px">
+            <sc-for list="{{ vault }}" as="v" hint-placeholder-count="6">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+                <div style="width:78px;height:84px;opacity:{{ v.opacity }}"><riung-monster monster="{{ v.id }}" state="{{ v.state }}" cosmetic="{{ v.cos }}"></riung-monster></div>
+                <div style="font-size:13px;font-weight:700">{{ v.name }}</div>
+                <div style="font-size:10px;color:{{ v.subColor }};font-weight:600">{{ v.sub }}</div>
+                <div style="width:100%;height:5px;border-radius:999px;background:#0D1030;overflow:hidden"><div style="width:{{ v.pct }};height:100%;background:{{ v.barColor }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Detail — Si Waswas</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Detail Si Waswas" style="min-height:100%;background:linear-gradient(180deg,rgba(232,169,78,0.12) 0%,#0D1030 38%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;font-size:15px;font-weight:700">Si Waswas</div>
+          <span style="font-size:10px;font-weight:700;color:#F2C67F;border:1px solid #8F7443;border-radius:999px;padding:3px 9px">72% JINAK</span>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+            <div style="width:140px;height:147px;animation:floaty 4s ease-in-out infinite"><riung-monster monster="waswas" state="tamed"></riung-monster></div>
+            <div style="font-size:13px;color:#B4BAE0;line-height:1.55;max-width:310px;text-wrap:pretty">Monster kecemasan. Matanya banyak karena dia melihat bahaya di mana-mana — bahkan yang belum tentu terjadi.</div>
+            <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:5px">
+              <div style="height:9px;border-radius:999px;background:#151A3A;overflow:hidden"><div style="width:72%;height:100%;background:linear-gradient(90deg,#E8A94E,#F2C67F)"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#7E85B0"><span>Liar</span><span style="color:#F2C67F;font-weight:700">72%</span><span>Jinak</span></div>
+            </div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12px;font-weight:700;color:#F2C67F;letter-spacing:0.6px">DI DUNIA NYATA, DIA ADALAH…</div>
+            <div style="font-size:13px;color:#B4BAE0;line-height:1.6;text-wrap:pretty">Pikiran "gimana kalau…" yang muter terus: gimana kalau ditanya dan nggak bisa jawab, gimana kalau hasilnya jelek. Dalam CBT ini disebut <span style="color:#F4F6FF;font-weight:700">catastrophizing</span> — membayangkan skenario terburuk sebagai satu-satunya kemungkinan.</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:rgba(232,169,78,0.08);border:1px solid rgba(232,169,78,0.3);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:11px;font-weight:700;color:#E8A94E;letter-spacing:0.6px">APA KATANYA</div>
+              <div style="font-size:12px;line-height:1.55;color:#F4F6FF;font-style:italic;text-wrap:pretty">"Gimana kalau besok semuanya berantakan?"</div>
+            </div>
+            <div style="flex:1;background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.3);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:11px;font-weight:700;color:#4FD1C5;letter-spacing:0.6px">FAKTANYA</div>
+              <div style="font-size:12px;line-height:1.55;color:#B4BAE0;text-wrap:pretty">Pikiran bukan ramalan. Coba hitung: dari yang kamu takutkan minggu lalu, berapa yang benar-benar terjadi?</div>
+            </div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:11px">
+            <div style="font-size:12px;font-weight:700;color:#B4BAE0;letter-spacing:0.6px">TEKNIK PENANGKAL</div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="width:36px;height:36px;border-radius:11px;background:rgba(232,169,78,0.15);display:flex;align-items:center;justify-content:center"><riung-icon name="calendar" size="18" color="#E8A94E"></riung-icon></div><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.45">Jadwalkan khawatirmu ke slot 10 menit</div><div style="font-size:11px;font-weight:800;color:#E8A94E;background:rgba(232,169,78,0.14);border-radius:999px;padding:4px 10px">5×</div></div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="width:36px;height:36px;border-radius:11px;background:rgba(255,184,119,0.15);display:flex;align-items:center;justify-content:center"><riung-icon name="journal" size="18" color="#FFB877"></riung-icon></div><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.45">Cek fakta: tulis bukti sebaliknya di jurnal</div><div style="font-size:11px;font-weight:800;color:#E8A94E;background:rgba(232,169,78,0.14);border-radius:999px;padding:4px 10px">3×</div></div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="width:36px;height:36px;border-radius:11px;background:rgba(79,209,197,0.15);display:flex;align-items:center;justify-content:center"><riung-icon name="eyeOpen" size="18" color="#4FD1C5"></riung-icon></div><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.45">Grounding: sebutkan 3 benda yang kamu lihat</div><div style="font-size:11px;font-weight:800;color:#E8A94E;background:rgba(232,169,78,0.14);border-radius:999px;padding:4px 10px">2×</div></div>
+            <div style="display:flex;align-items:center;gap:8px;border-top:1px solid #1E2450;padding-top:10px"><riung-icon name="zap" size="14" color="#B39BF9"></riung-icon><div style="font-size:11px;color:#7E85B0;line-height:1.45">Teknik yang tepat = serangan lebih besar di mini-game.</div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+            <div style="font-size:12px;font-weight:700;color:#B4BAE0;letter-spacing:0.6px">RIWAYAT PENJINAKAN</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#B4BAE0"><span>Kemarin · meditasi 10 mnt</span><span style="color:#5FD08A;font-weight:700">+3%</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#B4BAE0"><span>Jumat · entri jurnal</span><span style="color:#5FD08A;font-weight:700">+2%</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#B4BAE0"><span>Kamis · serangan mini-game</span><span style="color:#5FD08A;font-weight:700">+5%</span></div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#4FD1C5;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="lotus" size="17" color="#0D1030"></riung-icon>Latihan yang dia takuti</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Detail bos — Si Hakim</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Detail Si Hakim" style="min-height:100%;background:linear-gradient(180deg,rgba(139,92,246,0.16) 0%,#0D1030 40%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;font-size:15px;font-weight:700">Si Hakim</div>
+          <span style="font-size:10px;font-weight:700;color:#B39BF9;border:1px solid #8B5CF6;border-radius:999px;padding:3px 9px">BOS · 38%</span>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+            <div style="width:172px;height:181px;animation:wobble 6s ease-in-out infinite"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+            <div style="font-size:13px;color:#B4BAE0;line-height:1.55;max-width:310px;text-wrap:pretty">Bos dari semua monster. Suara hakim di kepalamu yang memvonis sebelum kamu mencoba: "pasti gagal", "kamu nggak pantas".</div>
+            <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:5px">
+              <div style="height:9px;border-radius:999px;background:#151A3A;overflow:hidden"><div style="width:38%;height:100%;background:linear-gradient(90deg,#8B5CF6,#B39BF9)"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#7E85B0"><span>Liar</span><span style="color:#B39BF9;font-weight:700">38%</span><span>Jinak</span></div>
+            </div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12px;font-weight:700;color:#B39BF9;letter-spacing:0.6px">DI DUNIA NYATA, DIA ADALAH…</div>
+            <div style="font-size:13px;color:#B4BAE0;line-height:1.6;text-wrap:pretty">Kritik diri yang kejam — dalam CBT disebut <span style="color:#F4F6FF;font-weight:700">negative self-talk</span>. Dia memberi makan keenam anak buahnya: dari vonisnya lahir cemas, malas gerak, dan rasa nggak cukup baik.</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.3);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:11px;font-weight:700;color:#B39BF9;letter-spacing:0.6px">APA KATANYA</div>
+              <div style="font-size:12px;line-height:1.55;color:#F4F6FF;font-style:italic;text-wrap:pretty">"Kamu pasti gagal — kayak biasanya."</div>
+            </div>
+            <div style="flex:1;background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.3);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:11px;font-weight:700;color:#4FD1C5;letter-spacing:0.6px">FAKTANYA</div>
+              <div style="font-size:12px;line-height:1.55;color:#B4BAE0;text-wrap:pretty">"Selalu" dan "nggak pernah" hampir selalu keliru. Satu keberhasilan kecil sudah cukup buat mematahkan vonisnya — dan kamu punya lebih dari satu.</div>
+            </div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:11px">
+            <div style="font-size:12px;font-weight:700;color:#B4BAE0;letter-spacing:0.6px">TEKNIK PENANGKAL</div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="width:36px;height:36px;border-radius:11px;background:rgba(255,184,119,0.15);display:flex;align-items:center;justify-content:center"><riung-icon name="journal" size="18" color="#FFB877"></riung-icon></div><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.45">Catat bukti sebaliknya di jurnal</div><div style="font-size:11px;font-weight:800;color:#B39BF9;background:rgba(139,92,246,0.16);border-radius:999px;padding:4px 10px">5×</div></div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="width:36px;height:36px;border-radius:11px;background:rgba(79,209,197,0.15);display:flex;align-items:center;justify-content:center"><riung-icon name="sparkChat" size="18" color="#4FD1C5"></riung-icon></div><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.45">Bicara ke dirimu seperti ke teman baik</div><div style="font-size:11px;font-weight:800;color:#B39BF9;background:rgba(139,92,246,0.16);border-radius:999px;padding:4px 10px">3×</div></div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="width:36px;height:36px;border-radius:11px;background:rgba(124,140,255,0.15);display:flex;align-items:center;justify-content:center"><riung-icon name="edit" size="18" color="#7C8CFF"></riung-icon></div><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.45">Beri nama vonisnya: "itu Si Hakim, bukan fakta"</div><div style="font-size:11px;font-weight:800;color:#B39BF9;background:rgba(139,92,246,0.16);border-radius:999px;padding:4px 10px">2×</div></div>
+            <div style="display:flex;align-items:center;gap:8px;border-top:1px solid #1E2450;padding-top:10px"><riung-icon name="zap" size="14" color="#B39BF9"></riung-icon><div style="font-size:11px;color:#7E85B0;line-height:1.45">Teknik yang tepat = serangan lebih besar di mini-game.</div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+            <div style="font-size:12px;font-weight:700;color:#B4BAE0;letter-spacing:0.6px">ANAK BUAH YANG DIA PIMPIN</div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:0 4px">
+              <sc-for list="{{ minions }}" as="mi" hint-placeholder-count="6">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                  <div style="width:34px;height:36px;opacity:{{ mi.opacity }}"><riung-monster monster="{{ mi.id }}" state="{{ mi.state }}" detail="low"></riung-monster></div>
+                  <div style="font-size:8px;color:#7E85B0">{{ mi.short }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:11px;color:#7E85B0;line-height:1.5;text-wrap:pretty">Tiap anak buah yang jinak mengurangi kekuatan Si Hakim 5%. Jinakkan semuanya buat membuka pertarungan terakhir.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;gap:10px">
+          <div style="flex:1;height:54px;border-radius:16px;background:#8B5CF6;color:#F4F6FF;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="zap" size="16" color="#F4F6FF"></riung-icon>Serang (1 tiket)</div>
+          <div style="flex:1;height:54px;border-radius:16px;border:1.5px solid #2A3160;color:#B4BAE0;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center">Latihan CBT</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Intro serangan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Intro mini-game" style="min-height:100%;background:radial-gradient(circle at 50% 30%,rgba(139,92,246,0.18),rgba(13,16,48,0) 60%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="close" size="20" color="#7E85B0"></riung-icon>
+          <div style="display:flex;align-items:center;gap:5px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:6px 12px"><riung-icon name="ticket" size="14" color="#4FD1C5"></riung-icon><span style="font-size:12px;font-weight:700;color:#4FD1C5">×3</span></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center">
+          <div style="width:150px;height:158px;animation:wobble 3s ease-in-out infinite"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.4px;color:#B39BF9">PECAHKAN BALOK · SERANGAN BOS</div>
+          <div style="font-size:23px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Si Hakim sedang lengah</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:300px;text-wrap:pretty">Pantulkan bola, pecahkan balok "vonis"-nya. Tiap balok pecah = kritik yang kamu patahkan. 60 detik per serangan.</div>
+          <div style="display:flex;gap:10px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:14px;padding:11px 15px;display:flex;flex-direction:column;align-items:center;gap:3px"><riung-icon name="zap" size="17" color="#B39BF9"></riung-icon><div style="font-size:12px;font-weight:800;color:#B39BF9">-5%</div><div style="font-size:9px;color:#7E85B0">kekuatan bos</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:14px;padding:11px 15px;display:flex;flex-direction:column;align-items:center;gap:3px"><riung-icon name="coin" size="17" color="#FFB877"></riung-icon><div style="font-size:12px;font-weight:800;color:#FFB877">+{{ minigameReward }}</div><div style="font-size:9px;color:#7E85B0">koin bila menang</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:14px;padding:11px 15px;display:flex;flex-direction:column;align-items:center;gap:3px"><riung-icon name="ticket" size="17" color="#4FD1C5"></riung-icon><div style="font-size:12px;font-weight:800;color:#4FD1C5">1 tiket</div><div style="font-size:9px;color:#7E85B0">per serangan</div></div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#8B5CF6;color:#F4F6FF;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="zap" size="17" color="#F4F6FF"></riung-icon>Mulai serangan</div>
+          <div style="text-align:center;font-size:12px;color:#7E85B0;padding:4px">Hari ini: 1 gratis + 2 dari latihan · maks {{ maxFights }} serangan sehari</div>
+          <div style="text-align:center;font-size:11px;color:#7E85B0;line-height:1.5;padding:0 8px;text-wrap:pretty">Progres monstermu nggak bisa dibeli — cuma latihan yang bisa. Latihan yang baik itu sedikit tapi rutin.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Mini-game aktif</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Mini-game aktif" style="min-height:100%;background:#0A0C28;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="pause" size="19" color="#7E85B0"></riung-icon>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="font-size:13px;font-weight:800;color:#4FD1C5">0:42</div>
+            <div style="font-size:13px;font-weight:800;color:#FFB877">1.240 pts</div>
+          </div>
+        </div>
+        <div style="padding:4px 20px 10px;display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:42px;animation:wobble 2s ease-in-out infinite"><riung-monster monster="hakim" state="wild" detail="low"></riung-monster></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <div style="height:8px;border-radius:999px;background:#151A3A;overflow:hidden"><div style="width:64%;height:100%;background:linear-gradient(90deg,#8B5CF6,#B39BF9)"></div></div>
+            <div style="font-size:10px;color:#7E85B0">HP Si Hakim · 64%</div>
+          </div>
+        </div>
+        <div style="flex:1;position:relative;margin:0 20px;border-radius:20px;background:#0D1030;border:1px solid #1E2450;overflow:hidden">
+          <div style="position:absolute;top:16px;left:14px;right:14px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+            <sc-for list="{{ blocks }}" as="bk" hint-placeholder-count="15">
+              <div style="height:26px;border-radius:7px;background:{{ bk.bg }};border:1px solid {{ bk.border }};display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:{{ bk.color }};opacity:{{ bk.opacity }}">{{ bk.label }}</div>
+            </sc-for>
+          </div>
+          <div style="position:absolute;top:52%;left:58%;width:13px;height:13px;border-radius:999px;background:#4FD1C5;box-shadow:0 0 14px rgba(79,209,197,0.8)"></div>
+          <div style="position:absolute;top:47%;left:52%;width:9px;height:9px;border-radius:999px;background:rgba(79,209,197,0.4)"></div>
+          <div style="position:absolute;top:43%;left:47%;width:6px;height:6px;border-radius:999px;background:rgba(79,209,197,0.2)"></div>
+          <div style="position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;color:#565B7A">geser buat gerakkan papan</div>
+          <div style="position:absolute;bottom:22px;left:34%;width:104px;height:13px;border-radius:999px;background:linear-gradient(90deg,#7C8CFF,#4FD1C5)"></div>
+        </div>
+        <div style="padding:12px 20px 16px;text-align:center;font-size:11px;color:#7E85B0">Balok "PASTI GAGAL" pecah! +120 pts</div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Menang</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Mini-game menang" style="min-height:100%;background:radial-gradient(circle at 50% 22%,rgba(95,208,138,0.18),rgba(13,16,48,0) 55%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="position:relative;width:150px;height:158px">
+            <div style="width:100%;height:100%;animation:wobble 1.6s ease-in-out infinite"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+            <div style="position:absolute;top:-4px;right:-10px;font-size:26px">💥</div>
+          </div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.4px;color:#5FD08A">SERANGAN BERHASIL</div>
+          <div style="font-size:24px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Vonisnya patah!</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;max-width:300px;text-wrap:pretty">2.180 poin — semua balok pecah. Suara "pasti gagal" itu makin kecil tiap kali kamu melawannya.</div>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="zap" size="20" color="#B39BF9"></riung-icon><div style="font-size:16px;font-weight:800;color:#B39BF9">-5%</div><div style="font-size:10px;color:#7E85B0">HP Si Hakim</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="coin" size="20" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800;color:#FFB877">+{{ minigameReward }}</div><div style="font-size:10px;color:#7E85B0">koin</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="ticket" size="20" color="#4FD1C5"></riung-icon><div style="font-size:16px;font-weight:800;color:#4FD1C5">×2</div><div style="font-size:10px;color:#7E85B0">tiket tersisa</div></div>
+          </div>
+          <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:5px;margin-top:4px">
+            <div style="height:8px;border-radius:999px;background:#151A3A;overflow:hidden"><div style="width:43%;height:100%;background:linear-gradient(90deg,#8B5CF6,#B39BF9)"></div></div>
+            <div style="font-size:11px;color:#7E85B0">Si Hakim: 38% → <span style="color:#B39BF9;font-weight:700">43% menuju jinak</span></div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#8B5CF6;color:#F4F6FF;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="zap" size="17" color="#F4F6FF"></riung-icon>Serang lagi (1 tiket)</div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:6px">Cukup dulu, kembali</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Kalah — tetap suportif</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Mini-game kalah" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="width:132px;height:139px"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Kali ini dia masih bertahan</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:300px;text-wrap:pretty">860 poin — lumayan banget buat percobaan kedua. Poinmu tetap dihitung, dan Si Hakim tetap kena <span style="color:#B39BF9;font-weight:700">-2%</span>.</div>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="zap" size="20" color="#B39BF9"></riung-icon><div style="font-size:16px;font-weight:800;color:#B39BF9">-2%</div><div style="font-size:10px;color:#7E85B0">tetap kena</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="ticket" size="20" color="#4FD1C5"></riung-icon><div style="font-size:16px;font-weight:800;color:#4FD1C5">×2</div><div style="font-size:10px;color:#7E85B0">tiket tersisa</div></div>
+          </div>
+          <div style="background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.25);border-radius:16px;padding:13px 15px;max-width:310px;display:flex;gap:10px;text-align:left">
+            <riung-icon name="info" size="16" color="#4FD1C5"></riung-icon>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">Ini juga latihan CBT: gagal sekali bukan berarti "pasti gagal" — persis pikiran yang lagi kamu lawan.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#8B5CF6;color:#F4F6FF;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="zap" size="17" color="#F4F6FF"></riung-icon>Coba lagi (1 tiket)</div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:6px">Nanti saja</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Monster jinak — perayaan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Monster jinak" style="min-height:100%;background:radial-gradient(circle at 50% 30%,rgba(232,169,78,0.2),rgba(13,16,48,0) 60%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="font-size:22px;letter-spacing:6px">✨ 🎉 ✨</div>
+          <div style="width:170px;height:179px;animation:floaty 3s ease-in-out infinite"><riung-monster monster="waswas" state="tamed"></riung-monster></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.4px;color:#F2C67F">MONSTER KE-3 JINAK</div>
+          <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px;text-wrap:pretty">Si Waswas sekarang temanmu</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:310px;text-wrap:pretty">Dia nggak hilang — kecemasan memang nggak hilang. Tapi sekarang dia ikut kamu, bukan mengejar kamu. Dia akan menemanimu di sesi fokus.</div>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="coin" size="20" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800;color:#FFB877">+{{ tamedBonus }}</div><div style="font-size:10px;color:#7E85B0">bonus koin</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="zap" size="20" color="#B39BF9"></riung-icon><div style="font-size:16px;font-weight:800;color:#B39BF9">-5%</div><div style="font-size:10px;color:#7E85B0">HP Si Hakim</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="monster" size="20" color="#E8A94E"></riung-icon><div style="font-size:16px;font-weight:800">3/7</div><div style="font-size:10px;color:#7E85B0">jinak</div></div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#FFB877;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="share" size="17" color="#0D1030"></riung-icon>Bagikan pencapaian</div>
+          <div style="text-align:center;font-size:11px;color:#7E85B0">Yang dibagikan cuma kartunya — bukan isi jurnal atau datamu 🔒</div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:2px">Lanjut</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;minigameReward&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:0,&quot;max&quot;:50,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi&quot;},&quot;tamedBonus&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:50,&quot;min&quot;:0,&quot;max&quot;:500,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi&quot;},&quot;maxFights&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;min&quot;:1,&quot;max&quot;:10,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const minigameReward = this.props.minigameReward ?? 8;
+    const tamedBonus = this.props.tamedBonus ?? 50;
+    const maxFights = this.props.maxFights ?? 4;
+    const navItems = [
+      ['home','Beranda','#7E85B0'],['compass','Jelajah','#7E85B0'],['focus','Fokus','#7E85B0'],['monster','Monster','#7C8CFF'],['user','Profil','#7E85B0'],
+    ].map(([icon,label,color]) => ({ icon, label, color }));
+    const vault = [
+      { id:'kabut', name:'Si Kabut', sub:'JINAK · pakai topi rajut', pct:'100%', tamed:true, cos:'topi' },
+      { id:'waswas', name:'Si Waswas', sub:'72% menuju jinak', pct:'72%', tamed:false, active:true },
+      { id:'meronta', name:'Si Meronta', sub:'JINAK · di bantal mini', pct:'100%', tamed:true, cos:'bantal' },
+      { id:'cermin', name:'Si Cermin', sub:'34% menuju jinak', pct:'34%', tamed:false },
+      { id:'sempurna', name:'Si Sempurna', sub:'12% menuju jinak', pct:'12%', tamed:false },
+      { id:'mengelak', name:'Si Mengelak', sub:'21% menuju jinak', pct:'21%', tamed:false },
+    ].map(v => ({
+      id: v.id, name: v.name, sub: v.sub, pct: v.pct, cos: v.cos || '',
+      state: v.tamed ? 'tamed' : 'wild',
+      opacity: v.tamed ? '1' : (v.active ? '0.95' : '0.7'),
+      subColor: v.tamed ? '#5FD08A' : '#7E85B0',
+      barColor: v.tamed ? '#5FD08A' : (window.RIUNG_MONSTER_COLORS ? window.RIUNG_MONSTER_COLORS[v.id] : '#7C8CFF'),
+    }));
+    const minions = [
+      { id:'kabut', short:'Kabut', tamed:true },{ id:'waswas', short:'Waswas', tamed:false },{ id:'meronta', short:'Meronta', tamed:true },
+      { id:'cermin', short:'Cermin', tamed:false },{ id:'sempurna', short:'Sempurna', tamed:false },{ id:'mengelak', short:'Mengelak', tamed:false },
+    ].map(m => ({ id: m.id, short: m.short, state: m.tamed ? 'tamed' : 'wild', opacity: m.tamed ? '1' : '0.55' }));
+    const labels = ['PASTI GAGAL','NGGAK PANTAS','TELAT MULAI','KURANG PINTAR','BUKAN BAKATMU'];
+    const blocks = Array.from({ length: 15 }, (_, i) => {
+      const broken = [1,2,5,7,11].includes(i);
+      return {
+        label: broken ? '' : labels[i % 5],
+        bg: broken ? 'transparent' : 'rgba(139,92,246,0.18)',
+        border: broken ? 'transparent' : '#8B5CF6',
+        color: '#B39BF9',
+        opacity: broken ? '0' : '1',
+      };
+    });
+    return { minigameReward, tamedBonus, maxFights, navItems, vault, minions, blocks };
+  }
+}
+</script>
+</body>
+</html>

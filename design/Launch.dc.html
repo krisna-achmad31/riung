@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+@keyframes pulse{0%,100%{opacity:0.35}50%{opacity:1}}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Launch &amp; entry</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">5 layar — splash · daftar · masuk · lupa sandi · izin notifikasi</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Splash</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Splash" style="min-height:100%;background:radial-gradient(circle at 50% 42%,rgba(124,140,255,0.24),rgba(13,16,48,0) 55%),#0D1030;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="width:112px;height:112px;border-radius:32px;background:linear-gradient(135deg,#7C8CFF,#5A66D9);display:flex;align-items:center;justify-content:center;box-shadow:0 16px 50px rgba(124,140,255,0.4)">
+          <div style="width:72px;height:76px"><riung-monster monster="hakim" state="tamed"></riung-monster></div>
+        </div>
+        <div style="font-size:34px;font-weight:800;letter-spacing:-0.5px">Riung</div>
+        <div style="font-size:14px;color:#B4BAE0">Jinakkan monster dalam pikiranmu</div>
+        <div style="display:flex;gap:7px;margin-top:26px">
+          <div style="width:8px;height:8px;border-radius:999px;background:#7C8CFF;animation:pulse 1.2s infinite"></div>
+          <div style="width:8px;height:8px;border-radius:999px;background:#7C8CFF;animation:pulse 1.2s 0.2s infinite"></div>
+          <div style="width:8px;height:8px;border-radius:999px;background:#7C8CFF;animation:pulse 1.2s 0.4s infinite"></div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Daftar (email)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Daftar" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="padding:12px 20px"><riung-icon name="back" size="22" color="#B4BAE0"></riung-icon></div>
+        <div style="flex:1;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="width:70px;height:74px"><riung-monster monster="waswas" state="tamed"></riung-monster></div>
+          <div>
+            <div style="font-size:26px;font-weight:800;letter-spacing:-0.4px">Buat akunmu</div>
+            <div style="font-size:14px;color:#B4BAE0;margin-top:6px;line-height:1.5">Gratis untuk mulai — datamu aman dan tidak dibagikan.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="border:1.5px solid #7C8CFF;border-radius:16px;background:#151A3A;padding:13px 16px">
+              <div style="font-size:11px;font-weight:600;color:#7C8CFF;margin-bottom:3px">Email</div>
+              <div style="font-size:15px">raka.pratama@gmail.com<span style="color:#7C8CFF">|</span></div>
+            </div>
+            <div style="border:1.5px solid #2A3160;border-radius:16px;background:#151A3A;padding:13px 16px;display:flex;align-items:center;gap:10px">
+              <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#7E85B0;margin-bottom:3px">Kata sandi</div><div style="font-size:15px;letter-spacing:3px">••••••••</div></div>
+              <riung-icon name="eyeOpen" size="20" color="#7E85B0"></riung-icon>
+            </div>
+          </div>
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Daftar</div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="flex:1;height:1px;background:#2A3160"></div><div style="font-size:12px;color:#7E85B0">atau</div><div style="flex:1;height:1px;background:#2A3160"></div></div>
+          <div style="height:54px;border-radius:16px;border:1.5px solid #2A3160;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:600"><div style="width:20px;height:20px;border-radius:999px;background:#fff;color:#0D1030;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">G</div>Lanjutkan dengan Google</div>
+        </div>
+        <div style="padding:14px 24px 18px;text-align:center;font-size:13px;color:#7E85B0">Sudah punya akun? <span style="color:#7C8CFF;font-weight:600">Masuk</span></div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Masuk</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Masuk" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="padding:12px 20px"><riung-icon name="back" size="22" color="#B4BAE0"></riung-icon></div>
+        <div style="flex:1;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="width:70px;height:74px"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          <div>
+            <div style="font-size:26px;font-weight:800;letter-spacing:-0.4px">Selamat datang kembali</div>
+            <div style="font-size:14px;color:#B4BAE0;margin-top:6px">Monster-monstermu menunggumu.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="border:1.5px solid #2A3160;border-radius:16px;background:#151A3A;padding:13px 16px">
+              <div style="font-size:11px;font-weight:600;color:#7E85B0;margin-bottom:3px">Email</div>
+              <div style="font-size:15px">raka.pratama@gmail.com</div>
+            </div>
+            <div style="border:1.5px solid #2A3160;border-radius:16px;background:#151A3A;padding:13px 16px;display:flex;align-items:center;gap:10px">
+              <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#7E85B0;margin-bottom:3px">Kata sandi</div><div style="font-size:15px;letter-spacing:3px">••••••••</div></div>
+              <riung-icon name="eyeOpen" size="20" color="#7E85B0"></riung-icon>
+            </div>
+            <div style="text-align:right;font-size:13px;font-weight:600;color:#7C8CFF">Lupa kata sandi?</div>
+          </div>
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Masuk</div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="flex:1;height:1px;background:#2A3160"></div><div style="font-size:12px;color:#7E85B0">atau</div><div style="flex:1;height:1px;background:#2A3160"></div></div>
+          <div style="height:54px;border-radius:16px;border:1.5px solid #2A3160;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:600"><div style="width:20px;height:20px;border-radius:999px;background:#fff;color:#0D1030;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">G</div>Lanjutkan dengan Google</div>
+        </div>
+        <div style="padding:14px 24px 18px;text-align:center;font-size:13px;color:#7E85B0">Belum punya akun? <span style="color:#7C8CFF;font-weight:600">Daftar</span></div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Lupa / reset kata sandi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Lupa kata sandi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="padding:12px 20px"><riung-icon name="back" size="22" color="#B4BAE0"></riung-icon></div>
+        <div style="flex:1;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="width:70px;height:74px"><riung-monster monster="meronta" state="tamed"></riung-monster></div>
+          <div>
+            <div style="font-size:26px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Lupa kata sandi? Tenang.</div>
+            <div style="font-size:14px;color:#B4BAE0;margin-top:6px;line-height:1.55">Masukkan emailmu — kami kirim tautan untuk membuat kata sandi baru.</div>
+          </div>
+          <div style="border:1.5px solid #7C8CFF;border-radius:16px;background:#151A3A;padding:13px 16px">
+            <div style="font-size:11px;font-weight:600;color:#7C8CFF;margin-bottom:3px">Email</div>
+            <div style="font-size:15px">raka.pratama@gmail.com<span style="color:#7C8CFF">|</span></div>
+          </div>
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Kirim tautan reset</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(79,209,197,0.1);border:1px solid rgba(79,209,197,0.3);border-radius:14px;padding:13px 15px">
+            <riung-icon name="mail" size="18" color="#4FD1C5"></riung-icon>
+            <div style="font-size:13px;line-height:1.5;color:#B4BAE0">Tautan terkirim! Cek kotak masuk (atau folder spam) — berlaku 30 menit.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;text-align:center;font-size:13px;color:#7E85B0">Ingat lagi kata sandimu? <span style="color:#7C8CFF;font-weight:600">Masuk</span></div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Izin notifikasi + dialog sistem</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Izin notifikasi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;position:relative">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:44px 28px;gap:14px;text-align:center;filter:brightness(0.55)">
+          <div style="position:relative;width:120px;height:126px">
+            <riung-monster monster="waswas" state="tamed"></riung-monster>
+            <div style="position:absolute;top:-4px;right:-10px;width:40px;height:40px;border-radius:999px;background:#FFB877;display:flex;align-items:center;justify-content:center"><riung-icon name="bell" size="21" color="#0D1030"></riung-icon></div>
+          </div>
+          <div style="font-size:24px;font-weight:800;line-height:1.3;text-wrap:pretty">Biar kami ingatkan dengan lembut</div>
+          <div style="font-size:14px;color:#B4BAE0;line-height:1.55;max-width:300px">Satu pengingat kecil tiap pagi untuk check-in — tanpa spam, tanpa drama. Kamu bisa mengaturnya kapan saja.</div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px;filter:brightness(0.55)">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Nyalakan pengingat</div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:6px">Nanti saja</div>
+        </div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:300px;background:#252A4E;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,0.55);display:flex;flex-direction:column;gap:14px">
+          <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#7C8CFF,#5A66D9);display:flex;align-items:center;justify-content:center;align-self:center"><div style="width:24px;height:25px"><riung-monster monster="hakim" state="tamed" detail="low"></riung-monster></div></div>
+          <div style="font-size:15px;line-height:1.5;text-align:center;color:#F4F6FF">Izinkan <b>Riung</b> mengirimi Anda notifikasi?</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:44px;border-radius:999px;background:#7C8CFF;color:#0D1030;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">Izinkan</div>
+            <div style="height:44px;border-radius:999px;color:#B4BAE0;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center">Jangan izinkan</div>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+</body>
+</html>

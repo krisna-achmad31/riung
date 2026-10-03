@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Riung</string>
+    <string name="lock_accessibility_summary">Kunci Aplikasi Beku</string>
+    <string name="lock_accessibility_description">Riung memakai izin ini hanya untuk tahu kapan aplikasi yang kamu bekukan dibuka, supaya bisa menampilkan layar jeda saat batas hariannya tercapai. Riung tidak membaca isi layar, chat, atau apa yang kamu ketik, dan tidak mengirim data ini ke mana pun. Matikan kapan saja di sini.</string>
+</resources>

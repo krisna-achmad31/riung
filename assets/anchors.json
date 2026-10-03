@@ -1,0 +1,250 @@
+{
+  "version": "1.0",
+  "sourceViewBox": {
+    "width": 200,
+    "height": 210
+  },
+  "coordinateSystem": "Anchor x/y are normalized 0-1 relative to the monster SVG viewBox (multiply by rendered width/height). scale multiplies the cosmetic's native size; rotationDeg rotates around the anchor point. Anchors are identical for liar and jinak states.",
+  "compositingOrder": [
+    "bantal_mini (under, zIndex 0)",
+    "monster body (zIndex 1)",
+    "topi_rajut / syal_hangat / bingkai_emas (over, zIndex 2)"
+  ],
+  "monsters": {
+    "meronta": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "meronta_liar.svg",
+        "jinak": "meronta_jinak.svg"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.3143,
+          "scale": 1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.7143,
+          "scale": 1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.8381,
+          "scale": 1.12,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "waswas": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "waswas_liar.svg",
+        "jinak": "waswas_jinak.svg"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.2762,
+          "scale": 1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.7524,
+          "scale": 1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.8667,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "kabut": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "kabut_liar.svg",
+        "jinak": "kabut_jinak.svg"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.2857,
+          "scale": 1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.7143,
+          "scale": 1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.8095,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "cermin": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "cermin_liar.svg",
+        "jinak": "cermin_jinak.svg"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.2381,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.7238,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.8476,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "sempurna": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "sempurna_liar.svg",
+        "jinak": "sempurna_jinak.svg"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.3333,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.7238,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.8381,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "mengelak": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "mengelak_liar.svg",
+        "jinak": "mengelak_jinak.svg"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.58,
+          "y": 0.1905,
+          "scale": 0.88,
+          "rotationDeg": -12
+        },
+        "neck": {
+          "x": 0.54,
+          "y": 0.7048,
+          "scale": 0.95,
+          "rotationDeg": -8
+        },
+        "base": {
+          "x": 0.49,
+          "y": 0.8476,
+          "scale": 1.05,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "hakim": {
+      "boss": true,
+      "bossScale": 1.4,
+      "files": {
+        "liar": "hakim_liar.svg",
+        "jinak": "hakim_jinak.svg"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.1333,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.7714,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.8667,
+          "scale": 1.2,
+          "rotationDeg": 0
+        }
+      }
+    }
+  },
+  "cosmetics": {
+    "topi_rajut": {
+      "file": "topi_rajut.svg",
+      "slot": "head",
+      "zIndex": 2,
+      "layer": "over",
+      "canonicalWearer": "kabut",
+      "rarity": "common",
+      "priceProp": "cosmeticCommonPrice"
+    },
+    "syal_hangat": {
+      "file": "syal_hangat.svg",
+      "slot": "neck",
+      "zIndex": 2,
+      "layer": "over",
+      "canonicalWearer": "waswas",
+      "rarity": "common",
+      "priceProp": "cosmeticCommonPrice"
+    },
+    "bantal_mini": {
+      "file": "bantal_mini.svg",
+      "slot": "base",
+      "zIndex": 0,
+      "layer": "under",
+      "canonicalWearer": "meronta",
+      "rarity": "epic",
+      "priceProp": "cosmeticEpicPrice"
+    },
+    "bingkai_emas": {
+      "file": "bingkai_emas.svg",
+      "slot": "none",
+      "zIndex": 2,
+      "layer": "over",
+      "canonicalWearer": "cermin",
+      "rarity": "legendary",
+      "priceProp": "cosmeticLegendaryPrice",
+      "note": "Cermin-only. Uses absolute geometry in the 200x210 source space (mirror outline), not an anchor. Overlay its viewBox region 1:1 on the monster canvas."
+    }
+  }
+}

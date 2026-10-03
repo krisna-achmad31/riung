@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modify this file to customize your launch splash screen -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- M7 Task 2: ganti dari ?android:colorBackground (ikut tema sistem,
+         bisa putih di light mode) ke warna latar app supaya tidak ada
+         flash putih sebelum Flutter engine ready. drawable-v21 ini yang
+         benar-benar dipakai di runtime sejak minSdk 21 (folder plain
+         drawable/ di atas cuma fallback API<21). -->
+    <item android:drawable="@color/riung_splash_background" />
+
+    <!-- You can insert your own image assets here -->
+    <!-- <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/launch_image" />
+    </item> -->
+</layer-list>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Better Me &amp; Profil</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">8 layar — Better Me · kalender latihan · profil · pengaturan · notifikasi · bantuan krisis · langganan · hapus akun</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Better Me — perkembangan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Better Me" style="min-height:100%;background:linear-gradient(180deg,#12163F 0%,#0D1030 30%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Better Me</div><div style="font-size:13px;color:#7E85B0">Perubahan kecil yang kelihatan kalau dikumpulkan</div></div>
+          <div style="background:linear-gradient(135deg,#1E2450,#2A2F63);border:1px solid #2A3160;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:58px;height:61px"><riung-monster monster="waswas" state="tamed" detail="low"></riung-monster></div>
+              <div style="flex:1"><div style="font-size:15px;font-weight:800">Skor cemasmu turun 18%</div><div style="font-size:12px;color:#B4BAE0;margin-top:2px">dibanding saat kamu mulai, 27 hari lalu</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:5px;height:72px">
+              <sc-for list="{{ progressBars }}" as="pb" hint-placeholder-count="9">
+                <div style="flex:1;border-radius:5px 5px 2px 2px;background:{{ pb.color }};height:{{ pb.h }}"></div>
+              </sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#7E85B0"><span>Minggu 1</span><span>Minggu 4</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <sc-for list="{{ betterStats }}" as="bs" hint-placeholder-count="4">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:6px">
+                <riung-icon name="{{ bs.icon }}" size="19" color="{{ bs.color }}"></riung-icon>
+                <div style="font-size:19px;font-weight:800;color:{{ bs.color }}">{{ bs.val }}</div>
+                <div style="font-size:11px;color:#7E85B0;line-height:1.4">{{ bs.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:11px;margin-bottom:8px">
+            <div style="font-size:12px;font-weight:700;color:#B4BAE0;letter-spacing:0.6px">PENCAPAIAN</div>
+            <sc-for list="{{ milestones }}" as="ms" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:11px">
+                <div style="width:36px;height:36px;border-radius:12px;background:{{ ms.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="{{ ms.icon }}" size="17" color="{{ ms.color }}"></riung-icon></div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">{{ ms.title }}</div><div style="font-size:11px;color:#7E85B0">{{ ms.sub }}</div></div>
+                <riung-icon name="check" size="15" color="#5FD08A"></riung-icon>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Kalender latihan bulanan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Kalender latihan" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;font-size:15px;font-weight:700">Kalender latihan</div>
+          <riung-icon name="share" size="19" color="#7E85B0"></riung-icon>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 20px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px">
+            <riung-icon name="back" size="17" color="#7E85B0"></riung-icon>
+            <div style="font-size:16px;font-weight:800">Juli 2026</div>
+            <riung-icon name="chevR" size="17" color="#3A4066"></riung-icon>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="flame" size="18" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800">13 hari</div><div style="font-size:10px;color:#7E85B0">streak sekarang</div></div>
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="star" size="18" color="#B39BF9"></riung-icon><div style="font-size:16px;font-weight:800">21 hari</div><div style="font-size:10px;color:#7E85B0">streak terbaik</div></div>
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="calendar" size="18" color="#4FD1C5"></riung-icon><div style="font-size:16px;font-weight:800">7/7</div><div style="font-size:10px;color:#7E85B0">minggu ini</div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+              <sc-for list="{{ calWeekdays }}" as="wd" hint-placeholder-count="7">
+                <div style="text-align:center;font-size:10px;font-weight:700;color:#565B7A">{{ wd }}</div>
+              </sc-for>
+              <sc-for list="{{ calDays }}" as="cd" hint-placeholder-count="33">
+                <div style="height:38px;border-radius:12px;background:{{ cd.bg }};border:{{ cd.border }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">
+                  <div style="font-size:12px;font-weight:{{ cd.weight }};color:{{ cd.color }}">{{ cd.label }}</div>
+                  <div style="width:4px;height:4px;border-radius:999px;background:{{ cd.dot }}"></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:16px;height:16px;border-radius:6px;background:#4FD1C5"></div><div style="font-size:12px;color:#B4BAE0">Hari penuh — latihan + misi harian selesai</div></div>
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:16px;height:16px;border-radius:6px;background:rgba(124,140,255,0.22);border:1px solid rgba(124,140,255,0.35)"></div><div style="font-size:12px;color:#B4BAE0">Latihan dilakukan</div></div>
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:16px;height:16px;border-radius:6px;display:flex;align-items:center;justify-content:center"><div style="width:5px;height:5px;border-radius:999px;background:#FFB877"></div></div><div style="font-size:12px;color:#B4BAE0">Pakai koin secara sadar</div></div>
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:16px;height:16px;border-radius:6px;border:1px solid #2A3160"></div><div style="font-size:12px;color:#B4BAE0">Hari kosong</div></div>
+          </div>
+          <div style="font-size:11px;color:#7E85B0;text-align:center;line-height:1.5;margin-bottom:8px;text-wrap:pretty">Hari kosong bukan kegagalan — kalender ini catatan, bukan rapor.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Profil</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Profil" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Profil</div><riung-icon name="gear" size="21" color="#B4BAE0"></riung-icon></div>
+          <div style="background:linear-gradient(160deg,#1E2450,#12163A);border:1px solid #2A3160;border-radius:22px;padding:20px;display:flex;align-items:center;gap:14px">
+            <div style="width:64px;height:64px;border-radius:22px;background:linear-gradient(135deg,#7C8CFF,#4FD1C5);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0D1030">{{ userInitial }}</div>
+            <div style="flex:1"><div style="font-size:18px;font-weight:800">{{ userName }}</div><div style="font-size:12px;color:#B39BF9;font-weight:700;margin-top:2px">Penjinak pemula · Level 4</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">Bergabung 30 Juni 2026</div></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="flame" size="18" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800">13</div><div style="font-size:10px;color:#7E85B0">hari streak</div></div>
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="coin" size="18" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800;color:#FFB877">145</div><div style="font-size:10px;color:#7E85B0">koin</div></div>
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="monster" size="18" color="#E8A94E"></riung-icon><div style="font-size:16px;font-weight:800">2/7</div><div style="font-size:10px;color:#7E85B0">jinak</div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;overflow:hidden;margin-bottom:8px">
+            <sc-for list="{{ profileMenu }}" as="pm" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;border-bottom:1px solid #1E2450">
+                <riung-icon name="{{ pm.icon }}" size="19" color="{{ pm.color }}"></riung-icon>
+                <div style="flex:1;font-size:14px;font-weight:600;color:{{ pm.textColor }}">{{ pm.label }}</div>
+                <sc-if value="{{ pm.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;color:#0D1030;background:#FFB877;border-radius:999px;padding:3px 9px">{{ pm.badge }}</span></sc-if>
+                <riung-icon name="chevR" size="17" color="#7E85B0"></riung-icon>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItemsProfil }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pengaturan (dengan disclaimer)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pengaturan" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Pengaturan</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 20px;display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:12px;font-weight:700;color:#7E85B0;letter-spacing:0.6px;padding:0 4px">AKUN</div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1E2450"><riung-icon name="mail" size="18" color="#B4BAE0"></riung-icon><div style="flex:1"><div style="font-size:13px;font-weight:600">Email</div><div style="font-size:11px;color:#7E85B0">raka.pratama@gmail.com</div></div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1E2450"><riung-icon name="lock" size="18" color="#B4BAE0"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Kunci jurnal &amp; PIN</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px"><riung-icon name="download" size="18" color="#B4BAE0"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Unduh semua dataku</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#7E85B0;letter-spacing:0.6px;padding:0 4px">APLIKASI</div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1E2450"><riung-icon name="bell" size="18" color="#B4BAE0"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Notifikasi</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1E2450"><riung-icon name="download" size="18" color="#B4BAE0"></riung-icon><div style="flex:1"><div style="font-size:13px;font-weight:600">Unduhan offline</div><div style="font-size:11px;color:#7E85B0">3 sesi · 6,4 MB</div></div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px"><riung-icon name="crown" size="18" color="#FFB877"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Langganan Riung Premium</div><span style="font-size:10px;font-weight:700;color:#0D1030;background:#FFB877;border-radius:999px;padding:3px 9px">AKTIF</span><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#7E85B0;letter-spacing:0.6px;padding:0 4px">DUKUNGAN</div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1E2450"><riung-icon name="shield" size="18" color="#F27C86"></riung-icon><div style="flex:1;font-size:13px;font-weight:600;color:#F27C86">Butuh bantuan sekarang</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1E2450"><riung-icon name="sparkChat" size="18" color="#B4BAE0"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Hubungi tim Riung</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px"><riung-icon name="info" size="18" color="#B4BAE0"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Kebijakan privasi</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+          </div>
+          <div style="background:rgba(124,140,255,0.06);border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;gap:10px;margin-bottom:4px">
+            <riung-icon name="info" size="16" color="#7E85B0"></riung-icon>
+            <div style="font-size:11px;color:#7E85B0;line-height:1.55;text-wrap:pretty">Riung adalah alat bantu kesejahteraan mental berbasis latihan CBT, bukan pengganti diagnosis, terapi, atau penanganan profesional. Kalau kondisimu terasa berat atau membahayakan, hubungi profesional atau layanan krisis di halaman "Butuh bantuan sekarang".</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+            <div style="text-align:center;font-size:13px;font-weight:600;color:#B4BAE0;padding:10px">Keluar akun</div>
+            <div style="text-align:center;font-size:12px;font-weight:600;color:#F27C86;padding:4px">Hapus akun</div>
+            <div style="text-align:center;font-size:10px;color:#565B7A">Riung v2.4.1</div>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Notifikasi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pengaturan notifikasi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Notifikasi</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;padding:0 4px;text-wrap:pretty">Riung nggak akan spam. Semua pengingat maksimal sekali per hari, dan bisa dimatikan satu-satu.</div>
+          <sc-for list="{{ notifSettings }}" as="ns" hint-placeholder-count="5">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:15px 16px;display:flex;align-items:center;gap:12px">
+              <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ ns.title }}</div><div style="font-size:11px;color:#7E85B0;margin-top:3px;line-height:1.45">{{ ns.sub }}</div></div>
+              <div style="width:44px;height:26px;border-radius:999px;background:{{ ns.togBg }};position:relative;flex-shrink:0"><div style="position:absolute;top:3px;{{ ns.togPos }};width:20px;height:20px;border-radius:999px;background:{{ ns.knob }}"></div></div>
+            </div>
+          </sc-for>
+          <div style="background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.25);border-radius:16px;padding:14px;display:flex;gap:10px;margin-bottom:8px">
+            <riung-icon name="moon" size="16" color="#4FD1C5"></riung-icon>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5">Mode hening otomatis 22:30–06:00 — mengikuti target tidurmu.</div>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Bantuan krisis</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Bantuan krisis" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Butuh bantuan sekarang</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:14px;color:#B4BAE0;line-height:1.6;text-wrap:pretty">Kalau kamu sedang dalam kondisi yang terasa nggak tertahankan, atau punya pikiran menyakiti diri — kamu berhak dibantu manusia sungguhan, secepatnya. Ini bukan hal yang harus kamu hadapi sendirian.</div>
+          <div style="background:rgba(242,124,134,0.1);border:1.5px solid rgba(242,124,134,0.4);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12px;font-weight:700;color:#F27C86;letter-spacing:0.6px">DARURAT · 24 JAM</div>
+            <div style="font-size:16px;font-weight:800">Layanan Kesehatan Jiwa Kemenkes</div>
+            <div style="height:52px;border-radius:14px;background:#F27C86;color:#0D1030;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">📞 Telepon 119 ext. 8</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ crisisLines }}" as="cl" hint-placeholder-count="3">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:15px 16px;display:flex;align-items:center;gap:12px">
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">{{ cl.name }}</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">{{ cl.sub }}</div></div>
+                <div style="font-size:12px;font-weight:700;color:#7C8CFF;border:1px solid #2A3160;border-radius:11px;padding:8px 13px">{{ cl.action }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;gap:10px;margin-bottom:8px">
+            <riung-icon name="lock" size="16" color="#5FD08A"></riung-icon>
+            <div style="font-size:11px;color:#7E85B0;line-height:1.55;text-wrap:pretty">Riung nggak mencatat atau membagikan bahwa kamu membuka halaman ini. Streak dan datamu nggak terpengaruh.</div>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Langganan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Status langganan" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Langgananku</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:linear-gradient(135deg,rgba(255,184,119,0.16),rgba(30,36,80,0.9));border:1.5px solid rgba(255,184,119,0.45);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:9px"><riung-icon name="crown" size="21" color="#FFB877"></riung-icon><span style="font-size:17px;font-weight:800">Riung Premium · Tahunan</span></div>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5">Aktif sampai <span style="font-weight:700;color:#F4F6FF">14 Juli 2027</span> · diperpanjang otomatis</div>
+            <div style="font-size:12px;color:#B4BAE0">Rp {{ yearlyPrice }}/tahun via Google Play</div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:11px">
+            <div style="font-size:12px;font-weight:700;color:#B4BAE0;letter-spacing:0.6px">YANG KAMU DAPAT</div>
+            <div style="display:flex;align-items:center;gap:10px"><riung-icon name="check" size="15" color="#5FD08A"></riung-icon><span style="font-size:13px;color:#B4BAE0">Semua meditasi &amp; cerita tidur (120+)</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><riung-icon name="check" size="15" color="#5FD08A"></riung-icon><span style="font-size:13px;color:#B4BAE0">Panduan jurnal CBT lengkap</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><riung-icon name="check" size="15" color="#5FD08A"></riung-icon><span style="font-size:13px;color:#B4BAE0">Unduhan offline tanpa batas</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><riung-icon name="check" size="15" color="#5FD08A"></riung-icon><span style="font-size:13px;color:#B4BAE0">Laporan Better Me bulanan</span></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1E2450"><riung-icon name="calendar" size="18" color="#B4BAE0"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Riwayat pembayaran</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px"><riung-icon name="close" size="18" color="#B4BAE0"></riung-icon><div style="flex:1;font-size:13px;font-weight:600">Batalkan perpanjangan</div><riung-icon name="chevR" size="16" color="#7E85B0"></riung-icon></div>
+          </div>
+          <div style="font-size:11px;color:#7E85B0;line-height:1.55;text-align:center;padding:0 10px 12px;text-wrap:pretty">Kalau dibatalkan, Riung Premium tetap aktif sampai akhir periode. Progres, jurnal, dan monstermu nggak hilang.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Hapus akun — konfirmasi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Hapus akun" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;padding:8px 24px;opacity:0.3">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 0"><riung-icon name="back" size="22" color="#B4BAE0"></riung-icon><div style="font-size:15px;font-weight:700">Pengaturan</div></div>
+        </div>
+        <div style="background:#151A3A;border-top:1px solid #2A3160;border-radius:24px 24px 0 0;padding:22px 24px 26px;display:flex;flex-direction:column;gap:14px">
+          <div style="width:44px;height:5px;border-radius:999px;background:#2A3160;align-self:center"></div>
+          <div style="width:96px;height:100px;align-self:center"><riung-monster monster="meronta" state="tamed"></riung-monster></div>
+          <div style="font-size:19px;font-weight:800;text-align:center;text-wrap:pretty">Yakin mau menghapus akunmu?</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;text-align:center;text-wrap:pretty">Semua jurnal, progres monster, dan {{ coinBalance }} koinmu akan dihapus permanen dalam 30 hari. Selama 30 hari itu kamu masih bisa berubah pikiran dengan login kembali.</div>
+          <div style="background:rgba(124,140,255,0.08);border:1px solid rgba(124,140,255,0.25);border-radius:14px;padding:12px 14px;font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">Kalau alasannya biaya, paket bulanan bisa dijeda — tanpa kehilangan data. Kalau aplikasinya terasa nggak membantu, kami mau dengar: <span style="color:#7C8CFF;font-weight:700">ceritakan ke tim Riung</span>.</div>
+          <div style="height:52px;border-radius:16px;border:1.5px solid #2A3160;color:#F4F6FF;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center">Nggak jadi, kembali</div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#F27C86;padding:4px">Ya, hapus akunku</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Raka&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Konten&quot;},&quot;coinBalance&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:145,&quot;min&quot;:0,&quot;max&quot;:9999,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Konten&quot;},&quot;yearlyPrice&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;399.000&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Ekonomi&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const userName = this.props.userName ?? 'Raka';
+    const coinBalance = this.props.coinBalance ?? 145;
+    const yearlyPrice = this.props.yearlyPrice ?? '399.000';
+    const navItems = [
+      ['home','Beranda','#7E85B0'],['compass','Jelajah','#7C8CFF'],['focus','Fokus','#7E85B0'],['monster','Monster','#7E85B0'],['user','Profil','#7E85B0'],
+    ].map(([icon,label,color]) => ({ icon, label, color }));
+    const navItemsProfil = [
+      ['home','Beranda','#7E85B0'],['compass','Jelajah','#7E85B0'],['focus','Fokus','#7E85B0'],['monster','Monster','#7E85B0'],['user','Profil','#7C8CFF'],
+    ].map(([icon,label,color]) => ({ icon, label, color }));
+    const progressBars = [
+      { h:'88%' },{ h:'92%' },{ h:'74%' },{ h:'80%' },{ h:'66%' },{ h:'58%' },{ h:'62%' },{ h:'48%' },{ h:'42%' },
+    ].map((b, i) => ({ h: b.h, color: i < 7 ? '#3E477F' : '#4FD1C5' }));
+    const betterStats = [
+      { icon:'lotus', val:'29', label:'sesi meditasi', color:'#4FD1C5' },
+      { icon:'journal', val:'20', label:'entri jurnal', color:'#FFB877' },
+      { icon:'focus', val:'312 mnt', label:'total fokus', color:'#7C8CFF' },
+      { icon:'moon', val:'6,4 jam', label:'rata-rata tidur', color:'#B39DDB' },
+    ];
+    const milestones = [
+      { icon:'flame', title:'7 hari beruntun', sub:'Dicapai 8 Juli', bg:'rgba(255,184,119,0.15)', color:'#FFB877' },
+      { icon:'monster', title:'Monster pertama jinak', sub:'Si Kabut · 12 Juli', bg:'rgba(154,162,184,0.18)', color:'#9AA2B8' },
+      { icon:'journal', title:'10 entri jurnal', sub:'Dicapai 19 Juli', bg:'rgba(255,184,119,0.15)', color:'#FFB877' },
+    ];
+    const profileMenu = [
+      { icon:'chart', label:'Better Me — perkembanganku', color:'#4FD1C5', textColor:'#F4F6FF', badge:'' },
+      { icon:'monster', label:'Brankas monster', color:'#E8A94E', textColor:'#F4F6FF', badge:'' },
+      { icon:'gift', label:'Toko', color:'#FFB877', textColor:'#F4F6FF', badge:'BARU' },
+      { icon:'crown', label:'Riung Premium', color:'#FFB877', textColor:'#F4F6FF', badge:'' },
+      { icon:'bell', label:'Notifikasi', color:'#B4BAE0', textColor:'#F4F6FF', badge:'' },
+      { icon:'shield', label:'Butuh bantuan sekarang', color:'#F27C86', textColor:'#F27C86', badge:'' },
+    ];
+    const notifSettings = [
+      { title:'Check-in pagi', sub:'"Gimana perasaanmu hari ini?" · 07:00', on:true },
+      { title:'Afirmasi harian', sub:'Satu kalimat dari koleksimu · 07:00', on:true },
+      { title:'Pengingat tidur', sub:'30 menit sebelum jam tidurmu', on:true },
+      { title:'Tiket serangan', sub:'Saat monster sedang lengah', on:false },
+      { title:'Kabar dari Riung', sub:'Fitur baru dan konten baru, jarang banget', on:false },
+    ].map(n => ({
+      title: n.title, sub: n.sub,
+      togBg: n.on ? '#7C8CFF' : '#1E2450',
+      togPos: n.on ? 'right:3px' : 'left:3px',
+      knob: n.on ? '#0D1030' : '#565B7A',
+    }));
+    const crisisLines = [
+      { name:'SEJIWA', sub:'Konseling psikologis · 119 ext. 8', action:'Telepon' },
+      { name:'Into The Light Indonesia', sub:'Dukungan sebaya, chat dan email', action:'Buka situs' },
+      { name:'IPK Indonesia', sub:'Direktori psikolog klinis terdekat', action:'Cari' },
+    ];
+    const calWeekdays = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+    const full = [1,4,5,8,11,14,16,18,20,22,25,26];
+    const lat = [2,6,9,10,12,15,17,19,21,23,24];
+    const koin = [19,24];
+    const today = 26;
+    const calDays = [{blank:true},{blank:true}].concat(Array.from({ length: 31 }, (_, i) => ({ d: i + 1 }))).map(c => {
+      if (c.blank) return { label:'', bg:'transparent', border:'none', color:'transparent', dot:'transparent', weight:'400' };
+      const d = c.d;
+      const isFull = full.includes(d), isLat = lat.includes(d), isFuture = d > today;
+      return {
+        label: String(d),
+        bg: isFull ? '#4FD1C5' : isLat ? 'rgba(124,140,255,0.22)' : 'transparent',
+        border: d === today ? '1.5px solid #F4F6FF' : isFuture ? '1px dashed #1E2450' : isFull ? '1px solid #4FD1C5' : isLat ? '1px solid rgba(124,140,255,0.35)' : '1px solid #2A3160',
+        color: isFull ? '#0D1030' : isLat ? '#B4BAE0' : isFuture ? '#3A4066' : '#565B7A',
+        dot: koin.includes(d) ? '#FFB877' : 'transparent',
+        weight: isFull ? '800' : '500',
+      };
+    });
+    return { userName, userInitial: (userName || 'R').slice(0,1).toUpperCase(), coinBalance, yearlyPrice, calWeekdays, calDays, navItems, navItemsProfil, progressBars, betterStats, milestones, profileMenu, notifSettings, crisisLines };
+  }
+}
+</script>
+</body>
+</html>

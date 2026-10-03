@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header style="display:flex;flex-direction:column;gap:10px">
+  <div style="font-size:32px;font-weight:800">Riung · Aplikasi Beku</div>
+  <div style="font-size:14px;color:#7E85B0">7 layar — pilih aplikasi · izin akses (penjelasan) · dialog sistem Android · interstisial batas tercapai · setelah napas · toko "Buka Waktu Scroll" · rekap harian</div>
+  <div style="font-size:13px;color:#4FD1C5;background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.3);border-radius:12px;padding:10px 14px;max-width:760px;text-wrap:pretty"><b>Prinsip flow ini:</b> Riung nggak pernah memblokir total — tujuannya bikin scroll jadi pilihan sadar, bukan refleks. Jeda napas selalu gratis dan selalu pilihan pertama; membuka waktu ekstra selalu bisa, tanpa rasa bersalah.</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pilih aplikasi yang dibekukan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pilih aplikasi beku" style="min-height:100%;background:linear-gradient(180deg,#12163F 0%,#0D1030 30%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;font-size:15px;font-weight:700">Aplikasi Beku</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:4px 20px 8px;display:flex;flex-direction:column;gap:14px">
+          <div>
+            <div style="font-size:21px;font-weight:800;letter-spacing:-0.3px;text-wrap:pretty">Aplikasi mana yang suka nyedot waktumu?</div>
+            <div style="font-size:13px;color:#B4BAE0;margin-top:6px;line-height:1.5;text-wrap:pretty">Pilih aplikasinya dan batas harianmu. Lewat batas, Riung cuma minta kamu jeda sebentar — nggak pernah mengunci.</div>
+          </div>
+          <div style="background:#151A3A;border:1.5px solid #4FD1C5;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:13px">
+              <div style="width:42px;height:42px;border-radius:13px;background:rgba(242,118,111,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#F2766F">Ig</div>
+              <div style="flex:1"><div style="font-size:14px;font-weight:700">Instagram</div><div style="font-size:11px;color:#7E85B0">Rata-rata 2,1 jam/hari</div></div>
+              <div style="position:relative;width:44px;height:26px;border-radius:999px;background:#4FD1C5"><div style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:999px;background:#0D1030"></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:11px;color:#7E85B0;margin-right:2px">Batas harian</div>
+              <div style="font-size:12px;font-weight:700;color:#B4BAE0;border:1.5px solid #2A3160;border-radius:999px;padding:6px 13px">15 mnt</div>
+              <div style="font-size:12px;font-weight:700;color:#0D1030;background:#4FD1C5;border:1.5px solid #4FD1C5;border-radius:999px;padding:6px 13px">30 mnt</div>
+              <div style="font-size:12px;font-weight:700;color:#B4BAE0;border:1.5px solid #2A3160;border-radius:999px;padding:6px 13px">60 mnt</div>
+            </div>
+          </div>
+          <sc-for list="{{ freezeApps }}" as="ap" hint-placeholder-count="4">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:13px">
+              <div style="width:42px;height:42px;border-radius:13px;background:{{ ap.tileBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:{{ ap.tileColor }}">{{ ap.tile }}</div>
+              <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ ap.name }}</div><div style="font-size:11px;color:#7E85B0">{{ ap.sub }}</div></div>
+              <div style="font-size:11px;font-weight:700;color:{{ ap.limitColor }}">{{ ap.limitLabel }}</div>
+              <div style="position:relative;width:44px;height:26px;border-radius:999px;background:{{ ap.togBg }}"><div style="position:absolute;top:3px;{{ ap.togPos }};width:20px;height:20px;border-radius:999px;background:{{ ap.knob }}"></div></div>
+            </div>
+          </sc-for>
+          <div style="background:#0D1030;border:1px dashed #2A3160;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:13px;opacity:0.75">
+            <div style="width:42px;height:42px;border-radius:13px;background:rgba(95,208,138,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#5FD08A">WA</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">WhatsApp</div><div style="font-size:11px;color:#7E85B0;line-height:1.45">Nggak dibekukan — jalur komunikasimu tetap terbuka. Bisa kamu ubah nanti.</div></div>
+          </div>
+        </div>
+        <div style="padding:12px 24px 16px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Bekukan 3 aplikasi</div>
+          <div style="text-align:center;font-size:11px;color:#7E85B0;line-height:1.5;text-wrap:pretty">Riung nggak pernah memblokir total — tujuannya bikin scroll jadi pilihan sadar, bukan refleks.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Izin akses — penjelasan jujur</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Izin akses data penggunaan" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;font-size:15px;font-weight:700">Satu izin dulu</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+            <div style="width:104px;height:109px;animation:floaty 4s ease-in-out infinite"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+            <div style="font-size:22px;font-weight:800;letter-spacing:-0.3px;text-wrap:pretty">Riung perlu izin "Akses data penggunaan"</div>
+            <div style="font-size:13px;color:#B4BAE0;line-height:1.55;max-width:310px;text-wrap:pretty">Ini izin Android buat tahu aplikasi mana yang lagi terbuka dan berapa lama — cuma itu, dan kami mau jujur soal batasnya.</div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:11px">
+            <div style="font-size:12px;font-weight:700;color:#5FD08A;letter-spacing:0.6px">YANG RIUNG BACA</div>
+            <div style="display:flex;gap:10px;align-items:flex-start"><riung-icon name="check" size="15" color="#5FD08A"></riung-icon><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.5">Aplikasi mana yang kamu buka, dan berapa menit</div></div>
+            <div style="display:flex;gap:10px;align-items:flex-start"><riung-icon name="check" size="15" color="#5FD08A"></riung-icon><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.5">Hanya untuk aplikasi yang kamu pilih sendiri</div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:11px">
+            <div style="font-size:12px;font-weight:700;color:#F27C86;letter-spacing:0.6px">YANG RIUNG NGGAK BISA LIHAT</div>
+            <div style="display:flex;gap:10px;align-items:flex-start"><riung-icon name="close" size="15" color="#F27C86"></riung-icon><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.5">Isi layarmu, chat, foto, atau apa yang kamu tonton</div></div>
+            <div style="display:flex;gap:10px;align-items:flex-start"><riung-icon name="close" size="15" color="#F27C86"></riung-icon><div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.5">Data ini nggak pernah keluar dari perangkatmu</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(124,140,255,0.08);border:1px solid rgba(124,140,255,0.25);border-radius:14px;padding:12px 14px">
+            <riung-icon name="shield" size="17" color="#7C8CFF"></riung-icon>
+            <div style="flex:1;font-size:12px;color:#B4BAE0;line-height:1.5">Bisa dicabut kapan pun di Pengaturan Android — Aplikasi Beku tinggal berhenti, fitur lain tetap jalan.</div>
+          </div>
+        </div>
+        <div style="padding:12px 24px 16px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Buka pengaturan Android</div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:6px">Nanti saja</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Dialog sistem Android</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Dialog sistem izin" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;position:relative">
+        <div style="flex:1;padding:12px 20px;opacity:0.25;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:12px"><riung-icon name="back" size="22" color="#B4BAE0"></riung-icon><div style="font-size:15px;font-weight:700">Satu izin dulu</div></div>
+          <div style="width:104px;height:109px;align-self:center;margin-top:20px"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          <div style="font-size:22px;font-weight:800;text-align:center">Riung perlu izin "Akses data penggunaan"</div>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(4,6,18,0.55);display:flex;align-items:center;justify-content:center;padding:32px">
+          <div style="width:100%;background:#23252E;border-radius:26px;padding:24px 24px 14px;display:flex;flex-direction:column;gap:14px;font-family:Roboto,'Plus Jakarta Sans',sans-serif;box-shadow:0 18px 50px rgba(0,0,0,0.5)">
+            <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#7C8CFF,#5A66D9);display:flex;align-items:center;justify-content:center;align-self:center"><div style="width:26px;height:26px"><riung-monster monster="hakim" state="tamed" detail="low"></riung-monster></div></div>
+            <div style="font-size:17px;font-weight:500;color:#E8EAED;text-align:center;line-height:1.4">Izinkan <b>Riung</b> mengakses data penggunaan aplikasi?</div>
+            <div style="font-size:13px;color:#9AA0A6;line-height:1.55;text-align:center">Aplikasi ini akan dapat memantau aplikasi mana yang Anda gunakan dan seberapa sering, mengidentifikasi operator, setelan bahasa, dan detail lainnya.</div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:4px">
+              <div style="font-size:14px;font-weight:600;color:#8AB4F8;padding:10px 14px;border-radius:999px">Batal</div>
+              <div style="font-size:14px;font-weight:600;color:#062E6F;background:#8AB4F8;padding:10px 18px;border-radius:999px">Izinkan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Interstisial — batas tercapai (monster mengikuti perilakunya: scroll = Si Kabut)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Batas scroll tercapai" style="min-height:100%;background:radial-gradient(circle at 50% 26%,rgba(154,162,184,0.22),rgba(13,16,48,0) 60%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;justify-content:center;padding:16px 20px 0">
+          <div style="display:flex;align-items:center;gap:7px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:7px 14px"><div style="width:18px;height:18px;border-radius:6px;background:rgba(242,118,111,0.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#F2766F">Ig</div><span style="font-size:12px;font-weight:600;color:#B4BAE0">Instagram · 30 mnt hari ini — batasmu tercapai</span></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center">
+          <div style="width:150px;height:158px;animation:floaty 4s ease-in-out infinite"><riung-monster monster="kabut" state="wild"></riung-monster></div>
+          <div style="font-size:24px;font-weight:800;letter-spacing:-0.4px;line-height:1.25;max-width:300px;text-wrap:pretty">Si Kabut yang ngajak scroll — bukan kamu</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:300px;text-wrap:pretty">Jempolmu jalan sendiri, kan? Itu refleks, bukan pilihan. Yuk kembalikan jadi pilihan — jeda dulu satu menit.</div>
+          <div style="font-size:12px;color:#7E85B0;line-height:1.55;max-width:290px;font-style:italic;text-wrap:pretty">Si Kabut memang sudah jinak — tapi kadang dia mampir lagi. Itu normal.</div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:9px">
+          <div style="height:54px;border-radius:16px;background:#4FD1C5;color:#0D1030;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="lotus" size="17" color="#0D1030"></riung-icon>Tarik napas 1 menit dulu · gratis</div>
+          <div style="height:50px;border-radius:16px;border:1.5px solid #2A3160;color:#F4F6FF;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px">Buka 10 menit lagi · <riung-icon name="coin" size="14" color="#FFB877"></riung-icon><span style="color:#FFB877;font-weight:700">{{ unlock10 }} koin</span></div>
+          <div style="text-align:center;font-size:13px;font-weight:600;color:#7E85B0;padding:4px">Kembali</div>
+          <div style="text-align:center;font-size:11px;color:#7E85B0;line-height:1.5;text-wrap:pretty">Riung nggak pernah memblokir total — tujuannya bikin scroll jadi pilihan sadar, bukan refleks.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Setelah napas — tanpa rasa bersalah</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Setelah napas" style="min-height:100%;background:radial-gradient(circle at 50% 26%,rgba(79,209,197,0.16),rgba(13,16,48,0) 60%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center">
+          <div style="width:130px;height:137px;animation:breathe 4s ease-in-out infinite"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.4px;color:#4FD1C5">1 MENIT SELESAI · KABUTNYA MENIPIS</div>
+          <div style="font-size:24px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Masih mau lanjut scroll?</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:300px;text-wrap:pretty">Boleh banget — bedanya, sekarang itu keputusanmu, bukan refleks. Dua-duanya pilihan yang sadar.</div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:9px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center">Tutup Instagram, lanjut hariku</div>
+          <div style="height:50px;border-radius:16px;border:1.5px solid #2A3160;color:#F4F6FF;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px">Buka 10 menit · <riung-icon name="coin" size="14" color="#FFB877"></riung-icon><span style="color:#FFB877;font-weight:700">{{ unlock10 }} koin</span></div>
+          <div style="text-align:center;font-size:11px;color:#7E85B0;line-height:1.5">Nggak ada jawaban yang salah di sini.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Toko — Buka Waktu Scroll</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Toko waktu scroll" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <div style="display:flex;align-items:center;gap:12px"><riung-icon name="back" size="22" color="#B4BAE0"></riung-icon><div style="font-size:15px;font-weight:700">Buka Waktu Scroll</div></div>
+          <div style="display:flex;align-items:center;gap:5px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:5px 11px"><riung-icon name="coin" size="13" color="#FFB877"></riung-icon><span style="font-size:12px;font-weight:700;color:#FFB877">145</span></div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:4px 20px 8px;display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;text-wrap:pretty">Waktu ekstra buat aplikasi yang dibekukan — berlaku hari ini saja, sisa batas besok tetap segar.</div>
+          <div style="font-size:14px;font-weight:700">Per aplikasi</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ unlockRows }}" as="u" hint-placeholder-count="4">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 16px;display:flex;align-items:center;gap:12px">
+                <div style="width:38px;height:38px;border-radius:12px;background:rgba(124,140,255,0.14);display:flex;align-items:center;justify-content:center"><riung-icon name="focus" size="19" color="#7C8CFF"></riung-icon></div>
+                <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ u.label }}</div><div style="font-size:11px;color:#7E85B0">untuk satu aplikasi pilihanmu</div></div>
+                <div style="display:flex;align-items:center;gap:4px;background:#1E2450;border:1px solid #2A3160;border-radius:11px;padding:7px 12px"><riung-icon name="coin" size="13" color="#FFB877"></riung-icon><span style="font-size:13px;font-weight:800;color:#FFB877">{{ u.price }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:14px;font-weight:700">Bundel</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:4px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+              <div style="width:38px;height:38px;border-radius:12px;background:rgba(79,209,197,0.14);display:flex;align-items:center;justify-content:center"><riung-icon name="heart" size="19" color="#4FD1C5"></riung-icon></div>
+              <div style="flex:1"><div style="font-size:14px;font-weight:700">Sesi santai</div><div style="font-size:11px;color:#7E85B0;line-height:1.45">Instagram 15 mnt + TikTok 15 mnt</div></div>
+              <div style="display:flex;align-items:center;gap:4px;background:#1E2450;border:1px solid #2A3160;border-radius:11px;padding:7px 12px"><riung-icon name="coin" size="13" color="#FFB877"></riung-icon><span style="font-size:13px;font-weight:800;color:#FFB877">{{ bundleSantai }}</span></div>
+            </div>
+            <div style="background:rgba(255,184,119,0.08);border:1.5px solid #FFB877;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;position:relative">
+              <div style="position:absolute;top:-9px;right:16px;background:#FFB877;color:#0D1030;font-size:9px;font-weight:800;border-radius:999px;padding:3px 10px;letter-spacing:0.5px">{{ sosmedTag }}</div>
+              <div style="width:38px;height:38px;border-radius:12px;background:rgba(255,184,119,0.16);display:flex;align-items:center;justify-content:center"><riung-icon name="star" size="19" color="#FFB877"></riung-icon></div>
+              <div style="flex:1"><div style="font-size:14px;font-weight:700">Semua sosmed</div><div style="font-size:11px;color:#7E85B0;line-height:1.45">30 mnt untuk tiap aplikasi sosmedmu</div></div>
+              <div style="display:flex;align-items:center;gap:4px;background:#1E2450;border:1px solid #2A3160;border-radius:11px;padding:7px 12px"><riung-icon name="coin" size="13" color="#FFB877"></riung-icon><span style="font-size:13px;font-weight:800;color:#FFB877">{{ bundleSosmed }}</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 24px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="text-align:center;font-size:11px;color:#7E85B0;line-height:1.5;text-wrap:pretty">Progres monstermu nggak bisa dibeli — cuma latihan yang bisa.</div>
+          <div style="text-align:center;font-size:11px;color:#7E85B0;line-height:1.5;text-wrap:pretty">Riung nggak pernah memblokir total — scroll tetap pilihanmu.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Rekap harian</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Rekap scroll harian" style="min-height:100%;background:linear-gradient(180deg,#12163F 0%,#0D1030 30%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;font-size:15px;font-weight:700">Aplikasi Beku</div>
+          <riung-icon name="gear" size="19" color="#7E85B0"></riung-icon>
+        </div>
+        <div style="flex:1;overflow:auto;padding:4px 20px 8px;display:flex;flex-direction:column;gap:14px">
+          <div style="background:linear-gradient(135deg,rgba(79,209,197,0.14),rgba(30,36,80,0.9));border:1px solid rgba(79,209,197,0.35);border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:12px;font-weight:700;color:#4FD1C5;letter-spacing:0.6px">HARI INI</div>
+              <div style="font-size:24px;font-weight:800;letter-spacing:-0.4px">49 mnt scroll</div>
+              <div style="font-size:12px;color:#B4BAE0;line-height:1.5">42 menit di bawah total batasmu — kabutnya makin tipis.</div>
+            </div>
+            <div style="width:76px;height:80px;flex-shrink:0"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:13px">
+            <div style="font-size:12px;font-weight:700;color:#B4BAE0;letter-spacing:0.6px">PER APLIKASI</div>
+            <sc-for list="{{ recapBars }}" as="rb" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="font-weight:600">{{ rb.name }}</span><span style="color:{{ rb.color }};font-weight:700">{{ rb.used }} <span style="color:#7E85B0;font-weight:500">{{ rb.limitText }}</span></span></div>
+                <div style="height:7px;border-radius:999px;background:#0D1030;overflow:hidden"><div style="width:{{ rb.pct }};height:100%;border-radius:999px;background:{{ rb.color }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="lotus" size="19" color="#4FD1C5"></riung-icon><div style="font-size:15px;font-weight:800;color:#4FD1C5">2×</div><div style="font-size:10px;color:#7E85B0;text-align:center">jeda napas diambil</div></div>
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="coin" size="19" color="#FFB877"></riung-icon><div style="font-size:15px;font-weight:800;color:#FFB877">0</div><div style="font-size:10px;color:#7E85B0;text-align:center">koin buat buka waktu</div></div>
+            <div style="flex:1;background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="flame" size="19" color="#FFB877"></riung-icon><div style="font-size:15px;font-weight:800">4 hari</div><div style="font-size:10px;color:#7E85B0;text-align:center">di bawah batas beruntun</div></div>
+          </div>
+          <div style="background:#1E2450;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px"><riung-icon name="sparkChat" size="16" color="#4FD1C5"></riung-icon><span style="font-size:12px;font-weight:700;color:#4FD1C5">Tahukah kamu?</span></div>
+            <div style="font-size:13px;line-height:1.5;text-wrap:pretty">Jeda 60 detik sebelum membuka aplikasi terbukti memutus scroll otomatis — itulah kenapa napas selalu jadi pilihan pertama di sini.</div>
+            <div style="align-self:flex-start;font-size:10px;font-weight:600;color:#7E85B0;border:1px solid #2A3160;border-radius:999px;padding:2px 9px">Riset kebiasaan digital</div>
+          </div>
+        </div>
+        <div style="padding:10px 24px 16px">
+          <div style="text-align:center;font-size:11px;color:#7E85B0;line-height:1.5;text-wrap:pretty">Riung nggak pernah memblokir total — tujuannya bikin scroll jadi pilihan sadar, bukan refleks.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;unlock10&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:15,&quot;min&quot;:0,&quot;max&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi scroll&quot;},&quot;unlock20&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:25,&quot;min&quot;:0,&quot;max&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi scroll&quot;},&quot;unlock30&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:35,&quot;min&quot;:0,&quot;max&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi scroll&quot;},&quot;unlock60&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:60,&quot;min&quot;:0,&quot;max&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi scroll&quot;},&quot;bundleSantai&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:35,&quot;min&quot;:0,&quot;max&quot;:300,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi scroll&quot;},&quot;bundleSosmed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:75,&quot;min&quot;:0,&quot;max&quot;:300,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi scroll&quot;},&quot;sosmedDiscount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:16,&quot;min&quot;:0,&quot;max&quot;:90,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi scroll&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const unlock10 = this.props.unlock10 ?? 15;
+    const unlock20 = this.props.unlock20 ?? 25;
+    const unlock30 = this.props.unlock30 ?? 35;
+    const unlock60 = this.props.unlock60 ?? 60;
+    const bundleSantai = this.props.bundleSantai ?? 35;
+    const bundleSosmed = this.props.bundleSosmed ?? 75;
+    const sosmedTag = 'HEMAT ' + (this.props.sosmedDiscount ?? 16) + '%';
+    const freezeApps = [
+      { tile:'TT', tileBg:'rgba(79,209,197,0.16)', tileColor:'#4FD1C5', name:'TikTok', sub:'Rata-rata 1,4 jam/hari', on:true, limit:'15 mnt' },
+      { tile:'YT', tileBg:'rgba(242,124,134,0.16)', tileColor:'#F27C86', name:'YouTube', sub:'Rata-rata 56 mnt/hari', on:true, limit:'60 mnt' },
+      { tile:'X', tileBg:'rgba(180,186,224,0.14)', tileColor:'#B4BAE0', name:'X', sub:'Rata-rata 31 mnt/hari', on:false, limit:'' },
+      { tile:'ML', tileBg:'rgba(255,184,119,0.16)', tileColor:'#FFB877', name:'Mobile Legends', sub:'Rata-rata 48 mnt/hari', on:false, limit:'' },
+    ].map(a => ({
+      ...a,
+      limitLabel: a.on ? a.limit : 'nonaktif',
+      limitColor: a.on ? '#4FD1C5' : '#565B7A',
+      togBg: a.on ? '#4FD1C5' : '#1E2450',
+      togPos: a.on ? 'right:3px' : 'left:3px',
+      knob: a.on ? '#0D1030' : '#565B7A',
+    }));
+    const unlockRows = [
+      { label:'10 menit', price: unlock10 },
+      { label:'20 menit', price: unlock20 },
+      { label:'30 menit', price: unlock30 },
+      { label:'60 menit', price: unlock60 },
+    ];
+    const recapBars = [
+      { name:'Instagram', used:'22 mnt', limitText:'/ 30 mnt', pct:'73%', color:'#4FD1C5' },
+      { name:'TikTok', used:'15 mnt', limitText:'· batas tercapai', pct:'100%', color:'#FFCE73' },
+      { name:'YouTube', used:'12 mnt', limitText:'/ 60 mnt', pct:'20%', color:'#4FD1C5' },
+    ];
+    return { unlock10, unlock20, unlock30, unlock60, bundleSantai, bundleSosmed, sosmedTag, freezeApps, unlockRows, recapBars };
+  }
+}
+</script>
+</body>
+</html>

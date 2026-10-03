@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#0D1030</color>
+    <!-- M7 Task 2: latar splash sebelum Flutter engine ready — samakan
+         dengan AppColors.latar supaya tidak ada flash putih. -->
+    <color name="riung_splash_background">#0D1030</color>
+</resources>

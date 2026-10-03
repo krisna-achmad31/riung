@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Afirmasi</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">5 layar — kartu harian · koleksi · buat sendiri · pengingat · bagikan kartu</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Kartu harian</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Kartu afirmasi harian" style="min-height:100%;background:linear-gradient(180deg,#191441 0%,#0D1030 55%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Afirmasi hari ini</div>
+          <riung-icon name="heart" size="20" color="#B4BAE0"></riung-icon>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px">
+          <div style="width:300px;border-radius:26px;background:linear-gradient(160deg,#2A2461,#161A45);border:1px solid #3A3580;padding:30px 26px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;box-shadow:0 18px 44px rgba(0,0,0,0.4)">
+            <div style="width:76px;height:80px"><riung-monster monster="cermin" state="tamed"></riung-monster></div>
+            <div style="font-size:21px;font-weight:800;line-height:1.45;letter-spacing:-0.3px;text-wrap:pretty">"Aku nggak harus secepat orang lain. Langkahku tetap langkah."</div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:1.4px;color:#B39DDB">MEREDAKAN SI CERMIN</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <div style="width:20px;height:6px;border-radius:999px;background:#B39DDB"></div>
+            <div style="width:6px;height:6px;border-radius:999px;background:#2A3160"></div>
+            <div style="width:6px;height:6px;border-radius:999px;background:#2A3160"></div>
+          </div>
+          <div style="font-size:12px;color:#7E85B0">Geser buat kartu berikutnya · 1 dari 3</div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;gap:10px">
+          <div style="flex:1;height:52px;border-radius:16px;border:1.5px solid #2A3160;color:#B4BAE0;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="heart" size="16" color="#B4BAE0"></riung-icon>Simpan</div>
+          <div style="flex:1;height:52px;border-radius:16px;background:#B39DDB;color:#0D1030;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="share" size="16" color="#0D1030"></riung-icon>Bagikan</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Koleksi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Koleksi afirmasi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center">
+            <div style="flex:1"><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Afirmasi</div><div style="font-size:13px;color:#7E85B0">Kalimat kecil, pengaruh pelan-pelan</div></div>
+            <div style="width:40px;height:40px;border-radius:13px;background:#1E2450;border:1px solid #2A3160;display:flex;align-items:center;justify-content:center"><riung-icon name="plus" size="19" color="#B4BAE0"></riung-icon></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px">
+            <sc-for list="{{ affirmationDecks }}" as="d" hint-placeholder-count="6">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="width:46px;height:48px"><riung-monster monster="{{ d.monster }}" state="{{ d.state }}" detail="low"></riung-monster></div>
+                <div style="font-size:14px;font-weight:700;text-wrap:pretty">{{ d.title }}</div>
+                <div style="font-size:11px;color:#7E85B0">{{ d.count }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Buat afirmasi sendiri</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Buat afirmasi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="close" size="20" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Afirmasi buatanmu</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;text-wrap:pretty">Kalimat yang kamu tulis sendiri biasanya paling nempel. Pakai bahasamu sehari-hari — nggak perlu puitis.</div>
+          <div style="background:#151A3A;border:1.5px solid #7C8CFF;border-radius:18px;padding:16px;min-height:110px">
+            <div style="font-size:16px;line-height:1.6;text-wrap:pretty">Aku boleh istirahat tanpa merasa bersalah<span style="display:inline-block;width:2px;height:19px;background:#7C8CFF;vertical-align:text-bottom"></span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Kalimat ini melawan…</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ monsterTags }}" as="mt" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;border:1.5px solid {{ mt.border }};background:{{ mt.bg }}">
+                  <div style="width:17px;height:18px"><riung-monster monster="{{ mt.monster }}" state="wild" detail="low"></riung-monster></div>
+                  <span style="font-size:12px;font-weight:700;color:{{ mt.color }}">{{ mt.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Butuh inspirasi?</div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:14px;padding:12px 14px;font-size:13px;color:#B4BAE0;line-height:1.5">"Perasaan ini nggak enak, tapi dia akan lewat."</div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:14px;padding:12px 14px;font-size:13px;color:#B4BAE0;line-height:1.5">"Aku sudah melewati hari-hari yang lebih berat dari ini."</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Simpan ke koleksiku</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Pengingat afirmasi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pengingat afirmasi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Pengingat afirmasi</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:14px;font-weight:700">Kirim afirmasi harian</div>
+              <div style="width:44px;height:26px;border-radius:999px;background:#7C8CFF;position:relative"><div style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:999px;background:#0D1030"></div></div>
+            </div>
+            <div style="font-size:12px;color:#7E85B0;line-height:1.5">Satu notifikasi per hari, isinya cuma kalimatnya — tanpa ajakan buka aplikasi.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Jam kirim</div>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;text-align:center;border-radius:14px;padding:13px 0;border:1.5px solid #7C8CFF;background:rgba(124,140,255,0.12)"><div style="font-size:15px;font-weight:800;color:#7C8CFF">07:00</div><div style="font-size:10px;color:#7C8CFF;margin-top:2px">Pagi</div></div>
+              <div style="flex:1;text-align:center;border-radius:14px;padding:13px 0;border:1.5px solid #2A3160"><div style="font-size:15px;font-weight:800;color:#B4BAE0">12:30</div><div style="font-size:10px;color:#7E85B0;margin-top:2px">Istirahat kerja</div></div>
+              <div style="flex:1;text-align:center;border-radius:14px;padding:13px 0;border:1.5px solid #2A3160"><div style="font-size:15px;font-weight:800;color:#B4BAE0">21:00</div><div style="font-size:10px;color:#7E85B0;margin-top:2px">Sebelum tidur</div></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Pratinjau notifikasi</div>
+            <div style="background:#1E2450;border:1px solid #2A3160;border-radius:16px;padding:13px 14px;display:flex;gap:11px">
+              <div style="width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#7C8CFF,#4FD1C5);display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="sparkChat" size="18" color="#0D1030"></riung-icon></div>
+              <div style="flex:1"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:700">Riung</span><span style="font-size:10px;color:#7E85B0">07:00</span></div><div style="font-size:12px;color:#B4BAE0;margin-top:2px;line-height:1.45">"Aku boleh istirahat tanpa merasa bersalah."</div></div>
+            </div>
+          </div>
+          <div style="background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.25);border-radius:16px;padding:14px;display:flex;gap:10px">
+            <riung-icon name="info" size="17" color="#4FD1C5"></riung-icon>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">Afirmasi dari koleksimu diputar bergantian. Kalimat buatanmu sendiri muncul lebih sering.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Simpan</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Bagikan kartu</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Bagikan afirmasi" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Bagikan kartu</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px">
+          <div style="width:280px;border-radius:24px;background:linear-gradient(160deg,#2A2461,#161A45);border:1px solid #3A3580;padding:26px 22px;display:flex;flex-direction:column;align-items:center;gap:15px;text-align:center">
+            <div style="width:64px;height:67px"><riung-monster monster="cermin" state="tamed"></riung-monster></div>
+            <div style="font-size:18px;font-weight:800;line-height:1.45;letter-spacing:-0.3px;text-wrap:pretty">"Aku nggak harus secepat orang lain. Langkahku tetap langkah."</div>
+            <div style="font-size:10px;font-weight:700;color:#7C8CFF">riung.app</div>
+          </div>
+          <div style="font-size:12px;color:#7E85B0;text-align:center;max-width:280px;line-height:1.5">Bagikan kartunya tanpa membagikan isi jurnal atau datamu 🔒</div>
+          <div style="display:flex;gap:14px">
+            <sc-for list="{{ shareTargets }}" as="st" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div style="width:52px;height:52px;border-radius:999px;background:#151A3A;border:1px solid #2A3160;display:flex;align-items:center;justify-content:center"><riung-icon name="{{ st.icon }}" size="22" color="{{ st.color }}"></riung-icon></div>
+                <div style="font-size:10px;color:#7E85B0">{{ st.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:52px;border-radius:16px;border:1.5px solid #2A3160;color:#B4BAE0;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><riung-icon name="download" size="16" color="#B4BAE0"></riung-icon>Simpan sebagai gambar</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  renderVals() {
+    const navItems = [
+      ['home','Beranda','#7E85B0'],['compass','Jelajah','#7C8CFF'],['focus','Fokus','#7E85B0'],['monster','Monster','#7E85B0'],['user','Profil','#7E85B0'],
+    ].map(([icon,label,color]) => ({ icon, label, color }));
+    const affirmationDecks = [
+      { title:'Berhenti membandingkan', count:'12 kartu · vs Si Cermin', monster:'cermin', state:'tamed' },
+      { title:'Tenang saat cemas', count:'15 kartu · vs Si Waswas', monster:'waswas', state:'tamed' },
+      { title:'Boleh nggak sempurna', count:'10 kartu · vs Si Sempurna', monster:'sempurna', state:'wild' },
+      { title:'Semangat kerja sehat', count:'11 kartu · buat pekerja', monster:'mengelak', state:'tamed' },
+      { title:'Percaya proses belajar', count:'9 kartu · buat pelajar', monster:'kabut', state:'tamed' },
+      { title:'Buatanku sendiri', count:'3 kartu', monster:'meronta', state:'tamed' },
+    ];
+    const monsterTags = [
+      { label:'Si Sempurna', monster:'sempurna', color:'#F8A19B', border:'#F2766F', bg:'rgba(242,118,111,0.12)' },
+      { label:'Si Hakim', monster:'hakim', color:'#B4BAE0', border:'#2A3160', bg:'transparent' },
+      { label:'Si Cermin', monster:'cermin', color:'#B4BAE0', border:'#2A3160', bg:'transparent' },
+      { label:'Si Waswas', monster:'waswas', color:'#B4BAE0', border:'#2A3160', bg:'transparent' },
+    ];
+    const shareTargets = [
+      { label:'WhatsApp', icon:'sparkChat', color:'#5FD08A' },
+      { label:'Instagram', icon:'heart', color:'#F27C86' },
+      { label:'Salin', icon:'journal', color:'#B4BAE0' },
+      { label:'Lainnya', icon:'share', color:'#B4BAE0' },
+    ];
+    return { navItems, affirmationDecks, monsterTags, shareTargets };
+  }
+}
+</script>
+</body>
+</html>

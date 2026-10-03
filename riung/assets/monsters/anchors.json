@@ -1,0 +1,417 @@
+{
+  "version": "2.0",
+  "render": "raster",
+  "coordinateSystem": "Anchor x/y dinormalisasi 0-1 terhadap kanvas persegi monster (sourceViewBox 512x512, garis lantai di 0.96). Ukuran kosmetik = width x lebar render x anchor.scale; tinggi dari aspect; pivot = titik di gambar kosmetik yang ditempel ke anchor & pusat rotasi. anchorsLiar menimpa anchors untuk wujud liar (pose art 3D berbeda). slot none = overlay kanvas penuh 1:1 (sudah di-precompose per wujud).",
+  "sourceViewBox": {
+    "width": 512,
+    "height": 512
+  },
+  "assetDir": "assets/monsters/3d",
+  "compositingOrder": [
+    "bantal_mini (under, zIndex 0)",
+    "monster body (zIndex 1)",
+    "topi_rajut / syal_hangat / bingkai_emas (over, zIndex 2)"
+  ],
+  "monsters": {
+    "meronta": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "meronta_liar.webp",
+        "jinak": "meronta_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.46,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.82,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.9,
+          "scale": 1.05,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.47,
+          "y": 0.39,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.47,
+          "y": 0.82,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.48,
+          "y": 0.91,
+          "scale": 1.0,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "waswas": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "waswas_liar.webp",
+        "jinak": "waswas_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.53,
+          "y": 0.33,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.53,
+          "y": 0.79,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.53,
+          "y": 0.89,
+          "scale": 0.85,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.5,
+          "y": 0.37,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.77,
+          "scale": 1.0,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.91,
+          "scale": 0.85,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "kabut": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "kabut_liar.webp",
+        "jinak": "kabut_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.48,
+          "y": 0.37,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.48,
+          "y": 0.73,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.48,
+          "y": 0.86,
+          "scale": 0.95,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.5,
+          "y": 0.4,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.75,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.9,
+          "scale": 1.0,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "cermin": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "cermin_liar.webp",
+        "jinak": "cermin_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.27,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.77,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.88,
+          "scale": 0.8,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.47,
+          "y": 0.19,
+          "scale": 0.95,
+          "rotationDeg": -4
+        },
+        "neck": {
+          "x": 0.46,
+          "y": 0.75,
+          "scale": 0.95,
+          "rotationDeg": -4
+        },
+        "base": {
+          "x": 0.46,
+          "y": 0.9,
+          "scale": 0.8,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "sempurna": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "sempurna_liar.webp",
+        "jinak": "sempurna_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.32,
+          "scale": 1.0,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.61,
+          "scale": 1.0,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.89,
+          "scale": 0.85,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.5,
+          "y": 0.31,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.63,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.91,
+          "scale": 0.9,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "mengelak": {
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "mengelak_liar.webp",
+        "jinak": "mengelak_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.71,
+          "y": 0.27,
+          "scale": 0.85,
+          "rotationDeg": -12
+        },
+        "neck": {
+          "x": 0.68,
+          "y": 0.61,
+          "scale": 0.9,
+          "rotationDeg": -8
+        },
+        "base": {
+          "x": 0.66,
+          "y": 0.87,
+          "scale": 0.8,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.36,
+          "y": 0.33,
+          "scale": 0.85,
+          "rotationDeg": -10
+        },
+        "neck": {
+          "x": 0.38,
+          "y": 0.67,
+          "scale": 0.9,
+          "rotationDeg": -6
+        },
+        "base": {
+          "x": 0.4,
+          "y": 0.89,
+          "scale": 0.8,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "hakim": {
+      "boss": true,
+      "bossScale": 1.4,
+      "files": {
+        "liar": "hakim_liar.webp",
+        "jinak": "hakim_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.47,
+          "y": 0.22,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.47,
+          "y": 0.62,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.47,
+          "y": 0.89,
+          "scale": 1.0,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.48,
+          "y": 0.29,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.48,
+          "y": 0.66,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.48,
+          "y": 0.91,
+          "scale": 1.0,
+          "rotationDeg": 0
+        }
+      }
+    }
+  },
+  "cosmetics": {
+    "bantal_mini": {
+      "file": "bantal_mini.webp",
+      "slot": "base",
+      "zIndex": 0,
+      "layer": "under",
+      "width": 0.72,
+      "aspect": 1.4942,
+      "pivot": {
+        "x": 0.44,
+        "y": 0.3
+      },
+      "canonicalWearer": "meronta",
+      "rarity": "epic",
+      "priceProp": "cosmeticEpicPrice"
+    },
+    "syal_hangat": {
+      "file": "syal_hangat.webp",
+      "slot": "neck",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.36,
+      "aspect": 1.035,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.26
+      },
+      "canonicalWearer": "waswas",
+      "rarity": "common",
+      "priceProp": "cosmeticCommonPrice"
+    },
+    "topi_rajut": {
+      "file": "topi_rajut.webp",
+      "slot": "head",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.34,
+      "aspect": 1.1034,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8
+      },
+      "canonicalWearer": "kabut",
+      "rarity": "common",
+      "priceProp": "cosmeticCommonPrice"
+    },
+    "bingkai_emas": {
+      "file": "bingkai_emas_cermin_jinak.webp",
+      "fileLiar": "bingkai_emas_cermin_liar.webp",
+      "slot": "none",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 1,
+      "aspect": 1,
+      "pivot": {
+        "x": 0,
+        "y": 0
+      },
+      "canonicalWearer": "cermin",
+      "rarity": "legendary",
+      "priceProp": "cosmeticLegendaryPrice",
+      "note": "Khusus Cermin. Overlay kanvas penuh 512x512 yang sudah di-precompose mengikuti bingkai cermin tiap wujud (tools/build_3d_assets.py)."
+    }
+  }
+}

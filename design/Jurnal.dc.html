@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Jurnal</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">7 layar — daftar entri · pilih prompt · menulis · tersimpan · kunci privasi · kosong · gagal simpan</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Daftar entri</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Daftar jurnal" style="min-height:100%;background:linear-gradient(180deg,#12163F 0%,#0D1030 30%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1"><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Jurnal</div><div style="font-size:13px;color:#7E85B0">Terkunci &amp; hanya untukmu 🔒</div></div>
+            <div style="display:flex;align-items:center;gap:5px;background:#1E2450;border:1px solid #2A3160;border-radius:999px;padding:6px 12px"><riung-icon name="journal" size="14" color="#FFB877"></riung-icon><span style="font-size:12px;font-weight:700;color:#FFB877">19 entri</span></div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ weekStrip }}" as="w" hint-placeholder-count="7">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;border-radius:14px;padding:9px 0;background:{{ w.bg }};border:1px solid {{ w.border }}">
+                <div style="font-size:10px;color:{{ w.dayColor }}">{{ w.day }}</div>
+                <div style="font-size:14px;font-weight:800;color:{{ w.numColor }}">{{ w.num }}</div>
+                <div style="width:5px;height:5px;border-radius:999px;background:{{ w.dot }}"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+            <sc-for list="{{ journalEntries }}" as="j" hint-placeholder-count="4">
+              <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:15px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:17px">{{ j.mood }}</span>
+                  <div style="flex:1;font-size:11px;color:#7E85B0">{{ j.when }}</div>
+                  <div style="display:flex;align-items:center;gap:5px;border:1px solid {{ j.tagBorder }};border-radius:999px;padding:3px 9px">
+                    <div style="width:15px;height:16px"><riung-monster monster="{{ j.monster }}" state="wild" detail="low"></riung-monster></div>
+                    <span style="font-size:10px;font-weight:700;color:{{ j.tagColor }}">{{ j.tag }}</span>
+                  </div>
+                </div>
+                <div style="font-size:14px;font-weight:700">{{ j.title }}</div>
+                <div style="font-size:12px;color:#B4BAE0;line-height:1.5">{{ j.preview }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="position:relative">
+          <div style="position:absolute;right:20px;top:-64px;width:54px;height:54px;border-radius:18px;background:#FFB877;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(255,184,119,0.35)"><riung-icon name="plus" size="24" color="#0D1030" stroke="2.4"></riung-icon></div>
+          <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+            <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Entri baru — pilih prompt</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Pilih prompt jurnal" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="close" size="20" color="#B4BAE0"></riung-icon>
+          <div style="font-size:15px;font-weight:700">Mau nulis dari mana?</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:12px">
+          <div style="background:linear-gradient(135deg,rgba(255,184,119,0.15),rgba(30,36,80,0.9));border:1.5px solid rgba(255,184,119,0.45);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:#FFB877">TULIS BEBAS</div>
+            <div style="font-size:15px;font-weight:700">Kosongkan saja isi kepala</div>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.45">Tanpa arahan, tanpa format. Tulis apa pun yang lagi penuh di pikiranmu.</div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:#B4BAE0;margin-top:4px">Atau pakai panduan CBT</div>
+          <sc-for list="{{ prompts }}" as="p" hint-placeholder-count="4">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:15px;display:flex;align-items:center;gap:12px">
+              <div style="width:42px;height:44px;flex-shrink:0"><riung-monster monster="{{ p.monster }}" state="wild" detail="low"></riung-monster></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <div style="font-size:14px;font-weight:700;text-wrap:pretty">{{ p.title }}</div>
+                <div style="font-size:11px;color:#7E85B0;line-height:1.45">{{ p.sub }}</div>
+              </div>
+              <riung-icon name="chevR" size="18" color="#7E85B0"></riung-icon>
+            </div>
+          </sc-for>
+          <div style="font-size:11px;color:#7E85B0;text-align:center;line-height:1.5;padding:6px 10px 12px">Menulis 3 kalimat saja sudah dihitung selesai · +{{ journalReward }} koin</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Menulis entri</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Menulis jurnal" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:12px;color:#7E85B0">Tersimpan otomatis ✓</div>
+          <div style="background:#7C8CFF;color:#0D1030;font-size:13px;font-weight:700;border-radius:11px;padding:8px 16px">Selesai</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:14px">
+          <div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center">
+            <div style="width:34px;height:36px;flex-shrink:0"><riung-monster monster="hakim" state="wild" detail="low"></riung-monster></div>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.45;text-wrap:pretty"><span style="font-weight:700;color:#B39BF9">Panduan:</span> Apa bukti kalau pikiran "aku pasti gagal" itu benar? Apa bukti sebaliknya?</div>
+          </div>
+          <div style="font-size:12px;color:#7E85B0">Senin, 27 Juli · 21:14</div>
+          <div style="font-size:15px;line-height:1.75;color:#F4F6FF;text-wrap:pretty">Besok presentasi ke klien pertama kali dan dari tadi kepikiran terus bakal ditanya hal yang aku nggak bisa jawab. Padahal kalau dipikir-pikir, deck-nya udah dicek Mbak Sari dua kali dan minggu lalu latihan juga lancar.<br><br>Bukti aku bakal gagal: belum pernah presentasi ke klien ini. Udah, itu doang sih sebenarnya…<span style="display:inline-block;width:2px;height:18px;background:#7C8CFF;vertical-align:text-bottom"></span></div>
+        </div>
+        <div style="padding:12px 20px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid #1E2450">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-size:11px;font-weight:700;color:#7E85B0">MOOD</div>
+            <div style="display:flex;gap:6px"><span style="font-size:18px;opacity:0.4">😞</span><span style="font-size:18px;opacity:0.4">😕</span><span style="font-size:22px">😟</span><span style="font-size:18px;opacity:0.4">🙂</span><span style="font-size:18px;opacity:0.4">😄</span></div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:5px;border:1px solid #8B5CF6;border-radius:999px;padding:4px 10px">
+              <div style="width:16px;height:17px"><riung-monster monster="hakim" state="wild" detail="low"></riung-monster></div>
+              <span style="font-size:10px;font-weight:700;color:#B39BF9">Si Hakim terdeteksi</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#7E85B0;line-height:1.45">Riung menandai pola "pasti gagal" sebagai suara Si Hakim. Menyelesaikan entri ini melemahkannya +2%.</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Entri tersimpan</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Jurnal tersimpan" style="min-height:100%;background:radial-gradient(circle at 50% 20%,rgba(255,184,119,0.14),rgba(13,16,48,0) 55%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="width:128px;height:135px"><riung-monster monster="hakim" state="wild"></riung-monster></div>
+          <div style="font-size:23px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Kamu barusan melawan balik Si Hakim ✍️</div>
+          <div style="font-size:14px;color:#B4BAE0;line-height:1.55;max-width:310px;text-wrap:pretty">Menuliskan bukti sebaliknya itu inti dari CBT — dan kamu melakukannya sendiri.</div>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="coin" size="20" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800;color:#FFB877">+{{ journalReward }}</div><div style="font-size:10px;color:#7E85B0">koin</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="monster" size="20" color="#B39BF9"></riung-icon><div style="font-size:16px;font-weight:800;color:#B39BF9">+2%</div><div style="font-size:10px;color:#7E85B0">Si Hakim</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="journal" size="20" color="#FFB877"></riung-icon><div style="font-size:16px;font-weight:800">20</div><div style="font-size:10px;color:#7E85B0">total entri</div></div>
+          </div>
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:13px 16px;max-width:320px;margin-top:6px;display:flex;gap:10px;align-items:center">
+            <riung-icon name="lock" size="17" color="#5FD08A"></riung-icon>
+            <div style="font-size:11px;color:#7E85B0;text-align:left;line-height:1.5">Entri ini terenkripsi di perangkatmu. Progresmu bisa dibagikan — isinya tidak pernah.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Kembali ke jurnal</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Kunci privasi</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Kunci jurnal" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;text-align:center">
+          <div style="width:74px;height:74px;border-radius:24px;background:rgba(95,208,138,0.12);border:1px solid rgba(95,208,138,0.3);display:flex;align-items:center;justify-content:center"><riung-icon name="lock" size="34" color="#5FD08A"></riung-icon></div>
+          <div style="font-size:21px;font-weight:800">Jurnalmu terkunci</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;max-width:290px;text-wrap:pretty">Buka dengan sidik jari, atau masukkan PIN 6 digit yang kamu buat.</div>
+          <div style="display:flex;gap:12px;margin-top:4px">
+            <div style="width:13px;height:13px;border-radius:999px;background:#7C8CFF"></div>
+            <div style="width:13px;height:13px;border-radius:999px;background:#7C8CFF"></div>
+            <div style="width:13px;height:13px;border-radius:999px;background:#7C8CFF"></div>
+            <div style="width:13px;height:13px;border-radius:999px;border:1.5px solid #2A3160"></div>
+            <div style="width:13px;height:13px;border-radius:999px;border:1.5px solid #2A3160"></div>
+            <div style="width:13px;height:13px;border-radius:999px;border:1.5px solid #2A3160"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;margin-top:10px">
+            <sc-for list="{{ pinKeys }}" as="k" hint-placeholder-count="12">
+              <div style="height:60px;border-radius:18px;background:{{ k.bg }};border:1px solid #2A3160;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:{{ k.color }}">{{ k.label }}</div>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#7C8CFF;margin-top:6px">Lupa PIN?</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Kosong — belum ada entri</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Jurnal kosong" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="padding:14px 20px"><div style="font-size:22px;font-weight:800;letter-spacing:-0.3px">Jurnal</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center">
+          <div style="width:114px;height:120px;opacity:0.85"><riung-monster monster="kabut" state="wild"></riung-monster></div>
+          <div style="font-size:19px;font-weight:800;text-wrap:pretty">Halaman pertamamu masih kosong</div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.6;max-width:300px;text-wrap:pretty">Nggak perlu rapi, nggak perlu panjang. Tiga kalimat tentang harimu sudah cukup buat mulai — dan Si Kabut paling nggak tahan sama pikiran yang dituliskan.</div>
+          <div style="height:50px;border-radius:16px;background:#FFB877;color:#0D1030;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 22px;margin-top:6px"><riung-icon name="edit" size="15" color="#0D1030"></riung-icon>Tulis entri pertama · +{{ journalReward }} koin</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:2px"><riung-icon name="lock" size="13" color="#7E85B0"></riung-icon><span style="font-size:11px;color:#7E85B0">Terkunci, terenkripsi, hanya untukmu</span></div>
+        </div>
+        <div style="display:flex;background:#151A3A;border-top:1px solid #2A3160;padding:10px 6px 6px">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="{{ nv.icon }}" size="23" color="{{ nv.color }}"></riung-icon><div style="font-size:10px;font-weight:600;color:{{ nv.color }}">{{ nv.label }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Gagal menyimpan — draf aman</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Jurnal gagal simpan" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;opacity:0.35">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="font-size:12px;color:#7E85B0">Draf</div>
+          <div style="background:#7C8CFF;color:#0D1030;font-size:13px;font-weight:700;border-radius:11px;padding:8px 16px">Selesai</div>
+        </div>
+        <div style="flex:1;padding:8px 24px;opacity:0.35">
+          <div style="font-size:12px;color:#7E85B0;margin-bottom:12px">Senin, 27 Juli · 21:14</div>
+          <div style="font-size:15px;line-height:1.75">Besok presentasi ke klien pertama kali dan dari tadi kepikiran terus…</div>
+        </div>
+        <div style="background:#151A3A;border-top:1px solid #2A3160;border-radius:24px 24px 0 0;padding:22px 24px 26px;display:flex;flex-direction:column;gap:12px">
+          <div style="width:44px;height:5px;border-radius:999px;background:#2A3160;align-self:center"></div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:46px;height:46px;border-radius:16px;background:rgba(242,124,134,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="wifiOff" size="22" color="#F27C86"></riung-icon></div>
+            <div><div style="font-size:16px;font-weight:800">Belum tersinkron</div><div style="font-size:12px;color:#7E85B0;margin-top:2px">Koneksi terputus saat menyimpan</div></div>
+          </div>
+          <div style="font-size:13px;color:#B4BAE0;line-height:1.55;text-wrap:pretty">Tenang — tulisanmu <span style="font-weight:700;color:#5FD08A">sudah aman tersimpan di perangkat ini</span>. Riung akan menyinkronkannya otomatis begitu kamu online, koinmu juga tetap masuk.</div>
+          <div style="height:50px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px">Oke, lanjut menulis</div>
+          <div style="text-align:center;font-size:12px;font-weight:600;color:#7E85B0">Coba sinkron sekarang</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;journalReward&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;min&quot;:0,&quot;max&quot;:50,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const journalReward = this.props.journalReward ?? 4;
+    const navItems = [
+      ['home','Beranda','#7E85B0'],['compass','Jelajah','#7C8CFF'],['focus','Fokus','#7E85B0'],['monster','Monster','#7E85B0'],['user','Profil','#7E85B0'],
+    ].map(([icon,label,color]) => ({ icon, label, color }));
+    const weekStrip = [
+      { day:'Sel', num:'21', done:true },{ day:'Rab', num:'22', done:true },{ day:'Kam', num:'23', done:false },
+      { day:'Jum', num:'24', done:true },{ day:'Sab', num:'25', done:true },{ day:'Min', num:'26', done:true },
+      { day:'Sen', num:'27', today:true, done:false },
+    ].map(w => ({
+      day: w.day, num: w.num,
+      bg: w.today ? 'rgba(124,140,255,0.14)' : '#151A3A',
+      border: w.today ? '#7C8CFF' : '#2A3160',
+      dayColor: w.today ? '#7C8CFF' : '#7E85B0',
+      numColor: w.today ? '#7C8CFF' : '#F4F6FF',
+      dot: w.done ? '#FFB877' : 'transparent',
+    }));
+    const journalEntries = [
+      { mood:'😟', when:'Kemarin · 21:40', monster:'hakim', tag:'Si Hakim', tagColor:'#B39BF9', tagBorder:'#8B5CF6', title:'Deg-degan soal presentasi', preview:'Besok presentasi ke klien pertama kali dan dari tadi kepikiran terus bakal ditanya hal yang…' },
+      { mood:'🙂', when:'Minggu · 20:12', monster:'kabut', tag:'Si Kabut', tagColor:'#BCC2D2', tagBorder:'#5E6474', title:'Hari yang lumayan tenang', preview:'Jalan pagi sama Dita, terus siangnya beresin kamar. Ternyata pikiran lebih jernih kalau…' },
+      { mood:'😕', when:'Sabtu · 23:05', monster:'cermin', tag:'Si Cermin', tagColor:'#CFC0EA', tagBorder:'#6E6386', title:'Lihat feed teman kuliah', preview:'Semua orang kayaknya udah pada punya pencapaian. Aku tahu ini jebakan bandingin diri tapi…' },
+      { mood:'🙂', when:'Jumat · 19:30', monster:'waswas', tag:'Si Waswas', tagColor:'#F2C67F', tagBorder:'#8F7443', title:'Ternyata rapatnya baik-baik aja', preview:'Kemarin cemas banget soal one-on-one sama atasan, ternyata malah dipuji soal laporan…' },
+    ];
+    const pinKeys = ['1','2','3','4','5','6','7','8','9','','0','⌫'].map(label => ({
+      label, bg: label === '' ? 'transparent' : '#151A3A', color: label === '⌫' ? '#7E85B0' : '#F4F6FF',
+    }));
+    return { journalReward, navItems, weekStrip, journalEntries, pinKeys };
+  }
+}
+</script>
+</body>
+</html>

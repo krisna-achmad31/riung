@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="monsters.js"></script>
+<style>
+body{margin:0;background:#080A20;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF;-webkit-font-smoothing:antialiased}
+a{color:#7C8CFF;text-decoration:none}a:hover{color:#B39BF9}
+</style>
+</helmet>
+<div style="padding:56px 64px;display:flex;flex-direction:column;gap:24px">
+<header>
+  <div style="font-size:32px;font-weight:800">Riung · Check-in Pagi</div>
+  <div style="font-size:14px;color:#7E85B0;margin-top:6px">5 layar — pilih mood · pilih faktor · catatan singkat · hasil check-in · riwayat mood</div>
+</header>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">1 · Pilih mood</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Check-in mood" style="min-height:100%;background:linear-gradient(180deg,#161B4A 0%,#0D1030 45%);display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="close" size="20" color="#7E85B0"></riung-icon>
+          <div style="display:flex;gap:5px"><div style="width:22px;height:5px;border-radius:999px;background:#7C8CFF"></div><div style="width:22px;height:5px;border-radius:999px;background:#1E2450"></div><div style="width:22px;height:5px;border-radius:999px;background:#1E2450"></div></div>
+          <div style="font-size:11px;color:#7E85B0">1/3</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;text-align:center">
+          <div style="width:96px;height:100px"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          <div style="font-size:23px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Pagi, {{ userName }}. Gimana rasanya hari ini?</div>
+          <div style="font-size:13px;color:#7E85B0">Jawaban apa pun nggak ada yang salah.</div>
+          <div style="display:flex;gap:9px;margin-top:6px">
+            <sc-for list="{{ moods }}" as="mo" hint-placeholder-count="5">
+              <div style="width:62px;border-radius:18px;padding:14px 0 11px;display:flex;flex-direction:column;align-items:center;gap:7px;border:1.5px solid {{ mo.border }};background:{{ mo.bg }}">
+                <span style="font-size:26px">{{ mo.emoji }}</span>
+                <span style="font-size:10px;font-weight:600;color:{{ mo.color }}">{{ mo.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Lanjut</div>
+          <div style="text-align:center;font-size:12px;font-weight:600;color:#7E85B0;padding:4px">Lewati hari ini — streak tetap aman</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">2 · Pilih faktor</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Check-in faktor" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="display:flex;gap:5px"><div style="width:22px;height:5px;border-radius:999px;background:#7C8CFF"></div><div style="width:22px;height:5px;border-radius:999px;background:#7C8CFF"></div><div style="width:22px;height:5px;border-radius:999px;background:#1E2450"></div></div>
+          <div style="font-size:11px;color:#7E85B0">2/3</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:30px">😟</span>
+            <div style="font-size:20px;font-weight:800;letter-spacing:-0.3px;text-wrap:pretty">Agak berat ya. Apa yang paling kepikiran?</div>
+          </div>
+          <div style="font-size:13px;color:#7E85B0">Pilih maksimal 3 — biar sarannya pas.</div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap">
+            <sc-for list="{{ factors }}" as="f" hint-placeholder-count="10">
+              <div style="display:flex;align-items:center;gap:7px;border-radius:999px;padding:10px 16px;border:1.5px solid {{ f.border }};background:{{ f.bg }}">
+                <riung-icon name="{{ f.icon }}" size="15" color="{{ f.color }}"></riung-icon>
+                <span style="font-size:13px;font-weight:600;color:{{ f.color }}">{{ f.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);border-radius:16px;padding:14px;display:flex;gap:11px;align-items:center;margin-top:4px">
+            <div style="width:40px;height:42px;flex-shrink:0"><riung-monster monster="hakim" state="wild" detail="low"></riung-monster></div>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">"Kerjaan" + "takut gagal" — kombinasi favorit Si Hakim. Nanti Riung siapkan latihan yang tepat sasaran.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Lanjut</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">3 · Catatan singkat (opsional)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Check-in catatan" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="display:flex;gap:5px"><div style="width:22px;height:5px;border-radius:999px;background:#7C8CFF"></div><div style="width:22px;height:5px;border-radius:999px;background:#7C8CFF"></div><div style="width:22px;height:5px;border-radius:999px;background:#7C8CFF"></div></div>
+          <div style="font-size:11px;color:#7E85B0">3/3</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:20px;font-weight:800;letter-spacing:-0.3px;text-wrap:pretty">Mau cerita dikit? Satu kalimat cukup.</div>
+          <div style="background:#151A3A;border:1.5px solid #7C8CFF;border-radius:18px;padding:16px;min-height:120px">
+            <div style="font-size:15px;line-height:1.65;text-wrap:pretty">Deadline laporan numpuk minggu ini, takut hasilnya dianggap kurang sama atasan<span style="display:inline-block;width:2px;height:18px;background:#7C8CFF;vertical-align:text-bottom"></span></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #2A3160;color:#B4BAE0">Capek aja</div>
+            <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #2A3160;color:#B4BAE0">Nggak tahu kenapa</div>
+            <div style="font-size:12px;font-weight:600;border-radius:999px;padding:7px 13px;border:1px solid #2A3160;color:#B4BAE0">Biasa aja sih</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px"><riung-icon name="lock" size="13" color="#7E85B0"></riung-icon><span style="font-size:11px;color:#7E85B0">Catatan ini masuk jurnal terkuncimu — nggak pernah dibagikan.</span></div>
+        </div>
+        <div style="padding:14px 24px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Selesai check-in</div>
+          <div style="text-align:center;font-size:12px;font-weight:600;color:#7E85B0;padding:4px">Lewati catatan</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Hasil check-in</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Hasil check-in" style="min-height:100%;background:radial-gradient(circle at 50% 18%,rgba(124,140,255,0.16),rgba(13,16,48,0) 55%),#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="flex:1;overflow:auto;padding:20px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+          <div style="width:110px;height:116px"><riung-monster monster="kabut" state="tamed"></riung-monster></div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-0.4px;text-wrap:pretty">Makasih udah jujur sama diri sendiri</div>
+          <div style="display:flex;gap:10px">
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="coin" size="19" color="#FFB877"></riung-icon><div style="font-size:15px;font-weight:800;color:#FFB877">+{{ checkinReward }}</div><div style="font-size:10px;color:#7E85B0">koin</div></div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:4px"><riung-icon name="flame" size="19" color="#FFB877"></riung-icon><div style="font-size:15px;font-weight:800">13</div><div style="font-size:10px;color:#7E85B0">hari beruntun</div></div>
+          </div>
+          <div style="width:100%;background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;text-align:left">
+            <div style="font-size:12px;font-weight:700;color:#B39BF9;letter-spacing:0.6px">SARAN BUAT PAGIMU</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:42px;height:42px;border-radius:13px;background:rgba(79,209,197,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="lotus" size="20" color="#4FD1C5"></riung-icon></div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:700">Jeda di Tengah Kerja</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">5 mnt · pas buat deadline numpuk</div></div>
+              <riung-icon name="play" size="17" color="#4FD1C5"></riung-icon>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:42px;height:42px;border-radius:13px;background:rgba(255,184,119,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0"><riung-icon name="journal" size="20" color="#FFB877"></riung-icon></div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:700">Uji pikiran "dianggap kurang"</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">Panduan CBT · melemahkan Si Hakim</div></div>
+              <riung-icon name="chevR" size="17" color="#7E85B0"></riung-icon>
+            </div>
+          </div>
+          <div style="width:100%;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);border-radius:16px;padding:13px 14px;display:flex;gap:10px;align-items:center;text-align:left">
+            <div style="width:38px;height:40px;flex-shrink:0"><riung-monster monster="hakim" state="wild" detail="low"></riung-monster></div>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">Si Hakim muncul di 4 dari 7 check-in terakhirmu — selalu di hari kerja. Polanya mulai kebaca.</div>
+          </div>
+        </div>
+        <div style="padding:14px 24px 18px">
+          <div style="height:54px;border-radius:16px;background:#7C8CFF;color:#0D1030;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">Mulai hariku</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:600;color:#B4BAE0">Riwayat mood</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+      <div data-screen-label="Riwayat mood" style="min-height:100%;background:#0D1030;display:flex;flex-direction:column;font-family:'Plus Jakarta Sans',sans-serif;color:#F4F6FF">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px">
+          <riung-icon name="back" size="22" color="#B4BAE0"></riung-icon>
+          <div style="flex:1;font-size:15px;font-weight:700">Riwayat mood</div>
+          <div style="display:flex;gap:6px">
+            <div style="font-size:11px;font-weight:700;border-radius:999px;padding:5px 11px;background:#7C8CFF;color:#0D1030">Minggu</div>
+            <div style="font-size:11px;font-weight:600;border-radius:999px;padding:5px 11px;border:1px solid #2A3160;color:#B4BAE0">Bulan</div>
+          </div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:8px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#151A3A;border:1px solid #2A3160;border-radius:18px;padding:18px 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">21–27 Juli</div>
+            <div style="display:flex;align-items:flex-end;gap:8px;height:120px">
+              <sc-for list="{{ moodBars }}" as="mb" hint-placeholder-count="7">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                  <span style="font-size:15px">{{ mb.emoji }}</span>
+                  <div style="width:100%;border-radius:7px 7px 3px 3px;background:{{ mb.color }};height:{{ mb.h }}"></div>
+                  <div style="font-size:9px;color:#7E85B0">{{ mb.day }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700;color:#B4BAE0">Yang paling sering muncul</div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px">
+              <div style="width:46px;height:48px;flex-shrink:0"><riung-monster monster="hakim" state="wild" detail="low"></riung-monster></div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:700">Si Hakim · 4 hari</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">Selalu bareng faktor "kerjaan"</div></div>
+              <riung-icon name="chevR" size="17" color="#7E85B0"></riung-icon>
+            </div>
+            <div style="background:#151A3A;border:1px solid #2A3160;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px">
+              <div style="width:46px;height:48px;flex-shrink:0"><riung-monster monster="waswas" state="wild" detail="low"></riung-monster></div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:700">Si Waswas · 2 hari</div><div style="font-size:11px;color:#7E85B0;margin-top:2px">Muncul menjelang rapat mingguan</div></div>
+              <riung-icon name="chevR" size="17" color="#7E85B0"></riung-icon>
+            </div>
+          </div>
+          <div style="background:rgba(95,208,138,0.08);border:1px solid rgba(95,208,138,0.25);border-radius:16px;padding:14px;display:flex;gap:10px;margin-bottom:8px">
+            <riung-icon name="chart" size="17" color="#5FD08A"></riung-icon>
+            <div style="font-size:12px;color:#B4BAE0;line-height:1.5;text-wrap:pretty">Akhir pekanmu konsisten lebih ringan. Coba bawa satu kebiasaan Sabtu (jalan pagi?) ke tengah minggu.</div>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Raka&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Konten&quot;},&quot;checkinReward&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:0,&quot;max&quot;:50,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ekonomi&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const userName = this.props.userName ?? 'Raka';
+    const checkinReward = this.props.checkinReward ?? 5;
+    const moods = [
+      { emoji:'😞', label:'Berat', sel:false },{ emoji:'😟', label:'Agak berat', sel:true },{ emoji:'😐', label:'Datar', sel:false },
+      { emoji:'🙂', label:'Cukup baik', sel:false },{ emoji:'😄', label:'Senang', sel:false },
+    ].map(m => ({
+      emoji: m.emoji, label: m.label,
+      border: m.sel ? '#7C8CFF' : '#2A3160',
+      bg: m.sel ? 'rgba(124,140,255,0.14)' : '#151A3A',
+      color: m.sel ? '#7C8CFF' : '#B4BAE0',
+    }));
+    const factors = [
+      { label:'Kerjaan', icon:'chart', sel:true },{ label:'Kuliah / sekolah', icon:'journal', sel:false },
+      { label:'Takut gagal', icon:'monster', sel:true },{ label:'Keluarga', icon:'heart', sel:false },
+      { label:'Uang', icon:'coin', sel:false },{ label:'Hubungan', icon:'user', sel:false },
+      { label:'Kurang tidur', icon:'moon', sel:true },{ label:'Kesehatan', icon:'shield', sel:false },
+      { label:'Media sosial', icon:'eyeOpen', sel:false },{ label:'Lainnya', icon:'plus', sel:false },
+    ].map(f => ({
+      label: f.label, icon: f.icon,
+      border: f.sel ? '#7C8CFF' : '#2A3160',
+      bg: f.sel ? 'rgba(124,140,255,0.14)' : 'transparent',
+      color: f.sel ? '#7C8CFF' : '#B4BAE0',
+    }));
+    const moodBars = [
+      { day:'Sel', emoji:'😐', h:'42%', color:'#3E477F' },{ day:'Rab', emoji:'😟', h:'28%', color:'#3E477F' },
+      { day:'Kam', emoji:'🙂', h:'58%', color:'#5A66B8' },{ day:'Jum', emoji:'😟', h:'30%', color:'#3E477F' },
+      { day:'Sab', emoji:'😄', h:'82%', color:'#4FD1C5' },{ day:'Min', emoji:'🙂', h:'64%', color:'#5A66B8' },
+      { day:'Sen', emoji:'😟', h:'32%', color:'#7C8CFF' },
+    ];
+    return { userName, checkinReward, moods, factors, moodBars };
+  }
+}
+</script>
+</body>
+</html>

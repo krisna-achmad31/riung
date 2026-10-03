@@ -1,0 +1,11 @@
+# Lokal per mesin
+.claude/settings.local.json
+*.log
+
+# Konfigurasi Firebase per perangkat/akun — simpan di luar repo
+riung/android/app/google-services.json
+riung/ios/Runner/GoogleService-Info.plist
+riung/android/local.properties
+
+# Crop perantara aset 3D (dibuat ulang dari generated-*.png)
+design/aset3d/

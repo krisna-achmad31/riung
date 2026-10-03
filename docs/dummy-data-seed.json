@@ -1,0 +1,635 @@
+{
+  "_meta": {
+    "purpose": "Firestore seed / dummy data v1.0",
+    "locale": "id-ID",
+    "currency_soft": "koin"
+  },
+  "config_economy": {
+    "coin_rewards": {
+      "daily_checkin": 5,
+      "streak_7": 20,
+      "streak_30": 100,
+      "monster_tamed": 50,
+      "betterme_lesson": 10,
+      "minigame_win": 8
+    },
+    "coin_costs": {
+      "focus_25min": 25,
+      "focus_45min": 40,
+      "focus_60min": 50,
+      "attack_ticket": 30,
+      "streak_saver": 20,
+      "skin_common": 100,
+      "skin_epic": 300,
+      "skin_legendary": 500
+    },
+    "free_tier_limits": {
+      "meditations": 3,
+      "sleep_stories": 2,
+      "journal_per_day": 1,
+      "minigame_per_day": 1
+    }
+  },
+  "products": [
+    {
+      "id": "coins_80",
+      "sku": "coin_pack_small",
+      "type": "consumable",
+      "coins": 80,
+      "price_idr": 15000,
+      "label": "Kantong Koin"
+    },
+    {
+      "id": "coins_300",
+      "sku": "coin_pack_medium",
+      "type": "consumable",
+      "coins": 300,
+      "bonus": 30,
+      "price_idr": 49000,
+      "label": "Peti Koin",
+      "badge": "Terpopuler"
+    },
+    {
+      "id": "coins_700",
+      "sku": "coin_pack_large",
+      "type": "consumable",
+      "coins": 700,
+      "bonus": 120,
+      "price_idr": 99000,
+      "label": "Brankas Koin"
+    },
+    {
+      "id": "premium_m",
+      "sku": "premium_monthly",
+      "type": "subscription",
+      "price_idr": 59000,
+      "label": "Premium Bulanan"
+    },
+    {
+      "id": "premium_y",
+      "sku": "premium_yearly",
+      "type": "subscription",
+      "price_idr": 399000,
+      "label": "Premium Tahunan",
+      "badge": "Hemat 44%",
+      "trial_days": 7
+    }
+  ],
+  "saboteurs": [
+    {
+      "id": "meronta",
+      "nama": "Si Meronta",
+      "distorsi_cbt": "Personalization / pola korban",
+      "warna": "#6E7BA6",
+      "deskripsi": "Membesar-besarkan kemalangan dan membuatmu merasa tak berdaya. 'Kenapa selalu aku?'",
+      "tanda": [
+        "Sering merasa dunia tidak adil",
+        "Sulit melihat pilihan yang masih ada",
+        "Energi habis untuk mengasihani diri"
+      ],
+      "cara_menjinakkan": "Latihan reframing: tulis 1 hal yang MASIH bisa kamu kendalikan hari ini.",
+      "fakta_riset": "Behavioral activation — melakukan aktivitas kecil yang bermakna — terbukti menurunkan gejala depresi hingga 6 bulan dalam uji klinis digital."
+    },
+    {
+      "id": "waswas",
+      "nama": "Si Waswas",
+      "distorsi_cbt": "Catastrophizing",
+      "warna": "#E8A94E",
+      "deskripsi": "Selalu membayangkan skenario terburuk yang belum tentu terjadi.",
+      "tanda": [
+        "Overthinking sebelum tidur",
+        "Jantung berdebar memikirkan 'bagaimana kalau...'",
+        "Sulit fokus karena cemas"
+      ],
+      "cara_menjinakkan": "Napas 4-7-8 tiga putaran, lalu uji: 'Apa buktinya skenario itu akan terjadi?'",
+      "fakta_riset": "Kecemasan adalah masalah kesehatan mental paling umum pada remaja Indonesia (I-NAMHS 2022). Latihan pernapasan rutin terbukti mempercepat penurunan kecemasan dalam 6 minggu pertama."
+    },
+    {
+      "id": "kabut",
+      "nama": "Si Kabut",
+      "distorsi_cbt": "Ruminasi & prokrastinasi",
+      "warna": "#9AA2B8",
+      "deskripsi": "Mengaburkan tujuanmu sampai semua terasa berat untuk dimulai.",
+      "tanda": [
+        "Scroll tanpa sadar berjam-jam",
+        "Menunda tugas kecil",
+        "Merasa 'buntu' tanpa alasan jelas"
+      ],
+      "cara_menjinakkan": "Masuk Mode Fokus 25 menit — satu tugas kecil saja.",
+      "fakta_riset": "Pemakaian layar berlebihan berkaitan dengan naiknya risiko depresi dan kecemasan hingga 20–30%, dan mengganggu tidur yang mengatur mood."
+    },
+    {
+      "id": "cermin",
+      "nama": "Si Cermin",
+      "distorsi_cbt": "Social comparison",
+      "warna": "#B39DDB",
+      "deskripsi": "Memantulkan versi dirimu yang terdistorsi lewat perbandingan dengan orang lain.",
+      "tanda": [
+        "Merasa kurang setelah buka medsos",
+        "Mengukur diri dari likes/followers",
+        "Iri yang melelahkan"
+      ],
+      "cara_menjinakkan": "Tulis 3 hal yang kamu hargai dari dirimu — tanpa membandingkan.",
+      "fakta_riset": "Tekanan perbandingan sosial dan validasi digital terbukti memperburuk kondisi mental remaja; interaksi daring yang positif justru memperkuat percaya diri."
+    },
+    {
+      "id": "sempurna",
+      "nama": "Si Sempurna",
+      "distorsi_cbt": "Perfectionism / should-statements",
+      "warna": "#F2766F",
+      "deskripsi": "Membawa 'pena merah' dan tidak pernah puas dengan usahamu.",
+      "tanda": [
+        "Takut mulai karena takut jelek",
+        "Standar 'harus sempurna'",
+        "Sulit merayakan progres"
+      ],
+      "cara_menjinakkan": "Restrukturisasi kognitif: ganti 'harus sempurna' menjadi 'cukup baik untuk hari ini'.",
+      "fakta_riset": "Cognitive restructuring adalah salah satu komponen aktif paling efektif dalam aplikasi kesehatan mental berbasis CBT menurut analisis 169 uji klinis."
+    },
+    {
+      "id": "mengelak",
+      "nama": "Si Mengelak",
+      "distorsi_cbt": "Experiential avoidance",
+      "warna": "#5FB0A0",
+      "deskripsi": "Licin — selalu membawamu kabur dari hal yang tidak nyaman.",
+      "tanda": [
+        "Menghindari percakapan sulit",
+        "Ganti aktivitas saat mulai tidak nyaman",
+        "Masalah menumpuk"
+      ],
+      "cara_menjinakkan": "Goal setting mikro: hadapi 1 hal kecil yang kamu hindari, 10 menit saja.",
+      "fakta_riset": "Goal setting terstruktur adalah komponen inti aplikasi CBT yang efektif; menghadapi bertahap lebih efektif daripada menghindar."
+    },
+    {
+      "id": "hakim",
+      "nama": "Si Hakim",
+      "distorsi_cbt": "Inner critic / global labeling",
+      "warna": "#8B5CF6",
+      "boss": true,
+      "deskripsi": "Saboteur utama — suara yang menghakimi dirimu dan orang lain, sumber yang membangunkan saboteur lainnya.",
+      "tanda": [
+        "Self-talk kasar ('aku bodoh')",
+        "Cepat menghakimi orang",
+        "Merasa tidak pernah cukup"
+      ],
+      "cara_menjinakkan": "Program 'Better me': kenali suaranya, beri nama, jawab dengan bukti.",
+      "fakta_riset": "Intervensi digital berbasis CBT menempati peringkat efikasi tertinggi untuk depresi dan kecemasan pada remaja & dewasa muda dalam network meta-analysis."
+    }
+  ],
+  "research_facts": [
+    {
+      "id": "rf1",
+      "teks": "1 dari 3 remaja Indonesia (≈15,5 juta) memiliki setidaknya satu masalah kesehatan mental.",
+      "sumber": "I-NAMHS 2022"
+    },
+    {
+      "id": "rf2",
+      "teks": "Kecemasan adalah masalah paling umum: 28,2% remaja perempuan dan 25,4% remaja laki-laki.",
+      "sumber": "I-NAMHS 2022"
+    },
+    {
+      "id": "rf3",
+      "teks": "Prevalensi depresi tertinggi justru di usia 15–24 tahun.",
+      "sumber": "SKI 2023, Kemenkes"
+    },
+    {
+      "id": "rf4",
+      "teks": "Hanya sekitar 1 dari 10 anak muda dengan depresi yang mencari bantuan.",
+      "sumber": "SKI 2023, Kemenkes"
+    },
+    {
+      "id": "rf5",
+      "teks": "Pemakaian medsos berlebihan menaikkan risiko depresi & kecemasan hingga 20–30%.",
+      "sumber": "Kemenkes / studi 2019–2024"
+    },
+    {
+      "id": "rf6",
+      "teks": "Aplikasi berbasis CBT terbukti paling efektif menurunkan gejala cemas & depresi.",
+      "sumber": "Meta-analisis npj Digital Medicine 2025"
+    },
+    {
+      "id": "rf7",
+      "teks": "Latihan pernapasan yang rutin mempercepat penurunan kecemasan dalam 6 minggu pertama.",
+      "sumber": "JMIR 2023"
+    },
+    {
+      "id": "rf8",
+      "teks": "Risiko masalah mental 2,5x lebih besar pada pekerja usia produktif di bawah 40 tahun.",
+      "sumber": "Riset nasional 2025 (n=5.828)"
+    },
+    {
+      "id": "rf9",
+      "teks": "Pekerja dengan masalah mental kehilangan rata-rata 34 hari kerja per tahun, dengan penurunan performa hingga 51%.",
+      "sumber": "Riset nasional 2025"
+    },
+    {
+      "id": "rf10",
+      "teks": "Lebih dari 25% pekerja Indonesia bekerja di atas 49 jam per minggu — melebihi 48 jam/minggu menaikkan risiko burnout dan gangguan tidur.",
+      "sumber": "Sakernas 2025"
+    }
+  ],
+  "users_sample": [
+    {
+      "uid": "u_001",
+      "profile": {
+        "displayName": "Raka",
+        "avatarId": "av3",
+        "locale": "id",
+        "persona": "pekerja"
+      },
+      "wallet": {
+        "coins": 145,
+        "lifetimeEarned": 425,
+        "lifetimeSpent": 280
+      },
+      "premium": {
+        "active": false
+      },
+      "streak": {
+        "current": 12,
+        "longest": 21,
+        "lastCheckinDate": "2026-07-25"
+      },
+      "assessment": {
+        "dominantSaboteurs": [
+          "waswas",
+          "sempurna"
+        ],
+        "scores": {
+          "meronta": 34,
+          "waswas": 82,
+          "kabut": 61,
+          "cermin": 47,
+          "sempurna": 76,
+          "mengelak": 29,
+          "hakim": 68
+        }
+      },
+      "monsters": {
+        "waswas": {
+          "state": "taming",
+          "progress": 65
+        },
+        "sempurna": {
+          "state": "wild",
+          "progress": 20
+        },
+        "kabut": {
+          "state": "tamed",
+          "progress": 100,
+          "tamedAt": "2026-07-10"
+        }
+      }
+    },
+    {
+      "uid": "u_002",
+      "profile": {
+        "displayName": "Sinta",
+        "avatarId": "av7",
+        "locale": "id",
+        "persona": "pekerja"
+      },
+      "wallet": {
+        "coins": 730,
+        "lifetimeEarned": 1240,
+        "lifetimeSpent": 510
+      },
+      "premium": {
+        "active": true,
+        "plan": "yearly",
+        "renewsAt": "2027-03-02"
+      },
+      "streak": {
+        "current": 45,
+        "longest": 45,
+        "lastCheckinDate": "2026-07-26"
+      },
+      "assessment": {
+        "dominantSaboteurs": [
+          "cermin",
+          "hakim"
+        ],
+        "scores": {
+          "meronta": 22,
+          "waswas": 55,
+          "kabut": 40,
+          "cermin": 88,
+          "sempurna": 63,
+          "mengelak": 35,
+          "hakim": 79
+        }
+      },
+      "monsters": {
+        "cermin": {
+          "state": "taming",
+          "progress": 80
+        },
+        "hakim": {
+          "state": "taming",
+          "progress": 30
+        },
+        "waswas": {
+          "state": "tamed",
+          "progress": 100,
+          "tamedAt": "2026-06-01"
+        },
+        "meronta": {
+          "state": "tamed",
+          "progress": 100,
+          "tamedAt": "2026-05-12"
+        }
+      }
+    },
+    {
+      "uid": "u_003",
+      "profile": {
+        "displayName": "Dimas",
+        "avatarId": "av1",
+        "locale": "id",
+        "persona": "mahasiswa"
+      },
+      "wallet": {
+        "coins": 8,
+        "lifetimeEarned": 63,
+        "lifetimeSpent": 55
+      },
+      "premium": {
+        "active": false
+      },
+      "streak": {
+        "current": 2,
+        "longest": 5,
+        "lastCheckinDate": "2026-07-26"
+      },
+      "assessment": {
+        "dominantSaboteurs": [
+          "kabut",
+          "mengelak"
+        ],
+        "scores": {
+          "meronta": 41,
+          "waswas": 38,
+          "kabut": 85,
+          "cermin": 30,
+          "sempurna": 25,
+          "mengelak": 72,
+          "hakim": 50
+        }
+      },
+      "monsters": {
+        "kabut": {
+          "state": "wild",
+          "progress": 10
+        },
+        "mengelak": {
+          "state": "wild",
+          "progress": 0
+        }
+      }
+    }
+  ],
+  "transactions_sample": [
+    {
+      "uid": "u_001",
+      "txId": "tx_9001",
+      "type": "purchase",
+      "amount": 300,
+      "reason": "coin_pack_medium",
+      "price_idr": 49000,
+      "ts": "2026-07-20T09:12:00+07:00"
+    },
+    {
+      "uid": "u_001",
+      "txId": "tx_9002",
+      "type": "spend",
+      "amount": -25,
+      "reason": "focus_25min",
+      "ref": "sess_301",
+      "ts": "2026-07-20T09:15:00+07:00"
+    },
+    {
+      "uid": "u_001",
+      "txId": "tx_9003",
+      "type": "earn",
+      "amount": 5,
+      "reason": "daily_checkin",
+      "ts": "2026-07-21T06:40:00+07:00"
+    },
+    {
+      "uid": "u_001",
+      "txId": "tx_9004",
+      "type": "earn",
+      "amount": 50,
+      "reason": "monster_tamed:kabut",
+      "ts": "2026-07-10T20:02:00+07:00"
+    },
+    {
+      "uid": "u_003",
+      "txId": "tx_9101",
+      "type": "spend",
+      "amount": -30,
+      "reason": "attack_ticket",
+      "ref": "game_88",
+      "ts": "2026-07-25T19:30:00+07:00"
+    }
+  ],
+  "sessions_sample": [
+    {
+      "uid": "u_001",
+      "sessionId": "sess_301",
+      "type": "focus",
+      "duration_min": 25,
+      "coinsSpent": 25,
+      "completed": true,
+      "ts": "2026-07-20T09:15:00+07:00"
+    },
+    {
+      "uid": "u_002",
+      "sessionId": "sess_442",
+      "type": "meditation",
+      "contentId": "med_02",
+      "duration_min": 10,
+      "completed": true,
+      "ts": "2026-07-26T06:15:00+07:00"
+    },
+    {
+      "uid": "u_002",
+      "sessionId": "sess_443",
+      "type": "sleep",
+      "contentId": "slp_01",
+      "duration_min": 32,
+      "completed": false,
+      "ts": "2026-07-25T22:40:00+07:00"
+    },
+    {
+      "uid": "u_003",
+      "sessionId": "game_88",
+      "type": "minigame",
+      "saboteurId": "kabut",
+      "result": "win",
+      "coinsEarned": 8,
+      "ts": "2026-07-25T19:34:00+07:00"
+    }
+  ],
+  "checkins_sample": [
+    {
+      "uid": "u_001",
+      "date": "2026-07-26",
+      "mood": "cemas",
+      "energy": 3,
+      "sleepQuality": 2,
+      "intention": "Selesaikan revisi tanpa menunda"
+    },
+    {
+      "uid": "u_002",
+      "date": "2026-07-26",
+      "mood": "tenang",
+      "energy": 4,
+      "sleepQuality": 4,
+      "intention": "Jalan pagi 20 menit"
+    }
+  ],
+  "journal_sample": [
+    {
+      "uid": "u_001",
+      "entryId": "j_101",
+      "promptId": "p_03",
+      "mood": "lega",
+      "text": "Hari ini aku sadar Si Waswas muncul tiap mau presentasi. Kucoba napas 4-7-8 dan ternyata skenario buruknya nggak kejadian.",
+      "tags": [
+        "kerja",
+        "cemas"
+      ],
+      "createdAt": "2026-07-24T21:05:00+07:00"
+    }
+  ],
+  "meditations": [
+    {
+      "id": "med_01",
+      "judul": "Menjinakkan Napas",
+      "durasi_min": 5,
+      "free": true,
+      "kategori": "pemula"
+    },
+    {
+      "id": "med_02",
+      "judul": "Meredakan Waswas",
+      "durasi_min": 10,
+      "free": true,
+      "kategori": "kecemasan"
+    },
+    {
+      "id": "med_03",
+      "judul": "Fokus Satu Hal",
+      "durasi_min": 7,
+      "free": true,
+      "kategori": "fokus"
+    },
+    {
+      "id": "med_04",
+      "judul": "Melepas Pena Merah",
+      "durasi_min": 12,
+      "free": false,
+      "kategori": "perfeksionisme"
+    },
+    {
+      "id": "med_05",
+      "judul": "Jeda di Tengah Kerja",
+      "durasi_min": 5,
+      "free": true,
+      "kategori": "kerja"
+    }
+  ],
+  "sleep_stories": [
+    {
+      "id": "slp_01",
+      "judul": "Hujan di Kaki Gunung",
+      "durasi_min": 30,
+      "free": true
+    },
+    {
+      "id": "slp_02",
+      "judul": "Perahu di Danau Tenang",
+      "durasi_min": 45,
+      "free": true
+    },
+    {
+      "id": "slp_03",
+      "judul": "Kereta Malam ke Timur",
+      "durasi_min": 40,
+      "free": false
+    }
+  ],
+  "affirmations": [
+    {
+      "id": "af_01",
+      "teks": "Aku tidak harus sempurna untuk berharga.",
+      "target_saboteur": "sempurna"
+    },
+    {
+      "id": "af_02",
+      "teks": "Pikiran burukku bukan ramalan.",
+      "target_saboteur": "waswas"
+    },
+    {
+      "id": "af_03",
+      "teks": "Satu langkah kecil hari ini sudah cukup.",
+      "target_saboteur": "kabut"
+    },
+    {
+      "id": "af_04",
+      "teks": "Aku mengukur diriku dengan nilaiku sendiri.",
+      "target_saboteur": "cermin"
+    }
+  ],
+  "betterme_lessons": [
+    {
+      "id": "bm_01",
+      "level": 1,
+      "judul": "Kenali Suara Si Hakim",
+      "tipe": "psikoedukasi",
+      "coins_reward": 10,
+      "free": true
+    },
+    {
+      "id": "bm_02",
+      "level": 1,
+      "judul": "Memberi Nama Saboteurmu",
+      "tipe": "latihan",
+      "coins_reward": 10,
+      "free": true
+    },
+    {
+      "id": "bm_03",
+      "level": 2,
+      "judul": "Menguji Bukti Pikiran",
+      "tipe": "cbt_restructuring",
+      "coins_reward": 10,
+      "free": false
+    },
+    {
+      "id": "bm_04",
+      "level": 2,
+      "judul": "Aktivasi: Satu Aksi Kecil",
+      "tipe": "behavioral_activation",
+      "coins_reward": 10,
+      "free": false
+    },
+    {
+      "id": "bm_05",
+      "level": 3,
+      "judul": "Mengenali Burnout",
+      "tipe": "psikoedukasi",
+      "coins_reward": 10,
+      "free": false
+    },
+    {
+      "id": "bm_06",
+      "level": 3,
+      "judul": "Menetapkan Batas Kerja",
+      "tipe": "latihan",
+      "coins_reward": 10,
+      "free": false
+    }
+  ]
+}
