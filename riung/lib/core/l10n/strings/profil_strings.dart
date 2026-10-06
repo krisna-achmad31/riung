@@ -115,8 +115,11 @@ abstract class ProfilStrings {
   String get privacyFrozenBody;
   String get privacyDataTitle;
   String get privacyDataBody;
+  String get privacyAnalyticsTitle;
+  String get privacyAnalyticsBody;
   String get privacyDeleteTitle;
   String get privacyDeleteBody;
+  String get privacyFullPolicy;
 
   // ── Langganan ──
   String get subTitle;
@@ -366,7 +369,7 @@ class ProfilStringsId extends ProfilStrings {
   String get privacySyncTitle => 'Yang tersinkron ke server';
   @override
   String get privacySyncBody =>
-      'Cuma profil (nama, avatar), saldo koin, streak, progres monster, dan status Premium — supaya bisa lanjut di perangkat lain. Semuanya dilindungi aturan akses yang cuma bisa dibaca/ditulis akunmu sendiri.';
+      'Selama kamu belum masuk akun, semuanya tersimpan di perangkat ini saja. Setelah kamu masuk dengan email atau Google, yang tersinkron cuma profil (nama, avatar, bahasa), hasil kuis monster, saldo koin, streak, progres monster, status Premium, dan hash PIN jurnal (bukan PIN-nya, bukan isi jurnal), supaya bisa lanjut di perangkat lain. Semuanya dilindungi aturan akses yang cuma bisa dibaca/ditulis akunmu sendiri.';
   @override
   String get privacyCrisisTitle => 'Halaman krisis';
   @override
@@ -383,10 +386,17 @@ class ProfilStringsId extends ProfilStrings {
   String get privacyDataBody =>
       'Laporan refleksi dan hasil tes kepribadianmu dihitung di perangkat dari check-in dan metadata jurnal (tanggal, mood, tag), tanpa membaca isi jurnal, dan tidak dikirim ke server. Kalau kamu menghubungkan data tidur, Riung membaca durasi tidur dari Health Connect hanya untuk laporan itu, tidak menyimpannya, dan kamu bisa mencabut izinnya kapan saja.';
   @override
+  String get privacyAnalyticsTitle => 'Statistik pemakaian & laporan error';
+  @override
+  String get privacyAnalyticsBody =>
+      'Supaya tahu fitur mana yang membantu, Riung mencatat sedikit peristiwa lewat Firebase Analytics, misalnya selesai onboarding, hasil kuis (monster mana yang jadi bos), mood yang kamu pilih saat check-in, sesi Fokus, mini-game, membuka halaman Premium, dan pembelian. Catatan ini memakai ID acak, tidak terhubung ke nama atau emailmu, dan tidak pernah memuat isi jurnal. Kalau app error, Crashlytics mengirim detail teknis (model HP, versi Android, error-nya) supaya bisa kami perbaiki. Kami tidak menjual data dan tidak menampilkan iklan.';
+  @override
   String get privacyDeleteTitle => 'Hapus akun';
   @override
   String get privacyDeleteBody =>
-      'Menghapus akun akan menghapus profil, wallet, dan progres monstermu dari server, serta semua data di perangkat ini (jurnal, check-in, hasil tes). Ini permanen dan tidak bisa dibatalkan.';
+      'Menghapus akun akan menghapus profil, hasil kuis monster, wallet, dan progres monstermu dari server, serta semua data di perangkat ini (jurnal, check-in, hasil tes). Ini permanen dan tidak bisa dibatalkan.';
+  @override
+  String get privacyFullPolicy => 'Baca kebijakan privasi lengkap';
 
   @override
   String get subTitle => 'Langgananku';
@@ -683,7 +693,7 @@ class ProfilStringsEn extends ProfilStrings {
   String get privacySyncTitle => 'What syncs to the server';
   @override
   String get privacySyncBody =>
-      'Only your profile (name, avatar), coin balance, streak, monster progress, and Premium status, so you can continue on another device. All of it is protected by access rules that only your own account can read or write.';
+      'Until you sign in, everything stays on this device only. Once you sign in with email or Google, only your profile (name, avatar, language), monster quiz result, coin balance, streak, monster progress, Premium status, and a hash of your journal PIN (not the PIN itself, not your journal) sync, so you can continue on another device. All of it is protected by access rules that only your own account can read or write.';
   @override
   String get privacyCrisisTitle => 'Crisis page';
   @override
@@ -700,10 +710,17 @@ class ProfilStringsEn extends ProfilStrings {
   String get privacyDataBody =>
       'Your reflection report and personality results are calculated on your device from check-ins and journal metadata (date, mood, tags), without reading journal content, and are not sent to a server. If you connect sleep data, Riung reads sleep duration from Health Connect only for that report, does not store it, and you can revoke access any time.';
   @override
+  String get privacyAnalyticsTitle => 'Usage stats & crash reports';
+  @override
+  String get privacyAnalyticsBody =>
+      'To learn which features help, Riung records a few events with Firebase Analytics, such as finishing onboarding, your quiz result (which monster is the boss), the mood you pick in a check-in, Focus sessions, mini-games, opening the Premium page, and purchases. These use a random ID, are not linked to your name or email, and never include journal content. If the app crashes, Crashlytics sends technical details (phone model, Android version, the error) so we can fix it. We don\'t sell data and we don\'t show ads.';
+  @override
   String get privacyDeleteTitle => 'Delete account';
   @override
   String get privacyDeleteBody =>
-      'Deleting your account removes your profile, wallet, and monster progress from the server, plus all data on this device (journal, check-ins, test results). It is permanent and cannot be undone.';
+      'Deleting your account removes your profile, monster quiz result, wallet, and monster progress from the server, plus all data on this device (journal, check-ins, test results). It is permanent and cannot be undone.';
+  @override
+  String get privacyFullPolicy => 'Read the full privacy policy';
 
   @override
   String get subTitle => 'My subscription';
