@@ -46,6 +46,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Waitlist dari landing page (landing/public/waitlist.js) — publik
+    // boleh menambah satu email, tidak ada yang bisa membaca/mengubah
+    // dari client (dibaca lewat Firebase Console saja).
+    match /waitlist/{entryId} {
+      allow create: if request.resource.data.keys().hasOnly(['email', 'lang', 'source', 'createdAt'])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$')
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if false;
+    }
+
     function isOwner(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
