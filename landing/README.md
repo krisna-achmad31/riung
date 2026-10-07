@@ -59,3 +59,8 @@ whenever `styles.css` changes.
 `public/assets/*.webp` are resized from `design/aset3d_cut/`; the phone
 mockups (`phone_home`, `step_*`) are renders of the phone frames inside the
 landing design.
+
+`public/assets/misteri_*.webp` are the hidden Habit Monster silhouettes for
+the "Still hiding" teaser. They're built by
+`design/aset3d_cut/siluet/build_siluet.py` from the wild art and numbered in
+Big Quiz order on purpose, so the file names don't give the monsters away.
