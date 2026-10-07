@@ -1,0 +1,34 @@
+{
+  "title": "Burnout Test",
+  "description": "Measure your emotional exhaustion from work or school. Burnout isn't just physical tiredness; it's losing motivation and empathy.",
+  "options": ["Never", "A few times a year", "Once a month", "A few times a month", "Once a week", "Almost every day"],
+  "questions": {
+    "mbi_1": "I feel emotionally drained by my work or studies.",
+    "mbi_2": "I feel completely used up at the end of the workday.",
+    "mbi_3": "I feel tired every morning when I wake up and have to face the same routine again.",
+    "mbi_4": "I can easily understand how my colleagues or clients feel and help solve their problems.",
+    "mbi_5": "I feel I treat some colleagues or clients as if they were objects (a loss of empathy).",
+    "mbi_6": "Dealing with people all day leaves me feeling fed up and pressured.",
+    "mbi_7": "I can deal with problems at work effectively.",
+    "mbi_8": "I feel out of breath and overwhelmed by what's happening at work.",
+    "mbi_9": "I feel I make a positive difference in other people's lives through my work.",
+    "mbi_10": "I've become more callous toward people since I took on this role.",
+    "mbi_11": "I worry that this work is hardening me emotionally (making me numb).",
+    "mbi_12": "I feel very energetic at work.",
+    "mbi_13": "I feel very frustrated and held back by this work.",
+    "mbi_14": "I feel I'm working too hard, beyond what I can handle.",
+    "mbi_15": "I no longer care at all about what happens to the place where I study or work.",
+    "mbi_16": "Working directly with people puts too much stress on me.",
+    "mbi_17": "I can easily create a relaxed atmosphere with my colleagues or friends.",
+    "mbi_18": "I feel happy when I see the work I've done come together.",
+    "mbi_19": "I feel I've accomplished many worthwhile things in my career or studies.",
+    "mbi_20": "I feel I'm at the end of my rope.",
+    "mbi_21": "At work or on campus, I deal with emotional problems very calmly.",
+    "mbi_22": "I feel colleagues or clients blame me for problems they created themselves."
+  },
+  "results": [
+    { "category": "Stable", "description": "Your stress is under control. You still have positive energy for your routine." },
+    { "category": "Early Signs of Burnout", "description": "Cynicism and mental fatigue are starting to show and need attention soon, through time off or a detox." },
+    { "category": "Acute Burnout", "description": "You've run out of emotional fuel and feel empty or cynical. This is a red light for your mental health." }
+  ]
+}

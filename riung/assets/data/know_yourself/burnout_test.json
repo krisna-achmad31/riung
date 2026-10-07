@@ -1,0 +1,56 @@
+{
+  "id": "burnout_test",
+  "title": "Burnout Test",
+  "description": "Ukur kelelahan emosionalmu terkait pekerjaan/sekolah. Burnout bukan sekadar lelah fisik, melainkan kehilangan motivasi dan empati.",
+  "isPremium": true,
+  "questionCount": 22,
+  "theoryReference": "Diadaptasi dari Maslach Burnout Inventory (MBI)",
+  "scoringLogic": {
+    "type": "sum_with_reverse",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Beberapa Kali Setahun" },
+      { "value": 2, "label": "Sekali Sebulan" },
+      { "value": 3, "label": "Beberapa Kali Sebulan" },
+      { "value": 4, "label": "Sekali Seminggu" },
+      { "value": 5, "label": "Hampir Setiap Hari" }
+    ],
+    "reverseOptions": [
+      { "value": 5, "label": "Tidak Pernah" },
+      { "value": 4, "label": "Beberapa Kali Setahun" },
+      { "value": 3, "label": "Sekali Sebulan" },
+      { "value": 2, "label": "Beberapa Kali Sebulan" },
+      { "value": 1, "label": "Sekali Seminggu" },
+      { "value": 0, "label": "Hampir Setiap Hari" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 40, "category": "Kondisi Stabil", "description": "Tingkat stresmu terkendali. Kamu masih memiliki energi positif terhadap rutinitasmu." },
+    { "minScore": 41, "maxScore": 75, "category": "Gejala Burnout Awal", "description": "Mulai muncul rasa sinis dan kelelahan mental yang perlu segera dikelola lewat cuti atau detoks." },
+    { "minScore": 76, "maxScore": 110, "category": "Burnout Akut", "description": "Kamu kehabisan bahan bakar emosional (exhausted) dan merasa kosong/sinis. Ini lampu merah untuk kesehatan mentalmu." }
+  ],
+  "questions": [
+    { "id": "mbi_1", "text": "Saya merasa terkuras habis secara emosional oleh pekerjaan/studi saya." },
+    { "id": "mbi_2", "text": "Saya merasa benar-benar kehabisan tenaga pada saat hari kerja berakhir." },
+    { "id": "mbi_3", "text": "Saya merasa lelah setiap kali bangun tidur di pagi hari karena harus menghadapi beban rutinitas yang sama." },
+    { "id": "mbi_4", "text": "Saya bisa dengan mudah memahami perasaan dan menyelesaikan masalah rekan/klien saya.", "isReverse": true },
+    { "id": "mbi_5", "text": "Saya merasa memperlakukan beberapa kolega atau klien seperti 'benda mati' (hilang empati)." },
+    { "id": "mbi_6", "text": "Bekerja seharian berinteraksi dengan orang banyak membuat saya merasa sangat muak dan tertekan." },
+    { "id": "mbi_7", "text": "Saya mampu menangani masalah-masalah kerja secara efektif.", "isReverse": true },
+    { "id": "mbi_8", "text": "Saya merasa seperti kehabisan napas/kewalahan dengan apa yang terjadi di tempat kerja saya." },
+    { "id": "mbi_9", "text": "Saya merasa saya berkontribusi positif pada kehidupan orang lain melalui apa yang saya kerjakan.", "isReverse": true },
+    { "id": "mbi_10", "text": "Saya menjadi lebih bersikap tidak peduli (kalus) terhadap orang lain semenjak saya berada dalam peran ini." },
+    { "id": "mbi_11", "text": "Saya khawatir pekerjaan ini mulai membuat emosi saya mengeras (mati rasa)." },
+    { "id": "mbi_12", "text": "Saya merasa sangat energik di tempat kerja.", "isReverse": true },
+    { "id": "mbi_13", "text": "Saya merasa sangat frustrasi dan terhambat oleh pekerjaan ini." },
+    { "id": "mbi_14", "text": "Saya merasa saya bekerja terlalu keras hingga melewati batas kemampuan saya." },
+    { "id": "mbi_15", "text": "Saya sama sekali tidak peduli lagi pada apa yang akan terjadi dengan tempat saya belajar/bekerja saat ini." },
+    { "id": "mbi_16", "text": "Bekerja secara langsung dengan orang lain menimbulkan terlalu banyak tekanan bagi saya." },
+    { "id": "mbi_17", "text": "Saya dapat dengan mudah menciptakan suasana yang rileks bersama rekan kerja/teman saya.", "isReverse": true },
+    { "id": "mbi_18", "text": "Saya merasa gembira ketika melihat hasil yang saya kerjakan selesai.", "isReverse": true },
+    { "id": "mbi_19", "text": "Saya merasa telah mencapai banyak hal berharga dari karir/studi saya ini.", "isReverse": true },
+    { "id": "mbi_20", "text": "Saya merasa saya berada di penghujung kesabaran dan tali kewarasan saya." },
+    { "id": "mbi_21", "text": "Di tempat kerja/kampus, saya sangat mudah menyelesaikan masalah emosional dengan sangat tenang.", "isReverse": true },
+    { "id": "mbi_22", "text": "Saya merasa bahwa rekan atau klien justru menyalahkan saya atas masalah yang mereka buat sendiri." }
+  ]
+}

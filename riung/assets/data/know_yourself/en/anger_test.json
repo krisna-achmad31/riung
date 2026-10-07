@@ -1,0 +1,30 @@
+{
+  "title": "Anger Test",
+  "description": "Get to know your anger triggers and how you tend to express frustration.",
+  "options": ["Not at all", "Rarely", "Often", "Almost always"],
+  "questions": {
+    "ang_1": "Small things easily make me feel very irritated or frustrated.",
+    "ang_2": "When I'm angry, I tend to bottle it up until it finally explodes.",
+    "ang_3": "I often say or do things I regret when I'm emotional.",
+    "ang_4": "My heart pounds and my muscles tense up physically when I'm angry.",
+    "ang_5": "I feel that other people deliberately try to make me angry or annoy me.",
+    "ang_6": "I often raise my voice or snap during arguments.",
+    "ang_7": "It's hard for me to forgive people who hurt me, even long afterwards.",
+    "ang_8": "When I'm angry, I feel like breaking things or slamming doors.",
+    "ang_9": "I can stay angry for days over one small incident.",
+    "ang_10": "I often give people the silent treatment when I'm upset with them.",
+    "ang_11": "I feel no one listens to my opinion unless I get angry.",
+    "ang_12": "Sometimes I hit a wall or a table to let out my frustration.",
+    "ang_13": "When I'm alone, I keep replaying the events that made me angry.",
+    "ang_14": "People close to me have said I have trouble managing my anger.",
+    "ang_15": "I often get into heated arguments with strangers (e.g. on the road or on social media).",
+    "ang_16": "I get very angry when my plans don't go exactly the way I expected.",
+    "ang_17": "I get angry seeing other people break the rules, even when it doesn't affect me directly.",
+    "ang_18": "When my anger fades, I often feel very guilty."
+  },
+  "results": [
+    { "category": "Good Anger Management", "description": "You're very patient and keep your anger well under control." },
+    { "category": "Moderately Reactive", "description": "You sometimes explode or bottle up anger, but it's still within a normal range." },
+    { "category": "Clinical Level of Anger", "description": "Anger often takes control and affects your life and relationships." }
+  ]
+}

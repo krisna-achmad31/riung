@@ -1,0 +1,29 @@
+{
+  "title": "OCD Test",
+  "description": "Recognize tendencies toward obsessive thoughts and repetitive behaviors (compulsions).",
+  "options": ["Not at all", "A little", "Moderately", "A lot", "Extremely"],
+  "questions": {
+    "ocir_1": "I collect so many things that they fill up space and get in the way.",
+    "ocir_2": "I check things (like the stove, locks, or windows) more often than necessary.",
+    "ocir_3": "I get upset if others change the way I've arranged my things.",
+    "ocir_4": "I feel I have to count things (like my steps).",
+    "ocir_5": "I find it very hard to throw away things I don't actually need.",
+    "ocir_6": "I have unpleasant thoughts that keep coming back against my will.",
+    "ocir_7": "I repeat certain actions to make sure I've done them right.",
+    "ocir_8": "I wash my hands too much or for longer than necessary.",
+    "ocir_9": "I feel I have to check everything carefully and repeatedly.",
+    "ocir_10": "I often think about bad things that I can't get out of my head.",
+    "ocir_11": "I feel I have to do a routine or habit without skipping anything.",
+    "ocir_12": "I often think dirty, frightening, or strange things for no reason.",
+    "ocir_13": "I have to arrange things around me in a certain order or position to feel calm.",
+    "ocir_14": "I'm bothered when objects on a table or in a room aren't symmetrical or straight.",
+    "ocir_15": "I repeat certain numbers or words in my head to stop something bad from happening.",
+    "ocir_16": "I spend much longer in the shower than most people.",
+    "ocir_17": "My hands still feel dirty even right after I've washed them.",
+    "ocir_18": "I endlessly go back over the order of past events in great detail."
+  },
+  "results": [
+    { "category": "Low Tendency", "description": "You don't have OCD symptoms that get in the way." },
+    { "category": "Indication of OCD Symptoms", "description": "A score above 21 suggests obsessive thoughts or compulsive behaviors that are clinically significant." }
+  ]
+}

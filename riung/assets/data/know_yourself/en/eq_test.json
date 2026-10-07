@@ -1,0 +1,32 @@
+{
+  "title": "Emotional Intelligence Test",
+  "description": "Measure how well you recognize your own emotions, manage them, and empathize with people around you.",
+  "options": ["Not like me at all", "Not like me", "Like me", "Very much like me"],
+  "questions": {
+    "eq_1": "I'm very aware of the specific emotion I'm feeling right now.",
+    "eq_2": "When I'm extremely angry or sad, I can pinpoint exactly what's causing it.",
+    "eq_3": "I can notice someone's mood change just from their body language or tone of voice.",
+    "eq_4": "I find it easy to put myself in someone else's shoes and understand their point of view (empathy).",
+    "eq_5": "I can stop myself from saying hurtful, unnecessary things when I'm very emotional.",
+    "eq_6": "I know strategies to calm myself down when I feel panicked, anxious, or under pressure.",
+    "eq_7": "I always think about how my words will affect others' feelings before speaking impulsively.",
+    "eq_8": "People feel comfortable and safe sharing their personal problems and weaknesses with me.",
+    "eq_9": "I can listen to and accept constructive criticism without feeling personally attacked.",
+    "eq_10": "I'm good at motivating myself again right after a big failure.",
+    "eq_11": "I don't panic easily and can still think rationally in a crisis or unexpected situation.",
+    "eq_12": "I can 'read the room' (e.g. tense or relaxed) as soon as I walk in.",
+    "eq_13": "In a conflict, I focus more on finding middle ground (a solution) than on who's to blame.",
+    "eq_14": "I adapt easily to big life changes without much complaining or resisting.",
+    "eq_15": "I don't let one bad thing in the morning ruin my mood for the whole day.",
+    "eq_16": "I can express disappointment assertively (clearly and firmly) without attacking others.",
+    "eq_17": "I'm aware of and accept that my emotional state strongly affects my performance, focus, and thinking.",
+    "eq_18": "I feel happy and celebrate the success of people close to me without envy creeping in.",
+    "eq_19": "I have full control to hide negative emotions when a situation calls for professionalism.",
+    "eq_20": "I'm always willing to listen to others, even when I'm feeling quite tired myself."
+  },
+  "results": [
+    { "category": "Growth Area", "description": "You still find it hard to regulate intense emotions or read other people's feelings accurately." },
+    { "category": "Moderate Emotional Intelligence", "description": "You manage daily emotions and empathize fairly well, with room to stay calmer in a crisis." },
+    { "category": "Highly Emotionally Intelligent", "description": "You have remarkable self-awareness, strong empathy, and handle conflict very well." }
+  ]
+}

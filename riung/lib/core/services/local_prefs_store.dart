@@ -67,6 +67,8 @@ class LocalPrefsStore {
   static const _kAccessoriesJson = 'riung_personality_accessories_json';
   static const _kMonsterCosmeticsJson = 'riung_monster_cosmetics_json';
   static const _kWaswasStageJson = 'riung_waswas_stage_json';
+  static const _kKenaliResultsCipher = 'riung_kenali_results_cipher';
+  static const _kHabitStageJson = 'riung_habit_stage_json';
 
   /// Kode bahasa pilihan user (`id`/`en`); null = belum pernah memilih
   /// (pakai bahasa bawaan, lihat `AppLanguage.defaultLanguage`).
@@ -388,6 +390,33 @@ class LocalPrefsStore {
 
   Future<void> setWaswasStageJson(Map<String, dynamic> value) =>
       _prefs.setString(_kWaswasStageJson, jsonEncode(value));
+
+  /// Hasil tes & kuis Kenali Dirimu, TERENKRIPSI (AES, kunci di secure
+  /// storage) — dibaca/ditulis hanya lewat `KenaliResultRepository`.
+  String? get kenaliResultsCipher => _prefs.getString(_kKenaliResultsCipher);
+  Future<void> setKenaliResultsCipher(String value) => _prefs.setString(_kKenaliResultsCipher, value);
+
+  /// Latihan peta Monster Kebiasaan yang sudah selesai, berurutan & lintas
+  /// hari: `{nanti: 2, gulir: 0}` = jumlah node latihan yang sudah dilewati.
+  Map<String, int> get habitStageDone {
+    final raw = _prefs.getString(_kHabitStageJson);
+    if (raw == null) return const {};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) return decoded.map((k, v) => MapEntry(k.toString(), v is int ? v : 0));
+    } catch (_) {
+      // data rusak dianggap belum ada latihan.
+    }
+    return const {};
+  }
+
+  /// Naik tiap peta latihan Monster Kebiasaan berubah.
+  final ValueNotifier<int> habitStageRevision = ValueNotifier<int>(0);
+
+  Future<void> setHabitStageDone(String monsterId, int done) async {
+    await _prefs.setString(_kHabitStageJson, jsonEncode({...habitStageDone, monsterId: done}));
+    habitStageRevision.value++;
+  }
 
   /// Menghapus semua preferensi & progres tersimpan (hapus akun, dan test).
   Future<void> clearAll() => _prefs.clear();

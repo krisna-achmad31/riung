@@ -1,0 +1,32 @@
+{
+  "title": "Neurodivergent Test",
+  "description": "Explore traits of the autism spectrum, ADHD, and sensory processing sensitivity in yourself.",
+  "options": ["Never", "Rarely", "Often", "Always"],
+  "questions": {
+    "nd_1": "Loud noises, bright lights, or certain clothing textures bother me physically.",
+    "nd_2": "Busy social settings wear me out, and I need a long time to recover my energy.",
+    "nd_3": "I have very specific interests (special interests) and can spend hours talking about them.",
+    "nd_4": "I often feel I have to pretend or hide my true self when socializing (masking).",
+    "nd_5": "I tend to make repetitive movements when focused or anxious (e.g. bouncing my leg, fiddling with my fingers, stimming).",
+    "nd_6": "I often have trouble understanding sarcasm, jokes, or the hidden meaning in what people say.",
+    "nd_7": "I feel very anxious or upset when my routine or schedule changes suddenly.",
+    "nd_8": "I often notice patterns or small details that most people miss.",
+    "nd_9": "I often struggle to start tasks that involve many steps (executive dysfunction).",
+    "nd_10": "Sometimes I don't respond when called because I'm so absorbed in what I'm doing (hyperfocus).",
+    "nd_11": "I often feel very different, as if I came from another planet compared to the people around me.",
+    "nd_12": "I avoid eye contact because it feels very uncomfortable or intimidating.",
+    "nd_13": "In conversations, I often don't realize I've been dominating the talk about my favorite topic.",
+    "nd_14": "I have trouble recognizing my own emotions until they peak and boil over.",
+    "nd_15": "I'm very picky about food, often because of textures or smells I can't tolerate.",
+    "nd_16": "I feel my brain works so fast that my thoughts pile on top of each other.",
+    "nd_17": "It's very hard for me to switch from an activity I'm enjoying to another one.",
+    "nd_18": "I react physically (e.g. covering my ears or flinching) when I hear a sudden sharp sound.",
+    "nd_19": "I often rehearse and plan conversation scripts in my head before talking to people.",
+    "nd_20": "I feel much more comfortable expressing myself through text than face to face."
+  },
+  "results": [
+    { "category": "Strongly Neurotypical", "description": "You tend to process information, senses, and social interaction in common ways." },
+    { "category": "Borderline Range", "description": "You have some specific habits and sensitivities, but you still adapt fairly easily." },
+    { "category": "Indication of Neurodivergence", "description": "Many neurodivergent traits show up strongly in how your brain works." }
+  ]
+}

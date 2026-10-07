@@ -1,0 +1,37 @@
+{
+  "title": "Your Procrastination Profile",
+  "description": "Find out the emotional reasons behind your habit of putting things off. Procrastination isn't about laziness; it's about regulating emotions.",
+  "options": ["Never", "Rarely", "Often", "Very often"],
+  "questions": {
+    "proc_1": "I often put off starting a task simply because I'm afraid the result won't be perfect.",
+    "proc_2": "When a task looks too big, I feel paralyzed, panicked, and unsure which step to start with.",
+    "proc_3": "I deliberately delay tasks because the adrenaline of working right up to the deadline always makes me more productive.",
+    "proc_4": "When there's an important task to finish, I suddenly get absorbed in cleaning my room or tidying drawers.",
+    "proc_5": "I spend too much time researching and planning without ever actually executing.",
+    "proc_6": "Just thinking about how many steps a task takes makes me want to go to sleep.",
+    "proc_7": "To me, doing tasks well ahead of time feels boring, flat, and unchallenging.",
+    "proc_8": "I often justify answering trivial emails or tidying my inbox as 'productive work'.",
+    "proc_9": "If I feel I don't have enough time to finish something perfectly, I'd rather not start at all.",
+    "proc_10": "Seeing how long my to-do list is causes so much anxiety that I avoid looking at it altogether.",
+    "proc_11": "I believe I'm one of those magical people whose work is best under heavy pressure.",
+    "proc_12": "At the end of the day, I feel I've been busy all day, yet the most important task (Priority 1) is still untouched.",
+    "proc_13": "The biggest reason I procrastinate is that I care too much, or worry too much, about what people will think of my work.",
+    "proc_14": "I struggle to break a huge project into small, realistic daily steps I can chip away at.",
+    "proc_15": "I have no motivation to work at all until I realize I'm running out of time.",
+    "proc_16": "I keep jumping from one small task to another so my brain gets the satisfaction (dopamine) of finishing something.",
+    "proc_17": "Constantly editing, revising, and never being satisfied with one part over and over is my main weakness.",
+    "proc_18": "The fear or mental weight I imagine about a task is often far worse than actually doing it.",
+    "proc_19": "I really enjoy the huge sense of relief (euphoria) after successfully submitting something in the final seconds.",
+    "proc_20": "I often get caught up checking notifications or replying to others until I forget why I opened my laptop.",
+    "proc_21": "My standards and expectations for my own performance are often too high and unrealistic.",
+    "proc_22": "If I get stuck on the hardest part, I stop completely instead of moving to another part.",
+    "proc_23": "My friends or coworkers panic at my procrastination, but inside I'm always sure 'I'll get it done somehow.'",
+    "proc_24": "I have lots of browser tabs open at once and often switch between tasks aimlessly to avoid the core work."
+  },
+  "results": [
+    { "category": "The Perfectionist (Afraid to Get It Wrong)", "description": "You procrastinate out of fear of failure and the belief that everything must be perfect on the first try." },
+    { "category": "The Overwhelmed (Swamped)", "description": "You procrastinate because the task feels enormous, leaving you frozen and unsure where to begin." },
+    { "category": "The Thrill-Seeker (Adrenaline Chaser)", "description": "You procrastinate because, without realizing it, you enjoy the rush of working magically close to the deadline." },
+    { "category": "The Busy Bee (Fake Busy)", "description": "You procrastinate by doing a thousand small, unimportant things so you still feel productive and free of guilt." }
+  ]
+}

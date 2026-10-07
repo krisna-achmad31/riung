@@ -6,7 +6,7 @@ import '../logic/toko_data.dart';
 import 'koin_price_pill.dart';
 
 /// Kartu item Lemari (frame `Item …`): rarity + centang dipakai, art item,
-/// nama, lalu status — "Dipakai", harga (belum dimiliki), atau "Khusus …".
+/// nama, lalu status (kosmetik khas berlabel "Khas" alih-alih rarity) — "Dipakai", harga (belum dimiliki), atau "Khusus …".
 class LemariItemCard extends StatelessWidget {
   const LemariItemCard({super.key, required this.cosmetic, required this.owned, required this.wearable, required this.worn, required this.onTap});
 
@@ -37,8 +37,11 @@ class LemariItemCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: rarity.background, borderRadius: BorderRadius.circular(AppRadius.pill)),
-                  child: Text(rarity.label(t), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: rarity.foreground)),
+                  decoration: BoxDecoration(color: cosmetic.khas ? AppColors.aksenHangatLembut : rarity.background, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                  child: Text(
+                    cosmetic.khas ? t.khasLabel : rarity.label(t),
+                    style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: cosmetic.khas ? AppColors.aksenHangatGelap : rarity.foreground),
+                  ),
                 ),
                 const Spacer(),
                 if (worn)

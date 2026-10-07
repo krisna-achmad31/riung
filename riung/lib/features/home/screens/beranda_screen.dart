@@ -15,6 +15,7 @@ import '../../profil/screens/kalender_latihan_screen.dart';
 import '../../kepribadian/widgets/karakter_home_card.dart';
 import '../../laporan/widgets/laporan_home_card.dart';
 import '../widgets/home_quick_action_grid.dart';
+import '../widgets/kenali_home_card.dart';
 import '../widgets/home_top_bar.dart';
 import 'beranda_tiket_serangan_screen.dart';
 import 'koin_histori_screen.dart';
@@ -188,6 +189,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
           const SizedBox(height: AppSpacing.xl),
           const KarakterHomeCard(),
           const SizedBox(height: AppSpacing.xl),
+          const KenaliHomeCard(),
           const LaporanHomeCard(),
           const SizedBox(height: AppSpacing.xl),
           _FocusModeEntryCard(

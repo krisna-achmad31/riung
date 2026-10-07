@@ -1,0 +1,36 @@
+{
+  "title": "Your Relationship With Your Phone",
+  "description": "Unpack how you use your devices. Are you the master of your tech, or is your tech the master of you?",
+  "options": ["Never", "Rarely", "Often", "Very often"],
+  "questions": {
+    "pho_1": "I feel restless, uncomfortable, and extremely anxious if I realize I've left my phone at home.",
+    "pho_2": "I often suddenly realize I've just spent an hour scrolling social media feeds with no clear purpose.",
+    "pho_3": "I consciously turn off most app notifications on my phone (except urgent messages) to protect my focus.",
+    "pho_4": "I always feel a strong urge to respond to every notification sound as fast as possible.",
+    "pho_5": "My phone is the first thing I grab and check when I wake up, even before getting out of bed.",
+    "pho_6": "I often deliberately leave my phone in another room (out of reach) when I need to focus on work or spend time with family.",
+    "pho_7": "I very often worry about missing important news, the latest gossip, or invitations (FOMO) if I'm not online.",
+    "pho_8": "Whenever I feel even the slightest boredom (like waiting in an elevator or at a red light), my hand reflexively opens my phone.",
+    "pho_9": "I regularly and mindfully schedule times (or certain days) for a 'digital detox' (screen-free).",
+    "pho_10": "If there's a silence of more than a few minutes while I'm texting someone, I start to feel anxious or overthink.",
+    "pho_11": "I often mean to open my phone just to check the time or one important message, but end up drifting into other apps for ages.",
+    "pho_12": "I proactively set app time limits (screen time / app limits) and stick to them strictly when the limit is reached.",
+    "pho_13": "I have a habit of refreshing my email, chats, or feed over and over, hoping for an update or new notification.",
+    "pho_14": "Scrolling short-video algorithms (like Reels or TikTok) is my easiest way to switch my brain off and escape stressful thoughts.",
+    "pho_15": "I don't feel guilty at all about replying to messages a bit later because I'm focused on finishing a real-world task.",
+    "pho_16": "After posting a photo or status on social media, I feel quite stressed thinking about how many likes or comments I'll get.",
+    "pho_17": "I have a strong habit of double-screening, like scrolling my phone nonstop while a movie is playing on the TV or laptop.",
+    "pho_18": "Most of my screen time is truly used for very specific, functional purposes (e.g. maps, banking, studying, important communication).",
+    "pho_19": "Seeing my phone battery below 20% when I'm out makes me very restless and panicked about finding a charger.",
+    "pho_20": "I very often stay up late past my planned bedtime purely because I get sucked into the algorithm feed.",
+    "pho_21": "When eating with people close to me, my phone stays in my bag or pocket, not face-up on the table.",
+    "pho_22": "If my phone isn't in my pocket when my hand reflexively reaches for it, I feel a mini panic attack in my chest.",
+    "pho_23": "I've repeatedly deleted an entertainment app to limit myself, only to download it again the next day when the craving hits.",
+    "pho_24": "At the end of the day, I feel I'm the one in full control of my device, not the device dictating my emotions and time."
+  },
+  "results": [
+    { "category": "The Anxious Checker", "description": "You have strong FOMO. You keep checking your phone for fear of missing messages or trends, or of seeming unresponsive." },
+    { "category": "The Mindless Scroller", "description": "Your phone is your sacred escape. You scroll endless algorithms for a quick dopamine hit or to flee real-world boredom." },
+    { "category": "The Intentional User", "description": "Congratulations! You're very aware of your tech limits. You use your phone as a tool, not as an escape or a source of anxiety." }
+  ]
+}

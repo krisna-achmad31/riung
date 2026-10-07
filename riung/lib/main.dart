@@ -62,6 +62,9 @@ Future<void> main() async {
   // sqflite (Jurnal/Check-in) sengaja TIDAK dibuka di sini — lazy saat
   // fitur itu benar-benar dipakai, lihat LocalDatabaseService.
   final prefs = await LocalPrefsStore.init();
+  // Hasil Kenali Dirimu terenkripsi — didekripsi sekali, lalu dibaca sinkron
+  // oleh Beranda/Profil/Brankas (Monster Kebiasaan bangun dari hasil ini).
+  await KenaliResultRepository.instance.load(prefs);
   final remoteConfig = RemoteConfigService();
   await remoteConfig.init();
   // Notifikasi lokal bersifat best-effort — dibungkus try/catch supaya

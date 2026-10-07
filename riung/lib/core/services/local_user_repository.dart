@@ -14,6 +14,7 @@ import 'journal_crypto_service.dart';
 import 'local_database_service.dart';
 import 'local_prefs_store.dart';
 import 'user_repository.dart';
+import 'kenali_result_repository.dart';
 
 /// Implementasi [UserRepository] sungguhan sejak M3 — profil/wallet/streak/
 /// progres monster di [LocalPrefsStore] (shared_preferences), jurnal &
@@ -239,6 +240,7 @@ class LocalUserRepository implements UserRepository {
     await _db.deleteAll();
     await _crypto.deleteKey();
     await _prefs.clearAll();
+    KenaliResultRepository.instance.clearCache();
   }
 
   /// Migrasi anon→cloud cuma relevan buat implementasi Firestore — no-op

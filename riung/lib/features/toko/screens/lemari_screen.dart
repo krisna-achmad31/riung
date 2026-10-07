@@ -61,7 +61,7 @@ class _LemariScreenState extends State<LemariScreen> {
     final slot = _tabs[_tab];
     final items = [
       for (final c in tokoCosmetics)
-        if (slot == null || c.slot == slot) c,
+        if (c.listedFor(widget.monsterId) && (slot == null || c.slot == slot)) c,
     ];
 
     return Scaffold(

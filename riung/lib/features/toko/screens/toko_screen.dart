@@ -152,7 +152,8 @@ class _TokoScreenState extends State<TokoScreen> {
                   crossAxisSpacing: 12,
                   childAspectRatio: 169 / 201,
                   children: [
-                    for (final cosmetic in tokoCosmetics)
+                    // Kosmetik khas hanya dijual di Lemari monsternya sendiri.
+                    for (final cosmetic in tokoCosmetics.where((c) => !c.khas))
                       _KosmetikCard(cosmetic: cosmetic, owned: scope.wallet.ownsCosmetic(cosmetic.id), onTap: () => _buyCosmetic(cosmetic)),
                   ],
                 ),

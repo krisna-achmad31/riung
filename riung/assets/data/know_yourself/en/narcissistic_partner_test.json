@@ -1,0 +1,32 @@
+{
+  "title": "Narcissistic Partner Test",
+  "description": "Look at your partner's behavior to see whether there are red flags of narcissistic and manipulative traits in your relationship.",
+  "options": ["Never", "Rarely", "Often", "Almost always"],
+  "questions": {
+    "npt_1": "My partner always dominates conversations and steers the topic back to themselves.",
+    "npt_2": "They rarely ask about my day or sincerely ask how I feel.",
+    "npt_3": "My partner explicitly or implicitly feels smarter, better, or more important than others.",
+    "npt_4": "When something goes wrong in our relationship, they always blame me or the circumstances, never themselves.",
+    "npt_5": "They often react with anger or get very defensive at even the smallest criticism.",
+    "npt_6": "My partner often belittles my achievements, career, or dreams.",
+    "npt_7": "They demand special treatment in all sorts of places (e.g. restaurants, shops).",
+    "npt_8": "They twist the facts (gaslighting) until I doubt my own memory or sanity.",
+    "npt_9": "My partner is obsessed with appearance, status, and how others see them.",
+    "npt_10": "They often treat their needs and wants as far more urgent than mine.",
+    "npt_11": "They often give me the silent treatment as punishment when they're angry with me.",
+    "npt_12": "My partner is often jealous of others' success and thinks those people don't deserve it.",
+    "npt_13": "They can be very charming and friendly in front of others, but cold or harsh when it's just the two of us.",
+    "npt_14": "They often take advantage of my kindness, money, or time without real gratitude.",
+    "npt_15": "My partner constantly demands praise and recognition from me.",
+    "npt_16": "They often cut me off because they feel what they want to say is more important.",
+    "npt_17": "They rarely, if ever, apologize sincerely without adding 'but you also...'.",
+    "npt_18": "My partner feels entitled to read all my messages or control who I spend time with.",
+    "npt_19": "They are often insensitive and ignore me when I'm sad or dealing with something hard.",
+    "npt_20": "This relationship makes me feel like I'm always walking on eggshells (being very careful so they don't get angry)."
+  },
+  "results": [
+    { "category": "Safe", "description": "Your partner's behavior is reasonable, with no notable signs of toxic narcissism." },
+    { "category": "Yellow Flag (Be Watchful)", "description": "There are some selfish or insensitive traits. Consider communicating your boundaries clearly." },
+    { "category": "Strong Signs of Toxicity / Narcissism", "description": "There are many manipulative patterns and a lack of empathy. This relationship risks draining you emotionally." }
+  ]
+}

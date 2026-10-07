@@ -1,0 +1,193 @@
+{
+  "id": "childhood_trauma_test",
+  "title": "Childhood Trauma Test",
+  "description": "Mengevaluasi jejak pengalaman masa kecil yang mungkin masih memengaruhi kondisi emosional dan hubunganmu saat ini.",
+  "isPremium": true,
+  "questionCount": 22,
+  "theoryReference": "Diadaptasi dari Childhood Trauma Questionnaire (CTQ) & ACEs",
+  "scoringLogic": {
+    "type": "sum_with_reverse",
+    "options": [
+      {
+        "value": 1,
+        "label": "Sama sekali tidak pernah"
+      },
+      {
+        "value": 2,
+        "label": "Jarang"
+      },
+      {
+        "value": 3,
+        "label": "Kadang-kadang"
+      },
+      {
+        "value": 4,
+        "label": "Sering"
+      },
+      {
+        "value": 5,
+        "label": "Sangat sering"
+      }
+    ],
+    "reverseOptions": [
+      {
+        "value": 5,
+        "label": "Sama sekali tidak pernah"
+      },
+      {
+        "value": 4,
+        "label": "Jarang"
+      },
+      {
+        "value": 3,
+        "label": "Kadang-kadang"
+      },
+      {
+        "value": 2,
+        "label": "Sering"
+      },
+      {
+        "value": 1,
+        "label": "Sangat sering"
+      }
+    ]
+  },
+  "results": [
+    {
+      "minScore": 22,
+      "maxScore": 44,
+      "category": "Dampak Sangat Rendah",
+      "description": "Kamu memiliki fondasi masa kecil yang relatif aman dan mendukung."
+    },
+    {
+      "minScore": 45,
+      "maxScore": 66,
+      "category": "Dampak Ringan",
+      "description": "Ada beberapa pengalaman masa kecil yang kurang ideal, namun tidak mendominasi hidupmu saat ini."
+    },
+    {
+      "minScore": 67,
+      "maxScore": 88,
+      "category": "Dampak Sedang",
+      "description": "Luka masa kecil cukup membekas dan mungkin memengaruhi cara kamu merespons konflik atau hubungan saat ini."
+    },
+    {
+      "minScore": 89,
+      "maxScore": 110,
+      "category": "Dampak Berat",
+      "description": "Pengalaman masa lalu sangat memengaruhi kesejahteraan emosionalmu. Berkonsultasi dengan profesional sangat dianjurkan untuk proses penyembuhan."
+    }
+  ],
+  "questions": [
+    {
+      "id": "ctq_1",
+      "text": "Orang tua atau pengasuh saya sering menyebut saya bodoh, nakal, atau kata-kata merendahkan lainnya.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_2",
+      "text": "Saya sering merasa bahwa tidak ada seorang pun di keluarga saya yang benar-benar menyayangi saya.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_3",
+      "text": "Orang tua saya sering kali tidak bisa merawat saya karena terlalu sibuk atau tidak ada.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_4",
+      "text": "Saya pernah dihukum secara fisik hingga meninggalkan memar atau luka.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_5",
+      "text": "Saya merasa harus melindungi orang tua saya secara emosional, alih-alih mereka yang melindungi saya.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_6",
+      "text": "Kebutuhan dasar saya (makanan bersih, pakaian layak, ke dokter) terkadang diabaikan.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_7",
+      "text": "Ada anggota keluarga yang bertindak dengan cara yang membuat saya merasa sangat tidak aman secara fisik.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_8",
+      "text": "Orang tua saya sering bertengkar hebat hingga saling melempar barang atau melakukan kekerasan fisik.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_9",
+      "text": "Saya sering dibiarkan sendirian di rumah dalam waktu yang lama ketika saya masih terlalu kecil.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_10",
+      "text": "Saya merasa aman dan terlindungi saat berada di dalam rumah.",
+      "isReverse": true
+    },
+    {
+      "id": "ctq_11",
+      "text": "Orang tua saya memberikan tuntutan atau tanggung jawab yang terlalu berat untuk anak seusia saya.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_12",
+      "text": "Kasih sayang dalam keluarga saya hanya diberikan jika saya mencapai suatu prestasi.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_13",
+      "text": "Saya sering merasa takut dengan kemarahan salah satu atau kedua orang tua saya.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_14",
+      "text": "Keluarga saya sangat tertutup dan saya merasa tidak nyaman membawa teman ke rumah.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_15",
+      "text": "Saya sering diejek atau dipermalukan oleh anggota keluarga di depan orang lain.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_16",
+      "text": "Saya memiliki setidaknya satu orang dewasa yang sangat peduli dan bisa saya andalkan saat kecil.",
+      "isReverse": true
+    },
+    {
+      "id": "ctq_17",
+      "text": "Saya pernah dibuat merasa bahwa keluarga saya akan lebih baik jika saya tidak ada.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_18",
+      "text": "Saat saya bersedih atau menangis, saya sering disuruh untuk diam atau dimarahi.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_19",
+      "text": "Saya sering menyaksikan tokoh ibu atau pengasuh perempuan saya diperlakukan dengan kasar.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_20",
+      "text": "Hukuman yang saya terima sering kali jauh tidak sebanding dengan kesalahan kecil yang saya buat.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_21",
+      "text": "Orang tua saya sering menggunakan ancaman akan membuang atau meninggalkan saya untuk mendisiplinkan saya.",
+      "isReverse": false
+    },
+    {
+      "id": "ctq_22",
+      "text": "Secara keseluruhan, saya merasa masa kecil saya bahagia seperti anak-anak pada umumnya.",
+      "isReverse": true
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "title": "ADHD Test",
+  "description": "See how often you face challenges with focus, self-regulation, and hyperactivity.",
+  "options": ["Never", "Rarely", "Sometimes", "Often", "Very often"],
+  "questions": {
+    "asrs_1": "How often do you have trouble wrapping up the final details of a task once the hardest part is done?",
+    "asrs_2": "How often do you have difficulty getting things in order when a task requires a lot of organization?",
+    "asrs_3": "How often do you forget appointments or obligations?",
+    "asrs_4": "When given a task that needs a lot of thought, how often do you avoid it or delay getting started?",
+    "asrs_5": "How often do you fidget or squirm with your hands or feet when you have to sit for a long time?",
+    "asrs_6": "How often do you feel overly active, as if driven by a motor?",
+    "asrs_7": "How often do you make careless mistakes when working on a boring or difficult project?",
+    "asrs_8": "How often do you have trouble keeping your attention on boring work?",
+    "asrs_9": "How often do you have trouble concentrating on what people say to you, even when they're speaking to you directly?",
+    "asrs_10": "How often do you misplace things or have trouble finding them at home or at work?",
+    "asrs_11": "How often are you distracted by activity or noise around you?",
+    "asrs_12": "How often do you leave your seat in meetings or other situations where you're expected to stay seated?",
+    "asrs_13": "How often do you feel restless or uneasy inside?",
+    "asrs_14": "How often do you have trouble unwinding and relaxing when you have free time?",
+    "asrs_15": "How often do you find yourself talking too much in social situations?",
+    "asrs_16": "How often do you finish other people's sentences before they can finish them themselves?",
+    "asrs_17": "How often do you have trouble waiting your turn when you need to?",
+    "asrs_18": "How often do you interrupt others when they are busy?"
+  },
+  "results": [
+    { "category": "Very Low Indication", "description": "Your focus and energy are fairly well under control." },
+    { "category": "Moderate Indication", "description": "There are some signs of inattention or hyperactivity, though they may not meet the full criteria." },
+    { "category": "High Indication", "description": "What you experience closely resembles an ADHD pattern. Talking to a professional is recommended." }
+  ]
+}

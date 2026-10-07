@@ -105,6 +105,14 @@ abstract final class AppColors {
   static const Color monsterMengelak = Color(0xFF5FA596);
   static const Color monsterHakim = Color(0xFF8B6FD6);
 
+  // Warna khas Monster Kebiasaan (6, bangun dari Kuis Besar Kenali Dirimu).
+  static const Color monsterNanti = Color(0xFF9A93A8);
+  static const Color monsterGulir = Color(0xFF4FA8C2);
+  static const Color monsterBegadang = Color(0xFF5B62A8);
+  static const Color monsterBunglon = Color(0xFFE39466);
+  static const Color monsterBimbang = Color(0xFFB79FCF);
+  static const Color monsterBara = Color(0xFFE0674F);
+
   /// Latar pastel lembut per monster (thumbnail deck, kartu monster).
   static const Map<String, Color> monsterLembut = {
     'meronta': langitLembut,
@@ -114,6 +122,12 @@ abstract final class AppColors {
     'sempurna': aksenHangatLembut,
     'mengelak': primerLembut,
     'hakim': sekunderLembut,
+    'nanti': netralLembut,
+    'gulir': langitLembut,
+    'begadang': kabutLavender,
+    'bunglon': aksenHangatLembut,
+    'bimbang': sekunderPucat,
+    'bara': aksenHangatLembut,
   };
 
   /// Netral hangat lembut (orb mood "datar").
@@ -136,5 +150,11 @@ abstract final class AppColors {
     'sempurna': monsterSempurna,
     'mengelak': monsterMengelak,
     'hakim': monsterHakim,
+    'nanti': monsterNanti,
+    'gulir': monsterGulir,
+    'begadang': monsterBegadang,
+    'bunglon': monsterBunglon,
+    'bimbang': monsterBimbang,
+    'bara': monsterBara,
   };
 }

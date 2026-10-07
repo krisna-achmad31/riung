@@ -1,0 +1,36 @@
+{
+  "title": "You and Decisions",
+  "description": "Find out what gets in your way most when you have to make a big decision.",
+  "options": ["Not like me", "Rarely like me", "Often like me", "Very much like me"],
+  "questions": {
+    "dec_1": "When buying something expensive, I research for days and read hundreds of reviews until my head spins (analysis paralysis).",
+    "dec_2": "Even for personal matters, I have to ask many friends, 'What do you think I should do?'",
+    "dec_3": "I often make big decisions within minutes, guided only by how I feel in the moment.",
+    "dec_4": "I'm so afraid of making the wrong decision that I let the option expire.",
+    "dec_5": "I'll change my decision if an authority figure (a parent or boss) doubts it even slightly.",
+    "dec_6": "To me, a bad decision is much better than no decision at all.",
+    "dec_7": "After deciding something, I keep thinking, 'What if I had chosen the other one?'",
+    "dec_8": "I strongly avoid being the sole decision-maker in team projects.",
+    "dec_9": "I often rely on sudden gut feelings and ignore facts or logic that contradict them.",
+    "dec_10": "I make long pros-and-cons lists for almost every important choice in my life.",
+    "dec_11": "My decisions are often a compromise based on what my family or partner wants.",
+    "dec_12": "I'm easily swayed by discounts, limited-time offers, or urgent deals without thinking it through.",
+    "dec_13": "The thought that no decision is ever '100% perfect' really bothers and torments me.",
+    "dec_14": "If a decision turns out badly, I feel a little relieved if others agreed with the choice too (so it's not purely my fault).",
+    "dec_15": "When I'm upset or very stressed, I tend to take drastic steps like quitting suddenly or ending a relationship.",
+    "dec_16": "I struggle with simple decisions (like picking lunch) when there are too many options.",
+    "dec_17": "Getting most people's support is crucial before I dare to change direction.",
+    "dec_18": "I rarely make a backup plan; I jump straight into Plan A and hope everything works out.",
+    "dec_19": "I often stay up all night weighing two options that are actually both fine.",
+    "dec_20": "I often call my parents or best friend from a clothing store just to get approval before buying something.",
+    "dec_21": "As soon as a fresh idea pops into my head, I act on it right then without considering the money or energy needed.",
+    "dec_22": "I feel the information I have is never enough to make a solid final decision.",
+    "dec_23": "The weight of having free choice makes me wish someone older or smarter would take control of my life.",
+    "dec_24": "I tend to ignore warnings and advice from people close to me once I really want something."
+  },
+  "results": [
+    { "category": "The Overthinker (Paralyzed by Analysis)", "description": "You think through every worst-case scenario and research endlessly until you run out of time to choose." },
+    { "category": "The Consensus Seeker (Leaning on Others)", "description": "You feel unsafe deciding on your own and need validation from ten different people before you move." },
+    { "category": "The Impulsive Decider (In a Rush)", "description": "You hate waiting, so you just pick the fastest option to make the stress go away, without thinking about the consequences." }
+  ]
+}

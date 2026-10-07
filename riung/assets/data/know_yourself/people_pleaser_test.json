@@ -1,0 +1,48 @@
+{
+  "id": "people_pleaser_test",
+  "title": "You and Other People's Eye (People Pleaser Test)",
+  "description": "Seberapa jauh kamu mengubah dirimu demi membuat orang lain senang dan menghindari konflik?",
+  "isPremium": true,
+  "questionCount": 24,
+  "theoryReference": "Diadaptasi dari instrumen kesejahteraan interpersonal dan sosiometri (People Pleasing Scale)",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Jarang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Selalu" }
+    ]
+  },
+  "results": [
+    { "dominantTrait": "Chameleon", "category": "The Chameleon (Bunglon)", "description": "Kamu mengubah kepribadian, hobi, dan pendapatmu agar selalu bisa diterima (fit-in) oleh lingkungan sekitarmu." },
+    { "dominantTrait": "Peacekeeper", "category": "The Peacekeeper (Penjaga Damai)", "description": "Kamu sangat takut pada konflik dan amarah, sehingga kamu rela menelan pendapatmu sendiri demi menjaga suasana tetap harmonis." },
+    { "dominantTrait": "Rescuer", "category": "The Rescuer (Sang Penyelamat)", "description": "Kamu kesulitan bilang 'tidak' karena merasa harga dirimu bergantung pada seberapa berguna dirimu bagi orang lain." }
+  ],
+  "questions": [
+    { "id": "pp_1", "trait": "Chameleon", "text": "Saya mengubah gaya bicara atau selera musik saya tergantung dengan siapa saya sedang bergaul saat ini." },
+    { "id": "pp_2", "trait": "Peacekeeper", "text": "Saya lebih memilih meminta maaf meskipun saya tidak salah, asalkan argumennya bisa segera berakhir." },
+    { "id": "pp_3", "trait": "Rescuer", "text": "Saya selalu mengiyakan permintaan tolong teman, meskipun jadwal saya sendiri sudah sangat penuh." },
+    { "id": "pp_4", "trait": "Chameleon", "text": "Saat ditanya 'Mau makan di mana?', saya selalu menjawab 'Terserah kamu saja' agar mereka senang." },
+    { "id": "pp_5", "trait": "Peacekeeper", "text": "Ketakutan terbesar saya adalah mengetahui ada seseorang yang diam-diam marah atau kecewa kepada saya." },
+    { "id": "pp_6", "trait": "Rescuer", "text": "Saya merasa bersalah jika saya bersantai sementara ada orang di sekitar saya yang sedang bekerja keras." },
+    { "id": "pp_7", "trait": "Chameleon", "text": "Saya sering setuju dengan opini publik secara vokal, padahal di dalam hati saya sangat tidak setuju." },
+    { "id": "pp_8", "trait": "Peacekeeper", "text": "Saya sangat berhati-hati dalam merangkai kata agar tidak menyinggung siapa pun (berjalan di atas cangkang telur)." },
+    { "id": "pp_9", "trait": "Rescuer", "text": "Harga diri saya meningkat tajam setiap kali saya merasa dibutuhkan atau berhasil menolong seseorang." },
+    { "id": "pp_10", "trait": "Chameleon", "text": "Saya merasa tidak punya kepribadian atau 'jati diri' yang tetap jika sedang sendirian tanpa orang lain." },
+    { "id": "pp_11", "trait": "Peacekeeper", "text": "Jika pelayanan di restoran sangat buruk, saya tidak akan pernah berani komplain secara langsung kepada stafnya." },
+    { "id": "pp_12", "trait": "Rescuer", "text": "Saya sering merasa kelelahan emosional karena terus-menerus menampung curhatan dan masalah semua teman saya." },
+    { "id": "pp_13", "trait": "Chameleon", "text": "Saya tertawa keras pada lelucon yang sama sekali tidak lucu hanya agar suasana kelompok tetap cair." },
+    { "id": "pp_14", "trait": "Peacekeeper", "text": "Saya bersedia mengeluarkan uang lebih atau dirugikan secara finansial agar tidak dibilang pelit atau ribet oleh teman." },
+    { "id": "pp_15", "trait": "Rescuer", "text": "Bilang kata 'Tidak' terasa seperti sebuah dosa besar atau pengkhianatan bagi saya." },
+    { "id": "pp_16", "trait": "Chameleon", "text": "Saya sering melebih-lebihkan antusiasme saya terhadap hobi teman saya agar mereka menyukai saya." },
+    { "id": "pp_17", "trait": "Peacekeeper", "text": "Saat seseorang mengkritik saya, refleks pertama saya adalah tersenyum dan setuju, lalu menangisinya nanti di kamar." },
+    { "id": "pp_18", "trait": "Rescuer", "text": "Saya cenderung menarik orang-orang yang toksik (red flag) karena saya percaya saya memiliki kekuatan untuk 'memperbaiki' mereka." },
+    { "id": "pp_19", "trait": "Chameleon", "text": "Saya takut menunjukkan sisi rapuh, sedih, atau marah karena saya ingin selalu terlihat sebagai sosok yang positif dan asyik." },
+    { "id": "pp_20", "trait": "Peacekeeper", "text": "Saya rela menekan ambisi atau impian saya jika hal itu membuat orang terdekat saya merasa terancam atau iri." },
+    { "id": "pp_21", "trait": "Rescuer", "text": "Saya diam-diam merasa kesal (resentful) karena saya selalu membantu orang lain, tetapi jarang ada yang membantu saya." },
+    { "id": "pp_22", "trait": "Chameleon", "text": "Saya meniru kebiasaan unik atau gaya berpakaian orang yang saya kagumi agar saya terlihat keren seperti mereka." },
+    { "id": "pp_23", "trait": "Peacekeeper", "text": "Menghadapi konfrontasi secara tatap muka bisa membuat saya gemetar, berkeringat dingin, dan mual." },
+    { "id": "pp_24", "trait": "Rescuer", "text": "Saya merasa hidup saya kurang bermakna jika saya tidak sibuk menyelesaikan masalah yang dihadapi keluarga/teman saya." }
+  ]
+}

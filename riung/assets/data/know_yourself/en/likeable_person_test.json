@@ -1,0 +1,30 @@
+{
+  "title": "Likeable Person Test",
+  "description": "How pleasant is your presence to others? Look at your warmth and social skills.",
+  "options": ["Strongly disagree", "Disagree", "Agree", "Strongly agree"],
+  "questions": {
+    "lik_1": "I easily make strangers or new people feel comfortable around me.",
+    "lik_2": "People often ask me for advice or confide in me about their personal problems.",
+    "lik_3": "I can laugh at my own silly mistakes without getting defensive or angry.",
+    "lik_4": "I often give others sincere compliments on their achievements or appearance.",
+    "lik_5": "When someone is talking, I give them my full attention instead of being busy with my phone.",
+    "lik_6": "I focus more on finding the good in people than on looking for their flaws.",
+    "lik_7": "I'm easy to work with in a team and rarely force my way.",
+    "lik_8": "I avoid interrupting when others haven't finished explaining something.",
+    "lik_9": "Others think I have a good sense of humor that doesn't put anyone down.",
+    "lik_10": "I really respect other people's opinions even when I see things differently.",
+    "lik_11": "When something goes wrong, I focus more on finding a solution than on blaming someone.",
+    "lik_12": "I easily remember small details of other people's lives (like their pet's name).",
+    "lik_13": "I usually show open, friendly body language (like a genuine smile and natural eye contact).",
+    "lik_14": "People often say my energy is positive and calming.",
+    "lik_15": "I always say please and thank you, even for small favors.",
+    "lik_16": "I find it easy to get along with people from backgrounds very different from mine.",
+    "lik_17": "I stay away from drama and avoid spreading gossip that hurts others.",
+    "lik_18": "When I succeed, I always remember and appreciate the people who helped me."
+  },
+  "results": [
+    { "category": "Socially Reserved", "description": "You tend to keep your distance, come across as cool, or may be hard for new people to approach." },
+    { "category": "Neutral / Fairly Warm", "description": "You can be pleasant at certain times and within certain circles of friends." },
+    { "category": "Very Likeable", "description": "You have strong empathy, get along easily, and radiate positive energy that people enjoy." }
+  ]
+}

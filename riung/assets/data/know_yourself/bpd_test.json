@@ -1,0 +1,44 @@
+{
+  "id": "bpd_test",
+  "title": "BPD Test",
+  "description": "Evaluasi seberapa sering kamu mengalami emosi yang berfluktuasi, ketakutan akan penolakan, dan impulsivitas.",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari kriteria Diagnostic and Statistical Manual of Mental Disorders (DSM-5) untuk BPD",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Jarang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Sangat Sering" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 15, "category": "Risiko Rendah", "description": "Kamu memiliki emosi yang stabil dan pandangan yang sehat tentang hubungan." },
+    { "minScore": 16, "maxScore": 35, "category": "Risiko Sedang", "description": "Kamu kadang mengalami ketidakstabilan emosi atau ketakutan akan pengabaian yang mengganggu." },
+    { "minScore": 36, "maxScore": 60, "category": "Risiko Tinggi", "description": "Banyak gejalamu sejalan dengan kriteria Borderline. Sangat disarankan untuk berkonsultasi dengan psikolog." }
+  ],
+  "questions": [
+    { "id": "bpd_1", "text": "Saya memiliki ketakutan yang ekstrem bahwa orang yang saya sayangi akan meninggalkan saya." },
+    { "id": "bpd_2", "text": "Perasaan saya terhadap orang terdekat sering berubah drastis dari sangat memuja menjadi sangat benci." },
+    { "id": "bpd_3", "text": "Saya sering merasa hampa atau kosong secara emosional di dalam diri saya." },
+    { "id": "bpd_4", "text": "Saya sering meragukan siapa diri saya sebenarnya atau apa tujuan hidup saya." },
+    { "id": "bpd_5", "text": "Saya bertindak impulsif saat sedang sedih/marah (misal: belanja berlebihan, makan berlebihan, hal berisiko)." },
+    { "id": "bpd_6", "text": "Saya pernah memikirkan atau melakukan tindakan melukai diri sendiri saat merasa sangat tertekan." },
+    { "id": "bpd_7", "text": "Suasana hati saya bisa berubah sangat ekstrim hanya dalam hitungan jam atau menit." },
+    { "id": "bpd_8", "text": "Saya sering merasa sangat marah hingga sulit mengendalikannya." },
+    { "id": "bpd_9", "text": "Saat stres berat, saya merasa seolah terlepas dari tubuh saya atau merasa dunia tidak nyata (disosiasi)." },
+    { "id": "bpd_10", "text": "Saya sering menuduh orang lain memiliki niat buruk terhadap saya saat saya cemas." },
+    { "id": "bpd_11", "text": "Saya merasa kesulitan mempertahankan hubungan persahabatan atau asmara yang stabil." },
+    { "id": "bpd_12", "text": "Saya sering merasa tidak ada orang yang benar-benar memahami atau memedulikan saya." },
+    { "id": "bpd_13", "text": "Perasaan sedih saya terasa jauh lebih intens dan menyakitkan dibandingkan orang pada umumnya." },
+    { "id": "bpd_14", "text": "Saya sering merasa butuh kepastian dan perhatian terus-menerus untuk merasa aman." },
+    { "id": "bpd_15", "text": "Ketika seseorang membatalkan rencana, saya merasa sangat hancur atau dikhianati." },
+    { "id": "bpd_16", "text": "Saya cenderung melakukan segala cara (memohon, mengancam) agar orang tidak meninggalkan saya." },
+    { "id": "bpd_17", "text": "Saya sangat reaktif dan mudah tersinggung terhadap kritik sekecil apa pun." },
+    { "id": "bpd_18", "text": "Saya sering merasa bosan dan mencari sensasi berisiko untuk menghilangkan kebosanan itu." },
+    { "id": "bpd_19", "text": "Saya sering melampiaskan amarah dengan berteriak, mengumpat, atau merusak barang." },
+    { "id": "bpd_20", "text": "Saat merasa kesepian, saya merasa keberadaan saya di dunia ini tidak ada artinya." }
+  ]
+}

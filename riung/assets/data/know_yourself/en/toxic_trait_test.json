@@ -1,0 +1,32 @@
+{
+  "title": "Toxic Trait Test",
+  "description": "Look at the darker side of your personality and identify unhealthy behaviors in your relationships with others.",
+  "options": ["Not like me at all", "Rarely", "Often", "Very much like me"],
+  "questions": {
+    "tox_1": "I often manipulate situations so the outcome always benefits me.",
+    "tox_2": "If I'm at fault, I'd rather blame the circumstances or someone else so I don't look bad.",
+    "tox_3": "I find it hard to feel genuinely happy when a friend achieves something big.",
+    "tox_4": "I often leak other people's secrets as gossip to make conversations more exciting.",
+    "tox_5": "I think it's fine to lie now and then to avoid conflict or gain an advantage.",
+    "tox_6": "When someone hurts me, I plan how to get revenge.",
+    "tox_7": "I tend to feel that common rules don't apply to me if I'm clever enough to get around them.",
+    "tox_8": "I like stirring up trouble or arguments on social media or group chats just for fun.",
+    "tox_9": "I rarely apologize directly and prefer to act as if nothing happened the next day.",
+    "tox_10": "I often give fake (passive-aggressive) compliments to subtly bring someone down.",
+    "tox_11": "I easily lose sympathy for other people's problems that I think are trivial or stupid.",
+    "tox_12": "I get close to certain people only because they can give me status, money, or connections.",
+    "tox_13": "If I don't like someone, I try to influence others to dislike them too.",
+    "tox_14": "I often make promises or commitments I know from the start I won't keep.",
+    "tox_15": "When arguing, my main goal is to win, not to find a solution.",
+    "tox_16": "I tend to downplay other people's problems because I feel mine are far more important or serious.",
+    "tox_17": "I secretly feel pleased when I see someone I dislike fail.",
+    "tox_18": "I often play the victim to get sympathy or help.",
+    "tox_19": "When others set boundaries with me, I feel offended and try to push past them.",
+    "tox_20": "I believe being selfish and cunning is the only way to succeed in this world."
+  },
+  "results": [
+    { "category": "Self-Aware & Sincere", "description": "You interact with others honestly and have very good self-awareness." },
+    { "category": "Occasionally Selfish", "description": "You have some defensive or selfish traits, but you're not an intense manipulator." },
+    { "category": "Signs of Toxic Traits", "description": "Be careful: there are many manipulative, self-serving patterns that can damage your relationships." }
+  ]
+}

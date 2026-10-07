@@ -1,0 +1,27 @@
+{
+  "title": "Well-being Test",
+  "description": "A short screening of your overall mental well-being, life satisfaction, and happiness over the past two weeks.",
+  "options": ["Never at all", "Rarely", "Sometimes", "Often", "Always"],
+  "questions": {
+    "wb_1": "Over the past two weeks, I've felt very optimistic and hopeful about my future.",
+    "wb_2": "Over the past two weeks, I've felt my life has clear meaning and purpose.",
+    "wb_3": "Over the past two weeks, I've often felt relaxed, calm, and at ease.",
+    "wb_4": "Over the past two weeks, I've felt able to handle the problems that came up fairly well.",
+    "wb_5": "Over the past two weeks, I've felt I have enough energy and physical stamina for daily activities.",
+    "wb_6": "Over the past two weeks, my mind hasn't felt foggy (brain fog) and I could think clearly.",
+    "wb_7": "Over the past two weeks, I've had a positive view of myself and valued who I am.",
+    "wb_8": "Over the past two weeks, I've felt very close and connected to the people around me.",
+    "wb_9": "Over the past two weeks, I've felt confident and steady making decisions (even small ones).",
+    "wb_10": "Over the past two weeks, I've felt loved, noticed, and cared for by the people closest to me.",
+    "wb_11": "Over the past two weeks, I've often looked forward to new things or challenges with enthusiasm.",
+    "wb_12": "Over the past two weeks, I've more often felt cheerful, light, and in a good mood than sad.",
+    "wb_13": "Over the past two weeks, I've felt useful to those around me and able to contribute well.",
+    "wb_14": "Over the past two weeks, I've felt interested in many things around me and curious to learn.",
+    "wb_15": "Over the past two weeks, overall I've felt very grateful and satisfied with my life right now."
+  },
+  "results": [
+    { "category": "Low Well-being", "description": "You seem to be going through a fairly tough time. Your emotional well-being needs more care." },
+    { "category": "Moderate Well-being", "description": "Your happiness has had ups and downs lately, but overall you can still manage." },
+    { "category": "Very Good Well-being", "description": "You feel happy, optimistic, emotionally healthy, and satisfied with your quality of life right now." }
+  ]
+}

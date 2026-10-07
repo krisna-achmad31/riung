@@ -1,0 +1,42 @@
+{
+  "id": "likeable_person_test",
+  "title": "Likeable Person Test",
+  "description": "Seberapa menyenangkan kehadiranmu di mata orang lain? Evaluasi kehangatan dan kemampuan sosialmu.",
+  "isPremium": true,
+  "questionCount": 18,
+  "theoryReference": "Diadaptasi dari Reysen Likability Scale & konsep Warmth-Competence Model",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Sangat Tidak Setuju" },
+      { "value": 1, "label": "Tidak Setuju" },
+      { "value": 2, "label": "Setuju" },
+      { "value": 3, "label": "Sangat Setuju" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 20, "category": "Kaku secara Sosial", "description": "Kamu cenderung menjaga jarak, dingin, atau mungkin sulit didekati oleh orang baru." },
+    { "minScore": 21, "maxScore": 39, "category": "Netral / Cukup Hangat", "description": "Kamu bisa menyenangkan pada waktu tertentu dan di lingkaran pertemanan tertentu." },
+    { "minScore": 40, "maxScore": 54, "category": "Sangat Menyenangkan", "description": "Kamu memiliki empati tinggi, mudah bergaul, dan memancarkan energi positif yang disukai orang." }
+  ],
+  "questions": [
+    { "id": "lik_1", "text": "Saya dengan mudah membuat orang asing atau orang baru merasa nyaman di dekat saya." },
+    { "id": "lik_2", "text": "Orang-orang sering meminta saran atau curhat kepada saya tentang masalah pribadi mereka." },
+    { "id": "lik_3", "text": "Saya bisa menertawakan kesalahan konyol saya sendiri tanpa merasa defensif atau marah." },
+    { "id": "lik_4", "text": "Saya sering memberikan pujian yang tulus kepada orang lain atas pencapaian atau penampilan mereka." },
+    { "id": "lik_5", "text": "Saat seseorang berbicara, saya memberikan perhatian penuh tanpa sibuk dengan ponsel saya." },
+    { "id": "lik_6", "text": "Saya lebih fokus mencari kebaikan dalam diri seseorang daripada mencari-cari kekurangannya." },
+    { "id": "lik_7", "text": "Saya mudah diajak bekerja sama dalam tim dan jarang memaksakan kehendak." },
+    { "id": "lik_8", "text": "Saya menghindari menyela pembicaraan saat orang lain belum selesai menjelaskan sesuatu." },
+    { "id": "lik_9", "text": "Orang lain menganggap saya memiliki selera humor yang baik tanpa perlu merendahkan siapa pun." },
+    { "id": "lik_10", "text": "Saya sangat menghargai pendapat orang lain meskipun saya berbeda pandangan dengannya." },
+    { "id": "lik_11", "text": "Saat terjadi kesalahan, saya lebih fokus mencari solusi daripada menyalahkan siapa yang salah." },
+    { "id": "lik_12", "text": "Saya mudah mengingat detail kecil kehidupan orang lain (seperti nama hewan peliharaannya)." },
+    { "id": "lik_13", "text": "Saya terbiasa menunjukkan bahasa tubuh terbuka dan ramah (seperti senyum tulus dan kontak mata wajar)." },
+    { "id": "lik_14", "text": "Orang-orang sering berkata bahwa energi saya positif dan menenangkan." },
+    { "id": "lik_15", "text": "Saya selalu mengucapkan tolong dan terima kasih, bahkan untuk bantuan-bantuan kecil." },
+    { "id": "lik_16", "text": "Saya merasa mudah bergaul dengan orang-orang dari berbagai latar belakang yang sangat berbeda dari saya." },
+    { "id": "lik_17", "text": "Saya menjauhi drama atau menghindari menyebarkan gosip yang merugikan orang lain." },
+    { "id": "lik_18", "text": "Saat mencapai kesuksesan, saya selalu mengingat dan mengapresiasi orang-orang yang membantu saya." }
+  ]
+}

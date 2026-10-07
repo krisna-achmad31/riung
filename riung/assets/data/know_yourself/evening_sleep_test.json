@@ -1,0 +1,48 @@
+{
+  "id": "evening_sleep_test",
+  "title": "Your Evening and Sleep",
+  "description": "Kenali apa yang sebenarnya membuatmu sering begadang dan menghancurkan pola tidurmu.",
+  "isPremium": true,
+  "questionCount": 24,
+  "theoryReference": "Diadaptasi dari penelitian Revenge Bedtime Procrastination dan Sleep Hygiene",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Kadang-Kadang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Selalu" }
+    ]
+  },
+  "results": [
+    { "dominantTrait": "Revenge", "category": "Revenge Bedtime Procrastinator", "description": "Kamu mengorbankan tidur demi merebut kembali 'me-time' yang hilang akibat kesibukan/tuntutan di siang hari." },
+    { "dominantTrait": "Anxious", "category": "The Anxious Sleeper", "description": "Tubuhmu lelah, tapi otakmu berisik. Malam hari menjadi waktu di mana overthinking dan kecemasanmu memuncak." },
+    { "dominantTrait": "Dopamine", "category": "The Dopamine Chaser", "description": "Kamu begadang karena tersedot oleh hiburan (game/sosmed/series) yang memberi dopamin instan hingga lupa waktu." }
+  ],
+  "questions": [
+    { "id": "es_1", "trait": "Revenge", "text": "Saya sengaja menunda tidur agar memiliki waktu bebas untuk diri sendiri yang tidak saya dapatkan di siang hari." },
+    { "id": "es_2", "trait": "Anxious", "text": "Saat kepala saya menyentuh bantal, otak saya justru mulai memikirkan kesalahan yang saya buat hari ini." },
+    { "id": "es_3", "trait": "Dopamine", "text": "Saya selalu berjanji 'satu video/episode lagi', tetapi akhirnya bablas berjam-jam kemudian." },
+    { "id": "es_4", "trait": "Revenge", "text": "Karena jadwal siang saya dikontrol oleh orang lain (bos/dosen/orang tua), malam hari adalah waktu saya untuk merasa bebas." },
+    { "id": "es_5", "trait": "Anxious", "text": "Saya sering terbangun di tengah malam dengan jantung berdebar karena teringat pekerjaan besok." },
+    { "id": "es_6", "trait": "Dopamine", "text": "Saya merasa butuh hiburan layar yang intens (bermain game kompetitif atau scrolling) tepat sebelum memejamkan mata." },
+    { "id": "es_7", "trait": "Revenge", "text": "Tidur lebih awal terasa seperti mengakhiri kesenangan hari ini terlalu cepat." },
+    { "id": "es_8", "trait": "Anxious", "text": "Malam hari yang sunyi membuat pikiran-pikiran negatif yang selama ini saya pendam muncul ke permukaan." },
+    { "id": "es_9", "trait": "Dopamine", "text": "Bahkan saat saya sudah sangat mengantuk, jari saya secara otomatis terus me-scroll media sosial." },
+    { "id": "es_10", "trait": "Revenge", "text": "Saya merasa marah/kesal pada diri sendiri keesokan paginya karena begadang, tapi mengulanginya lagi di malam hari." },
+    { "id": "es_11", "trait": "Anxious", "text": "Saya sering merencanakan skenario terburuk tentang masa depan saya saat mencoba untuk tidur." },
+    { "id": "es_12", "trait": "Dopamine", "text": "Saya kesulitan membayangkan bisa tertidur tanpa ada video YouTube atau film yang menyala di latar belakang." },
+    { "id": "es_13", "trait": "Revenge", "text": "Makin sibuk dan melelahkan siang hari saya, makin saya memaksakan diri untuk begadang mencari hiburan di malam hari." },
+    { "id": "es_14", "trait": "Anxious", "text": "Melihat jam yang terus berputar menuju pagi justru membuat saya semakin panik dan semakin sulit tidur." },
+    { "id": "es_15", "trait": "Dopamine", "text": "Rasa bosan saat bersiap tidur sangat tidak tertahankan, sehingga saya mencari ponsel sebagai pelarian." },
+    { "id": "es_16", "trait": "Revenge", "text": "Saya merasa waktu tidur mencuri sisa waktu berharga yang bisa saya gunakan untuk bersantai ria." },
+    { "id": "es_17", "trait": "Anxious", "text": "Saya mencoba berbagai teknik pernapasan untuk tidur, tapi pikiran saya terlalu sibuk untuk bisa rileks." },
+    { "id": "es_18", "trait": "Dopamine", "text": "Notifikasi yang masuk saat saya sudah memejamkan mata langsung memancing saya untuk membuka ponsel kembali." },
+    { "id": "es_19", "trait": "Revenge", "text": "Saya tahu begadang merusak kesehatan saya, tetapi kebebasan di larut malam terasa sepadan dengan risiko itu." },
+    { "id": "es_20", "trait": "Anxious", "text": "Saya terbiasa menggertakkan gigi atau mengepalkan tangan tanpa sadar saat mencoba untuk tidur." },
+    { "id": "es_21", "trait": "Dopamine", "text": "Daya tarik dari obrolan larut malam (chatting) atau bermain game bersama teman jauh lebih kuat dari rasa kantuk." },
+    { "id": "es_22", "trait": "Revenge", "text": "Bagi saya, malam hari adalah tempat perlindungan (sanctuary) di mana tidak ada yang bisa memberikan tuntutan kepada saya." },
+    { "id": "es_23", "trait": "Anxious", "text": "Sebelum tidur, saya mengingat interaksi sosial tadi siang dan merasa malu atas apa yang saya ucapkan." },
+    { "id": "es_24", "trait": "Dopamine", "text": "Otak saya menagih 'hadiah' (dopamin) setelah seharian bekerja keras, dan tidur tidak terasa seperti sebuah hadiah." }
+  ]
+}

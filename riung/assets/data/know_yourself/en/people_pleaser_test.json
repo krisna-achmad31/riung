@@ -1,0 +1,36 @@
+{
+  "title": "You and Other People's Eyes (People Pleaser Test)",
+  "description": "How far do you change yourself to keep others happy and avoid conflict?",
+  "options": ["Never", "Rarely", "Often", "Always"],
+  "questions": {
+    "pp_1": "I change the way I talk or my taste in music depending on who I'm hanging out with.",
+    "pp_2": "I'd rather apologize even when I'm not wrong, as long as the argument ends quickly.",
+    "pp_3": "I always say yes when friends ask for help, even when my own schedule is already packed.",
+    "pp_4": "When asked 'Where do you want to eat?', I always answer 'Up to you' so they'll be happy.",
+    "pp_5": "My biggest fear is finding out someone is secretly angry or disappointed with me.",
+    "pp_6": "I feel guilty relaxing while people around me are working hard.",
+    "pp_7": "I often voice agreement with popular opinion, even though inside I strongly disagree.",
+    "pp_8": "I choose my words very carefully so I don't offend anyone (walking on eggshells).",
+    "pp_9": "My self-worth shoots up every time I feel needed or manage to help someone.",
+    "pp_10": "I feel I have no fixed personality or 'true self' when I'm alone without others.",
+    "pp_11": "If the service at a restaurant is terrible, I would never dare to complain directly to the staff.",
+    "pp_12": "I often feel emotionally exhausted from constantly holding everyone's venting and problems.",
+    "pp_13": "I laugh loudly at jokes that aren't funny at all just to keep the group's mood light.",
+    "pp_14": "I'm willing to spend more or lose money so friends won't call me stingy or difficult.",
+    "pp_15": "Saying 'No' feels like a huge sin or a betrayal to me.",
+    "pp_16": "I often exaggerate my enthusiasm for a friend's hobby so they'll like me.",
+    "pp_17": "When someone criticizes me, my first reflex is to smile and agree, then cry about it later in my room.",
+    "pp_18": "I tend to attract toxic (red-flag) people because I believe I have the power to 'fix' them.",
+    "pp_19": "I'm afraid to show my fragile, sad, or angry side because I want to always seem positive and fun.",
+    "pp_20": "I'm willing to hold back my ambitions or dreams if they make someone close to me feel threatened or envious.",
+    "pp_21": "I secretly feel resentful because I always help others, but rarely does anyone help me.",
+    "pp_22": "I copy the unique habits or style of people I admire so I'll look cool like them.",
+    "pp_23": "Facing a confrontation in person can make me shake, break into a cold sweat, and feel nauseous.",
+    "pp_24": "I feel my life is less meaningful if I'm not busy solving my family's or friends' problems."
+  },
+  "results": [
+    { "category": "The Chameleon", "description": "You change your personality, hobbies, and opinions so you can always fit in with the people around you." },
+    { "category": "The Peacekeeper", "description": "You're very afraid of conflict and anger, so you'll swallow your own opinions to keep things harmonious." },
+    { "category": "The Rescuer", "description": "You struggle to say 'no' because you feel your worth depends on how useful you are to others." }
+  ]
+}

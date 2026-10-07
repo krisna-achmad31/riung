@@ -1,0 +1,50 @@
+{
+  "id": "self_esteem_test",
+  "title": "Self-Esteem Test",
+  "description": "Cari tahu seberapa sehat tingkat penghargaan dan welas asihmu terhadap diri sendiri (Self-Worth & Self-Compassion).",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari Rosenberg Self-Esteem Scale (RSES) & Neff's Self-Compassion Scale (SCS-SF)",
+  "scoringLogic": {
+    "type": "sum_with_reverse",
+    "options": [
+      { "value": 1, "label": "Sangat Tidak Setuju" },
+      { "value": 2, "label": "Tidak Setuju" },
+      { "value": 3, "label": "Setuju" },
+      { "value": 4, "label": "Sangat Setuju" }
+    ],
+    "reverseOptions": [
+      { "value": 4, "label": "Sangat Tidak Setuju" },
+      { "value": 3, "label": "Tidak Setuju" },
+      { "value": 2, "label": "Setuju" },
+      { "value": 1, "label": "Sangat Setuju" }
+    ]
+  },
+  "results": [
+    { "minScore": 20, "maxScore": 45, "category": "Harga Diri Rendah", "description": "Kamu memandang dirimu dengan sangat keras dan merasa tidak berharga. Waktunya belajar untuk mencintai dirimu sendiri." },
+    { "minScore": 46, "maxScore": 65, "category": "Harga Diri Sedang", "description": "Secara umum positif, namun keyakinan dirimu mudah goyah saat menghadapi kegagalan atau kritik." },
+    { "minScore": 66, "maxScore": 80, "category": "Harga Diri Sangat Sehat", "description": "Kamu menyadari nilaimu yang utuh sebagai manusia, baik dalam keadaan berhasil maupun gagal." }
+  ],
+  "questions": [
+    { "id": "se_1", "text": "Secara keseluruhan, saya merasa sangat puas dengan diri saya sendiri.", "isReverse": false },
+    { "id": "se_2", "text": "Terkadang saya benar-benar berpikir bahwa saya ini tidak berguna (good for nothing).", "isReverse": true },
+    { "id": "se_3", "text": "Saya merasa bahwa saya memiliki sejumlah kualitas (keahlian/sifat) yang baik.", "isReverse": false },
+    { "id": "se_4", "text": "Saya mampu melakukan banyak hal sebaik yang dilakukan mayoritas orang lain.", "isReverse": false },
+    { "id": "se_5", "text": "Saya merasa tidak punya banyak hal untuk dibanggakan dari hidup saya.", "isReverse": true },
+    { "id": "se_6", "text": "Saya memiliki sikap yang sangat positif tentang masa depan dan diri saya sendiri.", "isReverse": false },
+    { "id": "se_7", "text": "Pada umumnya, saya cenderung menganggap diri saya sebagai sebuah kegagalan.", "isReverse": true },
+    { "id": "se_8", "text": "Saya sangat berharap saya bisa memiliki lebih banyak rasa hormat terhadap diri saya sendiri.", "isReverse": true },
+    { "id": "se_9", "text": "Secara umum, saya merasa saya adalah orang yang berharga, paling tidak setara dengan orang lain.", "isReverse": false },
+    { "id": "se_10", "text": "Saat ini, saya sering merasa sangat payah, bodoh, atau memalukan.", "isReverse": true },
+    { "id": "se_11", "text": "Ketika saya sedang mengalami kesulitan emosional, saya berusaha bersikap lembut dan sabar kepada diri sendiri.", "isReverse": false },
+    { "id": "se_12", "text": "Saat menemui kekurangan dalam diri, saya cenderung menghukum dan mencaci diri saya dengan keras.", "isReverse": true },
+    { "id": "se_13", "text": "Saat sesuatu berjalan tidak sesuai rencana, saya mencoba melihat hal itu sebagai hal normal yang dialami semua orang.", "isReverse": false },
+    { "id": "se_14", "text": "Ketika saya gagal pada sesuatu yang penting, saya merasa seolah-olah saya ini satu-satunya orang terburuk di dunia.", "isReverse": true },
+    { "id": "se_15", "text": "Saya mencoba bersikap pengertian pada aspek-aspek diri saya yang kurang saya sukai.", "isReverse": false },
+    { "id": "se_16", "text": "Saat saya sangat sedih, saya terobsesi dengan memikirkan betapa menderitanya diri saya.", "isReverse": true },
+    { "id": "se_17", "text": "Saya menjaga keseimbangan pikiran yang sehat bahkan saat ada kejadian buruk menimpa saya.", "isReverse": false },
+    { "id": "se_18", "text": "Saya bersikap sangat tidak toleran (keras) dan menghakimi kekurangan/kelemahan saya sendiri.", "isReverse": true },
+    { "id": "se_19", "text": "Saya memberi diri saya kasih sayang dan kelembutan layaknya saya memperlakukan sahabat yang sedang bersedih.", "isReverse": false },
+    { "id": "se_20", "text": "Saya merasa cacat secara personal ketika kelemahan saya terlihat oleh orang lain.", "isReverse": true }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "title": "Childhood Trauma Test",
+  "description": "Look at the traces of childhood experiences that may still shape your emotions and relationships today.",
+  "options": ["Never at all", "Rarely", "Sometimes", "Often", "Very often"],
+  "questions": {
+    "ctq_1": "My parents or caregivers often called me stupid, naughty, or other belittling names.",
+    "ctq_2": "I often felt that no one in my family truly loved me.",
+    "ctq_3": "My parents often couldn't take care of me because they were too busy or absent.",
+    "ctq_4": "I was physically punished to the point of bruises or injuries.",
+    "ctq_5": "I felt I had to protect my parents emotionally, instead of them protecting me.",
+    "ctq_6": "My basic needs (clean food, decent clothes, seeing a doctor) were sometimes neglected.",
+    "ctq_7": "A family member acted in ways that made me feel physically unsafe.",
+    "ctq_8": "My parents often fought so badly that they threw things or got physically violent.",
+    "ctq_9": "I was often left home alone for long periods when I was too young.",
+    "ctq_10": "I felt safe and protected at home.",
+    "ctq_11": "My parents gave me demands or responsibilities that were too heavy for a child my age.",
+    "ctq_12": "Affection in my family was only given when I achieved something.",
+    "ctq_13": "I was often afraid of one or both of my parents' anger.",
+    "ctq_14": "My family was very closed off, and I didn't feel comfortable bringing friends home.",
+    "ctq_15": "I was often mocked or humiliated by family members in front of others.",
+    "ctq_16": "As a child, I had at least one adult who truly cared about me and whom I could rely on.",
+    "ctq_17": "I was made to feel that my family would be better off without me.",
+    "ctq_18": "When I was sad or cried, I was often told to be quiet or scolded.",
+    "ctq_19": "I often saw my mother or female caregiver being treated harshly.",
+    "ctq_20": "The punishments I received were often far out of proportion to the small mistakes I made.",
+    "ctq_21": "My parents often threatened to abandon or leave me as a way to discipline me.",
+    "ctq_22": "Overall, I feel my childhood was as happy as most children's."
+  },
+  "results": [
+    { "category": "Very Low Impact", "description": "You have a relatively safe and supportive childhood foundation." },
+    { "category": "Mild Impact", "description": "There were some less-than-ideal childhood experiences, but they don't dominate your life now." },
+    { "category": "Moderate Impact", "description": "Childhood wounds have left a mark and may affect how you respond to conflict or relationships today." },
+    { "category": "Severe Impact", "description": "Past experiences strongly affect your emotional well-being. Working with a professional is highly recommended for healing." }
+  ]
+}

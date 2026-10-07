@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/kenali_dirimu_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
@@ -7,11 +8,15 @@ import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../betterme/screens/betterme_home_screen.dart';
 import '../../minigame/screens/minigame_intro_screen.dart';
+import '../../kenali_dirimu/logic/kenali_progress.dart';
+import '../logic/habit_monsters.dart';
+import '../widgets/habit_vault_tab.dart';
 import 'hakim_detail_screen.dart';
 import 'saboteur_detail_screen.dart';
 
-/// Brankas monster — kartu besar Si Hakim (bos) + grid 6 anak buah.
-/// Implement persis `design/Monster.dc.html` § Brankas monster.
+/// Brankas monster — tab Pikiran (kartu besar Si Hakim + grid 6 anak buah,
+/// `design/Monster.dc.html` § Brankas monster) dan tab Kebiasaan
+/// ([HabitVaultTab], frame `Glass — Monster · Brankas · Kebiasaan`).
 class VaultScreen extends StatefulWidget {
   const VaultScreen({super.key});
 
@@ -22,6 +27,7 @@ class VaultScreen extends StatefulWidget {
 class _VaultScreenState extends State<VaultScreen> {
   List<Saboteur>? _saboteurs;
   Object? _loadError;
+  int _tab = 0;
 
   @override
   void initState() {
@@ -82,7 +88,10 @@ class _VaultScreenState extends State<VaultScreen> {
     final hakim = saboteurs.firstWhere((s) => s.id == 'hakim', orElse: () => saboteurs.first);
     final anakBuah = saboteurs.where((s) => s.id != 'hakim').toList();
     final hakimProgress = scope.monsterProgress.progressOf('hakim') ?? MonsterProgress.initial('hakim');
-    final tamedCount = scope.monsterProgress.all.values.where((m) => m.state == MonsterState.tamed).length;
+    final k = context.s.kenali;
+    final pikiranCount = saboteurs.length;
+    final habitCount = KenaliDirimuConfig.habitMonsters.length;
+    final tamedPikiran = scope.monsterProgress.all.values.where((m) => m.state == MonsterState.tamed && !HabitMonsters.isHabit(m.saboteurId)).length;
 
     return ListView(
       padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
@@ -105,7 +114,7 @@ class _VaultScreenState extends State<VaultScreen> {
                     child: Text(t.vaultTitle, maxLines: 1, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2)),
                   ),
                   const SizedBox(height: 2),
-                  Text(t.vaultSub(tamedCount), style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
+                  Text(_tab == 0 ? k.pikiranSub(tamedPikiran, pikiranCount + habitCount) : k.habitSub(_awakeHabits, habitCount, _tamedHabits(scope)), style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
                 ],
               ),
             ),
@@ -114,7 +123,10 @@ class _VaultScreenState extends State<VaultScreen> {
             KoinChip(balance: scope.wallet.coins),
           ],
         ),
+        const SizedBox(height: AppSpacing.lg),
+        RiungSegmentedTabs(labels: [k.tabPikiran(pikiranCount), k.tabKebiasaan(habitCount)], index: _tab, onChanged: (i) => setState(() => _tab = i)),
         const SizedBox(height: AppSpacing.xl),
+        if (_tab == 1) const HabitVaultTab() else ...[
         _HakimCard(
           saboteur: hakim,
           progress: hakimProgress,
@@ -139,9 +151,15 @@ class _VaultScreenState extends State<VaultScreen> {
               ),
             ),
           ),
+        ],
       ],
     );
   }
+
+  int get _awakeHabits => KenaliDirimuConfig.habitMonsters.where(KenaliProgress.isAwake).length;
+
+  int _tamedHabits(AppScope scope) =>
+      KenaliDirimuConfig.habitMonsters.where((id) => KenaliProgress.isAwake(id) && scope.monsterProgress.progressOf(id)?.state == MonsterState.tamed).length;
 
   Widget _minion(BuildContext context, AppScope scope, Saboteur saboteur) => _AccompliceCard(
         saboteur: saboteur,

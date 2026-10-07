@@ -1,0 +1,33 @@
+{
+  "title": "Difficult Person Test",
+  "description": "How difficult do others find you? Look at 7 hidden antagonistic traits you might not be aware of.",
+  "options": ["Strongly disagree", "Disagree", "Agree", "Strongly agree"],
+  "questions": {
+    "dpt_1": "I don't feel the need to care much about other people's problems or feelings.",
+    "dpt_2": "I find it hard to sincerely sympathize when I see others struggling.",
+    "dpt_3": "My parents or friends have told me I lack empathy.",
+    "dpt_4": "I feel I deserve special treatment compared to most people.",
+    "dpt_5": "Deep down, I feel smarter or better than most people.",
+    "dpt_6": "I really enjoy being the center of attention and admired by others.",
+    "dpt_7": "I'm easily provoked and sometimes explode when I'm angry.",
+    "dpt_8": "I often use threats, shouting, or anger to get what I want.",
+    "dpt_9": "I love sharp debates and beating others in an argument.",
+    "dpt_10": "I find it very hard to trust that others mean well toward me.",
+    "dpt_11": "I often feel others are secretly talking badly about me or planning something against me.",
+    "dpt_12": "I'm very cautious and always suspicious when new people are too nice to me.",
+    "dpt_13": "I often look for loopholes or manipulate situations to benefit myself.",
+    "dpt_14": "I sometimes deliberately twist the facts (gaslighting) so I don't get blamed for a mistake.",
+    "dpt_15": "I can be very sweet to someone just because I want something from them.",
+    "dpt_16": "When working in a team, I feel I have to be the one controlling and organizing everything.",
+    "dpt_17": "I get very annoyed when others refuse to follow my instructions or suggestions.",
+    "dpt_18": "I always try to dominate conversations and decision-making in a group.",
+    "dpt_19": "I often do reckless or high-risk things without thinking about the consequences for myself or others.",
+    "dpt_20": "I get bored easily and keep looking for new thrills that are risky or even break the rules.",
+    "dpt_21": "Rules and social norms feel like restrictions that I often want to break."
+  },
+  "results": [
+    { "category": "Easy-going", "description": "You tend to be tolerant and empathetic, and rarely cause unnecessary friction." },
+    { "category": "Fairly Stubborn", "description": "You have some firm or defensive traits that sometimes make it hard for others to compromise with you." },
+    { "category": "Difficult Person", "description": "You have many antagonistic traits (such as dominance, suspicion, or aggression) that can make interactions with you exhausting for others." }
+  ]
+}

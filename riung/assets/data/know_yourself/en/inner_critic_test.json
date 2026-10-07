@@ -1,0 +1,36 @@
+{
+  "title": "Your Inner Critic",
+  "description": "Find out whose voice is dictating the negative thoughts in your head when you make a mistake.",
+  "options": ["Never", "Sometimes", "Often", "Always"],
+  "questions": {
+    "ic_1": "If I'm not productive all day, the voice in my head tells me I'm useless.",
+    "ic_2": "I often blame myself excessively for small mistakes from the past.",
+    "ic_3": "When someone replies to my message briefly, I'm immediately sure they're angry with me.",
+    "ic_4": "I feel there's no room to rest until all my work is done perfectly.",
+    "ic_5": "The voice in my head often reminds me how selfish or troublesome I am.",
+    "ic_6": "I often replay social interactions, afraid I said something that made people secretly hate me.",
+    "ic_7": "The word 'should' (I should be better, I should be smarter) keeps dominating my thoughts.",
+    "ic_8": "I feel I deserve to be punished or to have bad things happen when things don't go well.",
+    "ic_9": "I hold back from speaking in meetings or class because I'm sure others will think my idea is stupid.",
+    "ic_10": "Getting a B or a small reprimand feels like a total, humiliating failure.",
+    "ic_11": "I feel fully responsible for my parents' or partner's happiness.",
+    "ic_12": "When my boss or teacher calls me in, my first thought is: 'Someone must have reported something bad about me.'",
+    "ic_13": "It's hard for me to celebrate success because the voice in my head says 'This isn't good enough yet.'",
+    "ic_14": "I feel the good luck I get will someday be taken away because I don't deserve it.",
+    "ic_15": "When friends compliment me, I often think they're just lying to be polite.",
+    "ic_16": "I measure my self-worth only by how much I got done today.",
+    "ic_17": "When I turn down someone's request, guilt haunts me for days.",
+    "ic_18": "Being in public makes me tense because I feel everyone is judging how I look.",
+    "ic_19": "If I'm sick and have to rest, I get stressed about wasting time.",
+    "ic_20": "I feel that asking for help is the same as showing I'm weak and a burden.",
+    "ic_21": "I often change my personal opinions to match the majority so I won't be judged.",
+    "ic_22": "I often compare how fast I'm succeeding with other people my age.",
+    "ic_23": "I feel I'm not allowed to be happy when someone close to me is going through a hard time.",
+    "ic_24": "My biggest fear is being seen as 'weird' or 'incompetent' by the people around me."
+  },
+  "results": [
+    { "category": "The Taskmaster", "description": "Your critic demands absolute perfection. You feel your worth is decided by achievement and productivity." },
+    { "category": "The Guilt-Tripper", "description": "Your critic likes to make you feel guilty about the past or convince you that you're a burden to others." },
+    { "category": "The Mind-Reader", "description": "Your critic always guesses the worst about what others think of you (fear of being judged)." }
+  ]
+}

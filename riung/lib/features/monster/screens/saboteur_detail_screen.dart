@@ -12,6 +12,8 @@ import '../../minigame/screens/minigame_intro_screen.dart';
 import '../../toko/logic/monster_loadout.dart';
 import '../../toko/screens/lemari_screen.dart';
 import '../logic/saboteur_content.dart';
+import '../widgets/monster_info_card.dart';
+import '../widgets/monster_state_toggle.dart';
 import 'waswas_stage_map_screen.dart';
 
 /// Detail satu saboteur (bukan bos). Implement persis
@@ -119,7 +121,7 @@ class _SaboteurDetailScreenState extends State<SaboteurDetailScreen> {
                                     Positioned(
                                       left: 0,
                                       top: 12,
-                                      child: _StateToggle(
+                                      child: MonsterStateToggle(
                                         value: shown,
                                         wildLabel: t.wild,
                                         tamedLabel: t.tamed,
@@ -161,9 +163,9 @@ class _SaboteurDetailScreenState extends State<SaboteurDetailScreen> {
                         ),
                         if (content != null) ...[
                           const SizedBox(height: AppSpacing.md),
-                          _InfoCard(eyebrow: t.realWorld, child: _body(content.duniaNyata)),
+                          MonsterInfoCard(eyebrow: t.realWorld, child: _body(content.duniaNyata)),
                           const SizedBox(height: AppSpacing.md),
-                          _InfoCard(
+                          MonsterInfoCard(
                             eyebrow: t.whatItSays,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,9 +182,9 @@ class _SaboteurDetailScreenState extends State<SaboteurDetailScreen> {
                             ),
                           ),
                           const SizedBox(height: AppSpacing.md),
-                          _InfoCard(eyebrow: t.theFact, eyebrowColor: AppColors.sekunder, color: AppColors.sekunderLembut.withValues(alpha: 0.7), child: _body(content.faktanya)),
+                          MonsterInfoCard(eyebrow: t.theFact, eyebrowColor: AppColors.sekunder, color: AppColors.sekunderLembut.withValues(alpha: 0.7), child: _body(content.faktanya)),
                           const SizedBox(height: AppSpacing.md),
-                          _InfoCard(
+                          MonsterInfoCard(
                             eyebrow: t.antidotes,
                             eyebrowColor: AppColors.primer,
                             color: AppColors.kabutSage.withValues(alpha: 0.7),
@@ -216,68 +218,6 @@ class _SaboteurDetailScreenState extends State<SaboteurDetailScreen> {
   }
 
   Widget _body(String text) => Text(text, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksUtama));
-}
-
-/// Toggle pil Liar/Jinak untuk pratinjau wujud (frame `Toggle state`).
-class _StateToggle extends StatelessWidget {
-  const _StateToggle({required this.value, required this.wildLabel, required this.tamedLabel, required this.onChanged});
-
-  final MonsterVisualState value;
-  final String wildLabel;
-  final String tamedLabel;
-  final ValueChanged<MonsterVisualState> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget seg(MonsterVisualState v, String label) {
-      final on = v == value;
-      return GestureDetector(
-        onTap: () => onChanged(v),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          decoration: BoxDecoration(color: on ? AppColors.tinta : AppColors.tinta.withValues(alpha: 0), borderRadius: BorderRadius.circular(AppRadius.pill)),
-          child: Text(label, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: on ? AppColors.diAtasTinta : AppColors.teksSekunder)),
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: AppGlass.pill(),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [seg(MonsterVisualState.liar, wildLabel), seg(MonsterVisualState.jinak, tamedLabel)],
-      ),
-    );
-  }
-}
-
-/// Kartu info kaca dengan eyebrow (DI DUNIA NYATA / FAKTANYA / …).
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.eyebrow, required this.child, this.eyebrowColor = AppColors.teksRedup, this.color = AppColors.kartu});
-
-  final String eyebrow;
-  final Widget child;
-  final Color eyebrowColor;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return RiungGlassCard(
-      radius: 24,
-      color: color,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(eyebrow, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: eyebrowColor)),
-          const SizedBox(height: 8),
-          child,
-        ],
-      ),
-    );
-  }
 }
 
 class _TeknikRow extends StatelessWidget {

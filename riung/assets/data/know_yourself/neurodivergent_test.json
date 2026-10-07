@@ -1,0 +1,44 @@
+{
+  "id": "neurodivergent_test",
+  "title": "Neurodivergent Test",
+  "description": "Eksplorasi ciri-ciri spektrum autisme, ADHD, dan sensitivitas pemrosesan sensori pada dirimu.",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari RAADS-14, ASRS, dan Adult Sensory Profile",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Jarang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Selalu" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 20, "category": "Sangat Neurotipikal", "description": "Kamu cenderung memproses informasi, sensorik, dan interaksi sosial dengan cara yang umum." },
+    { "minScore": 21, "maxScore": 40, "category": "Ambang Batas (Borderline)", "description": "Ada beberapa kebiasaan dan sensitivitas spesifik, namun kamu masih cukup mudah beradaptasi." },
+    { "minScore": 41, "maxScore": 60, "category": "Indikasi Neurodivergen", "description": "Banyak sifat neurodivergen yang tercermin kuat dalam cara otakmu bekerja." }
+  ],
+  "questions": [
+    { "id": "nd_1", "text": "Saya merasa suara bising, cahaya terang, atau tekstur pakaian tertentu sangat mengganggu saya secara fisik." },
+    { "id": "nd_2", "text": "Berada di lingkungan sosial yang ramai membuat saya kelelahan dan butuh waktu lama untuk memulihkan energi." },
+    { "id": "nd_3", "text": "Saya memiliki ketertarikan (special interest) yang sangat spesifik dan bisa menghabiskan berjam-jam membahasnya." },
+    { "id": "nd_4", "text": "Saya sering merasa harus berpura-pura atau menutupi diri saya yang asli saat bersosialisasi (masking)." },
+    { "id": "nd_5", "text": "Saya cenderung melakukan gerakan berulang saat fokus atau cemas (misal: menggoyangkan kaki, memainkan jari, stimming)." },
+    { "id": "nd_6", "text": "Saya sering kesulitan memahami sarkasme, candaan, atau makna tersirat dari ucapan orang lain." },
+    { "id": "nd_7", "text": "Saya merasa sangat cemas atau terganggu jika rutinitas/jadwal saya berubah secara mendadak." },
+    { "id": "nd_8", "text": "Saya lebih sering memperhatikan pola atau detail kecil yang dilewatkan oleh kebanyakan orang." },
+    { "id": "nd_9", "text": "Saya sering kesulitan memulai tugas yang membutuhkan banyak langkah (executive dysfunction)." },
+    { "id": "nd_10", "text": "Terkadang saya tidak merespons saat dipanggil karena terlalu fokus pada apa yang sedang saya kerjakan (hyperfocus)." },
+    { "id": "nd_11", "text": "Saya sering merasa sangat berbeda atau seperti berasal dari planet lain dibandingkan orang di sekitar saya." },
+    { "id": "nd_12", "text": "Saya menghindari kontak mata karena terasa sangat tidak nyaman atau mengintimidasi." },
+    { "id": "nd_13", "text": "Saat mengobrol, saya sering tidak sadar telah mendominasi percakapan tentang topik favorit saya." },
+    { "id": "nd_14", "text": "Saya kesulitan mengenali emosi saya sendiri hingga emosi itu sudah memuncak dan meledak." },
+    { "id": "nd_15", "text": "Saya sangat pemilih dalam hal makanan, sering karena tekstur atau baunya yang tidak bisa saya toleransi." },
+    { "id": "nd_16", "text": "Saya merasa otak saya bekerja terlalu cepat sehingga pikiran saya tumpang tindih." },
+    { "id": "nd_17", "text": "Sangat sulit bagi saya untuk beralih dari satu aktivitas yang sedang saya nikmati ke aktivitas lainnya." },
+    { "id": "nd_18", "text": "Saya bereaksi secara fisik (misal: menutup telinga/menghindar) saat mendengar suara tajam yang tidak terduga." },
+    { "id": "nd_19", "text": "Saya sering berlatih dan merencanakan naskah percakapan di kepala saya sebelum berbicara dengan orang lain." },
+    { "id": "nd_20", "text": "Saya merasa jauh lebih nyaman dan mudah berekspresi melalui teks dibandingkan berbicara langsung." }
+  ]
+}

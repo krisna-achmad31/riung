@@ -46,6 +46,8 @@ abstract class TokoStrings {
   String get slotNeck;
   String get slotBase;
   String get slotFrame;
+  String get slotSide;
+  String get khasLabel;
   String get worn;
   String exclusiveTo(String monster);
   String get lemariNote;
@@ -177,6 +179,30 @@ class TokoStringsId extends TokoStrings {
         return 'Bantal mini Si Meronta';
       case 'bingkai_emas':
         return 'Bingkai emas Si Cermin';
+      case 'jam_pasir':
+        return 'Jam pasir mini';
+      case 'kantong_hp':
+        return 'Kantong HP rajut';
+      case 'topi_tidur':
+        return 'Topi tidur bulan';
+      case 'pin_berani':
+        return 'Pin berani';
+      case 'kompas':
+        return 'Kompas kuningan';
+      case 'cangkir_teh':
+        return 'Cangkir teh hangat';
+      case 'batu_tenang':
+        return 'Batu tenang';
+      case 'lentera':
+        return 'Lentera kecil';
+      case 'bintang_kintsugi':
+        return 'Bintang kintsugi';
+      case 'senter':
+        return 'Senter mungil';
+      case 'selimut_peluk':
+        return 'Selimut peluk';
+      case 'palu_busa':
+        return 'Palu busa';
     }
     return id;
   }
@@ -251,6 +277,10 @@ class TokoStringsId extends TokoStrings {
   String get slotBase => 'Alas';
   @override
   String get slotFrame => 'Bingkai';
+  @override
+  String get slotSide => 'Khas';
+  @override
+  String get khasLabel => 'Khas';
   @override
   String get worn => 'Dipakai';
   @override
@@ -480,6 +510,30 @@ class TokoStringsEn extends TokoStrings {
         return "Si Meronta's mini pillow";
       case 'bingkai_emas':
         return "Si Cermin's golden frame";
+      case 'jam_pasir':
+        return "Mini hourglass";
+      case 'kantong_hp':
+        return "Knitted phone pouch";
+      case 'topi_tidur':
+        return "Moon nightcap";
+      case 'pin_berani':
+        return "Brave pin";
+      case 'kompas':
+        return "Brass compass";
+      case 'cangkir_teh':
+        return "Warm cup of tea";
+      case 'batu_tenang':
+        return "Calm stone";
+      case 'lentera':
+        return "Little lantern";
+      case 'bintang_kintsugi':
+        return "Kintsugi star";
+      case 'senter':
+        return "Tiny flashlight";
+      case 'selimut_peluk':
+        return "Hug blanket";
+      case 'palu_busa':
+        return "Foam gavel";
     }
     return id;
   }
@@ -554,6 +608,10 @@ class TokoStringsEn extends TokoStrings {
   String get slotBase => 'Base';
   @override
   String get slotFrame => 'Frame';
+  @override
+  String get slotSide => 'Signature';
+  @override
+  String get khasLabel => 'Signature';
   @override
   String get worn => 'Wearing';
   @override

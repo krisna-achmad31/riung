@@ -1,0 +1,50 @@
+{
+  "id": "depression_test",
+  "title": "Depression Test",
+  "description": "Skrining awal untuk mengenali gejala depresi dan perubahan energi yang signifikan dalam keseharianmu (berbasis 1 minggu terakhir).",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Berdasarkan Center for Epidemiologic Studies Depression Scale (CES-D)",
+  "scoringLogic": {
+    "type": "sum_with_reverse",
+    "options": [
+      { "value": 0, "label": "Jarang / Tidak Pernah (<1 hari)" },
+      { "value": 1, "label": "Beberapa Hari (1-2 hari)" },
+      { "value": 2, "label": "Sering (3-4 hari)" },
+      { "value": 3, "label": "Hampir Setiap Hari (5-7 hari)" }
+    ],
+    "reverseOptions": [
+      { "value": 3, "label": "Jarang / Tidak Pernah (<1 hari)" },
+      { "value": 2, "label": "Beberapa Hari (1-2 hari)" },
+      { "value": 1, "label": "Sering (3-4 hari)" },
+      { "value": 0, "label": "Hampir Setiap Hari (5-7 hari)" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 15, "category": "Normal", "description": "Tidak ada indikasi depresi klinis. Emosimu dalam kondisi stabil dan wajar." },
+    { "minScore": 16, "maxScore": 21, "category": "Depresi Ringan", "description": "Mulai ada tanda-tanda stres emosional yang membebani harimu." },
+    { "minScore": 22, "maxScore": 60, "category": "Indikasi Depresi Mayor", "description": "Kamu menanggung beban emosional yang sangat berat. Sangat disarankan untuk mencari bantuan psikolog profesional secepatnya." }
+  ],
+  "questions": [
+    { "id": "cesd_1", "text": "Saya merasa terganggu oleh hal-hal yang biasanya tidak mengganggu saya.", "isReverse": false },
+    { "id": "cesd_2", "text": "Saya merasa tidak ingin makan; nafsu makan saya memburuk.", "isReverse": false },
+    { "id": "cesd_3", "text": "Saya merasa tidak bisa menghilangkan rasa sedih ini, bahkan dengan bantuan keluarga atau teman.", "isReverse": false },
+    { "id": "cesd_4", "text": "Saya merasa kualitas diri saya sama baiknya dengan orang lain (saya berharga).", "isReverse": true },
+    { "id": "cesd_5", "text": "Saya merasa sulit untuk menjaga fokus dan konsentrasi terhadap apa yang sedang saya kerjakan.", "isReverse": false },
+    { "id": "cesd_6", "text": "Saya merasa sangat tertekan (depresi).", "isReverse": false },
+    { "id": "cesd_7", "text": "Saya merasa segala hal yang saya lakukan membutuhkan usaha ekstra (sangat melelahkan).", "isReverse": false },
+    { "id": "cesd_8", "text": "Saya merasa optimis dan memiliki harapan yang baik tentang masa depan.", "isReverse": true },
+    { "id": "cesd_9", "text": "Saya merasa hidup saya seperti sebuah kegagalan.", "isReverse": false },
+    { "id": "cesd_10", "text": "Saya merasa takut atau cemas akan sesuatu yang tidak jelas.", "isReverse": false },
+    { "id": "cesd_11", "text": "Kualitas tidur saya sangat buruk / saya tidur gelisah.", "isReverse": false },
+    { "id": "cesd_12", "text": "Saya merasa bahagia.", "isReverse": true },
+    { "id": "cesd_13", "text": "Saya berbicara lebih sedikit dari biasanya (menarik diri).", "isReverse": false },
+    { "id": "cesd_14", "text": "Saya merasa sangat kesepian.", "isReverse": false },
+    { "id": "cesd_15", "text": "Orang-orang bersikap sangat tidak ramah atau menjauhi saya.", "isReverse": false },
+    { "id": "cesd_16", "text": "Saya bisa menikmati dan meresapi keindahan hidup.", "isReverse": true },
+    { "id": "cesd_17", "text": "Saya mudah menangis dan meneteskan air mata.", "isReverse": false },
+    { "id": "cesd_18", "text": "Saya merasa sedih (gloomy).", "isReverse": false },
+    { "id": "cesd_19", "text": "Saya merasa orang-orang di sekitar tidak menyukai saya.", "isReverse": false },
+    { "id": "cesd_20", "text": "Saya kesulitan menemukan energi untuk memulai sesuatu ('get going').", "isReverse": false }
+  ]
+}

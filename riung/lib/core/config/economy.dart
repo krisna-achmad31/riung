@@ -44,6 +44,10 @@ abstract final class EconomySpend {
   static const int skinEpic = 300;
   static const int skinLegendary = 500;
 
+  /// Kosmetik khas satu monster (jam pasir Si Nanti, cangkir teh Si Bara, dst):
+  /// setara tier epic, hanya dijual di Lemari monster itu.
+  static const int skinKhas = skinEpic;
+
   /// Harga awal buka waktu scroll di Aplikasi Beku (bertingkat, ini nilai awal).
   static const int scrollUnlockMulai = 15;
 

@@ -51,6 +51,12 @@ abstract class CommonStrings {
     'sempurna': 'Si Sempurna',
     'mengelak': 'Si Mengelak',
     'hakim': 'Si Hakim',
+    'nanti': 'Si Nanti',
+    'gulir': 'Si Gulir',
+    'begadang': 'Si Begadang',
+    'bunglon': 'Si Bunglon',
+    'bimbang': 'Si Bimbang',
+    'bara': 'Si Bara',
   };
 }
 

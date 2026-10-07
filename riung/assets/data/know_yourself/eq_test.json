@@ -1,0 +1,44 @@
+{
+  "id": "eq_test",
+  "title": "Emotional Intelligence Test",
+  "description": "Ukur kemampuanmu dalam mengenali emosi diri sendiri, mengelolanya, dan berempati pada lingkungan sosialmu.",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari Schutte Self-Report Emotional Intelligence Test (SSEIT)",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Sangat Tidak Sesuai" },
+      { "value": 1, "label": "Tidak Sesuai" },
+      { "value": 2, "label": "Sesuai" },
+      { "value": 3, "label": "Sangat Sesuai" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 25, "category": "Area Berkembang", "description": "Kamu masih kesulitan meregulasi emosi yang intens atau membaca perasaan orang lain dengan akurat." },
+    { "minScore": 26, "maxScore": 45, "category": "Kecerdasan Emosional Menengah", "description": "Kamu cukup mampu mengelola emosi harian dan berempati, dengan ruang untuk lebih tenang saat krisis." },
+    { "minScore": 46, "maxScore": 60, "category": "Sangat Cerdas Emosional", "description": "Kamu memiliki kesadaran diri yang luar biasa, berempati tinggi, dan mampu meredakan konflik dengan sangat baik." }
+  ],
+  "questions": [
+    { "id": "eq_1", "text": "Saya sangat menyadari emosi spesifik apa yang sedang saya rasakan saat ini." },
+    { "id": "eq_2", "text": "Saat saya marah atau sedih yang luar biasa, saya bisa mengidentifikasi persis apa penyebab utamanya." },
+    { "id": "eq_3", "text": "Saya bisa mengenali perubahan mood (suasana hati) orang lain hanya dari perubahan bahasa tubuh atau nada bicaranya." },
+    { "id": "eq_4", "text": "Saya merasa mudah untuk menempatkan diri saya di posisi orang lain dan memahami sudut pandang mereka (empati)." },
+    { "id": "eq_5", "text": "Saya mampu mengendalikan diri untuk tidak mengatakan hal-hal buruk yang tidak perlu saat sedang sangat emosi." },
+    { "id": "eq_6", "text": "Saya tahu strategi dan cara untuk menenangkan diri sendiri saat merasa panik, cemas, atau tertekan." },
+    { "id": "eq_7", "text": "Saya selalu memikirkan dampak ucapan saya terhadap perasaan orang lain sebelum berbicara secara impulsif." },
+    { "id": "eq_8", "text": "Orang-orang merasa sangat nyaman dan aman saat menceritakan masalah pribadi dan kelemahan mereka kepada saya." },
+    { "id": "eq_9", "text": "Saya bisa mendengarkan dan menerima kritik konstruktif tanpa langsung merasa diserang secara personal." },
+    { "id": "eq_10", "text": "Saya memiliki kemampuan yang baik untuk memotivasi diri saya sendiri kembali saat baru saja menghadapi kegagalan besar." },
+    { "id": "eq_11", "text": "Saya tidak mudah panik dan tetap bisa berpikir rasional saat menghadapi situasi krisis atau tidak terduga." },
+    { "id": "eq_12", "text": "Saya bisa 'membaca suasana' di dalam sebuah ruangan (misal: sedang tegang atau santai) saat baru saja memasukinya." },
+    { "id": "eq_13", "text": "Saat terjadi konflik dengan orang lain, saya lebih fokus mencari jalan tengah (solusi) daripada mencari siapa yang salah." },
+    { "id": "eq_14", "text": "Saya mudah beradaptasi dengan perubahan besar dalam hidup tanpa banyak mengeluh atau melawan." },
+    { "id": "eq_15", "text": "Saya tidak membiarkan satu kejadian buruk di pagi hari merusak suasana hati saya seharian penuh." },
+    { "id": "eq_16", "text": "Saya dapat mengekspresikan kekecewaan saya dengan asertif (jelas dan tegas) namun dengan cara yang tidak menyerang orang lain." },
+    { "id": "eq_17", "text": "Saya sadar dan menerima fakta bahwa kondisi emosi saya sangat memengaruhi kinerja, fokus, dan cara berpikir saya." },
+    { "id": "eq_18", "text": "Saya merasa senang dan ikut merayakan kesuksesan orang terdekat saya tanpa disusupi rasa iri." },
+    { "id": "eq_19", "text": "Saya memiliki kendali penuh untuk menyembunyikan emosi negatif saya jika situasinya menuntut sikap profesional." },
+    { "id": "eq_20", "text": "Saya selalu bersedia mendengarkan orang lain bercerita, bahkan jika saya sendiri sedang merasa cukup lelah." }
+  ]
+}

@@ -7,11 +7,11 @@ import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../betterme/screens/betterme_home_screen.dart';
-import '../../kepribadian/screens/kepribadian_hub_screen.dart';
 import '../../monster/screens/vault_screen.dart';
 import '../../toko/screens/paywall_premium_screen.dart';
 import '../../toko/screens/toko_screen.dart';
 import '../logic/avatar_catalog.dart';
+import '../widgets/kenali_profil_card.dart';
 import '../widgets/profil_avatar.dart';
 import 'bantuan_krisis_screen.dart';
 import 'kalender_latihan_screen.dart';
@@ -118,6 +118,8 @@ class ProfilScreen extends StatelessWidget {
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallPremiumScreen())),
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                const KenaliProfilCard(),
+                const SizedBox(height: AppSpacing.lg),
                 RiungMenuGroup(
                   children: [
                     RiungMenuRow(
@@ -125,12 +127,6 @@ class ProfilScreen extends StatelessWidget {
                       title: t.betterMeTitle,
                       subtitle: t.betterMeSub,
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BetterMeHomeScreen())),
-                    ),
-                    RiungMenuRow(
-                      leading: const RiungIcon3D(RiungIcon.beranda, size: 42),
-                      title: context.s.kepribadian.title,
-                      subtitle: context.s.kepribadian.testName(PersonalityTest.jung),
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const KepribadianHubScreen())),
                     ),
                     RiungMenuRow(
                       leading: const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 42, applyBossScale: false),

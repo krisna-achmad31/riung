@@ -26,6 +26,7 @@ class LemariStage extends StatelessWidget {
     final head = at(CosmeticSlot.head);
     final neck = at(CosmeticSlot.neck);
     final base = at(CosmeticSlot.base);
+    final side = at(CosmeticSlot.side);
     return Container(
       height: 330,
       decoration: BoxDecoration(
@@ -63,6 +64,7 @@ class LemariStage extends StatelessWidget {
           if (head != null) Positioned(left: 14, top: 40, child: _SlotTag(slot: t.slotHead, item: t.cosmeticName(head.id))),
           if (neck != null) Positioned(right: 12, top: 150, child: _SlotTag(slot: t.slotNeck, item: t.cosmeticName(neck.id))),
           if (base != null) Positioned(left: 14, top: 236, child: _SlotTag(slot: t.slotBase, item: t.cosmeticName(base.id))),
+          if (side != null) Positioned(right: 12, top: 236, child: _SlotTag(slot: t.slotSide, item: t.cosmeticName(side.id))),
         ],
       ),
     );

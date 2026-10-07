@@ -1,0 +1,45 @@
+{
+  "id": "difficult_person_test",
+  "title": "Difficult Person Test",
+  "description": "Seberapa menyebalkan dirimu di mata orang lain? Evaluasi 7 sifat antagonis tersembunyi yang mungkin tidak kamu sadari.",
+  "isPremium": true,
+  "questionCount": 21,
+  "theoryReference": "Berdasarkan penelitian 7 Facets of Antagonism (Sleep et al., 2020)",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Sangat Tidak Setuju" },
+      { "value": 1, "label": "Tidak Setuju" },
+      { "value": 2, "label": "Setuju" },
+      { "value": 3, "label": "Sangat Setuju" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 15, "category": "Mudah Bergaul (Easy-going)", "description": "Kamu cenderung toleran, empatik, dan jarang menimbulkan gesekan yang tidak perlu." },
+    { "minScore": 16, "maxScore": 35, "category": "Cukup Keras Kepala", "description": "Kamu memiliki sifat-sifat tegas atau defensif yang kadang membuat orang lain kesulitan berkompromi denganmu." },
+    { "minScore": 36, "maxScore": 63, "category": "Karakter Sulit (Difficult Person)", "description": "Kamu memiliki banyak sifat antagonis (seperti dominasi, kecurigaan, atau agresivitas) yang membuat interaksi denganmu sangat melelahkan bagi orang lain." }
+  ],
+  "questions": [
+    { "id": "dpt_1", "text": "Saya merasa tidak perlu terlalu peduli dengan masalah atau perasaan orang lain." },
+    { "id": "dpt_2", "text": "Saya kurang bisa bersimpati secara tulus saat melihat orang lain kesusahan." },
+    { "id": "dpt_3", "text": "Orang tua atau teman pernah mengatakan bahwa saya kurang memiliki empati." },
+    { "id": "dpt_4", "text": "Saya merasa pantas mendapatkan perlakuan istimewa dibandingkan orang lain pada umumnya." },
+    { "id": "dpt_5", "text": "Jauh di lubuk hati, saya merasa lebih pintar atau lebih hebat dari kebanyakan orang." },
+    { "id": "dpt_6", "text": "Saya sangat suka ketika saya menjadi pusat perhatian dan dipuja oleh orang lain." },
+    { "id": "dpt_7", "text": "Saya mudah terpancing emosi dan kadang bertindak meledak-ledak saat marah." },
+    { "id": "dpt_8", "text": "Saya sering menggunakan ancaman, bentakan, atau amarah untuk mendapatkan apa yang saya inginkan." },
+    { "id": "dpt_9", "text": "Saya sangat suka berdebat tajam dan mengalahkan orang lain dalam perdebatan." },
+    { "id": "dpt_10", "text": "Saya sangat sulit percaya pada niat baik orang lain terhadap saya." },
+    { "id": "dpt_11", "text": "Saya sering merasa orang lain diam-diam sedang membicarakan keburukan saya atau merencanakan hal buruk terhadap saya." },
+    { "id": "dpt_12", "text": "Saya sangat berhati-hati dan selalu curiga saat orang baru bersikap terlalu baik pada saya." },
+    { "id": "dpt_13", "text": "Saya sering mencari celah atau memanipulasi situasi agar menguntungkan diri saya sendiri." },
+    { "id": "dpt_14", "text": "Saya kadang sengaja memutarbalikkan fakta (gaslighting) agar saya tidak disalahkan atas suatu kesalahan." },
+    { "id": "dpt_15", "text": "Saya bisa bersikap sangat manis kepada seseorang hanya karena saya menginginkan sesuatu darinya." },
+    { "id": "dpt_16", "text": "Saat bekerja dalam tim, saya merasa harus menjadi orang yang mengendalikan dan mengatur semuanya." },
+    { "id": "dpt_17", "text": "Saya merasa sangat kesal jika orang lain menolak untuk mengikuti instruksi atau saran saya." },
+    { "id": "dpt_18", "text": "Saya selalu berusaha mendominasi percakapan dan pengambilan keputusan dalam sebuah kelompok." },
+    { "id": "dpt_19", "text": "Saya sering melakukan tindakan nekat atau berisiko tinggi tanpa memikirkan konsekuensinya bagi diri sendiri atau orang lain." },
+    { "id": "dpt_20", "text": "Saya mudah merasa bosan dan selalu mencari sensasi baru yang berisiko atau bahkan melanggar aturan." },
+    { "id": "dpt_21", "text": "Aturan dan norma sosial terasa seperti halangan yang membatasi dan sering kali ingin saya langgar." }
+  ]
+}

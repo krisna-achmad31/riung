@@ -28,7 +28,7 @@ class AnchorPoint {
 
 /// Slot tempel kosmetik. `none` = overlay kanvas penuh 1:1 (khusus
 /// `bingkai_emas`, sudah di-precompose per wujud Cermin), bukan anchor.
-enum CosmeticSlot { head, neck, base, none }
+enum CosmeticSlot { head, neck, base, side, none }
 
 /// Mirror satu entri `cosmetics.<id>` di `anchors.json`.
 class CosmeticConfig {

@@ -41,6 +41,13 @@ MONSTERS = {
     'sempurna': ('si_sempurna.png', 'si_sempurna_liar.png'),
     'mengelak': ('si_mengelak.png', 'si_mengelak_liar.png'),
     'hakim': ('si_hakim.png', 'si_hakim_liar.png'),
+    # Monster Kebiasaan (bangun dari Kuis Besar "Kenali Dirimu").
+    'nanti': ('si_nanti.png', 'si_nanti_liar.png'),
+    'gulir': ('si_gulir.png', 'si_gulir_liar.png'),
+    'begadang': ('si_begadang.png', 'si_begadang_liar.png'),
+    'bunglon': ('si_bunglon.png', 'si_bunglon_liar.png'),
+    'bimbang': ('si_bimbang.png', 'si_bimbang_liar.png'),
+    'bara': ('si_bara.png', 'si_bara_liar.png'),
 }
 
 COSMETICS = {
@@ -48,6 +55,19 @@ COSMETICS = {
     'syal_hangat': 'syal_hangat.png',
     'bantal_mini': 'bantal_mini.png',
     'bingkai_emas': 'bingkai_emas.png',
+    # Kosmetik khas (hanya untuk satu monster, lihat toko_data.dart).
+    'jam_pasir': 'jam_pasir.png',
+    'kantong_hp': 'kantong_hp.png',
+    'topi_tidur': 'topi_tidur.png',
+    'pin_berani': 'pin_berani.png',
+    'kompas': 'kompas.png',
+    'cangkir_teh': 'cangkir_teh.png',
+    'batu_tenang': 'batu_tenang.png',
+    'lentera': 'lentera.png',
+    'bintang_kintsugi': 'bintang_kintsugi.png',
+    'senter': 'senter.png',
+    'selimut_peluk': 'selimut_peluk.png',
+    'palu_busa': 'palu_busa.png',
 }
 
 CHARACTERS = [

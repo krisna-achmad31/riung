@@ -1,0 +1,33 @@
+{
+  "title": "Anxiety Test",
+  "description": "Find out your level of anxiety and how it affects your body and mind day to day.",
+  "options": ["Never or rarely", "Sometimes", "Often", "Almost always"],
+  "questions": {
+    "sas_1": "I feel more nervous and anxious than usual.",
+    "sas_2": "I feel afraid for no clear reason.",
+    "sas_3": "I get upset easily or feel panicky.",
+    "sas_4": "I feel like I'm falling apart or going to pieces.",
+    "sas_5": "I feel that everything is all right and nothing bad will happen.",
+    "sas_6": "My arms and legs shake and tremble.",
+    "sas_7": "I am bothered by headaches, neck pain, or back pain.",
+    "sas_8": "I feel weak and get tired easily.",
+    "sas_9": "I feel calm and can sit still easily.",
+    "sas_10": "I can feel my heart beating fast.",
+    "sas_11": "I am often bothered by dizzy spells.",
+    "sas_12": "I feel like I'm going to faint.",
+    "sas_13": "I can breathe in and out easily.",
+    "sas_14": "My fingers and toes feel numb or tingly.",
+    "sas_15": "I am bothered by stomach aches or indigestion.",
+    "sas_16": "I feel I have to urinate often.",
+    "sas_17": "My hands are usually warm and dry.",
+    "sas_18": "My face feels hot and flushed.",
+    "sas_19": "I fall asleep easily and get a good night's rest.",
+    "sas_20": "I often have nightmares."
+  },
+  "results": [
+    { "category": "Normal / Mild Anxiety", "description": "You manage everyday anxiety well." },
+    { "category": "Moderate Anxiety", "description": "Anxiety is starting to get in the way of your activities and comfort a little." },
+    { "category": "Severe Anxiety", "description": "Your anxiety is quite high and interferes with daily functioning." },
+    { "category": "Very Severe Anxiety", "description": "Extreme anxiety. Talking to a professional is strongly recommended." }
+  ]
+}

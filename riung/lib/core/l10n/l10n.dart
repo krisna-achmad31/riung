@@ -19,3 +19,4 @@ export 'strings/tidur_strings.dart';
 export 'strings/betterme_strings.dart';
 export 'strings/appbeku_strings.dart';
 export 'strings/kepribadian_strings.dart';
+export 'strings/kenali_strings.dart';

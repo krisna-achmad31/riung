@@ -1,0 +1,32 @@
+{
+  "title": "Depression Test",
+  "description": "An early screening to recognize symptoms of depression and significant changes in your daily energy (based on the past week).",
+  "options": ["Rarely / never (<1 day)", "Some days (1-2 days)", "Often (3-4 days)", "Almost every day (5-7 days)"],
+  "questions": {
+    "cesd_1": "I was bothered by things that don't usually bother me.",
+    "cesd_2": "I did not feel like eating; my appetite was poor.",
+    "cesd_3": "I felt I could not shake off this sadness, even with help from family or friends.",
+    "cesd_4": "I felt I was just as good as other people (I'm worthy).",
+    "cesd_5": "I had trouble keeping my mind on what I was doing.",
+    "cesd_6": "I felt depressed.",
+    "cesd_7": "I felt that everything I did was an effort (very exhausting).",
+    "cesd_8": "I felt hopeful about the future.",
+    "cesd_9": "I thought my life had been a failure.",
+    "cesd_10": "I felt fearful or anxious about something unclear.",
+    "cesd_11": "My sleep was restless or very poor.",
+    "cesd_12": "I was happy.",
+    "cesd_13": "I talked less than usual (withdrew).",
+    "cesd_14": "I felt very lonely.",
+    "cesd_15": "People were unfriendly or avoided me.",
+    "cesd_16": "I enjoyed life.",
+    "cesd_17": "I had crying spells.",
+    "cesd_18": "I felt sad (gloomy).",
+    "cesd_19": "I felt that people around me disliked me.",
+    "cesd_20": "I could not get going."
+  },
+  "results": [
+    { "category": "Normal", "description": "No indication of clinical depression. Your emotions are stable and within a normal range." },
+    { "category": "Mild Depression", "description": "There are signs of emotional stress weighing on your days." },
+    { "category": "Indication of Major Depression", "description": "You're carrying a very heavy emotional load. Please reach out to a professional psychologist as soon as you can." }
+  ]
+}

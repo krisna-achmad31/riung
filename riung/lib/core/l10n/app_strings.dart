@@ -1,6 +1,7 @@
 import 'app_language.dart';
 import 'strings/common_strings.dart';
 import 'strings/kepribadian_strings.dart';
+import 'strings/kenali_strings.dart';
 import 'strings/laporan_strings.dart';
 import 'strings/appbeku_strings.dart';
 import 'strings/betterme_strings.dart';
@@ -45,6 +46,7 @@ abstract class AppStrings {
 
   CommonStrings get common;
   KepribadianStrings get kepribadian;
+  KenaliStrings get kenali;
   LaporanStrings get laporan;
   AppbekuStrings get appbeku;
   BettermeStrings get betterme;
@@ -75,6 +77,9 @@ class AppStringsId extends AppStrings {
 
   @override
   KepribadianStrings get kepribadian => const KepribadianStringsId();
+
+  @override
+  KenaliStrings get kenali => const KenaliStringsId();
 
   @override
   LaporanStrings get laporan => const LaporanStringsId();
@@ -139,6 +144,9 @@ class AppStringsEn extends AppStrings {
 
   @override
   KepribadianStrings get kepribadian => const KepribadianStringsEn();
+
+  @override
+  KenaliStrings get kenali => const KenaliStringsEn();
 
   @override
   LaporanStrings get laporan => const LaporanStringsEn();

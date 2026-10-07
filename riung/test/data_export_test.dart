@@ -26,6 +26,7 @@ void main() {
     'riung_language_code', 'riung_sleep_sync_enabled', 'riung_afirmasi_reminder_time', 'riung_sleep_reminder_json',
     'riung_personality_results_json', 'riung_personality_card_style', 'riung_personality_accessories_json',
     'riung_monster_cosmetics_json',
+    'riung_kenali_results_cipher', // didekripsi lewat KenaliResultRepository
   };
 
   // Sengaja tidak diekspor: penghitung harian / status internal, bukan data pribadi.
@@ -35,6 +36,7 @@ void main() {
     'riung_tickets_earned_today', 'riung_fights_today', 'riung_ticket_reset_date',
     'riung_appbeku_daily_json', 'riung_free_focus_date', 'riung_free_focus_used', 'riung_premium_daily_claim_date',
     'riung_purchased_coins_reserve', 'riung_missions_json', 'riung_waswas_stage_json',
+    'riung_habit_stage_json', // urutan latihan peta monster kebiasaan
   };
 
   test('semua kunci penyimpanan lokal diputuskan: diekspor atau dikecualikan', () {

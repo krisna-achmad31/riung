@@ -1,7 +1,7 @@
 {
   "version": "2.0",
   "render": "raster",
-  "coordinateSystem": "Anchor x/y dinormalisasi 0-1 terhadap kanvas persegi monster (sourceViewBox 512x512, garis lantai di 0.96). Ukuran kosmetik = width x lebar render x anchor.scale; tinggi dari aspect; pivot = titik di gambar kosmetik yang ditempel ke anchor & pusat rotasi. anchorsLiar menimpa anchors untuk wujud liar (pose art 3D berbeda). slot none = overlay kanvas penuh 1:1 (sudah di-precompose per wujud).",
+  "coordinateSystem": "Anchor x/y dinormalisasi 0-1 terhadap kanvas persegi monster (sourceViewBox 512x512, garis lantai di 0.96). Ukuran kosmetik = width x lebar render x anchor.scale; tinggi dari aspect; pivot = titik di gambar kosmetik yang ditempel ke anchor & pusat rotasi. anchorsLiar menimpa anchors untuk wujud liar (pose art 3D berbeda). slot none = overlay kanvas penuh 1:1 (sudah di-precompose per wujud). slot side = benda khas berdiri di lantai depan-kanan monster (pivot bawah-tengah di anchor side).",
   "sourceViewBox": {
     "width": 512,
     "height": 512
@@ -10,10 +10,11 @@
   "compositingOrder": [
     "bantal_mini (under, zIndex 0)",
     "monster body (zIndex 1)",
-    "topi_rajut / syal_hangat / bingkai_emas (over, zIndex 2)"
+    "topi_rajut / syal_hangat / bingkai_emas / kosmetik khas (over, zIndex 2)"
   ],
   "monsters": {
     "meronta": {
+      "family": "pikiran",
       "boss": false,
       "bossScale": 1,
       "files": {
@@ -38,6 +39,12 @@
           "y": 0.907,
           "scale": 1.067,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.842,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       },
       "anchorsLiar": {
@@ -58,10 +65,17 @@
           "y": 0.914,
           "scale": 1.056,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.823,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       }
     },
     "waswas": {
+      "family": "pikiran",
       "boss": false,
       "bossScale": 1,
       "files": {
@@ -86,6 +100,12 @@
           "y": 0.949,
           "scale": 0.968,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.75,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       },
       "anchorsLiar": {
@@ -106,10 +126,17 @@
           "y": 0.955,
           "scale": 1.062,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.791,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       }
     },
     "kabut": {
+      "family": "pikiran",
       "boss": false,
       "bossScale": 1,
       "files": {
@@ -134,6 +161,12 @@
           "y": 0.986,
           "scale": 0.979,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.752,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       },
       "anchorsLiar": {
@@ -154,10 +187,17 @@
           "y": 0.923,
           "scale": 1.098,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.93,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       }
     },
     "cermin": {
+      "family": "pikiran",
       "boss": false,
       "bossScale": 1,
       "files": {
@@ -182,6 +222,12 @@
           "y": 0.934,
           "scale": 1.008,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.725,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       },
       "anchorsLiar": {
@@ -202,10 +248,17 @@
           "y": 0.939,
           "scale": 0.879,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.717,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       }
     },
     "sempurna": {
+      "family": "pikiran",
       "boss": false,
       "bossScale": 1,
       "files": {
@@ -230,6 +283,12 @@
           "y": 0.93,
           "scale": 1.084,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.749,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       },
       "anchorsLiar": {
@@ -250,10 +309,17 @@
           "y": 0.956,
           "scale": 1.08,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.793,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       }
     },
     "mengelak": {
+      "family": "pikiran",
       "boss": false,
       "bossScale": 1,
       "files": {
@@ -278,6 +344,12 @@
           "y": 0.983,
           "scale": 0.801,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.76,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       },
       "anchorsLiar": {
@@ -298,10 +370,17 @@
           "y": 0.936,
           "scale": 0.876,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.684,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       }
     },
     "hakim": {
+      "family": "pikiran",
       "boss": true,
       "bossScale": 1.4,
       "files": {
@@ -326,6 +405,12 @@
           "y": 0.928,
           "scale": 1.151,
           "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.821,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
         }
       },
       "anchorsLiar": {
@@ -345,6 +430,378 @@
           "x": 0.555,
           "y": 0.933,
           "scale": 1.262,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.76,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "nanti": {
+      "family": "kebiasaan",
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "nanti_liar.webp",
+        "jinak": "nanti_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.165,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.57,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.844,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.5,
+          "y": 0.21,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.65,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 1.2,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.862,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "gulir": {
+      "family": "kebiasaan",
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "gulir_liar.webp",
+        "jinak": "gulir_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.53,
+          "y": 0.14,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.53,
+          "y": 0.5,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.53,
+          "y": 0.95,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.811,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.47,
+          "y": 0.21,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.47,
+          "y": 0.62,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.47,
+          "y": 0.95,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.85,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "begadang": {
+      "family": "kebiasaan",
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "begadang_liar.webp",
+        "jinak": "begadang_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.245,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.63,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.852,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.5,
+          "y": 0.285,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.72,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 1.0,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.825,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "bunglon": {
+      "family": "kebiasaan",
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "bunglon_liar.webp",
+        "jinak": "bunglon_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.145,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.43,
+          "y": 0.55,
+          "scale": 1.0,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.47,
+          "y": 0.95,
+          "scale": 1.05,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.866,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.58,
+          "y": 0.22,
+          "scale": 1.0,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.55,
+          "y": 0.6,
+          "scale": 1.0,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.53,
+          "y": 0.95,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.872,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "bimbang": {
+      "family": "kebiasaan",
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "bimbang_liar.webp",
+        "jinak": "bimbang_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.34,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.68,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.891,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.5,
+          "y": 0.34,
+          "scale": 1.15,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.7,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 1.1,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.772,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      }
+    },
+    "bara": {
+      "family": "kebiasaan",
+      "boss": false,
+      "bossScale": 1,
+      "files": {
+        "liar": "bara_liar.webp",
+        "jinak": "bara_jinak.webp"
+      },
+      "anchors": {
+        "head": {
+          "x": 0.5,
+          "y": 0.21,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.55,
+          "scale": 0.85,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 0.9,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.737,
+          "y": 0.965,
+          "scale": 1,
+          "rotationDeg": 0
+        }
+      },
+      "anchorsLiar": {
+        "head": {
+          "x": 0.5,
+          "y": 0.3,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "neck": {
+          "x": 0.5,
+          "y": 0.72,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "base": {
+          "x": 0.5,
+          "y": 0.95,
+          "scale": 0.95,
+          "rotationDeg": 0
+        },
+        "side": {
+          "x": 0.749,
+          "y": 0.965,
+          "scale": 1,
           "rotationDeg": 0
         }
       }
@@ -412,6 +869,198 @@
       "rarity": "legendary",
       "priceProp": "cosmeticLegendaryPrice",
       "note": "Khusus Cermin. Overlay kanvas penuh 512x512 yang sudah di-precompose mengikuti bingkai cermin tiap wujud (tools/build_3d_assets.py)."
+    },
+    "jam_pasir": {
+      "file": "jam_pasir.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.2,
+      "aspect": 0.5703,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "nanti",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "kantong_hp": {
+      "file": "kantong_hp.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.2,
+      "aspect": 0.6901,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "gulir",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "kompas": {
+      "file": "kompas.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.2,
+      "aspect": 0.5755,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "bimbang",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "cangkir_teh": {
+      "file": "cangkir_teh.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.22,
+      "aspect": 0.8646,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "bara",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "batu_tenang": {
+      "file": "batu_tenang.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.24,
+      "aspect": 1.4066,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "waswas",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "lentera": {
+      "file": "lentera.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.2,
+      "aspect": 0.5365,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "kabut",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "bintang_kintsugi": {
+      "file": "bintang_kintsugi.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.22,
+      "aspect": 1.0521,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "sempurna",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "senter": {
+      "file": "senter.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.16,
+      "aspect": 0.4896,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "mengelak",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "selimut_peluk": {
+      "file": "selimut_peluk.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.32,
+      "aspect": 1.901,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "meronta",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "palu_busa": {
+      "file": "palu_busa.webp",
+      "slot": "side",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.2,
+      "aspect": 0.6276,
+      "pivot": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "canonicalWearer": "hakim",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "topi_tidur": {
+      "file": "topi_tidur.webp",
+      "slot": "head",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.36,
+      "aspect": 1.2308,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8
+      },
+      "canonicalWearer": "begadang",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
+    },
+    "pin_berani": {
+      "file": "pin_berani.webp",
+      "slot": "neck",
+      "zIndex": 2,
+      "layer": "over",
+      "width": 0.12,
+      "aspect": 1.0079,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "canonicalWearer": "bunglon",
+      "rarity": "khas",
+      "priceProp": "cosmeticKhasPrice",
+      "khas": true
     }
   }
 }

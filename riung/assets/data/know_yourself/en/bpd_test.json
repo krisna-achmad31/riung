@@ -1,0 +1,32 @@
+{
+  "title": "BPD Test",
+  "description": "See how often you experience shifting emotions, fear of rejection, and impulsivity.",
+  "options": ["Never", "Rarely", "Often", "Very often"],
+  "questions": {
+    "bpd_1": "I have an extreme fear that the people I love will leave me.",
+    "bpd_2": "My feelings toward people close to me often swing drastically from adoring them to hating them.",
+    "bpd_3": "I often feel hollow or emotionally empty inside.",
+    "bpd_4": "I often doubt who I really am or what my purpose in life is.",
+    "bpd_5": "I act impulsively when I'm sad or angry (e.g. overspending, overeating, risky things).",
+    "bpd_6": "I have thought about or acted on hurting myself when I felt extremely distressed.",
+    "bpd_7": "My mood can change very drastically within hours or even minutes.",
+    "bpd_8": "I often feel so angry that it's hard to control.",
+    "bpd_9": "Under heavy stress, I feel detached from my body or feel like the world isn't real (dissociation).",
+    "bpd_10": "When I'm anxious, I often accuse others of having bad intentions toward me.",
+    "bpd_11": "I find it hard to keep friendships or romantic relationships stable.",
+    "bpd_12": "I often feel that no one truly understands or cares about me.",
+    "bpd_13": "My sadness feels far more intense and painful than it does for most people.",
+    "bpd_14": "I often need constant reassurance and attention to feel safe.",
+    "bpd_15": "When someone cancels plans, I feel completely crushed or betrayed.",
+    "bpd_16": "I tend to do whatever it takes (begging, threatening) so people won't leave me.",
+    "bpd_17": "I'm very reactive and easily hurt by even the smallest criticism.",
+    "bpd_18": "I often feel bored and look for risky thrills to make the boredom go away.",
+    "bpd_19": "I often let out anger by shouting, swearing, or breaking things.",
+    "bpd_20": "When I feel lonely, I feel like my existence in this world is meaningless."
+  },
+  "results": [
+    { "category": "Low Risk", "description": "Your emotions are stable and you have a healthy view of relationships." },
+    { "category": "Moderate Risk", "description": "You sometimes experience emotional instability or a fear of abandonment that gets in the way." },
+    { "category": "High Risk", "description": "Many of your symptoms line up with borderline criteria. Talking to a psychologist is strongly recommended." }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "title": "Self-Esteem Test",
+  "description": "Find out how healthy your self-worth and self-compassion are.",
+  "options": ["Strongly disagree", "Disagree", "Agree", "Strongly agree"],
+  "questions": {
+    "se_1": "On the whole, I am very satisfied with myself.",
+    "se_2": "At times I truly think I am no good at all.",
+    "se_3": "I feel that I have a number of good qualities (skills or traits).",
+    "se_4": "I am able to do things as well as most other people.",
+    "se_5": "I feel I do not have much to be proud of in my life.",
+    "se_6": "I take a very positive attitude toward my future and myself.",
+    "se_7": "All in all, I am inclined to feel that I am a failure.",
+    "se_8": "I really wish I could have more respect for myself.",
+    "se_9": "In general, I feel that I'm a person of worth, at least on an equal level with others.",
+    "se_10": "These days, I often feel useless, stupid, or embarrassing.",
+    "se_11": "When I'm going through emotional difficulty, I try to be gentle and patient with myself.",
+    "se_12": "When I notice flaws in myself, I tend to punish and berate myself harshly.",
+    "se_13": "When things don't go as planned, I try to see it as something normal that everyone goes through.",
+    "se_14": "When I fail at something important, I feel as if I'm the worst person in the world.",
+    "se_15": "I try to be understanding toward the parts of myself I don't like.",
+    "se_16": "When I'm very sad, I get fixated on how much I'm suffering.",
+    "se_17": "I keep a healthy balance of mind even when something bad happens to me.",
+    "se_18": "I'm very intolerant (harsh) and judgmental about my own flaws and weaknesses.",
+    "se_19": "I give myself the care and tenderness I'd give a close friend who is sad.",
+    "se_20": "I feel personally defective when others can see my weaknesses."
+  },
+  "results": [
+    { "category": "Low Self-Esteem", "description": "You see yourself very harshly and feel unworthy. It's time to learn to love yourself." },
+    { "category": "Moderate Self-Esteem", "description": "Mostly positive, but your self-belief is easily shaken by failure or criticism." },
+    { "category": "Very Healthy Self-Esteem", "description": "You recognize your full worth as a person, whether you succeed or fail." }
+  ]
+}

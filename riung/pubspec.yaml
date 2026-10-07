@@ -116,6 +116,8 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/data/dummy-data-seed.json
+    - assets/data/know_yourself/
+    - assets/data/know_yourself/en/
     - assets/monsters/anchors.json
     - assets/monsters/3d/
     - assets/characters/

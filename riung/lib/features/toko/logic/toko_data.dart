@@ -8,7 +8,7 @@ import '../../../core/theme/theme.dart';
 /// sama persis dengan `assets/monsters/anchors.json` § cosmetics supaya
 /// [RiungMonster] bisa merender overlay-nya (CLAUDE.md aturan #7).
 class TokoCosmetic {
-  const TokoCosmetic({required this.id, required this.monsterId, required this.price, required this.slot, this.exclusive = false});
+  const TokoCosmetic({required this.id, required this.monsterId, required this.price, required this.slot, this.exclusive = false, this.khas = false});
 
   /// Nama tampil per bahasa: `TokoStrings.cosmeticName(id)`.
   final String id;
@@ -19,7 +19,14 @@ class TokoCosmetic {
   /// Hanya bisa dipakai [monsterId] (mis. bingkai emas = khusus Si Cermin).
   final bool exclusive;
 
+  /// Kosmetik khas satu monster: hanya tampil di Lemari monster itu (tidak
+  /// di etalase Toko & Lemari monster lain). Selalu [exclusive].
+  final bool khas;
+
   bool wearableBy(String monster) => !exclusive || monster == monsterId;
+
+  /// Tampil di Lemari [monster]: kosmetik umum, atau khas miliknya sendiri.
+  bool listedFor(String monster) => !khas || monster == monsterId;
 
   static TokoCosmetic? byId(String id) {
     for (final c in tokoCosmetics) {
@@ -39,12 +46,16 @@ enum CosmeticSlot {
   head,
   neck,
   base,
+
+  /// Benda kecil berdiri di lantai, di depan kanan monster (kosmetik khas).
+  side,
   none;
 
   String label(TokoStrings t) => switch (this) {
         head => t.slotHead,
         neck => t.slotNeck,
         base => t.slotBase,
+        side => t.slotSide,
         none => t.slotFrame,
       };
 }
@@ -85,6 +96,19 @@ const tokoCosmetics = [
   TokoCosmetic(id: 'syal_hangat', monsterId: 'waswas', price: EconomySpend.skinCommon, slot: CosmeticSlot.neck),
   TokoCosmetic(id: 'bantal_mini', monsterId: 'meronta', price: EconomySpend.skinEpic, slot: CosmeticSlot.base),
   TokoCosmetic(id: 'bingkai_emas', monsterId: 'cermin', price: EconomySpend.skinLegendary, slot: CosmeticSlot.none, exclusive: true),
+  // Kosmetik khas — satu per monster, dijual di Lemari monster itu saja.
+  TokoCosmetic(id: 'batu_tenang', monsterId: 'waswas', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'lentera', monsterId: 'kabut', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'bintang_kintsugi', monsterId: 'sempurna', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'senter', monsterId: 'mengelak', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'selimut_peluk', monsterId: 'meronta', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'palu_busa', monsterId: 'hakim', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'jam_pasir', monsterId: 'nanti', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'kantong_hp', monsterId: 'gulir', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'topi_tidur', monsterId: 'begadang', price: EconomySpend.skinKhas, slot: CosmeticSlot.head, exclusive: true, khas: true),
+  TokoCosmetic(id: 'pin_berani', monsterId: 'bunglon', price: EconomySpend.skinKhas, slot: CosmeticSlot.neck, exclusive: true, khas: true),
+  TokoCosmetic(id: 'kompas', monsterId: 'bimbang', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
+  TokoCosmetic(id: 'cangkir_teh', monsterId: 'bara', price: EconomySpend.skinKhas, slot: CosmeticSlot.side, exclusive: true, khas: true),
 ];
 
 /// 1 sesi vs paket 5 sesi Mode Fokus prabayar (Toko § "Beli sesi fokus") —

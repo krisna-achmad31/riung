@@ -1,0 +1,32 @@
+{
+  "title": "Stress Coping Style",
+  "description": "Understand how you respond to a crisis. Do you take action right away, look for emotional support, or run away?",
+  "options": ["I don't do this", "I do this a little", "I do this often", "I do this most"],
+  "questions": {
+    "cop_1": "I focus all my effort on finding a way to deal with the problem.",
+    "cop_2": "I quickly make a plan with concrete steps for what I need to do.",
+    "cop_3": "I get emotional support, sympathy, or understanding from people close to me.",
+    "cop_4": "I look for someone to talk to so I can let out my feelings about what happened.",
+    "cop_5": "I use alcohol, drugs, or sleep all day to forget about the stress.",
+    "cop_6": "I spend time gaming, watching TV, or scrolling social media to escape the problem.",
+    "cop_7": "I try to find expert information or specific advice on how to handle this problem.",
+    "cop_8": "I take strong action to try to get rid of the source of the problem right away.",
+    "cop_9": "I find comfort in religion, prayer, or meditation and other spiritual activities.",
+    "cop_10": "I try to see this bad event from a different angle so it looks more positive (finding the lesson).",
+    "cop_11": "I deny that the problem is really happening (playing dumb / denial).",
+    "cop_12": "I deliberately refuse to believe that something this bad just happened to me.",
+    "cop_13": "I try to figure out which strategies I need to change in myself to get through this crisis.",
+    "cop_14": "I look for someone who will listen to my worries with full empathy.",
+    "cop_15": "I vent my frustration by lashing out or taking my emotions out on the wrong things.",
+    "cop_16": "I give up mentally on trying to resolve this crisis (feeling fate is too cruel).",
+    "cop_17": "I set aside my other activities and cancel my downtime so I can focus on this problem.",
+    "cop_18": "I laugh at my problems and respond with dark jokes or satire.",
+    "cop_19": "I turn my attention to other work or projects so I don't have to face the main crisis.",
+    "cop_20": "I accept that this crisis has happened and try to validate the pain I'm feeling."
+  },
+  "results": [
+    { "category": "Problem-Focused Coping (The Doer)", "description": "When stressed, you focus on finding real solutions and changing the situation." },
+    { "category": "Emotion-Focused Coping (The Feeler)", "description": "You put social support and emotional validation first so you feel calmer before acting." },
+    { "category": "Avoidant Coping (The Runner)", "description": "You tend to escape reality through entertainment, denial, or sleep to bury the problem for a while." }
+  ]
+}

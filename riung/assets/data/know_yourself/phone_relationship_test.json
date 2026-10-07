@@ -1,0 +1,48 @@
+{
+  "id": "phone_relationship_test",
+  "title": "Your Relationship With Your Phone",
+  "description": "Bongkar pola penggunaan gawaimu. Apakah kamu penguasa teknologimu, atau teknologi yang menguasaimu?",
+  "isPremium": true,
+  "questionCount": 24,
+  "theoryReference": "Diadaptasi dari Problematic Mobile Phone Use Questionnaire & Smartphone Addiction Scale",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Jarang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Sangat Sering" }
+    ]
+  },
+  "results": [
+    { "dominantTrait": "Anxious", "category": "The Anxious Checker (Si Cemas Ketinggalan)", "description": "Kamu mengidap FOMO kuat. Kamu bolak-balik mengecek HP karena takut melewatkan pesan, tren, atau dikira tidak responsif." },
+    { "dominantTrait": "Scroller", "category": "The Mindless Scroller (Si Penggulir Tanpa Sadar)", "description": "HP adalah alat pelarian sucimu. Kamu men-scroll algoritma tanpa akhir untuk mendapat dopamin cepat atau lari dari kebosanan dunia nyata." },
+    { "dominantTrait": "Intentional", "category": "The Intentional User (Si Tuan Atas Teknologinya)", "description": "Selamat! Kamu sadar betul batas penggunaan teknologimu. Kamu menggunakan HP sebagai alat, bukan sebagai pelarian atau pemicu kecemasan." }
+  ],
+  "questions": [
+    { "id": "pho_1", "trait": "Anxious", "text": "Saya merasa gelisah, tidak nyaman, dan cemas luar biasa jika suatu hari saya menyadari HP saya tertinggal di rumah." },
+    { "id": "pho_2", "trait": "Scroller", "text": "Saya sering tiba-tiba tersadar bahwa saya baru saja menghabiskan satu jam me-scroll feed media sosial tanpa tujuan yang jelas." },
+    { "id": "pho_3", "trait": "Intentional", "text": "Saya secara sadar mematikan sebagian besar notifikasi aplikasi (kecuali pesan darurat) di HP saya demi menjaga fokus kerja." },
+    { "id": "pho_4", "trait": "Anxious", "text": "Saya selalu merasa ada dorongan kuat untuk harus segera merespons setiap bunyi notifikasi yang masuk secepat mungkin." },
+    { "id": "pho_5", "trait": "Scroller", "text": "Gawai (HP) adalah benda pertama yang saya ambil dan cek saat saya bangun tidur, bahkan sebelum saya beranjak dari kasur." },
+    { "id": "pho_6", "trait": "Intentional", "text": "Saya sering dengan sengaja membiarkan HP saya di ruangan lain (di luar jangkauan) saat saya sedang butuh fokus bekerja atau berkumpul bersama keluarga." },
+    { "id": "pho_7", "trait": "Anxious", "text": "Saya sangat sering merasa khawatir akan tertinggal berita penting (FOMO), gosip terbaru, atau ajakan main jika saya sedang tidak online." },
+    { "id": "pho_8", "trait": "Scroller", "text": "Setiap kali saya merasakan kebosanan sekecil apa pun (seperti menunggu di dalam lift atau lampu merah), tangan saya refleks membuka HP." },
+    { "id": "pho_9", "trait": "Intentional", "text": "Saya secara teratur dan berkesadaran mengatur jadwal (atau hari tertentu) di mana saya melakukan 'detoks digital' (bebas dari layar)." },
+    { "id": "pho_10", "trait": "Anxious", "text": "Jika terdapat jeda sepi lebih dari beberapa menit saat saya berkirim pesan/chatting dengan seseorang, saya mulai merasa cemas atau overthinking." },
+    { "id": "pho_11", "trait": "Scroller", "text": "Saya sering kali bermaksud membuka HP hanya untuk mengecek jam atau satu pesan penting, namun berujung membuka aplikasi lain hingga berlarut-larut." },
+    { "id": "pho_12", "trait": "Intentional", "text": "Saya sangat proaktif memasang fitur batasan waktu aplikasi (screen time / app limits) dan mematuhinya secara disiplin saat batasnya tercapai." },
+    { "id": "pho_13", "trait": "Anxious", "text": "Saya memiliki kebiasaan me-refresh halaman beranda email, chat, atau feed berkali-kali berharap ada update atau notifikasi baru yang masuk." },
+    { "id": "pho_14", "trait": "Scroller", "text": "Men-scroll algoritma video pendek (seperti Reels atau TikTok) adalah cara termudah saya untuk mematikan otak dan melarikan diri dari pikiran stres." },
+    { "id": "pho_15", "trait": "Intentional", "text": "Saya sama sekali tidak merasa bersalah atau tidak enak jika saya membalas pesan sedikit lebih lama karena saya sedang fokus menyelesikan tugas di dunia nyata." },
+    { "id": "pho_16", "trait": "Anxious", "text": "Saat saya selesai mengunggah (post) foto/status ke media sosial, saya merasa cukup stres memikirkan seberapa banyak likes atau komentar yang akan saya dapatkan." },
+    { "id": "pho_17", "trait": "Scroller", "text": "Saya memiliki kebiasaan kuat menggunakan layar ganda, seperti men-scroll HP tanpa henti padahal saya juga sedang menyalakan film di TV/laptop." },
+    { "id": "pho_18", "trait": "Intentional", "text": "Sebagian besar waktu layar (screen time) saya benar-benar digunakan untuk tujuan yang sangat spesifik dan fungsional (misal: peta, banking, belajar, komunikasi penting)." },
+    { "id": "pho_19", "trait": "Anxious", "text": "Melihat indikator sisa baterai HP berada di bawah 20% saat saya berada di luar rumah membuat saya sangat gelisah dan panik mencari colokan." },
+    { "id": "pho_20", "trait": "Scroller", "text": "Saya sering sekali begadang larut malam melampaui jam tidur yang saya rencanakan murni karena saya tersedot oleh umpan algoritma di layar." },
+    { "id": "pho_21", "trait": "Intentional", "text": "Ketika sedang makan bersama orang terdekat di meja makan, HP saya pasti berada di dalam tas atau saku, bukan tergeletak tengadah di atas meja." },
+    { "id": "pho_22", "trait": "Anxious", "text": "Jika HP saya ternyata tidak ada di saku saat tangan saya refleks merabanya, saya merasakan serangan kepanikan mini di dada (mini heart-attack)." },
+    { "id": "pho_23", "trait": "Scroller", "text": "Saya berulang kali mencoba menghapus suatu aplikasi hiburan untuk membatasi diri, namun saya akan mengunduhnya kembali saat keinginan (craving) itu muncul keesokan harinya." },
+    { "id": "pho_24", "trait": "Intentional", "text": "Di penghujung hari, saya merasa sayalah yang memegang kendali mutlak atas gawai saya, bukan gawai yang mendikte emosi dan waktu saya." }
+  ]
+}

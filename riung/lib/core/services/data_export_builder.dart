@@ -1,4 +1,5 @@
 import '../models/personality_result.dart';
+import 'kenali_result_repository.dart';
 import 'local_prefs_store.dart';
 import 'user_repository.dart';
 
@@ -73,6 +74,13 @@ class DataExportBuilder {
         'buatanSendiri': [for (final a in buatanSendiri) {'id': a.id, 'teks': a.teks}],
       },
       'kepribadian': personalitySection(),
+      // Hasil Kenali Dirimu (skor/kategori; jawaban mentah tidak pernah disimpan).
+      'kenaliDirimu': {
+        for (final e in (KenaliResultRepository.instance.results.entries.toList()..sort((a, b) => a.key.compareTo(b.key)))) e.key: e.value.toMap(),
+      },
+      'kenaliDirimuRiwayat': [
+        for (final r in KenaliResultRepository.instance.history) {'testId': r.testId, ...r.toMap()},
+      ],
       'betterMe': {
         'sesiSelesai': prefs.betterMeCompleted.toList()..sort(),
         'refleksi': prefs.betterMeReflectionsJson,

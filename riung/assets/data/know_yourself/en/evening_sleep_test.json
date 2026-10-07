@@ -1,0 +1,36 @@
+{
+  "title": "Your Evening and Sleep",
+  "description": "Find out what really keeps you up late and wrecks your sleep pattern.",
+  "options": ["Never", "Sometimes", "Often", "Always"],
+  "questions": {
+    "es_1": "I deliberately delay sleep to get free time for myself that I don't get during the day.",
+    "es_2": "As soon as my head hits the pillow, my brain starts going over the mistakes I made today.",
+    "es_3": "I always promise 'just one more video or episode', but end up going for hours.",
+    "es_4": "Because my daytime schedule is controlled by others (boss, lecturer, parents), night is my time to feel free.",
+    "es_5": "I often wake up in the middle of the night with my heart racing, thinking about tomorrow's work.",
+    "es_6": "I feel I need intense screen entertainment (competitive gaming or scrolling) right before closing my eyes.",
+    "es_7": "Going to bed early feels like ending the day's fun too soon.",
+    "es_8": "The quiet of the night brings negative thoughts I've been holding back to the surface.",
+    "es_9": "Even when I'm very sleepy, my fingers keep scrolling social media automatically.",
+    "es_10": "I'm annoyed with myself the next morning for staying up late, but I do it again that night.",
+    "es_11": "I often plan worst-case scenarios about my future while trying to fall asleep.",
+    "es_12": "I can't imagine falling asleep without a YouTube video or movie playing in the background.",
+    "es_13": "The busier and more draining my day, the more I push myself to stay up for entertainment at night.",
+    "es_14": "Watching the clock tick toward morning makes me more panicked and even less able to sleep.",
+    "es_15": "Boredom while getting ready for bed feels unbearable, so I reach for my phone as an escape.",
+    "es_16": "I feel sleep steals the precious leftover time I could use to relax.",
+    "es_17": "I've tried all kinds of breathing techniques for sleep, but my mind is too busy to relax.",
+    "es_18": "A notification arriving after I've closed my eyes immediately tempts me to open my phone again.",
+    "es_19": "I know staying up late harms my health, but the late-night freedom feels worth the risk.",
+    "es_20": "I tend to grind my teeth or clench my fists without realizing it while trying to sleep.",
+    "es_21": "The pull of late-night chatting or gaming with friends is much stronger than my sleepiness.",
+    "es_22": "To me, night is a sanctuary where no one can make demands of me.",
+    "es_23": "Before sleep, I replay the day's social interactions and feel embarrassed about what I said.",
+    "es_24": "After working hard all day, my brain demands a 'reward' (dopamine), and sleep doesn't feel like one."
+  },
+  "results": [
+    { "category": "Revenge Bedtime Procrastinator", "description": "You sacrifice sleep to win back the 'me-time' you lose to daytime busyness and demands." },
+    { "category": "The Anxious Sleeper", "description": "Your body is tired, but your brain is noisy. Night is when overthinking and anxiety peak." },
+    { "category": "The Dopamine Chaser", "description": "You stay up because you get pulled into entertainment (games, social media, series) that gives instant dopamine until you lose track of time." }
+  ]
+}
