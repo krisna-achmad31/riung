@@ -70,6 +70,7 @@ abstract class KepribadianStrings {
   String slotName(AccessorySlot slot);
   String accessoryName(CharacterAccessory accessory);
   String get accessoryEquipped;
+  String tierName(AccessoryTier tier);
   String get accessoryRemove;
   String accessoryBought(String name);
   String accessoryConfirmLabel(String name);
@@ -450,6 +451,8 @@ class KepribadianStringsId extends KepribadianStrings {
 
   @override
   String get accessoryEquipped => 'Dipakai';
+  @override
+  String tierName(AccessoryTier tier) => switch (tier) { AccessoryTier.kecil => 'Kecil', AccessoryTier.biasa => 'Biasa', AccessoryTier.langka => 'Langka' };
   @override
   String get accessoryRemove => 'Lepas';
   @override
@@ -887,6 +890,8 @@ class KepribadianStringsEn extends KepribadianStrings {
 
   @override
   String get accessoryEquipped => 'Equipped';
+  @override
+  String tierName(AccessoryTier tier) => switch (tier) { AccessoryTier.kecil => 'Small', AccessoryTier.biasa => 'Regular', AccessoryTier.langka => 'Rare' };
   @override
   String get accessoryRemove => 'Remove';
   @override

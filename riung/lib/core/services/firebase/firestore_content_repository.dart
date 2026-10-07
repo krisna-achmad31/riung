@@ -45,7 +45,12 @@ class FirestoreContentRepository implements ContentRepository {
       final snap = await _firestore.collection('content').doc('affirmations').get();
       final items = (snap.data()?['items'] as List?)?.cast<Map<String, dynamic>>();
       if (items == null || items.isEmpty) return _fallback.getAffirmations();
-      final affirmations = items.map(Affirmation.fromMap).toList();
+      // Gabung dengan seed bawaan per id, supaya kartu yang baru ditambah
+      // di aplikasi tetap muncul walau dokumen Firestore belum diperbarui.
+      final remote = items.map(Affirmation.fromMap).toList();
+      final remoteIds = {for (final a in remote) a.id};
+      final bundled = await _fallback.getAffirmations();
+      final affirmations = [...remote, ...bundled.where((a) => !remoteIds.contains(a.id))];
       _affirmationCache = affirmations;
       return affirmations;
     } catch (_) {

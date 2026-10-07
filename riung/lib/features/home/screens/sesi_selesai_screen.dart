@@ -41,130 +41,92 @@ class _SesiSelesaiScreenState extends State<SesiSelesaiScreen> {
     final scope = AppScope.of(context);
     final t = context.s.home;
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.sukses,
-        alignment: const Alignment(0, -0.75),
-        opacity: 0.16,
-        child: SafeArea(
-          child: ListenableBuilder(
-            listenable: Listenable.merge([scope.auth, scope.streak]),
-            builder: (context, _) {
-              final userName = scope.auth.profile?.displayName ?? '';
-              return Column(
+      body: SafeArea(
+        child: ListenableBuilder(
+          listenable: Listenable.merge([scope.auth, scope.streak]),
+          builder: (context, _) {
+            final profile = scope.auth.profile;
+            final userName = profile?.displayName ?? '';
+            final monsterId = (profile != null && profile.dominantSaboteurs.isNotEmpty) ? profile.dominantSaboteurs.first : 'waswas';
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.md),
+              child: Column(
                 children: [
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 140,
-                            height: 147,
-                            child: RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 140),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          Text(
-                            t.fullMinutes(widget.duration.inMinutes, userName),
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.display.copyWith(fontSize: 25),
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            t.sessionRest,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.body,
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                    child: RiungBleedListView(
+                      children: [
+                        _Celebration(monsterId: monsterId),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(t.fullMinutes(widget.duration.inMinutes, userName), style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(t.sessionRest, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                        const SizedBox(height: AppSpacing.lg),
+                        IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _StatBox(
-                                icon: Icons.local_fire_department,
-                                iconColor: AppColors.aksenHangat,
-                                value: '${scope.streak.current}',
-                                label: t.streakDays,
+                              Expanded(
+                                child: RiungValueChip(leading: const RiungIcon3D(RiungIcon.streak, size: 30), value: '${scope.streak.current}', label: t.streakDays),
                               ),
-                              const SizedBox(width: AppSpacing.sm),
-                              _StatBox(
-                                icon: Icons.pest_control,
-                                iconColor: AppColors.monsterWaswas,
-                                value: '+${EconomyEarn.fokusProgressPercent}%',
-                                label: context.s.common.monsterName('waswas'),
-                                valueColor: AppColors.monsterWaswas,
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: RiungValueChip(
+                                  leading: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 30, applyBossScale: false),
+                                  value: '+${EconomyEarn.fokusProgressPercent}%',
+                                  label: context.s.common.monsterName(monsterId),
+                                ),
                               ),
                             ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        RiungButton(
-                          label: t.viewPlayerCard,
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const KartuPemainScreen()),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-                          child: Text(
-                            t.backToHome,
-                            style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  RiungButton(label: t.viewPlayerCard, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const KartuPemainScreen()))),
+                  const SizedBox(height: 10),
+                  RiungButton(label: t.backToHome, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
                 ],
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class _StatBox extends StatelessWidget {
-  const _StatBox({
-    required this.icon,
-    required this.iconColor,
-    required this.value,
-    required this.label,
-    this.valueColor,
-  });
+/// Monster jinak dengan aura & kilau emas (frame `Perayaan`).
+class _Celebration extends StatelessWidget {
+  const _Celebration({required this.monsterId});
 
-  final IconData icon;
-  final Color iconColor;
-  final String value;
-  final String label;
-  final Color? valueColor;
+  final String monsterId;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 13),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20, color: iconColor),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            value,
-            style: AppTextStyles.chipLabel.copyWith(color: valueColor ?? AppColors.teksUtama, fontSize: 16),
-          ),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10)),
-        ],
+    Widget spark(double l, double tp, double size) => Positioned(left: l, top: tp, child: Icon(Icons.auto_awesome, size: size, color: AppColors.emas));
+    return Center(
+      child: SizedBox(
+        width: 300,
+        height: 260,
+        child: Stack(
+          children: [
+            Positioned(
+              left: 20,
+              top: 0,
+              child: Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+              ),
+            ),
+            Positioned(left: 50, top: 30, child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 200, applyBossScale: false)),
+            spark(30, 40, 22),
+            spark(250, 30, 16),
+            spark(270, 170, 20),
+            spark(20, 190, 14),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/riung_ground_shadow.dart';
 import '../logic/character_accessory.dart';
 import '../logic/character_art.dart';
 import '../logic/character_spec.dart';
@@ -44,6 +45,13 @@ class CharacterAvatar extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          RiungGroundShadow(
+            canvasWidth: size,
+            canvasHeight: size,
+            floorY: art.bottom - 0.005,
+            widthFactor: art.bodyWidth * 0.86,
+            centerX: (art.left + art.right) / 2,
+          ),
           Positioned.fill(child: CustomPaint(painter: _CharacterPainter(spec, painted, art: art, phase: _Phase.back))),
           for (final a in back) _AccessoryImage(art: art, accessory: a, size: size, dpr: dpr),
           Positioned.fill(child: _ArtImage(asset: art.asset, width: size, dpr: dpr)),

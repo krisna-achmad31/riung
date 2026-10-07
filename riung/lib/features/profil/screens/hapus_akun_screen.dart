@@ -78,87 +78,81 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
     final wallet = AppScope.of(context).wallet;
     final t = context.s.profil;
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: Column(
-        children: [
-          Expanded(
-            child: Opacity(
-              opacity: 0.3,
-              child: SafeArea(
-                bottom: false,
-                child: Row(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.deleteAccount),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                   children: [
-                    IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
+                    SizedBox(
+                      height: 190,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 180,
+                            height: 180,
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                          ),
+                          const RiungMonster(monsterId: 'meronta', state: MonsterVisualState.jinak, size: 170, applyBossScale: false),
+                        ],
+                      ),
                     ),
-                    Text(t.settingsTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.deleteHeading, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                    const SizedBox(height: AppSpacing.md),
+                    ListenableBuilder(
+                      listenable: wallet,
+                      builder: (context, _) => Text(
+                        t.deleteBody(wallet.coins),
+                        style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.sekunderLembut.withValues(alpha: 0.7),
+                        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.chat_bubble_outline_rounded, size: 18, color: AppColors.sekunder),
+                          const SizedBox(width: 10),
+                          Expanded(child: Text(t.deleteHint, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              color: AppColors.permukaan,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            padding: const EdgeInsets.fromLTRB(24, 22, 24, 26),
-            child: SafeArea(
-              top: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(width: 44, height: 5, decoration: BoxDecoration(color: AppColors.garis, borderRadius: BorderRadius.circular(AppRadius.pill))),
-                  const SizedBox(height: AppSpacing.lg),
-                  const SizedBox(
-                    width: 96,
-                    height: 100,
-                    child: RiungMonster(monsterId: 'meronta', state: MonsterVisualState.jinak, size: 96),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(t.deleteHeading, textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 19)),
-                  const SizedBox(height: AppSpacing.sm),
-                  ListenableBuilder(
-                    listenable: wallet,
-                    builder: (context, _) => Text(
-                      t.deleteBody(wallet.coins),
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.6),
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(label: t.deleteBack, onPressed: _menghapus ? null : () => Navigator.of(context).maybePop()),
+              const SizedBox(height: AppSpacing.md),
+              Material(
+                color: AppColors.permukaan,
+                shape: StadiumBorder(side: BorderSide(color: AppColors.aksenHangat.withValues(alpha: 0.7), width: AppGlass.edgeWidth)),
+                child: InkWell(
+                  customBorder: const StadiumBorder(),
+                  onTap: _menghapus ? null : _hapus,
+                  child: SizedBox(
+                    height: 54,
+                    width: double.infinity,
+                    child: Center(
+                      child: Text(_menghapus ? t.deleting : t.deleteYes, style: AppTextStyles.buttonLabel.copyWith(fontSize: 15, color: AppColors.aksenHangatGelap)),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.primer.withValues(alpha: 0.08),
-                      border: Border.all(color: AppColors.primer.withValues(alpha: 0.25)),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Text(
-                      t.deleteHint,
-                      style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  RiungButton(
-                    label: t.deleteBack,
-                    variant: RiungButtonVariant.secondary,
-                    onPressed: _menghapus ? null : () => Navigator.of(context).maybePop(),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextButton(
-                    onPressed: _menghapus ? null : _hapus,
-                    child: Text(
-                      _menghapus ? t.deleting : t.deleteYes,
-                      style: AppTextStyles.chipLabel.copyWith(color: AppColors.error, fontSize: 13),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

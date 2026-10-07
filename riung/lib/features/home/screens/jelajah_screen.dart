@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../afirmasi/screens/afirmasi_kategori_screen.dart';
 import '../../jurnal/screens/jurnal_home_screen.dart';
 import '../../meditasi/screens/meditasi_list_screen.dart';
@@ -18,6 +19,9 @@ class JelajahScreen extends StatefulWidget {
   State<JelajahScreen> createState() => _JelajahScreenState();
 }
 
+/// Indeks tab Tidur — tab ini memakai latar malam penuh.
+const _tidurTab = 1;
+
 class _JelajahScreenState extends State<JelajahScreen> with SingleTickerProviderStateMixin {
   late final TabController _controller = TabController(length: 4, vsync: this);
 
@@ -32,37 +36,29 @@ class _JelajahScreenState extends State<JelajahScreen> with SingleTickerProvider
     final t = context.s.home;
     final tabs = [t.tabMeditation, t.tabSleep, t.tabJournal, t.tabAffirmation];
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Container(
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.garis))),
-              child: TabBar(
-                controller: _controller,
-                isScrollable: false,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                indicatorColor: AppColors.primer,
-                indicatorWeight: 3,
-                labelColor: AppColors.teksUtama,
-                unselectedLabelColor: AppColors.teksRedup,
-                labelStyle: AppTextStyles.chipLabel.copyWith(fontSize: 13),
-                tabs: [for (final label in tabs) Tab(text: label)],
+      body: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) => RiungGlassBackdrop(night: _controller.index == _tidurTab, child: child!),
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.sm),
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, _) =>
+                      RiungSegmentedTabs(labels: tabs, index: _controller.index, onChanged: _controller.animateTo, night: _controller.index == _tidurTab),
+                ),
               ),
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _controller,
-                children: const [
-                  MeditasiListScreen(),
-                  TidurListScreen(),
-                  JurnalHomeScreen(),
-                  AfirmasiKategoriScreen(),
-                ],
+              Expanded(
+                child: TabBarView(
+                  controller: _controller,
+                  children: const [MeditasiListScreen(), TidurListScreen(), JurnalHomeScreen(), AfirmasiKategoriScreen()],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

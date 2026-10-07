@@ -4,8 +4,6 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
-import '../../../core/widgets/widgets.dart';
-import '../../monster/screens/vault_screen.dart';
 import '../logic/character_accessory.dart';
 import '../logic/character_spec.dart';
 import '../screens/kepribadian_hasil_screen.dart';
@@ -34,22 +32,14 @@ class _KarakterHomeCardState extends State<KarakterHomeCard> {
   Widget build(BuildContext context) {
     final scope = AppScope.of(context);
     final t = context.s.kepribadian;
-    final profile = scope.auth.profile;
-    final monsterId = (profile != null && profile.dominantSaboteurs.isNotEmpty) ? profile.dominantSaboteurs.first : 'waswas';
-    final progress = scope.monsterProgress.progressOf(monsterId) ?? MonsterProgress.initial(monsterId);
-    final monsterColor = AppColors.monsterColors[monsterId] ?? AppColors.primer;
     return ValueListenableBuilder<int>(
       valueListenable: scope.prefs.personalityRevision,
       builder: (context, _, _) {
         final results = scope.prefs.personalityResults;
         final loadout = AccessoryLoadout(scope.prefs);
         return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
-      ),
+      padding: const EdgeInsets.all(20),
+      decoration: AppGlass.card(radius: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -58,55 +48,13 @@ class _KarakterHomeCardState extends State<KarakterHomeCard> {
             behavior: HitTestBehavior.opaque,
             child: Row(
               children: [
-                Expanded(child: Text(t.homeTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama))),
+                Expanded(child: Text(t.homeTitle, style: AppTextStyles.title.copyWith(fontSize: 18, color: AppColors.teksUtama))),
                 Text(t.homeSeeAll, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.primer, fontWeight: FontWeight.w700)),
                 const Icon(Icons.chevron_right, size: 18, color: AppColors.primer),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          GestureDetector(
-            onTap: () => _buka(const VaultScreen()),
-            behavior: HitTestBehavior.opaque,
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 58,
-                  height: 61,
-                  child: RiungMonster(
-                    monsterId: monsterId,
-                    state: progress.state == MonsterState.tamed ? MonsterVisualState.jinak : MonsterVisualState.liar,
-                    size: 58,
-                    applyBossScale: false,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(t.homeMonsterLabel, style: AppTextStyles.caption.copyWith(fontSize: 10, letterSpacing: 0.4)),
-                      const SizedBox(height: 2),
-                      Text(context.s.common.monsterName(monsterId), style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
-                      const SizedBox(height: 6),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                        child: LinearProgressIndicator(
-                          value: progress.progress / 100,
-                          minHeight: 6,
-                          backgroundColor: AppColors.latar,
-                          valueColor: AlwaysStoppedAnimation(monsterColor),
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(t.homeMonsterProgress(progress.progress), style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.md), child: Divider(color: AppColors.garis, height: 1)),
+          const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
               for (final test in PersonalityTest.values) ...[
@@ -167,7 +115,7 @@ class _CharacterTile extends StatelessWidget {
             height: 64,
             child: r == null
                 ? Container(
-                    decoration: BoxDecoration(color: AppColors.kartu, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.garis)),
+                    decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth)),
                     alignment: Alignment.center,
                     child: const Icon(Icons.add_rounded, size: 26, color: AppColors.teksRedup),
                   )

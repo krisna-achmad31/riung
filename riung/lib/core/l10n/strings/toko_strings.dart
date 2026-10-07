@@ -38,6 +38,19 @@ abstract class TokoStrings {
   String get rarityCommon;
   String get alreadyOwned;
   String coinsPrice(int price);
+  String priceShort(int idr);
+  String lemariTitle(String monster);
+  String get wardrobe;
+  String get slotAll;
+  String get slotHead;
+  String get slotNeck;
+  String get slotBase;
+  String get slotFrame;
+  String get worn;
+  String exclusiveTo(String monster);
+  String get lemariNote;
+  String get applyStyle;
+  String get styleSaved;
   String buyFor(int price);
   String cosmeticOwnedNow(String name);
 
@@ -222,6 +235,32 @@ class TokoStringsId extends TokoStrings {
   String get alreadyOwned => 'Sudah dimiliki';
   @override
   String coinsPrice(int price) => '$price koin';
+  @override
+  String priceShort(int idr) => 'Rp${idr ~/ 1000}rb';
+  @override
+  String lemariTitle(String monster) => 'Lemari $monster';
+  @override
+  String get wardrobe => 'Lemari';
+  @override
+  String get slotAll => 'Semua';
+  @override
+  String get slotHead => 'Kepala';
+  @override
+  String get slotNeck => 'Leher';
+  @override
+  String get slotBase => 'Alas';
+  @override
+  String get slotFrame => 'Bingkai';
+  @override
+  String get worn => 'Dipakai';
+  @override
+  String exclusiveTo(String monster) => 'Khusus $monster';
+  @override
+  String get lemariNote => 'Kosmetik cuma tampilan. Progres monstermu nggak bisa dibeli — cuma latihan yang bisa.';
+  @override
+  String get applyStyle => 'Pakai gaya ini';
+  @override
+  String get styleSaved => 'Gayanya tersimpan';
   @override
   String buyFor(int price) => 'Beli · $price koin';
   @override
@@ -499,6 +538,32 @@ class TokoStringsEn extends TokoStrings {
   String get alreadyOwned => 'Already owned';
   @override
   String coinsPrice(int price) => '$price coins';
+  @override
+  String priceShort(int idr) => 'Rp${idr ~/ 1000}k';
+  @override
+  String lemariTitle(String monster) => "$monster's wardrobe";
+  @override
+  String get wardrobe => 'Wardrobe';
+  @override
+  String get slotAll => 'All';
+  @override
+  String get slotHead => 'Head';
+  @override
+  String get slotNeck => 'Neck';
+  @override
+  String get slotBase => 'Base';
+  @override
+  String get slotFrame => 'Frame';
+  @override
+  String get worn => 'Wearing';
+  @override
+  String exclusiveTo(String monster) => '$monster only';
+  @override
+  String get lemariNote => "Cosmetics are just for looks. Your monster's progress can't be bought — only practice can.";
+  @override
+  String get applyStyle => 'Use this look';
+  @override
+  String get styleSaved => 'Look saved';
   @override
   String buyFor(int price) => 'Buy · $price coins';
   @override

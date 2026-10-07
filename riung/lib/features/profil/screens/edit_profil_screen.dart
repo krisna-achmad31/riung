@@ -5,6 +5,7 @@ import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../logic/avatar_catalog.dart';
+import '../widgets/profil_avatar.dart';
 
 /// Ganti nama & avatar. Layar ini tidak ada mockup terpisah di
 /// `design/Profil.dc.html` (cuma dirujuk lewat baris "Ganti nama" di
@@ -50,96 +51,99 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.s.profil;
-    final inisial = _namaController.text.trim().isEmpty ? '?' : _namaController.text.trim()[0].toUpperCase();
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.editTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.editTitle),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.md),
                   children: [
+                    Center(child: ProfilAvatar(avatar: AvatarCatalog.byId(_avatarId), size: 130)),
                     const SizedBox(height: AppSpacing.lg),
                     Container(
-                      width: 84,
-                      height: 84,
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(colors: AvatarCatalog.byId(_avatarId).colors),
+                        color: AppColors.permukaan,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
                       ),
-                      alignment: Alignment.center,
-                      child: Text(inisial, style: AppTextStyles.display.copyWith(fontSize: 32, color: AppColors.latar)),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    TextField(
-                      controller: _namaController,
-                      onChanged: (_) => setState(() {}),
-                      style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15),
-                      decoration: InputDecoration(
-                        labelText: t.nicknameLabel,
-                        labelStyle: AppTextStyles.caption,
-                        filled: true,
-                        fillColor: AppColors.permukaan,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.lg), borderSide: const BorderSide(color: AppColors.garis)),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.lg), borderSide: const BorderSide(color: AppColors.garis)),
-                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.lg), borderSide: const BorderSide(color: AppColors.primer)),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(t.pickAvatar, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Wrap(
-                      spacing: AppSpacing.md,
-                      runSpacing: AppSpacing.md,
-                      children: [
-                        for (final avatar in AvatarCatalog.all)
-                          GestureDetector(
-                            onTap: () => setState(() => _avatarId = avatar.id),
-                            child: Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(colors: avatar.colors),
-                                border: _avatarId == avatar.id ? Border.all(color: AppColors.teksUtama, width: 2.5) : null,
-                              ),
-                              alignment: Alignment.center,
-                              child: _avatarId == avatar.id ? const Icon(Icons.check, color: AppColors.latar) : null,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(t.nicknameLabel, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.teksRedup)),
+                          TextField(
+                            controller: _namaController,
+                            onChanged: (_) => setState(() {}),
+                            cursorColor: AppColors.primer,
+                            style: AppTextStyles.chipLabel.copyWith(fontSize: 16, color: AppColors.teksUtama),
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              filled: false,
+                              contentPadding: EdgeInsets.symmetric(vertical: 6),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(t.pickAvatar, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+                    const SizedBox(height: AppSpacing.md),
+                    GridView.count(
+                      crossAxisCount: 3,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 109 / 96,
+                      children: [
+                        for (final avatar in AvatarCatalog.all)
+                          _AvatarOptionTile(avatar: avatar, selected: _avatarId == avatar.id, onTap: () => setState(() => _avatarId = avatar.id)),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.xl),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-              child: RiungButton(
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(
                 label: _menyimpan ? t.saving : context.s.common.simpan,
                 onPressed: _menyimpan || _namaController.text.trim().isEmpty ? null : _simpan,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+/// Opsi avatar (frame `Opsi avatar`): kartu kaca, bingkai primer saat dipilih.
+class _AvatarOptionTile extends StatelessWidget {
+  const _AvatarOptionTile({required this.avatar, required this.selected, required this.onTap});
+
+  final AvatarOption avatar;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.permukaanPadat.withValues(alpha: 0.9) : AppColors.kartu,
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2.5 : AppGlass.edgeWidth),
+        ),
+        alignment: Alignment.center,
+        child: RiungMonster(monsterId: avatar.monsterId, state: MonsterVisualState.jinak, size: 76, applyBossScale: false),
       ),
     );
   }

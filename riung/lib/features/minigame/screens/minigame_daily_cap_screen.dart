@@ -16,58 +16,64 @@ class MinigameDailyCapScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.minigame;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xxl),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
           child: Column(
             children: [
               Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.close, color: AppColors.teksRedup)),
+                alignment: Alignment.centerLeft,
+                child: RiungGlassIconButton(icon: Icons.close_rounded, onTap: () => Navigator.of(context).maybePop()),
               ),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.lg),
                   children: [
-                    Container(
-                      width: 74,
-                      height: 74,
-                      decoration: BoxDecoration(
-                        color: AppColors.sekunder.withValues(alpha: 0.12),
-                        border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.3)),
-                        borderRadius: BorderRadius.circular(24),
+                    Center(
+                      child: SizedBox(
+                        width: 240,
+                        height: 200,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 20,
+                              top: 0,
+                              child: Container(
+                                width: 200,
+                                height: 200,
+                                decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                              ),
+                            ),
+                            const Positioned(left: 39, top: 40, child: RiungIcon3D(RiungIcon.tiket, size: 139)),
+                            const Positioned(left: 170, top: 30, child: Icon(Icons.bedtime_outlined, size: 36, color: AppColors.sekunder)),
+                          ],
+                        ),
                       ),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.confirmation_number_outlined, size: 32, color: AppColors.sekunder),
                     ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.capTitle, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.capBody(EconomyTiket.maxFightPerHari), textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, color: AppColors.teksSekunder)),
                     const SizedBox(height: AppSpacing.lg),
-                    Text(t.capTitle, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 21)),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      t.capBody(EconomyTiket.maxFightPerHari),
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(16)),
+                    RiungGlassCard(
+                      radius: 26,
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(t.capHowTo, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-                          const SizedBox(height: AppSpacing.sm),
-                          _Baris(t.capWayCheckin),
-                          _Baris(t.capWayMeditation),
-                          _Baris(t.capWayJournal),
+                          Text(t.capHowTo, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksUtama)),
+                          const SizedBox(height: 10),
+                          _Baris(icon: RiungIcon.checkin, text: t.capWayCheckin),
+                          _Baris(icon: RiungIcon.meditasi, text: t.capWayMeditation),
+                          _Baris(icon: RiungIcon.jurnal, text: t.capWayJournal),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              RiungButton(label: t.capBack, onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
+              const SizedBox(height: AppSpacing.md),
+              RiungButton(label: t.capBack, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
             ],
           ),
         ),
@@ -77,19 +83,20 @@ class MinigameDailyCapScreen extends StatelessWidget {
 }
 
 class _Baris extends StatelessWidget {
-  const _Baris(this.text);
+  const _Baris({required this.icon, required this.text});
 
+  final RiungIcon icon;
   final String text;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline, size: 15, color: AppColors.sekunder),
-          const SizedBox(width: AppSpacing.sm),
-          Text(text, style: AppTextStyles.caption.copyWith(fontSize: 12)),
+          RiungIcon3D(icon, size: 36),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.teksUtama))),
         ],
       ),
     );

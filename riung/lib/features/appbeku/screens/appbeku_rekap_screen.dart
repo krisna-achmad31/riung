@@ -5,6 +5,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../widgets/app_tile.dart';
 import 'appbeku_setup_screen.dart';
 
 /// Rekap harian Aplikasi Beku — pintu masuk fitur ini dari Pengaturan.
@@ -27,141 +28,156 @@ class _AppBekuRekapScreenState extends State<AppBekuRekapScreen> {
   Widget build(BuildContext context) {
     final appBeku = AppScope.of(context).appBeku;
     final t = context.s.appbeku;
+    void bukaSetup() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AppBekuSetupScreen()));
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Expanded(child: Text(t.title, style: AppTextStyles.subtitle.copyWith(fontSize: 15))),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AppBekuSetupScreen()),
-                    ),
-                    icon: const Icon(Icons.settings_rounded, size: 19, color: AppColors.teksRedup),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: appBeku,
-                builder: (context, _) {
-                  if (appBeku.enabledFrozenApps.isEmpty) {
-                    return _EmptyState(
-                      onSetup: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AppBekuSetupScreen()),
-                      ),
-                    );
-                  }
-                  final totalUsed = appBeku.enabledFrozenApps.fold<int>(0, (sum, a) => sum + appBeku.usageMinutesOf(a.packageName));
-                  final totalLimit = appBeku.enabledFrozenApps.fold<int>(0, (sum, a) => sum + appBeku.effectiveLimitOf(a.packageName));
-                  final sisa = (totalLimit - totalUsed).clamp(0, totalLimit == 0 ? 0 : 1 << 30);
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.title, trailing: RiungGlassIconButton(icon: Icons.tune_rounded, onTap: bukaSetup)),
+              Expanded(
+                child: ListenableBuilder(
+                  listenable: appBeku,
+                  builder: (context, _) {
+                    if (appBeku.enabledFrozenApps.isEmpty) return _EmptyState(onSetup: bukaSetup);
+                    final totalUsed = appBeku.enabledFrozenApps.fold<int>(0, (sum, a) => sum + appBeku.usageMinutesOf(a.packageName));
+                    final totalLimit = appBeku.enabledFrozenApps.fold<int>(0, (sum, a) => sum + appBeku.effectiveLimitOf(a.packageName));
+                    final sisa = (totalLimit - totalUsed).clamp(0, totalLimit == 0 ? 0 : 1 << 30);
 
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    return RiungBleedListView(
+                      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xl),
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [AppColors.sekunder.withValues(alpha: 0.14), AppColors.kartu.withValues(alpha: 0.9)],
-                            ),
-                            border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.35)),
-                            borderRadius: BorderRadius.circular(AppRadius.xxl),
+                        _HariIniCard(
+                          eyebrow: t.today,
+                          total: t.scrollMinutes(totalUsed),
+                          sub: sisa > 0 ? t.underLimit(sisa) : t.totalLimitReached,
+                          progress: totalLimit == 0 ? 0 : (totalUsed / totalLimit).clamp(0.0, 1.0),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: Text(t.perApp, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.teksRedup)),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        for (final setting in appBeku.enabledFrozenApps) ...[
+                          _RecapBar(
+                            entry: AppBekuCatalog.byPackage(setting.packageName),
+                            used: appBeku.usageMinutesOf(setting.packageName),
+                            limit: appBeku.effectiveLimitOf(setting.packageName),
                           ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                          decoration: BoxDecoration(color: AppColors.primerLembut.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(18)),
                           child: Row(
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(t.today, style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w700, fontSize: 12, letterSpacing: 0.6)),
-                                    const SizedBox(height: 6),
-                                    Text(t.scrollMinutes(totalUsed), style: AppTextStyles.display.copyWith(fontSize: 24)),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      sisa > 0 ? t.underLimit(sisa) : t.totalLimitReached,
-                                      style: AppTextStyles.body.copyWith(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 76,
-                                height: 80,
-                                child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 76),
-                              ),
+                              const AppTile(entry: AppBekuCatalog.whatsapp, size: 28),
+                              const SizedBox(width: 10),
+                              Expanded(child: Text(t.whatsappNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.35, fontWeight: FontWeight.w500, color: AppColors.primer))),
                             ],
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          decoration: BoxDecoration(
-                            color: AppColors.permukaan,
-                            border: Border.all(color: AppColors.garis),
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(height: AppSpacing.md),
+                        IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Text(t.perApp, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 12, letterSpacing: 0.6)),
-                              const SizedBox(height: AppSpacing.md),
-                              for (final setting in appBeku.enabledFrozenApps) ...[
-                                _RecapBar(
-                                  entry: AppBekuCatalog.byPackage(setting.packageName),
-                                  used: appBeku.usageMinutesOf(setting.packageName),
-                                  limit: appBeku.effectiveLimitOf(setting.packageName),
+                              Expanded(
+                                child: _StatBox(
+                                  leading: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(color: AppColors.primerLembut, borderRadius: BorderRadius.circular(10)),
+                                    child: const Icon(Icons.air_rounded, size: 16, color: AppColors.primer),
+                                  ),
+                                  value: t.breathsTaken(appBeku.breathTakenToday),
+                                  label: t.breathsLabel,
                                 ),
-                                const SizedBox(height: AppSpacing.sm),
-                              ],
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(child: _StatBox(leading: const RiungIcon3D(RiungIcon.koin, size: 30), value: '${appBeku.scrollCoinsToday}', label: t.coinsLabel)),
+                              const SizedBox(width: 10),
+                              Expanded(child: _StatBox(leading: const RiungIcon3D(RiungIcon.streak, size: 30), value: t.streakDays(appBeku.streakDays), label: t.streakLabel)),
                             ],
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        Row(
-                          children: [
-                            _StatBox(icon: Icons.spa_rounded, color: AppColors.sekunder, value: t.breathsTaken(appBeku.breathTakenToday), label: t.breathsLabel),
-                            const SizedBox(width: AppSpacing.sm),
-                            _StatBox(icon: Icons.monetization_on, color: AppColors.aksenHangat, value: '${appBeku.scrollCoinsToday}', label: t.coinsLabel),
-                            const SizedBox(width: AppSpacing.sm),
-                            _StatBox(icon: Icons.local_fire_department, color: AppColors.aksenHangat, value: t.streakDays(appBeku.streakDays), label: t.streakLabel),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        TahukahKamuCard(text: t.didYouKnowText, source: t.didYouKnowSource),
-                        const SizedBox(height: AppSpacing.lg),
-                        Text(
-                          t.footerNote,
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.caption.copyWith(fontSize: 11),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(t.footerNote, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksRedup)),
                       ],
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// Kartu "Hari ini" (frame `Hari ini`): gradien langit, total menit, ikon
+/// beku 3D, progres terhadap total batas.
+class _HariIniCard extends StatelessWidget {
+  const _HariIniCard({required this.eyebrow, required this.total, required this.sub, required this.progress});
+
+  final String eyebrow;
+  final String total;
+  final String sub;
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.langitLembut, AppColors.permukaanPadat]),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+        boxShadow: AppGlass.shadow,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(eyebrow, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.langitGelap)),
+                    const SizedBox(height: 2),
+                    FittedBox(fit: BoxFit.scaleDown, child: Text(total, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2))),
+                    const SizedBox(height: 2),
+                    Text(sub, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              const RiungIcon3D(RiungIcon.aplikasiBeku, size: 76),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(
+            height: 10,
+            decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(5)),
+            alignment: Alignment.centerLeft,
+            child: FractionallySizedBox(
+              heightFactor: 1,
+              widthFactor: progress,
+              child: DecoratedBox(
+                decoration: BoxDecoration(gradient: const LinearGradient(colors: [AppColors.langitMuda, AppColors.langit]), borderRadius: BorderRadius.circular(5)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Baris per aplikasi (frame `Per app …`): tile, nama, pemakaian, bar.
 class _RecapBar extends StatelessWidget {
   const _RecapBar({required this.entry, required this.used, required this.limit});
 
@@ -171,65 +187,70 @@ class _RecapBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s.appbeku;
     final overLimit = limit > 0 && used >= limit;
     final pct = limit == 0 ? 0.0 : (used / limit).clamp(0.0, 1.0);
-    final color = overLimit ? AppColors.peringatan : AppColors.sekunder;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(entry?.name ?? '?', style: AppTextStyles.chipLabel.copyWith(fontSize: 12)),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: context.s.appbeku.usedMinutes(used), style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
-                  TextSpan(
-                    text: overLimit ? context.s.appbeku.limitReachedInline : context.s.appbeku.ofLimit(limit),
-                    style: AppTextStyles.caption.copyWith(fontSize: 12),
+    return RiungGlassCard(
+      radius: 22,
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          AppTile(entry: entry),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: Text(entry?.name ?? '?', maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama))),
+                    Text(
+                      '${t.usedMinutes(used)}${t.ofLimit(limit)}${overLimit ? ' ${t.limitReachedInline}' : ''}',
+                      style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: overLimit ? AppColors.aksenHangatGelap : AppColors.teksSekunder),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  height: 6,
+                  decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(3)),
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    heightFactor: 1,
+                    widthFactor: pct,
+                    child: DecoratedBox(decoration: BoxDecoration(color: overLimit ? AppColors.aksenHangat : AppColors.langit, borderRadius: BorderRadius.circular(3))),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          child: LinearProgressIndicator(value: pct, minHeight: 7, backgroundColor: AppColors.latar, valueColor: AlwaysStoppedAnimation(color)),
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _StatBox extends StatelessWidget {
-  const _StatBox({required this.icon, required this.color, required this.value, required this.label});
+  const _StatBox({required this.leading, required this.value, required this.label});
 
-  final IconData icon;
-  final Color color;
+  final Widget leading;
   final String value;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 13),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 19, color: color),
-            const SizedBox(height: 4),
-            Text(value, style: AppTextStyles.chipLabel.copyWith(color: color, fontSize: 15)),
-            Text(label, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 10)),
-          ],
-        ),
+    return RiungGlassCard(
+      radius: 22,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          leading,
+          const SizedBox(height: 4),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(value, style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.2))),
+          const SizedBox(height: 2),
+          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10, height: 1.3, color: AppColors.teksSekunder)),
+        ],
       ),
     );
   }
@@ -251,10 +272,10 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(
               width: 110,
               height: 116,
-              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.liar, size: 110),
+              child: RiungIcon3D(RiungIcon.aplikasiBeku, size: 110),
             ),
             const SizedBox(height: AppSpacing.md),
-            Text(context.s.appbeku.emptyTitle, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+            Text(context.s.appbeku.emptyTitle, textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 20)),
             const SizedBox(height: AppSpacing.sm),
             Text(
               context.s.appbeku.emptyBody,

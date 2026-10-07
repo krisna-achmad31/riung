@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 
 /// Header 3 langkah wizard check-in — ikon kembali/tutup, 3 titik progres,
 /// label "n/3". Dipakai di ketiga layar pertanyaan check-in.
@@ -14,41 +15,36 @@ class CheckInStepHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: onBack ?? () => Navigator.of(context).maybePop(),
-            icon: Icon(
-              showClose ? Icons.close : Icons.arrow_back,
-              color: AppColors.teksSekunder,
-              size: showClose ? 20 : 22,
+      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+      child: SizedBox(
+        height: 44,
+        child: Row(
+          children: [
+            RiungGlassIconButton(
+              icon: showClose ? Icons.close_rounded : Icons.chevron_left_rounded,
+              onTap: onBack ?? () => Navigator.of(context).maybePop(),
             ),
-          ),
-          Row(
-            children: [
-              for (var i = 1; i <= 3; i++)
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 2.5),
-                  width: 22,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    color: i <= step ? AppColors.primer : AppColors.kartu,
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(
-            width: 48,
-            child: Text(
-              '$step/3',
-              textAlign: TextAlign.end,
-              style: AppTextStyles.caption.copyWith(fontSize: 11),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var i = 1; i <= 3; i++)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: i == step ? 28 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: i <= step ? AppColors.primer : AppColors.permukaan,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 44),
+          ],
+        ),
       ),
     );
   }

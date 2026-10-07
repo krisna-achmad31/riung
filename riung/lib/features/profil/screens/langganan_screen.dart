@@ -31,165 +31,164 @@ class LanggananScreen extends StatelessWidget {
     final scope = AppScope.of(context);
     final t = context.s.profil;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.subTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: scope.auth,
-                builder: (context, _) {
-                  final profile = scope.auth.profile;
-                  if (profile == null) {
-                    return const Center(child: CircularProgressIndicator(color: AppColors.primer));
-                  }
-                  final status = profile.premiumStatus(DateTime.now());
-                  if (status == PremiumStatus.expired) {
-                    return const _Kedaluwarsa();
-                  }
-                  if (status == PremiumStatus.none) {
-                    return _BelumPremium(onUpgrade: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const PaywallPremiumScreen()),
-                        ));
-                  }
-                  final isMonthly = profile.premiumPlan == 'premium_monthly';
-                  final planLabel = isMonthly ? t.planMonthly : t.planYearly;
-                  final rc = scope.remoteConfig;
-                  final rupiah = NumberFormat.decimalPattern('id_ID');
-                  final harga = isMonthly ? rc.premiumHargaBulananIdr : rc.premiumHargaTahunanIdr;
-                  final tanggal = profile.premiumRenewsAt == null
-                      ? ''
-                      : DateFormat('d MMMM yyyy', context.s.dateLocale).format(profile.premiumRenewsAt!);
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.subTitle),
+              Expanded(
+                child: ListenableBuilder(
+                  listenable: scope.auth,
+                  builder: (context, _) {
+                    final profile = scope.auth.profile;
+                    if (profile == null) {
+                      return const Center(child: CircularProgressIndicator(color: AppColors.primer));
+                    }
+                    final status = profile.premiumStatus(DateTime.now());
+                    if (status == PremiumStatus.expired) {
+                      return const _Kedaluwarsa();
+                    }
+                    if (status == PremiumStatus.none) {
+                      return _BelumPremium(onUpgrade: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallPremiumScreen())));
+                    }
+                    final isMonthly = profile.premiumPlan == 'premium_monthly';
+                    final planLabel = isMonthly ? t.planMonthly : t.planYearly;
+                    final rc = scope.remoteConfig;
+                    final rupiah = NumberFormat.decimalPattern('id_ID');
+                    final harga = isMonthly ? rc.premiumHargaBulananIdr : rc.premiumHargaTahunanIdr;
+                    final tanggal = profile.premiumRenewsAt == null ? '-' : DateFormat('d MMM yyyy', context.s.dateLocale).format(profile.premiumRenewsAt!);
 
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    return RiungBleedListView(
+                      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xl),
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [AppColors.aksenHangat.withValues(alpha: 0.16), AppColors.kartu.withValues(alpha: 0.9)],
-                            ),
-                            border: Border.all(color: AppColors.aksenHangat.withValues(alpha: 0.45), width: 1.5),
-                            borderRadius: BorderRadius.circular(AppRadius.xxl),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.workspace_premium_rounded, size: 21, color: AppColors.aksenHangat),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Text(t.planTitle(planLabel), style: AppTextStyles.title.copyWith(fontSize: 17)),
-                                ],
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text.rich(
-                                TextSpan(
-                                  style: AppTextStyles.body.copyWith(fontSize: 12),
-                                  children: [
-                                    TextSpan(text: t.activeUntil),
-                                    TextSpan(text: tanggal.isEmpty ? '-' : tanggal, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.teksUtama)),
-                                    TextSpan(text: t.autoRenew),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(t.priceVia(rupiah.format(harga), isMonthly), style: AppTextStyles.body.copyWith(fontSize: 12)),
-                              if (status == PremiumStatus.renewsSoon) ...[
-                                const SizedBox(height: AppSpacing.sm),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(Icons.info_outline, size: 14, color: AppColors.peringatan),
-                                    const SizedBox(width: 6),
-                                    Expanded(child: Text(t.statusRenewsSoon, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.peringatan, height: 1.45))),
-                                  ],
-                                ),
-                              ],
-                            ],
-                          ),
+                        _PaketAktifCard(
+                          title: t.planTitle(planLabel),
+                          sub: '${t.activeUntil}$tanggal${t.autoRenew}',
+                          price: t.priceVia(rupiah.format(harga), isMonthly),
+                          warning: status == PremiumStatus.renewsSoon ? t.statusRenewsSoon : null,
                         ),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.md),
                         PremiumDailyCoinsCard(isAnnual: profile.isAnnual),
-                        const SizedBox(height: AppSpacing.lg),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          decoration: BoxDecoration(
-                            color: AppColors.permukaan,
-                            border: Border.all(color: AppColors.garis),
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                          ),
+                        const SizedBox(height: AppSpacing.md),
+                        RiungGlassCard(
+                          radius: 26,
+                          padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(t.whatYouGet, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 12, letterSpacing: 0.6)),
-                              const SizedBox(height: AppSpacing.sm),
+                              Text(t.whatYouGet, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.5, color: AppColors.sekunder)),
                               for (final benefit in t.subBenefits)
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 8),
+                                  padding: const EdgeInsets.only(top: 10),
                                   child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(Icons.check_rounded, size: 15, color: AppColors.sukses),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Expanded(child: Text(benefit, style: AppTextStyles.body.copyWith(fontSize: 13))),
+                                      const Padding(padding: EdgeInsets.only(top: 1), child: Icon(Icons.check_rounded, size: 16, color: AppColors.primer)),
+                                      const SizedBox(width: 10),
+                                      Expanded(child: Text(benefit, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
                                     ],
                                   ),
                                 ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        GestureDetector(
-                          onTap: () => _kelolaLangganan(profile.premiumPlan),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            decoration: BoxDecoration(
-                              color: AppColors.permukaan,
-                              border: Border.all(color: AppColors.garis),
-                              borderRadius: BorderRadius.circular(AppRadius.xl),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.close_rounded, size: 18, color: AppColors.teksSekunder),
-                                const SizedBox(width: AppSpacing.md),
-                                Expanded(child: Text(t.manageSub, style: AppTextStyles.chipLabel.copyWith(fontSize: 13))),
-                                const Icon(Icons.chevron_right_rounded, size: 17, color: AppColors.teksRedup),
-                              ],
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: AppSpacing.md),
-                        Text(
-                          t.cancelNote,
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.55),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
+                        RiungButton(label: t.manageSub, variant: RiungButtonVariant.secondary, onPressed: () => _kelolaLangganan(profile.premiumPlan)),
+                        const SizedBox(height: 6),
+                        Text(t.cancelNote, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45, color: AppColors.teksSekunder)),
+                        const SizedBox(height: AppSpacing.md),
+                        const Center(child: _PulihkanLink()),
                       ],
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+/// Kartu paket aktif (frame `Paket aktif`): gradien ungu malam → primer.
+class _PaketAktifCard extends StatelessWidget {
+  const _PaketAktifCard({required this.title, required this.sub, required this.price, this.warning});
+
+  final String title;
+  final String sub;
+  final String price;
+  final String? warning;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.tiketAwal, AppColors.primer]),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: AppGlass.shadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const RiungIcon3D(RiungIcon.premium, size: 56),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: AppTextStyles.title.copyWith(fontSize: 17, color: AppColors.diAtasTinta)),
+                    const SizedBox(height: 2),
+                    Text(sub, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.3, fontWeight: FontWeight.w500, color: AppColors.diAtasTinta.withValues(alpha: 0.8))),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(price, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.emasLembut)),
+          if (warning != null) ...[
+            const SizedBox(height: 8),
+            Text(warning!, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, color: AppColors.emasMuda)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Tautan "Pulihkan pembelian" di bawah layar langganan aktif.
+class _PulihkanLink extends StatefulWidget {
+  const _PulihkanLink();
+
+  @override
+  State<_PulihkanLink> createState() => _PulihkanLinkState();
+}
+
+class _PulihkanLinkState extends State<_PulihkanLink> {
+  bool _checking = false;
+
+  Future<void> _pulihkan() async {
+    final scope = AppScope.of(context);
+    setState(() => _checking = true);
+    await scope.billing.restorePurchases();
+    await Future<void>.delayed(const Duration(seconds: 3));
+    await scope.auth.refreshProfile();
+    if (mounted) setState(() => _checking = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.s.profil;
+    return GestureDetector(
+      onTap: _checking ? null : _pulihkan,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Text(_checking ? t.restoreChecking : t.restorePurchases, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.primer)),
       ),
     );
   }
@@ -209,9 +208,9 @@ class _BelumPremium extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.workspace_premium_rounded, size: 40, color: AppColors.aksenHangat),
+            const RiungIcon3D(RiungIcon.premium, size: 96),
             const SizedBox(height: AppSpacing.md),
-            Text(t.notSubscribed, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+            Text(t.notSubscribed, textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 20)),
             const SizedBox(height: AppSpacing.sm),
             Text(
               t.notSubscribedBody,
@@ -258,9 +257,9 @@ class _KedaluwarsaState extends State<_Kedaluwarsa> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.workspace_premium_rounded, size: 40, color: AppColors.teksRedup),
+            const RiungIcon3D(RiungIcon.premium, size: 96),
             const SizedBox(height: AppSpacing.md),
-            Text(t.expiredTitle, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+            Text(t.expiredTitle, textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 20)),
             const SizedBox(height: AppSpacing.sm),
             Text(t.expiredBody, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13)),
             const SizedBox(height: AppSpacing.lg),

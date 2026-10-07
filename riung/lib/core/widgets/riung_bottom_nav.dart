@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../theme/theme.dart';
+import 'riung_glass_card.dart';
 
 /// Item navigasi bawah tetap Riung — urutan & label sesuai desain.
 enum RiungNavTab {
@@ -31,8 +32,8 @@ enum RiungNavTab {
   }
 }
 
-/// Navigasi bawah 5 tab Riung — lihat §05 Komponen inti · "Navigasi bawah"
-/// di `design/Design System.dc.html`.
+/// Navigasi bawah 5 tab Riung Glass — pil kaca mengambang (komponen
+/// `Tab Bar Kaca` di `design/riung.pen`); tab aktif = pil primer lembut.
 class RiungBottomNav extends StatelessWidget {
   const RiungBottomNav({
     super.key,
@@ -45,23 +46,32 @@ class RiungBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border(top: BorderSide(color: AppColors.garis)),
-      ),
-      padding: const EdgeInsets.fromLTRB(6, 10, 6, 6),
-      child: Row(
-        children: [
-          for (final tab in RiungNavTab.values)
-            Expanded(
-              child: _NavItem(
-                tab: tab,
-                active: tab == current,
-                onTap: () => onTabSelected(tab),
-              ),
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: RiungGlassCard(
+          blur: true,
+          radius: 34,
+          color: AppColors.kacaNav,
+          padding: const EdgeInsets.all(6),
+          child: SizedBox(
+            height: 56,
+            child: Row(
+              children: [
+                for (final tab in RiungNavTab.values)
+                  Expanded(
+                    child: _NavItem(
+                      tab: tab,
+                      active: tab == current,
+                      onTap: () => onTabSelected(tab),
+                    ),
+                  ),
+              ],
             ),
-        ],
+          ),
+        ),
       ),
     );
   }
@@ -77,15 +87,33 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = active ? AppColors.primer : AppColors.teksRedup;
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(tab.icon, size: 23, color: color),
-          const SizedBox(height: 4),
-          Text(tab.label(context.s), style: AppTextStyles.navLabel.copyWith(color: color)),
-        ],
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        margin: const EdgeInsets.symmetric(horizontal: 1),
+        decoration: BoxDecoration(
+          color: active ? AppColors.primerLembut : AppColors.primerLembut.withValues(alpha: 0),
+          borderRadius: BorderRadius.circular(28),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(tab.icon, size: 22, color: color),
+            const SizedBox(height: 3),
+            Text(
+              tab.label(context.s),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.navLabel.copyWith(
+                color: color,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

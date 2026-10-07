@@ -12,6 +12,7 @@ import '../widgets/auth_text_field.dart';
 import '../widgets/google_sign_in_button.dart';
 import 'daftar_screen.dart';
 import 'lupa_sandi_screen.dart';
+import '../widgets/launch_hero.dart';
 
 /// Masuk — email + kata sandi, opsi Google. Implement persis
 /// `design/Launch.dc.html` § Masuk.
@@ -82,90 +83,53 @@ class _MasukScreenState extends State<MasukScreen> {
   Widget build(BuildContext context) {
     final t = context.s.launch;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
+        child: RiungBleedListView(
+          padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.lg),
           children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
-                ],
+            const LaunchHero(left: 'meronta', center: 'hakim', right: 'mengelak'),
+            const SizedBox(height: AppSpacing.lg),
+            Text(t.welcomeBack, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
+            const SizedBox(height: AppSpacing.md),
+            Text(t.monstersWaiting, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+            const SizedBox(height: AppSpacing.md),
+            AuthTextField(
+              label: t.emailLabel,
+              icon: Icons.mail_outline_rounded,
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              onChanged: (_) => setState(() => _formError = null),
+            ),
+            const SizedBox(height: 14),
+            AuthTextField(
+              label: t.passwordLabel,
+              icon: Icons.lock_outline_rounded,
+              controller: _passwordController,
+              obscureText: true,
+              onChanged: (_) => setState(() => _formError = null),
+            ),
+            if (_formError != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(_formError!, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangatGelap)),
+            ],
+            const SizedBox(height: 14),
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LupaSandiScreen())),
+                child: Text(t.forgotPassword, style: AppTextStyles.caption.copyWith(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primer)),
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 70,
-                      height: 74,
-                      child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 70),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(t.welcomeBack, style: AppTextStyles.display.copyWith(fontSize: 26)),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(t.monstersWaiting, style: AppTextStyles.body),
-                    const SizedBox(height: AppSpacing.lg),
-                    AuthTextField(
-                      label: t.emailLabel,
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      onChanged: (_) => setState(() => _formError = null),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    AuthTextField(
-                      label: t.passwordLabel,
-                      controller: _passwordController,
-                      obscureText: true,
-                      onChanged: (_) => setState(() => _formError = null),
-                    ),
-                    if (_formError != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(_formError!, style: AppTextStyles.caption.copyWith(color: AppColors.error)),
-                    ],
-                    const SizedBox(height: AppSpacing.sm),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const LupaSandiScreen()),
-                        ),
-                        child: Text(
-                          t.forgotPassword,
-                          style: AppTextStyles.caption.copyWith(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primer,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    RiungButton(
-                      label: _submitting ? context.s.common.memproses : t.signIn,
-                      onPressed: _submitting ? null : _submit,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    const AuthDivider(),
-                    const SizedBox(height: AppSpacing.md),
-                    GoogleSignInButton(onPressed: _submitting ? null : _masukGoogle),
-                  ],
-                ),
-              ),
-            ),
+            const SizedBox(height: 14),
+            RiungButton(label: _submitting ? context.s.common.memproses : t.signIn, onPressed: _submitting ? null : _submit),
+            const SizedBox(height: 14),
+            const AuthDivider(),
+            const SizedBox(height: 14),
+            GoogleSignInButton(onPressed: _submitting ? null : _masukGoogle),
             AuthFooterLink(
               text: t.noAccount,
               actionLabel: t.signUp,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const DaftarScreen()),
-              ),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DaftarScreen())),
             ),
           ],
         ),

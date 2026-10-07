@@ -63,145 +63,204 @@ class _TidurListScreenState extends State<TidurListScreen> {
     final featured = SleepCatalog.stories.first;
     final targetTime = _formatTime(AppScope.of(context).prefs.sleepReminder.targetMinutes);
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.monsterCermin,
-        alignment: const Alignment(0, -1.3),
-        opacity: 0.1,
+      body: RiungGlassBackdrop(
+        night: true,
         child: SafeArea(
+          bottom: false,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+            padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
             children: [
               Row(
                 children: [
                   if (Navigator.canPop(context)) ...[
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
+                    RiungGlassIconButton(icon: Icons.chevron_left_rounded, night: true, onTap: () => Navigator.of(context).maybePop()),
+                    const SizedBox(width: AppSpacing.md),
                   ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.title, style: AppTextStyles.display.copyWith(fontSize: 22)),
-                        Text(t.subtitle, style: AppTextStyles.caption.copyWith(fontSize: 13)),
+                        Text(t.title, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2, color: AppNight.teks)),
+                        const SizedBox(height: 4),
+                        Text(t.subtitle, style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppNight.teksSekunder)),
                       ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: _openPengingat,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.kartu,
-                        border: Border.all(color: AppColors.garis),
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _FeaturedStoryCard(story: featured, onTap: () => _openStory(featured)),
+              const SizedBox(height: AppSpacing.lg),
+              GestureDetector(
+                onTap: _openPengingat,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+                  decoration: AppNight.card(),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.bedtime_rounded, size: 18, color: AppNight.aksen),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(t.reminderTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, fontWeight: FontWeight.w600, color: AppNight.teks))),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: AppNight.pil, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        child: Text(targetTime, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppNight.teks)),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.nightlight_round, size: 14, color: AppColors.primer),
-                          const SizedBox(width: 6),
-                          Text(targetTime, style: AppTextStyles.caption.copyWith(color: AppColors.primer, fontWeight: FontWeight.w700, fontSize: 12)),
-                        ],
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(t.sectionSounds, style: AppTextStyles.title.copyWith(fontSize: 17, color: AppNight.teks)),
+              const SizedBox(height: 6),
+              Text(t.soundsHint, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppNight.teksSekunder)),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  for (final sound in soundscapes) ...[
+                    if (sound != soundscapes.first) const SizedBox(width: 10),
+                    Expanded(
+                      child: _SoundTile(
+                        icon: _soundIcon(sound.id),
+                        label: t.soundLabel(sound.id),
+                        active: _playingSound == sound.id,
+                        onTap: () => _toggleSound(sound),
                       ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(t.sectionStories, style: AppTextStyles.title.copyWith(fontSize: 17, color: AppNight.teks)),
+              const SizedBox(height: AppSpacing.md),
+              for (var i = 0; i < SleepCatalog.stories.length; i++)
+                _StoryRow(story: SleepCatalog.stories[i], icon: _storyIcons[i % _storyIcons.length], onTap: () => _openStory(SleepCatalog.stories[i])),
+              const SizedBox(height: AppSpacing.sm),
+              Text(t.noSensorNote, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, color: AppNight.teksRedup)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static const _storyIcons = [Icons.sailing_rounded, Icons.train_rounded, Icons.forest_rounded, Icons.nights_stay_rounded];
+
+  static IconData _soundIcon(String id) => switch (id) {
+        'hujan' => Icons.water_drop_rounded,
+        'ombak' => Icons.waves_rounded,
+        _ => Icons.air_rounded,
+      };
+}
+
+/// Kartu "Cerita malam ini" (frame `Cerita malam ini`): kaca malam, cahaya,
+/// Si Kabut tidur di atas bantal mini, tombol pil terang "Putar".
+class _FeaturedStoryCard extends StatelessWidget {
+  const _FeaturedStoryCard({required this.story, required this.onTap});
+
+  final SleepStory story;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.s.tidur;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 250,
+        clipBehavior: Clip.antiAlias,
+        decoration: AppNight.card(radius: 36, color: AppNight.kacaKuat),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -20,
+              top: 10,
+              width: 240,
+              height: 220,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(colors: [AppNight.cahayaKartu, AppNight.cahayaKartu.withValues(alpha: 0)]),
+                ),
+              ),
+            ),
+            const Positioned(
+              right: 6,
+              top: 36,
+              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 156, cosmetics: ['bantal_mini']),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 22, 160, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.featuredKicker, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: AppNight.aksen)),
+                  const SizedBox(height: 6),
+                  Text(t.story(story.id).title, style: AppTextStyles.title.copyWith(fontSize: 22, height: 1.15, color: AppNight.teks)),
+                  const SizedBox(height: 6),
+                  Text(t.durationReader(story.durationMinutes, story.reader), style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppNight.teksSekunder)),
+                  const Spacer(),
+                  Container(
+                    height: 42,
+                    padding: const EdgeInsets.fromLTRB(7, 7, 18, 7),
+                    decoration: BoxDecoration(color: AppNight.teks, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: const BoxDecoration(color: AppNight.latarAtas, shape: BoxShape.circle),
+                          child: const Icon(Icons.play_arrow_rounded, size: 16, color: AppNight.teks),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(t.play, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppNight.latarAtas)),
+                      ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.permukaan, AppColors.latar]),
-                  border: Border.all(color: AppColors.garis),
-                  borderRadius: BorderRadius.circular(AppRadius.xxl),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(t.featuredKicker, style: AppTextStyles.caption.copyWith(color: AppColors.monsterCermin, fontWeight: FontWeight.w700, letterSpacing: 1.2, fontSize: 10)),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(t.story(featured.id).title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 17)),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(t.story(featured.id).blurb, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45)),
-                          const SizedBox(height: AppSpacing.sm),
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () => _openStory(featured),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                  decoration: BoxDecoration(color: AppColors.primer, borderRadius: BorderRadius.circular(11)),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.play_arrow, size: 13, color: AppColors.latar),
-                                      const SizedBox(width: 6),
-                                      Text(t.play, style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontWeight: FontWeight.w700, fontSize: 12)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              Text(t.durationReader(featured.durationMinutes, featured.reader), style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 82,
-                      height: 86,
-                      child: RiungMonster(monsterId: 'meronta', state: MonsterVisualState.jinak, size: 82),
-                    ),
-                  ],
-                ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Ubin suasana suara (frame `Suara …`): aktif = lavender tembus bertepi aksen.
+class _SoundTile extends StatelessWidget {
+  const _SoundTile({required this.icon, required this.label, required this.active, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: active,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 74,
+          decoration: BoxDecoration(
+            color: active ? AppNight.aksenLembut : AppNight.kaca,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: active ? AppNight.aksen : AppNight.tepi, width: 1.5),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(active ? Icons.pause_rounded : icon, size: 24, color: active ? AppNight.teks : AppNight.teksSekunder),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: active ? FontWeight.w700 : FontWeight.w500, color: active ? AppNight.teks : AppNight.teksSekunder),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(t.sectionStories, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15)),
-              const SizedBox(height: AppSpacing.sm),
-              for (final story in SleepCatalog.stories) _StoryRow(story: story, onTap: () => _openStory(story)),
-              const SizedBox(height: AppSpacing.md),
-              Text(t.sectionSounds, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15)),
-              const SizedBox(height: AppSpacing.xs),
-              Text(t.soundsHint, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  for (final sound in soundscapes)
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(right: sound == soundscapes.last ? 0 : AppSpacing.sm),
-                        child: GestureDetector(
-                          onTap: () => _toggleSound(sound),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 13),
-                            decoration: BoxDecoration(
-                              color: _playingSound == sound.id ? AppColors.primer.withValues(alpha: 0.12) : AppColors.permukaan,
-                              border: Border.all(color: _playingSound == sound.id ? AppColors.primer : AppColors.garis, width: _playingSound == sound.id ? 1.5 : 1),
-                              borderRadius: BorderRadius.circular(AppRadius.lg),
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(_playingSound == sound.id ? Icons.pause_rounded : Icons.graphic_eq, size: 22, color: AppColors.primer),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(t.soundLabel(sound.id), style: AppTextStyles.chipLabel.copyWith(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
             ],
           ),
         ),
@@ -210,46 +269,51 @@ class _TidurListScreenState extends State<TidurListScreen> {
   }
 }
 
+/// Baris cerita (frame `Cerita …`): thumbnail gradien berikon, judul, meta,
+/// tombol putar / kunci premium.
 class _StoryRow extends StatelessWidget {
-  const _StoryRow({required this.story, required this.onTap});
+  const _StoryRow({required this.story, required this.icon, required this.onTap});
 
   final SleepStory story;
+  final IconData icon;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final free = SleepCatalog.isStoryFree(story.id);
+    final t = context.s.tidur;
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.permukaan,
-            border: Border.all(color: AppColors.garis),
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-          ),
+          padding: const EdgeInsets.all(12),
+          decoration: AppNight.card(),
           child: Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(color: AppColors.primer.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14)),
-                alignment: Alignment.center,
-                child: const Icon(Icons.nightlight_round, size: 21, color: AppColors.primer),
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(gradient: AppNight.thumb, borderRadius: BorderRadius.circular(16)),
+                child: Icon(icon, size: 22, color: AppColors.kabutLavender),
               ),
-              const SizedBox(width: AppSpacing.md),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(context.s.tidur.story(story.id).title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14)),
-                    Text(context.s.tidur.durationReader(story.durationMinutes, story.reader), style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                    Text(t.story(story.id).title, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppNight.teks)),
+                    const SizedBox(height: 3),
+                    Text(t.durationReader(story.durationMinutes, story.reader), style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppNight.teksSekunder)),
                   ],
                 ),
               ),
-              Icon(free ? Icons.play_arrow : Icons.lock, size: free ? 18 : 15, color: free ? AppColors.primer : AppColors.teksRedup),
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(color: free ? AppNight.pil : AppNight.aksenLembut, shape: BoxShape.circle),
+                child: Icon(free ? Icons.play_arrow_rounded : Icons.lock_rounded, size: 16, color: AppNight.teks),
+              ),
             ],
           ),
         ),

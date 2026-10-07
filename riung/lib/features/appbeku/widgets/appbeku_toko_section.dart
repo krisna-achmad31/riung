@@ -4,8 +4,11 @@ import '../../../core/config/appbeku_catalog.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../toko/screens/koin_kurang_screen.dart';
+import '../../toko/widgets/koin_price_pill.dart';
 import '../../toko/widgets/konfirmasi_pembelian_sheet.dart';
+import 'app_tile.dart';
 
 /// Section "Buka Waktu Scroll" di layar Toko — cuma tampil kalau ada
 /// aplikasi yang sedang dibekukan (tanpa itu, "buka waktu" tidak berarti
@@ -26,8 +29,6 @@ class AppBekuTokoSection extends StatelessWidget {
     } else {
       final picked = await showModalBottomSheet<String>(
         context: context,
-        backgroundColor: AppColors.permukaan,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
         builder: (sheetContext) => Padding(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 26),
           child: Column(
@@ -43,13 +44,7 @@ class AppBekuTokoSection extends StatelessWidget {
                   if (entry == null) return const SizedBox.shrink();
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(color: entry.tileColor.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(11)),
-                      alignment: Alignment.center,
-                      child: Text(entry.tile, style: AppTextStyles.chipLabel.copyWith(color: entry.tileColor, fontSize: 12)),
-                    ),
+                    leading: AppTile(entry: entry, size: 36),
                     title: Text(entry.name, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
                     onTap: () => Navigator.of(sheetContext).pop(entry.packageName),
                   );
@@ -193,36 +188,36 @@ class AppBekuTokoSection extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(t.unlockSectionTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              t.unlockSectionBody,
-              style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5),
+            Text(t.unlockSectionTitle, style: AppTextStyles.title.copyWith(fontSize: 17)),
+            const SizedBox(height: 6),
+            Text(t.unlockSectionBody, style: AppTextStyles.caption.copyWith(fontSize: 13, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+            const SizedBox(height: AppSpacing.md),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 12,
+              childAspectRatio: 169 / 134,
+              children: [
+                for (final row in rows) _UnlockOption(minutes: row.$1, price: row.$2, onTap: () => _pilihAppLaluBeli(context, minutes: row.$1, price: row.$2)),
+              ],
             ),
             const SizedBox(height: AppSpacing.md),
-            for (final row in rows) ...[
-              _UnlockRow(minutes: row.$1, price: row.$2, onTap: () => _pilihAppLaluBeli(context, minutes: row.$1, price: row.$2)),
-              const SizedBox(height: AppSpacing.sm),
-            ],
-            const SizedBox(height: AppSpacing.sm),
-            Text(t.bundles, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
+            Text(t.bundles, style: AppTextStyles.title.copyWith(fontSize: 16)),
             const SizedBox(height: AppSpacing.md),
             _BundleRow(
-              icon: Icons.favorite_rounded,
-              iconColor: AppColors.sekunder,
               title: t.relaxedTitle,
               subtitle: t.relaxedSub,
-              price: rc.scrollBundleSantai,
+              badge: context.s.toko.coinsPrice(rc.scrollBundleSantai),
               onTap: () => _beliBundelSantai(context, rc.scrollBundleSantai),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.md),
             _BundleRow(
-              icon: Icons.star_rounded,
-              iconColor: AppColors.aksenHangat,
               title: t.allSocialTitle,
               subtitle: t.allSocialSub,
-              price: rc.scrollBundleSosmed,
-              badge: t.saveBadge(rc.scrollBundleSosmedDiscountPercent),
+              badge: '${t.saveBadge(rc.scrollBundleSosmedDiscountPercent)} · ${context.s.toko.coinsPrice(rc.scrollBundleSosmed)}',
               highlight: true,
               onTap: () => _beliBundelSosmed(context, rc.scrollBundleSosmed),
             ),
@@ -233,8 +228,9 @@ class AppBekuTokoSection extends StatelessWidget {
   }
 }
 
-class _UnlockRow extends StatelessWidget {
-  const _UnlockRow({required this.minutes, required this.price, required this.onTap});
+/// Opsi buka waktu (frame `Opsi …`): durasi besar, sub, harga koin.
+class _UnlockOption extends StatelessWidget {
+  const _UnlockOption({required this.minutes, required this.price, required this.onTap});
 
   final int minutes;
   final int price;
@@ -242,141 +238,63 @@ class _UnlockRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return RiungGlassCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(color: AppColors.primer.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(12)),
-              alignment: Alignment.center,
-              child: const Icon(Icons.center_focus_strong_rounded, size: 19, color: AppColors.primer),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(context.s.appbeku.minutesFull(minutes), style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                  Text(context.s.appbeku.forOneApp, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              decoration: BoxDecoration(
-                color: AppColors.kartu,
-                border: Border.all(color: AppColors.garis),
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.monetization_on, size: 13, color: AppColors.aksenHangat),
-                  const SizedBox(width: 4),
-                  Text('$price', style: AppTextStyles.chipLabel.copyWith(color: AppColors.aksenHangat, fontSize: 13)),
-                ],
-              ),
-            ),
-          ],
-        ),
+      radius: 24,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FittedBox(fit: BoxFit.scaleDown, child: Text(context.s.appbeku.minutesFull(minutes), style: AppTextStyles.title.copyWith(fontSize: 20, height: 1.2))),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Text(context.s.appbeku.forOneApp, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.3, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+          ),
+          KoinPricePill(label: context.s.toko.coinsPrice(price)),
+        ],
       ),
     );
   }
 }
 
+/// Bundel (frame `Bundel …`): judul, sub, badge harga di kanan.
 class _BundleRow extends StatelessWidget {
-  const _BundleRow({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.price,
-    required this.onTap,
-    this.badge,
-    this.highlight = false,
-  });
+  const _BundleRow({required this.title, required this.subtitle, required this.badge, required this.onTap, this.highlight = false});
 
-  final IconData icon;
-  final Color iconColor;
   final String title;
   final String subtitle;
-  final int price;
+  final String badge;
   final VoidCallback onTap;
-  final String? badge;
   final bool highlight;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return RiungGlassCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: highlight ? AppColors.aksenHangat.withValues(alpha: 0.08) : AppColors.permukaan,
-          border: Border.all(color: highlight ? AppColors.aksenHangat : AppColors.garis, width: highlight ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            if (badge != null)
-              Positioned(
-                top: -21,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(color: AppColors.aksenHangat, borderRadius: BorderRadius.circular(AppRadius.pill)),
-                  child: Text(badge!, style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-                ),
-              ),
-            Row(
+      radius: 22,
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(color: iconColor.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(12)),
-                  alignment: Alignment.center,
-                  child: Icon(icon, size: 19, color: iconColor),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                      Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45)),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: AppColors.kartu,
-                    border: Border.all(color: AppColors.garis),
-                    borderRadius: BorderRadius.circular(11),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.monetization_on, size: 13, color: AppColors.aksenHangat),
-                      const SizedBox(width: 4),
-                      Text('$price', style: AppTextStyles.chipLabel.copyWith(color: AppColors.aksenHangat, fontSize: 13)),
-                    ],
-                  ),
-                ),
+                Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.3, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
               ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: highlight ? AppColors.aksenHangatLembut : AppColors.permukaanPadat.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+            ),
+            child: Text(badge, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: highlight ? AppColors.aksenHangatGelap : AppColors.teksUtama)),
+          ),
+        ],
       ),
     );
   }

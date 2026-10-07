@@ -18,7 +18,7 @@ class MoodSparkline extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 84,
+          height: 120,
           width: double.infinity,
           child: CustomPaint(painter: _SparklinePainter(days)),
         ),
@@ -28,7 +28,7 @@ class MoodSparkline extends StatelessWidget {
             children: [
               for (final l in labels)
                 Expanded(
-                  child: Text(l, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 10)),
+                  child: Text(l, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
                 ),
             ],
           ),
@@ -38,6 +38,8 @@ class MoodSparkline extends StatelessWidget {
   }
 }
 
+/// Batang suasana hati (frame `Batang` di `Glass — Laporan`): batang kaca
+/// putih per hari, hari terakhir bergradien primer.
 class _SparklinePainter extends CustomPainter {
   _SparklinePainter(this.days);
 
@@ -45,57 +47,29 @@ class _SparklinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final guide = Paint()
-      ..color = AppColors.garis
-      ..strokeWidth = 1;
-    for (final v in [1.0, 3.0, 5.0]) {
-      final y = _y(v, size);
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), guide);
-    }
     final n = days.length;
-    double x(int i) => n == 1 ? size.width / 2 : size.width * (i + 0.5) / n;
-
-    final line = Paint()
-      ..color = AppColors.primer
+    if (n == 0) return;
+    final slot = size.width / n;
+    final barW = (slot * 0.72).clamp(3.0, 38.0);
+    final radius = Radius.circular((barW / 3).clamp(2.0, 12.0));
+    final edge = Paint()
+      ..color = AppColors.garis
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    var path = Path();
-    var open = false;
+      ..strokeWidth = 1;
     for (var i = 0; i < n; i++) {
       final mood = days[i].mood;
-      if (mood == null) {
-        if (open) canvas.drawPath(path, line);
-        path = Path();
-        open = false;
-        continue;
-      }
-      final p = Offset(x(i), _y(mood, size));
-      if (open) {
-        path.lineTo(p.dx, p.dy);
-      } else {
-        path.moveTo(p.dx, p.dy);
-        open = true;
-      }
+      final h = mood == null ? 6.0 : 10 + (mood - 1) / 4 * (size.height - 10);
+      final rect = Rect.fromLTWH(slot * i + (slot - barW) / 2, size.height - h, barW, h);
+      final rrect = RRect.fromRectAndRadius(rect, radius);
+      final last = i == n - 1 && mood != null;
+      canvas.drawRRect(
+        rrect,
+        last
+            ? (Paint()..shader = const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.kabutSage, AppColors.primer]).createShader(rect))
+            : (Paint()..color = mood == null ? AppColors.permukaan.withValues(alpha: 0.4) : AppColors.permukaan),
+      );
+      canvas.drawRRect(rrect, edge);
     }
-    if (open) canvas.drawPath(path, line);
-
-    final dot = Paint()..color = AppColors.primer;
-    final ring = Paint()..color = AppColors.permukaan;
-    final radius = n > 14 ? 2.5 : 4.5;
-    for (var i = 0; i < n; i++) {
-      final mood = days[i].mood;
-      if (mood == null) continue;
-      final p = Offset(x(i), _y(mood, size));
-      canvas.drawCircle(p, radius + 1.5, ring);
-      canvas.drawCircle(p, radius, dot);
-    }
-  }
-
-  double _y(double mood, Size size) {
-    const pad = 8.0;
-    return pad + (5 - mood) / 4 * (size.height - 2 * pad);
   }
 
   @override

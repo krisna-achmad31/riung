@@ -4,6 +4,7 @@ import '../../../core/models/models.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../widgets/pin_pad.dart';
 import 'jurnal_pin_setup_screen.dart';
 
@@ -75,7 +76,6 @@ class _JurnalPinRecoverScreenState extends State<JurnalPinRecoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
@@ -85,25 +85,24 @@ class _JurnalPinRecoverScreenState extends State<JurnalPinRecoverScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(false),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
+                  RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop(false)),
                 ],
               ),
-              Container(
-                width: 74,
-                height: 74,
-                decoration: BoxDecoration(
-                  color: AppColors.sekunder.withValues(alpha: 0.12),
-                  border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.3)),
-                  borderRadius: BorderRadius.circular(24),
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                    ),
+                    const RiungIcon3D(RiungIcon.jurnal, size: 100),
+                  ],
                 ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.restore_rounded, size: 34, color: AppColors.sekunder),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(context.s.jurnal.pinOldTitle, style: AppTextStyles.title.copyWith(fontSize: 21)),
+              Text(context.s.jurnal.pinOldTitle, style: AppTextStyles.display.copyWith(fontSize: 24)),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 context.s.jurnal.pinOldSub,
@@ -118,7 +117,7 @@ class _JurnalPinRecoverScreenState extends State<JurnalPinRecoverScreen> {
               ],
               const SizedBox(height: AppSpacing.xl),
               SizedBox(
-                width: 236,
+                width: 300,
                 child: PinNumpad(onDigit: _onDigit, onBackspace: _onBackspace),
               ),
               const SizedBox(height: AppSpacing.lg),

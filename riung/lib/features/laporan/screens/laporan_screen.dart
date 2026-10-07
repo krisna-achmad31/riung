@@ -4,6 +4,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/services/services.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../toko/screens/paywall_premium_screen.dart';
 import '../logic/report_config.dart';
 import '../logic/report_engine.dart';
@@ -146,84 +147,38 @@ class _LaporanScreenState extends State<LaporanScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.title, style: AppTextStyles.subtitle.copyWith(fontSize: 16)),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.title),
+              const SizedBox(height: AppSpacing.md),
+              RiungSegmentedTabs(
+                labels: [t.weekTab, premium ? t.monthTab : '${t.monthTab} 🔒'],
+                index: _monthly ? 1 : 0,
+                onChanged: (i) => setState(() => _monthly = i == 1),
               ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                children: [
-                  Row(
-                    children: [
-                      _TabChip(label: t.weekTab, selected: !_monthly, onTap: () => setState(() => _monthly = false)),
-                      const SizedBox(width: AppSpacing.sm),
-                      _TabChip(label: t.monthTab, selected: _monthly, locked: !premium, onTap: () => setState(() => _monthly = true)),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  content,
-                  const SizedBox(height: AppSpacing.lg),
-                  SleepConnectCard(
-                    connected: sleepEnabled,
-                    busy: _sleepBusy,
-                    noData: sleepEnabled && _sleepMinutes.isEmpty && _entries != null,
-                    onConnect: _connectSleep,
-                    onDisconnect: _disconnectSleep,
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(t.disclaimer, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 10, height: 1.5)),
-                  const SizedBox(height: AppSpacing.xl),
-                ],
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xxl),
+                  children: [
+                    content,
+                    const SizedBox(height: AppSpacing.md),
+                    SleepConnectCard(
+                      connected: sleepEnabled,
+                      busy: _sleepBusy,
+                      noData: sleepEnabled && _sleepMinutes.isEmpty && _entries != null,
+                      onConnect: _connectSleep,
+                      onDisconnect: _disconnectSleep,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(t.disclaimer, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45, color: AppColors.teksRedup)),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabChip extends StatelessWidget {
-  const _TabChip({required this.label, required this.selected, required this.onTap, this.locked = false});
-
-  final String label;
-  final bool selected;
-  final bool locked;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primer : Colors.transparent,
-          border: Border.all(color: selected ? AppColors.primer : AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label, style: AppTextStyles.chipLabel.copyWith(fontSize: 12, color: selected ? AppColors.latar : AppColors.teksSekunder)),
-            if (locked) ...[
-              const SizedBox(width: 4),
-              Icon(Icons.lock_rounded, size: 12, color: selected ? AppColors.latar : AppColors.teksRedup),
             ],
-          ],
+          ),
         ),
       ),
     );

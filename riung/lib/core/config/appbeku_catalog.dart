@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
 
@@ -13,6 +13,8 @@ class AppBekuCatalogEntry {
     required this.name,
     required this.tile,
     required this.tileColor,
+    required this.icon,
+    this.tileColorEnd,
     this.avgMinutesPerDay,
   });
 
@@ -20,6 +22,14 @@ class AppBekuCatalogEntry {
   final String name;
   final String tile;
   final Color tileColor;
+
+  /// Ujung gradien tile (Instagram); null = warna rata.
+  final Color? tileColorEnd;
+
+  /// Ikon garis putih di tile kaca (frame `App …`).
+  final IconData icon;
+
+  List<Color> get tileColors => [tileColor, tileColorEnd ?? tileColor];
 
   /// Rata-rata pemakaian nasional (menit/hari) — cuma konteks di kartu, bukan
   /// data user; kalimatnya per bahasa (`AppbekuStrings.appUsageAverage`).
@@ -32,7 +42,9 @@ abstract final class AppBekuCatalog {
     packageName: 'com.instagram.android',
     name: 'Instagram',
     tile: 'Ig',
-    tileColor: AppColors.error,
+    tileColor: AppColors.appInstagramAwal,
+    tileColorEnd: AppColors.appInstagramAkhir,
+    icon: Icons.camera_alt_outlined,
     avgMinutesPerDay: 126,
   );
 
@@ -40,7 +52,8 @@ abstract final class AppBekuCatalog {
     packageName: 'com.zhiliaoapp.musically',
     name: 'TikTok',
     tile: 'TT',
-    tileColor: AppColors.sekunder,
+    tileColor: AppColors.appTiktok,
+    icon: Icons.music_note_rounded,
     avgMinutesPerDay: 84,
   );
 
@@ -48,7 +61,8 @@ abstract final class AppBekuCatalog {
     packageName: 'com.google.android.youtube',
     name: 'YouTube',
     tile: 'YT',
-    tileColor: AppColors.error,
+    tileColor: AppColors.appYoutube,
+    icon: Icons.play_arrow_rounded,
     avgMinutesPerDay: 56,
   );
 
@@ -56,7 +70,8 @@ abstract final class AppBekuCatalog {
     packageName: 'com.twitter.android',
     name: 'X',
     tile: 'X',
-    tileColor: AppColors.teksSekunder,
+    tileColor: AppColors.appX,
+    icon: Icons.alternate_email_rounded,
     avgMinutesPerDay: 31,
   );
 
@@ -65,6 +80,7 @@ abstract final class AppBekuCatalog {
     name: 'Mobile Legends',
     tile: 'ML',
     tileColor: AppColors.aksenHangat,
+    icon: Icons.sports_esports_outlined,
     avgMinutesPerDay: 48,
   );
 
@@ -74,7 +90,8 @@ abstract final class AppBekuCatalog {
     packageName: 'com.whatsapp',
     name: 'WhatsApp',
     tile: 'WA',
-    tileColor: AppColors.sukses,
+    tileColor: AppColors.appWhatsapp,
+    icon: Icons.chat_bubble_outline_rounded,
   );
 
   /// Sosmed (dipakai bundel "Semua sosmed" di Toko).

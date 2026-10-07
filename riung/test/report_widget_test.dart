@@ -26,7 +26,7 @@ void main() {
     await tester.pumpWidget(LanguageScope(
       notifier: LanguageNotifier(prefs: prefs),
       child: MaterialApp(
-        theme: AppTheme.dark,
+        theme: AppTheme.light,
         home: Scaffold(body: SingleChildScrollView(padding: const EdgeInsets.all(20), child: ReportBody(report: report, premium: premium))),
       ),
     ));

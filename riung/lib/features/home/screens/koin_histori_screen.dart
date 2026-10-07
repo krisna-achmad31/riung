@@ -38,33 +38,45 @@ class _KoinHistoriScreenState extends State<KoinHistoriScreen> {
   @override
   Widget build(BuildContext context) {
     final transactions = _transactions;
+    final scope = AppScope.of(context);
+    final t = context.s.home;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.historyTitle),
+              const SizedBox(height: AppSpacing.md),
+              ListenableBuilder(
+                listenable: scope.wallet,
+                builder: (context, _) => RiungGlassCard(
+                  radius: 30,
+                  color: AppColors.permukaan,
+                  child: Row(
+                    children: [
+                      const RiungIcon3D(RiungIcon.koin, size: 72),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${scope.wallet.coins}', style: AppTextStyles.display.copyWith(fontSize: 36, height: 1.15)),
+                          Text(t.coinsUnit, style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
+                        ],
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: Text(context.s.home.historyTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
-                  ),
-                ],
+                ),
               ),
-            ),
-            Expanded(
-              child: transactions == null
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
-                  : transactions.isEmpty
-                      ? const _EmptyHistori()
-                      : _HistoriList(transactions: transactions),
-            ),
-          ],
+              Expanded(
+                child: transactions == null
+                    ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
+                    : transactions.isEmpty
+                        ? const _EmptyHistori()
+                        : _HistoriList(transactions: transactions),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -115,17 +127,17 @@ class _HistoriList extends StatelessWidget {
       groups.putIfAbsent(key, () => []).add(tx);
     }
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xl),
+    return RiungBleedListView(
+      padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.xxl),
       children: [
         for (final key in order) ...[
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-            child: Text(_labelForDate(context, groups[key]!.first.createdAt), style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700)),
+            padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
+            child: Text(_labelForDate(context, groups[key]!.first.createdAt), style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
           ),
           for (final tx in groups[key]!)
             Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
               child: _TransactionRow(tx: tx),
             ),
         ],
@@ -146,7 +158,7 @@ class _HistoriList extends StatelessWidget {
 class _TransactionInfo {
   const _TransactionInfo(this.label, this.icon);
   final String label;
-  final IconData icon;
+  final RiungIcon icon;
 }
 
 String _labelOfReason(HomeStrings t, String key) {
@@ -182,31 +194,33 @@ String _labelOfReason(HomeStrings t, String key) {
 }
 
 /// Cocok prefix `reason` (mis. `meditasi:sesi_id` → `meditasi`) ke label &
-/// ikon yang enak dibaca. Prefix diambil dari string `reason` sungguhan
-/// yang dipakai di seluruh app (grep `reason: '...'`), bukan dikarang.
-const Map<String, IconData> _reasonPrefixIcon = {
-  'daily_checkin': Icons.wb_sunny_outlined,
-  'jurnal': Icons.edit_note,
-  'meditasi': Icons.self_improvement,
-  'minigame_win': Icons.sports_esports_outlined,
-  'betterme': Icons.psychology_outlined,
-  'monster_tamed': Icons.emoji_events_outlined,
-  'focus_': Icons.center_focus_strong,
-  'prepaid_focus_sessions': Icons.confirmation_number_outlined,
-  'purchase': Icons.add_card_outlined,
-  'cosmetic': Icons.checkroom_outlined,
-  'streak_shield': Icons.shield_outlined,
-  'scroll_unlock': Icons.lock_open_outlined,
-  'misi_harian': Icons.task_alt,
+/// ikon 3D. Prefix diambil dari string `reason` sungguhan yang dipakai di
+/// seluruh app (grep `reason: '...'`), bukan dikarang.
+const Map<String, RiungIcon> _reasonPrefixIcon = {
+  'daily_checkin': RiungIcon.checkin,
+  'jurnal': RiungIcon.jurnal,
+  'meditasi': RiungIcon.meditasi,
+  'minigame_win': RiungIcon.tiket,
+  'betterme': RiungIcon.kepribadian,
+  'monster_tamed': RiungIcon.premium,
+  'focus_': RiungIcon.fokus,
+  'prepaid_focus_sessions': RiungIcon.fokus,
+  'purchase': RiungIcon.koin,
+  'cosmetic': RiungIcon.premium,
+  'streak_shield': RiungIcon.pelindung,
+  'scroll_unlock': RiungIcon.aplikasiBeku,
+  'misi_harian': RiungIcon.streak,
 };
 
 _TransactionInfo _infoForReason(HomeStrings t, String reason, bool isEarn) {
   for (final entry in _reasonPrefixIcon.entries) {
     if (reason.startsWith(entry.key)) return _TransactionInfo(_labelOfReason(t, entry.key), entry.value);
   }
-  return _TransactionInfo(isEarn ? t.coinIn : t.coinOut, isEarn ? Icons.add_circle_outline : Icons.remove_circle_outline);
+  return _TransactionInfo(isEarn ? t.coinIn : t.coinOut, RiungIcon.koin);
 }
 
+/// Baris transaksi (frame `Transaksi …`): thumbnail ikon 3D, label, waktu,
+/// nilai (+ primer / − persik tua).
 class _TransactionRow extends StatelessWidget {
   const _TransactionRow({required this.tx});
 
@@ -214,37 +228,36 @@ class _TransactionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = _infoForReason(context.s.home, tx.reason, tx.isEarn);
-    final color = tx.isEarn ? AppColors.sukses : AppColors.teksSekunder;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
+    final t = context.s.home;
+    final info = _infoForReason(t, tx.reason, tx.isEarn);
+    return RiungGlassCard(
+      radius: 20,
+      padding: const EdgeInsets.all(12),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(13)),
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(14)),
             alignment: Alignment.center,
-            child: Icon(info.icon, size: 19, color: color),
+            child: RiungIcon3D(info.icon, size: 38),
           ),
-          const SizedBox(width: AppSpacing.md),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(info.label, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-                Text(DateFormat('HH:mm').format(tx.createdAt), style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                Text(info.label, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+                Text(
+                  '${tx.isEarn ? t.coinIn : t.coinOut} · ${DateFormat('HH.mm').format(tx.createdAt)}',
+                  style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup),
+                ),
               ],
             ),
           ),
           Text(
-            '${tx.isEarn ? '+' : '-'}${tx.amount}',
-            style: AppTextStyles.chipLabel.copyWith(color: color, fontWeight: FontWeight.w700, fontSize: 14),
+            '${tx.isEarn ? '+' : '−'}${tx.amount}',
+            style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: tx.isEarn ? AppColors.primer : AppColors.aksenHangatGelap),
           ),
         ],
       ),

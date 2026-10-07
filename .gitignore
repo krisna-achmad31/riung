@@ -9,3 +9,4 @@ riung/android/local.properties
 
 # Crop perantara aset 3D (dibuat ulang dari generated-*.png)
 design/aset3d/
+design/aset3d_cut/_asli/

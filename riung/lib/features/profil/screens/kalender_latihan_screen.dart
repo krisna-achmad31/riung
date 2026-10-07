@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 
 /// Kalender latihan bulanan — 3 state netral dari data sungguhan
 /// (check-in & entri jurnal), tidak ada state "gagal"/merah. Implement
@@ -63,107 +64,80 @@ class _KalenderLatihanScreenState extends State<KalenderLatihanScreen> {
     final leadingBlanks = firstOfMonth.weekday - 1;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Expanded(child: Text(t.calendarScreenTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15))),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.calendarScreenTitle),
+              Expanded(
+                child: _loading
+                    ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
+                    : RiungBleedListView(
+                        padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xl),
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                onPressed: () => setState(() => _bulan = DateTime(_bulan.year, _bulan.month - 1)),
-                                icon: const Icon(Icons.chevron_left_rounded, color: AppColors.teksRedup),
-                              ),
-                              Text('${t.monthNames[_bulan.month - 1]} ${_bulan.year}', style: AppTextStyles.title.copyWith(fontSize: 16)),
-                              IconButton(
-                                onPressed: () => setState(() => _bulan = DateTime(_bulan.year, _bulan.month + 1)),
-                                icon: const Icon(Icons.chevron_right_rounded, color: AppColors.teksRedup),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              ListenableBuilder(
-                                listenable: scope.streak,
-                                builder: (context, _) => _StatBox(
-                                  icon: Icons.local_fire_department,
-                                  color: AppColors.aksenHangat,
-                                  value: t.daysCount(scope.streak.current),
-                                  label: t.streakNow,
+                          ListenableBuilder(
+                            listenable: scope.streak,
+                            builder: (context, _) => Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _StatBox(
+                                    leading: const RiungIcon3D(RiungIcon.streak, size: 28),
+                                    value: t.daysCount(scope.streak.current),
+                                    label: t.streakNow,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              ListenableBuilder(
-                                listenable: scope.streak,
-                                builder: (context, _) => _StatBox(
-                                  icon: Icons.star_rounded,
-                                  color: AppColors.monsterCermin,
-                                  value: t.daysCount(scope.streak.longest),
-                                  label: t.streakBest,
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              _StatBox(
-                                icon: Icons.calendar_today_rounded,
-                                color: AppColors.sekunder,
-                                value: '$daysThisWeekPracticed/7',
-                                label: t.thisWeek,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          Container(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            decoration: BoxDecoration(
-                              color: AppColors.permukaan,
-                              border: Border.all(color: AppColors.garis),
-                              borderRadius: BorderRadius.circular(AppRadius.xxl),
+                                const SizedBox(width: 10),
+                                Expanded(child: _StatBox(value: t.daysCount(scope.streak.longest), label: t.streakBest)),
+                                const SizedBox(width: 10),
+                                Expanded(child: _StatBox(value: t.daysCount(daysThisWeekPracticed), label: t.thisWeek)),
+                              ],
                             ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          RiungGlassCard(
+                            radius: 28,
+                            padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
                                 Row(
                                   children: [
+                                    _MonthArrow(icon: Icons.chevron_left_rounded, onTap: () => setState(() => _bulan = DateTime(_bulan.year, _bulan.month - 1))),
+                                    Expanded(
+                                      child: Text(
+                                        '${t.monthNames[_bulan.month - 1]} ${_bulan.year}',
+                                        textAlign: TextAlign.center,
+                                        style: AppTextStyles.title.copyWith(fontSize: 15),
+                                      ),
+                                    ),
+                                    _MonthArrow(icon: Icons.chevron_right_rounded, onTap: () => setState(() => _bulan = DateTime(_bulan.year, _bulan.month + 1))),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
                                     for (final wd in t.weekdayShort)
                                       Expanded(
-                                        child: Text(wd, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700)),
+                                        child: Text(wd, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.teksRedup)),
                                       ),
                                   ],
                                 ),
-                                const SizedBox(height: AppSpacing.sm),
+                                const SizedBox(height: 10),
                                 GridView.count(
                                   crossAxisCount: 7,
                                   shrinkWrap: true,
+                                  padding: EdgeInsets.zero,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  mainAxisSpacing: 6,
-                                  crossAxisSpacing: 6,
-                                  childAspectRatio: 0.95,
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 4,
+                                  childAspectRatio: 42 / 38,
                                   children: [
                                     for (var i = 0; i < leadingBlanks; i++) const SizedBox.shrink(),
                                     for (var d = 1; d <= daysInMonth; d++)
                                       _DayCell(
                                         day: d,
                                         isToday: DateTime(_bulan.year, _bulan.month, d) == today,
-                                        isFuture: DateTime(_bulan.year, _bulan.month, d).isAfter(today),
                                         checkin: _tanggalCheckin.contains(DateTime(_bulan.year, _bulan.month, d)),
                                         jurnal: _tanggalJurnal.contains(DateTime(_bulan.year, _bulan.month, d)),
                                       ),
@@ -172,47 +146,46 @@ class _KalenderLatihanScreenState extends State<KalenderLatihanScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.lg),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            decoration: BoxDecoration(
-                              color: AppColors.permukaan,
-                              border: Border.all(color: AppColors.garis),
-                              borderRadius: BorderRadius.circular(AppRadius.xl),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _LegendRow(color: AppColors.sekunder, label: t.legendFull),
-                                _LegendRow(color: AppColors.primer.withValues(alpha: 0.22), border: AppColors.primer.withValues(alpha: 0.35), label: t.legendPracticed),
-                                _LegendRow(color: Colors.transparent, border: AppColors.garis, label: t.legendEmpty),
-                              ],
-                            ),
-                          ),
                           const SizedBox(height: AppSpacing.md),
-                          Text(
-                            t.calendarNote,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.caption.copyWith(fontSize: 11),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
+                          _LegendRow(color: AppColors.primer, label: t.legendFull),
+                          _LegendRow(color: AppColors.primerLembut, label: t.legendPracticed),
+                          _LegendRow(color: AppColors.permukaan, label: t.legendEmpty),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(t.calendarNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, fontWeight: FontWeight.w600, color: AppColors.primer)),
                         ],
                       ),
-                    ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+class _MonthArrow extends StatelessWidget {
+  const _MonthArrow({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(padding: const EdgeInsets.all(4), child: Icon(icon, size: 18, color: AppColors.teksSekunder)),
+    );
+  }
+}
+
+/// Sel tanggal (frame `Tgl`): penuh = primer, latihan = primer lembut,
+/// kosong = kaca tipis. Tidak ada state "gagal".
 class _DayCell extends StatelessWidget {
-  const _DayCell({required this.day, required this.isToday, required this.isFuture, required this.checkin, required this.jurnal});
+  const _DayCell({required this.day, required this.isToday, required this.checkin, required this.jurnal});
 
   final int day;
   final bool isToday;
-  final bool isFuture;
   final bool checkin;
   final bool jurnal;
 
@@ -220,83 +193,63 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final penuh = checkin && jurnal;
     final latihan = checkin || jurnal;
-    final bg = penuh ? AppColors.sekunder : (latihan ? AppColors.primer.withValues(alpha: 0.22) : Colors.transparent);
-    final border = isToday
-        ? AppColors.teksUtama
-        : isFuture
-            ? AppColors.kartu
-            : penuh
-                ? AppColors.sekunder
-                : latihan
-                    ? AppColors.primer.withValues(alpha: 0.35)
-                    : AppColors.garis;
-    final textColor = penuh ? AppColors.latar : (isFuture ? AppColors.kartu : AppColors.teksSekunder);
-
+    final bg = penuh ? AppColors.primer : (latihan ? AppColors.primerLembut : AppColors.kartu);
+    final textColor = penuh ? AppColors.diAtasTinta : (latihan ? AppColors.primer : AppColors.teksRedup);
     return Container(
       decoration: BoxDecoration(
         color: bg,
-        border: Border.all(color: border, width: isToday ? 1.5 : 1),
+        border: isToday ? Border.all(color: AppColors.tinta, width: 1.5) : null,
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
-      child: Text(
-        '$day',
-        style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: penuh ? FontWeight.w800 : FontWeight.w500, color: textColor),
-      ),
+      child: Text('$day', style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: textColor)),
     );
   }
 }
 
 class _StatBox extends StatelessWidget {
-  const _StatBox({required this.icon, required this.color, required this.value, required this.label});
+  const _StatBox({required this.value, required this.label, this.leading});
 
-  final IconData icon;
-  final Color color;
+  final Widget? leading;
   final String value;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(height: 4),
-            Text(value, style: AppTextStyles.chipLabel.copyWith(fontSize: 15)),
-            Text(label, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 10)),
-          ],
-        ),
+    return RiungGlassCard(
+      radius: 22,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (leading != null) ...[leading!, const SizedBox(height: 2)],
+          FittedBox(fit: BoxFit.scaleDown, child: Text(value, style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.2))),
+          const SizedBox(height: 2),
+          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 10, color: AppColors.teksSekunder)),
+        ],
       ),
     );
   }
 }
 
 class _LegendRow extends StatelessWidget {
-  const _LegendRow({required this.color, required this.label, this.border});
+  const _LegendRow({required this.color, required this.label});
 
   final Color color;
-  final Color? border;
   final String label;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
           Container(
             width: 16,
             height: 16,
-            decoration: BoxDecoration(color: color, border: Border.all(color: border ?? Colors.transparent), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: color, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(5)),
           ),
-          const SizedBox(width: AppSpacing.sm),
+          const SizedBox(width: 8),
           Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
         ],
       ),

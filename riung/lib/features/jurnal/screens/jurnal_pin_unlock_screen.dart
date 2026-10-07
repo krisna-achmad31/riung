@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../widgets/pin_pad.dart';
 
 /// Verifikasi PIN sebelum membuka jurnal. Menawarkan biometrik kalau
@@ -74,7 +75,6 @@ class _JurnalPinUnlockScreenState extends State<JurnalPinUnlockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
@@ -84,25 +84,24 @@ class _JurnalPinUnlockScreenState extends State<JurnalPinUnlockScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(false),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
+                  RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop(false)),
                 ],
               ),
-              Container(
-                width: 74,
-                height: 74,
-                decoration: BoxDecoration(
-                  color: AppColors.primer.withValues(alpha: 0.12),
-                  border: Border.all(color: AppColors.primer.withValues(alpha: 0.3)),
-                  borderRadius: BorderRadius.circular(24),
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                    ),
+                    const RiungIcon3D(RiungIcon.jurnal, size: 100),
+                  ],
                 ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.lock_outline, size: 34, color: AppColors.primer),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(context.s.jurnal.pinEnter, style: AppTextStyles.title.copyWith(fontSize: 21)),
+              Text(context.s.jurnal.pinEnter, style: AppTextStyles.display.copyWith(fontSize: 24)),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 context.s.jurnal.pinEnterSub,
@@ -117,7 +116,7 @@ class _JurnalPinUnlockScreenState extends State<JurnalPinUnlockScreen> {
               ],
               const SizedBox(height: AppSpacing.xl),
               SizedBox(
-                width: 236,
+                width: 300,
                 child: PinNumpad(onDigit: _onDigit, onBackspace: _onBackspace),
               ),
               if (_biometricAvailable) ...[

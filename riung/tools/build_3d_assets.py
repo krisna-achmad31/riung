@@ -1,11 +1,13 @@
 """Bangun aset 3D (WebP) untuk Flutter dari hasil desain Riung Glass.
 
-Sumber : ../design/aset3d_cut/  (PNG ber-alpha hasil potong latar)
+Sumber : ../design/aset3d_cut/  (PNG ber-alpha hasil potong latar, TANPA bayangan lantai —
+         bayangan digambar di Flutter oleh RiungGroundShadow; cadangan potongan lama di _asli/)
 Keluaran:
   assets/monsters/3d/<monster>_<liar|jinak>.webp   kanvas persegi 512, garis lantai seragam
   assets/monsters/3d/<kosmetik>.webp               kosmetik ter-crop rapat
   assets/characters/<kode>.webp                    karakter kepribadian, kanvas persegi 512
   assets/characters/accessories/<id>.webp          aksesori karakter yang punya versi 3D
+  assets/icons/<nama>.webp                         ikon 3D Riung Glass (kanvas persegi 192)
 
 Jalankan dari folder `riung/`:  python tools/build_3d_assets.py
 Skrip ini juga mencetak metrik badan (bbox ternormalisasi) sebagai dasar
@@ -21,6 +23,8 @@ SRC = os.path.join('..', 'design', 'aset3d_cut')
 MON_OUT = os.path.join('assets', 'monsters', '3d')
 CHAR_OUT = os.path.join('assets', 'characters')
 ACC_OUT = os.path.join(CHAR_OUT, 'accessories')
+ICON_OUT = os.path.join('assets', 'icons')
+ICON_SIZE = 192
 
 CANVAS = 512
 # Subjek dimuat ke kotak 88% kanvas, dasarnya di 96% tinggi (garis lantai sama
@@ -70,10 +74,17 @@ CHAR_ACCESSORIES = {
 }
 
 
+# Ikon 3D (ikon_<nama>.png) -> assets/icons/<nama>.webp, dipusatkan di kanvas persegi.
+ICONS = [
+    'afirmasi', 'aplikasi_beku', 'bantuan', 'beranda', 'checkin', 'fokus', 'jurnal', 'kepribadian',
+    'koin', 'laporan', 'meditasi', 'pelindung', 'premium', 'streak', 'tidur', 'tiket',
+]
+
+
 # bingkai_emas (slot "none", khusus Cermin): di-precompose ke kanvas penuh per
 # wujud supaya renderer cukup menimpanya 1:1 (CLAUDE.md aturan #7).
 # Nilai = (pusat x, pusat y, lebar) ternormalisasi, mengikuti tepi cermin.
-FRAME_ON_CERMIN = {'jinak': (0.50, 0.535, 0.62), 'liar': (0.415, 0.52, 0.66)}
+FRAME_ON_CERMIN = {'jinak': (0.474, 0.499, 0.781), 'liar': (0.449, 0.521, 0.725)}
 
 
 def body_bbox(im, threshold=190):
@@ -141,6 +152,12 @@ def main():
         im.thumbnail((384, 384), Image.LANCZOS)
         save(im, os.path.join(ACC_OUT, f'{aid}.webp'))
         report['cosmetics'][f'acc_{aid}'] = {'aspect': round(im.width / im.height, 4)}
+    for name in ICONS:
+        im = tight(Image.open(os.path.join(SRC, f'ikon_{name}.png')).convert('RGBA'))
+        im.thumbnail((ICON_SIZE, ICON_SIZE), Image.LANCZOS)
+        canvas = Image.new('RGBA', (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
+        canvas.paste(im, ((ICON_SIZE - im.width) // 2, (ICON_SIZE - im.height) // 2), im)
+        save(canvas, os.path.join(ICON_OUT, f'{name}.webp'))
     print(json.dumps(report, indent=1))
 
 

@@ -13,19 +13,19 @@ class AuthFooterLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
+      padding: const EdgeInsets.only(top: AppSpacing.md),
       child: Center(
         child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: RichText(
             text: TextSpan(
-              style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksRedup),
+              style: AppTextStyles.caption.copyWith(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.teksSekunder),
               children: [
                 TextSpan(text: '$text '),
                 TextSpan(
                   text: actionLabel,
-                  style: const TextStyle(color: AppColors.primer, fontWeight: FontWeight.w600),
+                  style: const TextStyle(color: AppColors.primer, fontWeight: FontWeight.w700),
                 ),
               ],
             ),

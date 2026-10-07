@@ -51,14 +51,14 @@ class _RiungOfflineBannerState extends State<RiungOfflineBanner> {
           child: _offline
               ? Container(
                   width: double.infinity,
-                  color: AppColors.peringatan,
+                  color: AppColors.tinta,
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: SafeArea(
                     bottom: false,
                     child: Text(
                       context.s.common.offlineBanner,
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontWeight: FontWeight.w700, fontSize: 11),
+                      style: AppTextStyles.caption.copyWith(color: AppColors.diAtasTinta, fontWeight: FontWeight.w700, fontSize: 11),
                     ),
                   ),
                 )

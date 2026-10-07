@@ -5,6 +5,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../widgets/focus_ring.dart';
 import '../../home/screens/focus_timer_screen.dart';
 
 class _DurationOption {
@@ -38,128 +39,105 @@ class _FocusModeEntryScreenState extends State<FocusModeEntryScreen> {
     final scope = AppScope.of(context);
     final t = context.s.focus;
     final option = _durations[_selected];
+    final profile = scope.auth.profile;
+    final monsterId = (profile != null && profile.dominantSaboteurs.isNotEmpty) ? profile.dominantSaboteurs.first : 'waswas';
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
+        bottom: false,
         child: ListenableBuilder(
           listenable: scope.wallet,
           builder: (context, _) {
-            final adaGratis = scope.wallet.freeFocusAvailable(premium: scope.auth.profile?.premiumNow ?? false);
+            final adaGratis = scope.wallet.freeFocusAvailable(premium: profile?.premiumNow ?? false);
             final adaSesiPrabayar = scope.wallet.prepaidFocusSessions > 0;
             final cukupKoin = adaGratis || adaSesiPrabayar || scope.wallet.coins >= option.priceCoins;
-            return Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(t.title, style: AppTextStyles.display.copyWith(fontSize: 24)),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(t.subtitle, style: AppTextStyles.body.copyWith(fontSize: 13)),
-                  const SizedBox(height: AppSpacing.lg),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: AppColors.kartu,
-                          border: Border.all(color: AppColors.garis),
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.wifi_off_rounded, size: 14, color: AppColors.sekunder),
-                            const SizedBox(width: 6),
-                            Text(t.worksOffline, style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w700, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: AppColors.kartu,
-                          border: Border.all(color: AppColors.garis),
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.confirmation_number, size: 14, color: AppColors.monsterHakim),
-                            const SizedBox(width: 6),
-                            Text(t.attackTickets(scope.wallet.tickets), style: AppTextStyles.caption.copyWith(color: AppColors.monsterHakim, fontWeight: FontWeight.w700, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                      if (adaSesiPrabayar)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: AppColors.sekunder.withValues(alpha: 0.14),
-                            border: Border.all(color: AppColors.sekunder),
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.local_activity, size: 14, color: AppColors.sekunder),
-                              const SizedBox(width: 6),
-                              Text(
-                                t.prepaidSessions(scope.wallet.prepaidFocusSessions),
-                                style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w700, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  Row(
-                    children: [
-                      for (var i = 0; i < _durations.length; i++)
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: i == _durations.length - 1 ? 0 : AppSpacing.sm),
-                            child: _DurationCard(
-                              minutes: _durations[i].minutes,
-                              priceCoins: _durations[i].priceCoins,
-                              selected: _selected == i,
-                              onTap: () => setState(() => _selected = i),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const Spacer(),
-                  if (!cukupKoin)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                      child: Text(
-                        t.notEnoughCoins,
-                        style: AppTextStyles.caption.copyWith(color: AppColors.error, fontSize: 12, height: 1.5),
+            return ListView(
+              padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(t.title, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2)),
+                          const SizedBox(height: 4),
+                          Text(t.subtitle, style: AppTextStyles.caption.copyWith(fontSize: 13, height: 1.4, color: AppColors.teksSekunder)),
+                        ],
                       ),
                     ),
-                  RiungButton(
-                    label: adaGratis
-                        ? t.startFree(option.minutes)
-                        : adaSesiPrabayar
-                            ? t.startPrepaid(option.minutes)
-                            : t.startPaid(option.minutes, option.priceCoins),
-                    onPressed: cukupKoin
-                        ? () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => FocusTimerScreen(
-                                  duration: Duration(minutes: option.minutes),
-                                  priceCoins: option.priceCoins,
-                                ),
-                              ),
-                            )
-                        : null,
+                    const SizedBox(width: AppSpacing.md),
+                    KoinChip(balance: scope.wallet.coins),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                FocusRing(monsterId: monsterId, time: '${option.minutes}:00', unit: t.minutesUnit, progress: 0.78),
+                const SizedBox(height: AppSpacing.lg),
+                Row(
+                  children: [
+                    for (var i = 0; i < _durations.length; i++) ...[
+                      if (i > 0) const SizedBox(width: 10),
+                      Expanded(
+                        child: _DurationCard(
+                          minutes: _durations[i].minutes,
+                          price: i == 0 && adaGratis ? t.freeToday : t.coinsPrice(_durations[i].priceCoins),
+                          free: i == 0 && adaGratis,
+                          selected: _selected == i,
+                          onTap: () => setState(() => _selected = i),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _InfoPill(icon: Icons.wifi_off_rounded, label: t.worksOffline),
+                    _InfoPill(icon: Icons.confirmation_number_outlined, label: t.attackTickets(scope.wallet.tickets)),
+                    if (adaSesiPrabayar) _InfoPill(icon: Icons.local_activity_outlined, label: t.prepaidSessions(scope.wallet.prepaidFocusSessions)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: AppGlass.card(radius: 22, color: AppColors.kabutSage.withValues(alpha: 0.5), shadowed: false),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.air_rounded, size: 18, color: AppColors.primer),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          t.companionNote(context.s.common.monsterName(monsterId)),
+                          style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.primer),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                if (!cukupKoin)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: Text(t.notEnoughCoins, style: AppTextStyles.caption.copyWith(color: AppColors.error, fontSize: 12, height: 1.5)),
+                  ),
+                RiungButton(
+                  label: adaGratis
+                      ? t.startFree(option.minutes)
+                      : adaSesiPrabayar
+                          ? t.startPrepaid(option.minutes)
+                          : t.startPaid(option.minutes, option.priceCoins),
+                  onPressed: cukupKoin
+                      ? () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => FocusTimerScreen(duration: Duration(minutes: option.minutes), priceCoins: option.priceCoins),
+                            ),
+                          )
+                      : null,
+                ),
+              ],
             );
           },
         ),
@@ -168,44 +146,79 @@ class _FocusModeEntryScreenState extends State<FocusModeEntryScreen> {
   }
 }
 
+class _InfoPill extends StatelessWidget {
+  const _InfoPill({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(color: AppColors.kartu, borderRadius: BorderRadius.circular(AppRadius.pill), border: Border.all(color: AppColors.garis)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppColors.teksSekunder),
+          const SizedBox(width: 6),
+          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Kartu durasi (frame `Durasi …`): angka besar, "menit", pil harga.
 class _DurationCard extends StatelessWidget {
-  const _DurationCard({
-    required this.minutes,
-    required this.priceCoins,
-    required this.selected,
-    required this.onTap,
-  });
+  const _DurationCard({required this.minutes, required this.price, required this.free, required this.selected, required this.onTap});
 
   final int minutes;
-  final int priceCoins;
+  final String price;
+  final bool free;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.sekunder.withValues(alpha: 0.14) : AppColors.permukaan,
-          border: Border.all(color: selected ? AppColors.sekunder : AppColors.garis, width: selected ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-        ),
-        child: Column(
-          children: [
-            Text('$minutes', style: AppTextStyles.title.copyWith(fontSize: 26, color: selected ? AppColors.sekunder : AppColors.teksUtama)),
-            Text(context.s.focus.minutesUnit, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-            const SizedBox(height: AppSpacing.xs),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.monetization_on, size: 12, color: AppColors.aksenHangat),
-                const SizedBox(width: 3),
-                Text('$priceCoins', style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangat, fontWeight: FontWeight.w700, fontSize: 12)),
-              ],
-            ),
-          ],
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.fromLTRB(8, 14, 8, 14),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.permukaanPadat.withValues(alpha: 0.9) : AppColors.kartu,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2 : 1.5),
+          ),
+          child: Column(
+            children: [
+              Text('$minutes', style: AppTextStyles.title.copyWith(fontSize: 26, height: 1.15, color: selected ? AppColors.primer : AppColors.teksUtama)),
+              Text(context.s.focus.minutesUnit, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(color: free ? AppColors.primerLembut : AppColors.permukaan, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!free) ...[const RiungIcon3D(RiungIcon.koin, size: 14), const SizedBox(width: 4)],
+                    Flexible(
+                      child: Text(
+                        price,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: free ? AppColors.primer : AppColors.teksSekunder),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

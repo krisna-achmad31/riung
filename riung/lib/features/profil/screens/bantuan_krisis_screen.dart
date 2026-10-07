@@ -3,10 +3,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 
 class _CrisisLine {
-  const _CrisisLine({required this.name, required this.sub, required this.action, this.url, this.tel});
+  const _CrisisLine({required this.name, required this.sub, required this.action, required this.icon, this.url, this.tel});
   final String name;
+  final IconData icon;
   final String sub;
   final String action;
   final String? url;
@@ -22,9 +24,9 @@ class BantuanKrisisScreen extends StatelessWidget {
   List<_CrisisLine> _lines(BuildContext context) {
     final t = context.s.profil;
     return [
-      _CrisisLine(name: 'SEJIWA', sub: t.sejiwaSub, action: t.actionCall, tel: '1198'),
-      _CrisisLine(name: 'Into The Light Indonesia', sub: t.intoTheLightSub, action: t.actionOpenSite, url: 'https://intothelightid.org'),
-      _CrisisLine(name: 'IPK Indonesia', sub: t.ipkSub, action: t.actionSearch, url: 'https://ipkindonesia.or.id'),
+      _CrisisLine(name: 'SEJIWA', sub: t.sejiwaSub, action: t.actionCall, icon: Icons.phone_outlined, tel: '1198'),
+      _CrisisLine(name: 'Into The Light Indonesia', sub: t.intoTheLightSub, action: t.actionOpenSite, icon: Icons.language_rounded, url: 'https://intothelightid.org'),
+      _CrisisLine(name: 'IPK Indonesia', sub: t.ipkSub, action: t.actionSearch, icon: Icons.search_rounded, url: 'https://ipkindonesia.or.id'),
     ];
   }
 
@@ -36,100 +38,93 @@ class BantuanKrisisScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.profil;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.crisisScreenTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.crisisScreenTitle),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xl),
                   children: [
-                    Text(
-                      t.crisisIntro,
-                      style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.6),
+                    SizedBox(
+                      height: 150,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 160,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)]),
+                            ),
+                          ),
+                          const RiungIcon3D(RiungIcon.bantuan, size: 130),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.crisisIntro, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.55, fontWeight: FontWeight.w500, color: AppColors.teksUtama)),
+                    const SizedBox(height: AppSpacing.md),
                     Container(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: AppColors.error.withValues(alpha: 0.1),
-                        border: Border.all(color: AppColors.error.withValues(alpha: 0.4), width: 1.5),
-                        borderRadius: BorderRadius.circular(AppRadius.xxl),
+                        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.aksenHangatLembut, AppColors.aksenHangatMuda]),
+                        border: Border.all(color: AppColors.aksenHangat.withValues(alpha: 0.5), width: AppGlass.edgeWidth),
+                        borderRadius: BorderRadius.circular(28),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(t.crisisEmergencyLabel, style: AppTextStyles.caption.copyWith(color: AppColors.error, fontWeight: FontWeight.w700, fontSize: 12, letterSpacing: 0.6)),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(t.crisisMinistry, style: AppTextStyles.title.copyWith(fontSize: 16)),
+                          Text(t.crisisEmergencyLabel, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangatGelap, fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.5)),
+                          const SizedBox(height: 8),
+                          Text(t.crisisMinistry, style: AppTextStyles.title.copyWith(fontSize: 18)),
                           const SizedBox(height: AppSpacing.md),
-                          SizedBox(
-                            height: 52,
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: () => _telepon('1198'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.error,
-                                foregroundColor: AppColors.latar,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          Material(
+                            color: AppColors.aksenHangatGelap,
+                            shape: const StadiumBorder(),
+                            child: InkWell(
+                              customBorder: const StadiumBorder(),
+                              onTap: () => _telepon('1198'),
+                              child: SizedBox(
+                                height: 54,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.phone_outlined, size: 18, color: AppColors.diAtasTinta),
+                                    const SizedBox(width: 8),
+                                    Text(t.crisisCallButton, style: AppTextStyles.buttonLabel.copyWith(fontSize: 16, color: AppColors.diAtasTinta)),
+                                  ],
+                                ),
                               ),
-                              icon: const Icon(Icons.call_rounded, size: 18),
-                              label: Text(t.crisisCallButton, style: AppTextStyles.buttonLabel.copyWith(fontSize: 16)),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    for (final line in _lines(context)) ...[
-                      _CrisisRow(
-                        line: line,
-                        onTap: () => line.tel != null ? _telepon(line.tel!) : _bukaUrl(line.url!),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                    ],
                     const SizedBox(height: AppSpacing.md),
+                    for (final line in _lines(context)) ...[
+                      _CrisisRow(line: line, onTap: () => line.tel != null ? _telepon(line.tel!) : _bukaUrl(line.url!)),
+                      const SizedBox(height: AppSpacing.md),
+                    ],
                     Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.permukaan,
-                        border: Border.all(color: AppColors.garis),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(color: AppColors.primerLembut.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(18)),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.lock_rounded, size: 16, color: AppColors.sukses),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(
-                              t.crisisPrivacyNote,
-                              style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.55),
-                            ),
-                          ),
+                          const Icon(Icons.visibility_off_outlined, size: 16, color: AppColors.primer),
+                          const SizedBox(width: 10),
+                          Expanded(child: Text(t.crisisPrivacyNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.primer))),
                         ],
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -144,31 +139,39 @@ class _CrisisRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+    return RiungGlassCard(
+      radius: 22,
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(line.name, style: AppTextStyles.chipLabel.copyWith(fontSize: 13)),
+                Text(line.name, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
                 const SizedBox(height: 2),
-                Text(line.sub, style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                Text(line.sub, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: onTap,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-              decoration: BoxDecoration(border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(11)),
-              child: Text(line.action, style: AppTextStyles.chipLabel.copyWith(color: AppColors.primer, fontSize: 12)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.permukaanPadat.withValues(alpha: 0.8),
+                border: Border.all(color: AppColors.garis),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(line.icon, size: 14, color: AppColors.teksUtama),
+                  const SizedBox(width: 6),
+                  Text(line.action, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 12)),
+                ],
+              ),
             ),
           ),
         ],

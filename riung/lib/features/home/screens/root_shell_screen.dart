@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/services/services.dart';
 import '../../../core/state/state.dart';
-import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../appbeku/screens/appbeku_interstitial_screen.dart';
 import '../../appbeku/screens/appbeku_permission_screen.dart';
@@ -127,11 +126,55 @@ class _RootShellScreenState extends State<RootShellScreen> with WidgetsBindingOb
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: IndexedStack(index: _order.indexOf(_tab), children: _bodies),
+      extendBody: true,
+      body: _FadeIndexedStack(index: _order.indexOf(_tab), children: _bodies),
       bottomNavigationBar: RiungBottomNav(
         current: _tab,
         onTabSelected: (tab) => setState(() => _tab = tab),
+      ),
+    );
+  }
+}
+
+/// [IndexedStack] yang memudarkan + menaikkan sedikit tab baru saat pindah
+/// (220ms). State tiap tab tetap utuh; hanya tab aktif yang dianimasikan.
+class _FadeIndexedStack extends StatefulWidget {
+  const _FadeIndexedStack({required this.index, required this.children});
+
+  final int index;
+  final List<Widget> children;
+
+  @override
+  State<_FadeIndexedStack> createState() => _FadeIndexedStackState();
+}
+
+class _FadeIndexedStackState extends State<_FadeIndexedStack> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 220),
+    value: 1,
+  );
+  late final Animation<double> _curve = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+
+  @override
+  void didUpdateWidget(_FadeIndexedStack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.index != widget.index) _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _curve,
+      child: SlideTransition(
+        position: Tween(begin: const Offset(0, 0.015), end: Offset.zero).animate(_curve),
+        child: IndexedStack(index: widget.index, children: widget.children),
       ),
     );
   }

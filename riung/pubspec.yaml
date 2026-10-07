@@ -120,6 +120,8 @@ flutter:
     - assets/monsters/3d/
     - assets/characters/
     - assets/characters/accessories/
+    - assets/icons/
+    - assets/google_fonts/
     - assets/audio/
     - assets/audio/sleep/
     - assets/audio/ambient/

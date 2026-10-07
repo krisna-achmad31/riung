@@ -7,6 +7,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/models/journal_entry.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../logic/journal_prompts.dart';
 import 'jurnal_simpan_screen.dart';
 
@@ -89,67 +90,44 @@ class _JurnalEditorScreenState extends State<JurnalEditorScreen> {
   void _showGagalSimpanSheet(JurnalStrings t) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.permukaan,
       isDismissible: false,
       enableDrag: false,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (sheetContext) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 26),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(width: 44, height: 5, decoration: BoxDecoration(color: AppColors.garis, borderRadius: BorderRadius.circular(AppRadius.pill))),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(color: AppColors.error.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(16)),
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.wifi_off, size: 22, color: AppColors.error),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(t.syncFailedTitle, style: AppTextStyles.title.copyWith(fontSize: 16)),
-                      Text(t.syncFailedSub, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text.rich(
-              TextSpan(
-                style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.55),
-                children: [
-                  TextSpan(text: t.syncFailedPrefix),
-                  TextSpan(text: t.syncFailedSafe, style: AppTextStyles.body.copyWith(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.sukses)),
-                  TextSpan(text: t.syncFailedSuffix),
-                ],
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 110,
+                height: 110,
+                decoration: AppGlass.card(radius: 55, color: AppColors.permukaan),
+                child: const Icon(Icons.cloud_off_rounded, size: 44, color: AppColors.langit),
               ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            SizedBox(
-              height: 50,
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.of(sheetContext).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primer,
-                  foregroundColor: AppColors.latar,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-                ),
-                child: Text(t.syncFailedOk, style: AppTextStyles.chipLabel.copyWith(color: AppColors.latar, fontSize: 14)),
+              const SizedBox(height: AppSpacing.lg),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: AppColors.langitLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                child: Text(t.syncFailedTitle, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.langit)),
               ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              Text(t.syncFailedSub, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2)),
+              const SizedBox(height: AppSpacing.md),
+              Text.rich(
+                TextSpan(
+                  style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, color: AppColors.teksSekunder),
+                  children: [
+                    TextSpan(text: t.syncFailedPrefix),
+                    TextSpan(text: t.syncFailedSafe, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primer)),
+                    TextSpan(text: t.syncFailedSuffix),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              RiungButton(label: t.syncFailedOk, onPressed: () => Navigator.of(sheetContext).pop()),
+            ],
+          ),
         ),
       ),
     );
@@ -164,135 +142,138 @@ class _JurnalEditorScreenState extends State<JurnalEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.s.jurnal;
-    final formatter = DateFormat('EEEE, d MMMM · HH:mm', context.s.dateLocale);
+    final formatter = DateFormat('EEEE, d MMMM · HH.mm', context.s.dateLocale);
     final prompt = widget.prompt;
+    final canFinish = _sentenceCount > 0;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder)),
-                  const Spacer(),
-                  Text(t.autoSaved, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: _sentenceCount > 0 ? _selesai : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: _sentenceCount > 0 ? AppColors.primer : AppColors.garis,
-                        borderRadius: BorderRadius.circular(11),
-                      ),
-                      child: Text(t.done, style: AppTextStyles.chipLabel.copyWith(color: AppColors.latar, fontSize: 13)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 44,
+                child: Row(
                   children: [
-                    if (prompt != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.monsterHakim.withValues(alpha: 0.1),
-                          border: Border.all(color: AppColors.monsterHakim.withValues(alpha: 0.3)),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(width: 34, height: 36, child: Icon(Icons.pest_control, size: 20, color: AppColors.monsterHakim)),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Text.rich(
-                                TextSpan(
-                                  style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45),
-                                  children: [
-                                    TextSpan(text: t.guidePrefix, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.monsterHakim)),
-                                    TextSpan(text: t.prompt(prompt.id).guideQuestion),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-                    Text(formatter.format(_createdAt), style: AppTextStyles.caption.copyWith(fontSize: 12)),
-                    const SizedBox(height: AppSpacing.sm),
-                    TextField(
-                      controller: _controller,
-                      maxLines: null,
-                      minLines: 8,
-                      autofocus: true,
-                      onChanged: (_) => setState(() {}),
-                      style: AppTextStyles.body.copyWith(fontSize: 15, color: AppColors.teksUtama, height: 1.75),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: t.editorHint,
-                        hintStyle: AppTextStyles.body.copyWith(fontSize: 15, color: AppColors.teksRedup),
+                    RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: canFinish ? _selesai : null,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(color: canFinish ? AppColors.tinta : AppColors.kartu, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        alignment: Alignment.center,
+                        child: Text(t.done, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: canFinish ? AppColors.diAtasTinta : AppColors.teksRedup)),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-              decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.garis))),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+              const SizedBox(height: AppSpacing.md),
+              if (prompt != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: AppGlass.card(radius: 22, color: (AppColors.monsterLembut[prompt.monsterId] ?? AppColors.sekunderLembut).withValues(alpha: 0.7), shadowed: false),
+                  child: Row(
                     children: [
-                      Text(t.moodLabel, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700)),
-                      const SizedBox(width: AppSpacing.sm),
-                      for (final option in _moods)
-                        GestureDetector(
-                          onTap: () => setState(() => _mood = option.id),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Opacity(
-                              opacity: _mood == option.id ? 1 : 0.4,
-                              child: Text(option.emoji, style: TextStyle(fontSize: _mood == option.id ? 22 : 18)),
-                            ),
-                          ),
+                      RiungMonster(monsterId: prompt.monsterId, state: MonsterVisualState.jinak, size: 48, applyBossScale: false),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${t.guidePrefix}${t.prompt(prompt.id).title}', style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.sekunder)),
+                            const SizedBox(height: 2),
+                            Text(t.prompt(prompt.id).guideQuestion, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.teksUtama)),
+                          ],
                         ),
+                      ),
                     ],
                   ),
-                  if (prompt != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(border: Border.all(color: AppColors.monsterHakim), borderRadius: BorderRadius.circular(AppRadius.pill)),
-                        child: Text(t.monsterDetected(context.s.common.monsterName(prompt.monsterId)), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.monsterHakim)),
+                ),
+                const SizedBox(height: AppSpacing.md),
+              ],
+              Row(
+                children: [
+                  Text(t.moodLabel, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.teksRedup)),
+                  const SizedBox(width: 8),
+                  for (final option in _moods)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () => setState(() => _mood = option.id),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: _mood == option.id ? AppColors.garis : AppColors.kartu,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: _mood == option.id ? AppColors.primer : AppColors.garis, width: _mood == option.id ? 2 : 1),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(option.emoji, style: const TextStyle(fontSize: 16)),
+                        ),
                       ),
                     ),
-                  ],
-                  if (prompt != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      t.monsterMarked(context.s.common.monsterName(prompt.monsterId)),
-                      style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45),
-                    ),
-                  ],
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                  decoration: AppGlass.card(radius: 28, color: AppColors.permukaan),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(formatter.format(_createdAt), style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.teksRedup)),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          maxLines: null,
+                          expands: true,
+                          autofocus: true,
+                          textAlignVertical: TextAlignVertical.top,
+                          onChanged: (_) => setState(() {}),
+                          style: AppTextStyles.body.copyWith(fontSize: 15, height: 1.6, fontWeight: FontWeight.w500, color: AppColors.teksUtama),
+                          cursorColor: AppColors.primer,
+                          decoration: InputDecoration(
+                            filled: false,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                            hintText: t.editorHint,
+                            hintStyle: AppTextStyles.body.copyWith(fontSize: 15, color: AppColors.teksRedup),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  if (prompt != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(color: AppColors.sekunderLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                      child: Text(
+                        t.monsterDetected(context.s.common.monsterName(prompt.monsterId)),
+                        style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.sekunder),
+                      ),
+                    ),
+                  const Spacer(),
+                  Text(t.autoSaved, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primer)),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

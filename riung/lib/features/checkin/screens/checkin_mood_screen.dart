@@ -35,73 +35,88 @@ class _CheckInMoodScreenState extends State<CheckInMoodScreen> {
   Widget build(BuildContext context) {
     final t = context.s.checkin;
     final userName = AppScope.of(context).auth.profile?.displayName ?? context.s.home.defaultUserName;
+    final selected = checkInMoods.where((m) => m.id == _draft.moodId).firstOrNull;
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        alignment: const Alignment(0, -1.1),
-        opacity: 0.16,
-        child: SafeArea(
-          child: Column(
-            children: [
-              const CheckInStepHeader(step: 1, showClose: true),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const CheckInStepHeader(step: 1, showClose: true),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.md),
+                children: [
+                  Text(t.moodTitle(userName), style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.15)),
+                  const SizedBox(height: 8),
+                  Text(t.moodSub, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  const SizedBox(height: AppSpacing.xl),
+                  _SelectedMoodCard(mood: selected, hint: t.moodHint),
+                  const SizedBox(height: AppSpacing.xl),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(
-                        width: 96,
-                        height: 100,
-                        child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 96),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        t.moodTitle(userName),
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.display.copyWith(fontSize: 23, height: 1.3),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        t.moodSub,
-                        style: AppTextStyles.caption.copyWith(fontSize: 13),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Wrap(
-                        spacing: AppSpacing.sm,
-                        runSpacing: AppSpacing.sm,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          for (final mood in checkInMoods)
-                            _MoodOption(
-                              mood: mood,
-                              selected: _draft.moodId == mood.id,
-                              onTap: () => setState(() => _draft.moodId = mood.id),
-                            ),
-                        ],
-                      ),
+                      for (final mood in checkInMoods)
+                        _MoodOption(
+                          mood: mood,
+                          selected: _draft.moodId == mood.id,
+                          onTap: () => setState(() => _draft.moodId = mood.id),
+                        ),
                     ],
                   ),
-                ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-                child: Column(
-                  children: [
-                    RiungButton(label: context.s.common.lanjut, onPressed: _draft.moodId == null ? null : _lanjut),
-                    TextButton(
-                      onPressed: _lewati,
-                      child: Text(
-                        t.skipToday,
-                        style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+              child: Column(
+                children: [
+                  RiungButton(label: context.s.common.lanjut, onPressed: _draft.moodId == null ? null : _lanjut),
+                  TextButton(
+                    onPressed: _lewati,
+                    child: Text(t.skipToday, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.teksSekunder)),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+/// Kartu mood terpilih (frame `Mood terpilih`): orb gradien besar + label.
+class _SelectedMoodCard extends StatelessWidget {
+  const _SelectedMoodCard({required this.mood, required this.hint});
+
+  final CheckInMoodOption? mood;
+  final String hint;
+
+  @override
+  Widget build(BuildContext context) {
+    final m = mood;
+    final tint = m == null ? AppColors.netralLembut : (AppColors.moodLembut[m.id] ?? AppColors.netralLembut);
+    return RiungGlassCard(
+      radius: 36,
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+      child: Column(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(center: const Alignment(-0.3, -0.4), colors: [AppColors.diAtasTinta, tint]),
+              boxShadow: AppGlass.shadow,
+            ),
+            alignment: Alignment.center,
+            child: Text(m?.emoji ?? '🫧', style: const TextStyle(fontSize: 60)),
+          ),
+          const SizedBox(height: 8),
+          Text(m == null ? ' ' : context.s.checkin.moodLabel(m.id), style: AppTextStyles.title.copyWith(fontSize: 22)),
+          const SizedBox(height: 4),
+          Text(hint, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksRedup)),
+        ],
       ),
     );
   }
@@ -116,30 +131,39 @@ class _MoodOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 62,
-        padding: const EdgeInsets.fromLTRB(0, 14, 0, 11),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: 1.5),
-          color: selected ? AppColors.primer.withValues(alpha: 0.14) : AppColors.permukaan,
-        ),
-        child: Column(
-          children: [
-            Text(mood.emoji, style: const TextStyle(fontSize: 26)),
-            const SizedBox(height: 7),
-            Text(
-              context.s.checkin.moodLabel(mood.id),
-              textAlign: TextAlign.center,
-              style: AppTextStyles.caption.copyWith(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: selected ? AppColors.primer : AppColors.teksSekunder,
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        child: SizedBox(
+          width: 64,
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.moodLembut[mood.id] ?? AppColors.netralLembut,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2.5 : 1.5),
+                ),
+                alignment: Alignment.center,
+                child: Text(mood.emoji, style: const TextStyle(fontSize: 26)),
               ),
-            ),
-          ],
+              const SizedBox(height: 6),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                context.s.checkin.moodLabel(mood.id),
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: selected ? FontWeight.w700 : FontWeight.w500, color: selected ? AppColors.primer : AppColors.teksSekunder),
+              ),
+              ),
+            ],
+          ),
         ),
       ),
     );

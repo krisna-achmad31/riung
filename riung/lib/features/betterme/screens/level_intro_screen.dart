@@ -38,68 +38,67 @@ class _LevelIntroScreenState extends State<LevelIntroScreen> {
     final level = widget.level;
     final progress = BetterMeProgress(AppScope.of(context).prefs);
     final totalMenit = level.sessions.fold<int>(0, (sum, s) => sum + s.estimasiMenit);
-    final selanjutnya = level.sessions.firstWhere(
-      (s) => !progress.isCompleted(s.id),
-      orElse: () => level.sessions.first,
-    );
+    final selanjutnya = level.sessions.firstWhere((s) => !progress.isCompleted(s.id), orElse: () => level.sessions.first);
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.levelName(level.number), style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.levelName(level.number)),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                   children: [
-                    Text(t.level(level.number).judul, style: AppTextStyles.display.copyWith(fontSize: 24)),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(t.level(level.number).deskripsi, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.6)),
-                    const SizedBox(height: AppSpacing.lg),
+                    Container(
+                      height: 240,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.sekunderLembut, AppColors.kabutSage]),
+                        borderRadius: BorderRadius.circular(36),
+                        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                        boxShadow: AppGlass.shadow,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 210,
+                            height: 210,
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                          ),
+                          const RiungIcon3D(RiungIcon.kepribadian, size: 170),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.level(level.number).judul, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
+                    const SizedBox(height: 6),
+                    Text(t.level(level.number).deskripsi, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, color: AppColors.teksSekunder)),
+                    const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
-                        _MetaChip(icon: Icons.menu_book_rounded, label: t.sessionCount(level.sessions.length)),
-                        const SizedBox(width: AppSpacing.sm),
-                        _MetaChip(icon: Icons.schedule_rounded, label: t.totalMinutes(totalMenit)),
+                        _MetaChip(label: t.sessionCount(level.sessions.length)),
+                        const SizedBox(width: 8),
+                        _MetaChip(label: t.totalMinutes(totalMenit)),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.xl),
-                    for (final session in level.sessions)
+                    const SizedBox(height: AppSpacing.md),
+                    for (var i = 0; i < level.sessions.length; i++)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: _SessionRow(
-                          session: session,
-                          done: progress.isCompleted(session.id),
-                          onTap: () => _bukaSesi(session),
-                        ),
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: _SessionRow(index: i + 1, session: level.sessions[i], done: progress.isCompleted(level.sessions[i].id), onTap: () => _bukaSesi(level.sessions[i])),
                       ),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-              child: RiungButton(
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(
                 label: progress.completedInLevel(level.number) == 0 ? t.startLevel : t.continueWith(t.session(selanjutnya.id).judul),
                 onPressed: () => _bukaSesi(selanjutnya),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -107,52 +106,61 @@ class _LevelIntroScreenState extends State<LevelIntroScreen> {
 }
 
 class _MetaChip extends StatelessWidget {
-  const _MetaChip({required this.icon, required this.label});
-  final IconData icon;
+  const _MetaChip({required this.label});
   final String label;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(color: AppColors.kartu, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.pill)),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.pill)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.teksSekunder),
-          const SizedBox(width: 6),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12)),
+          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksUtama)),
         ],
       ),
     );
   }
 }
 
+/// Baris sesi (frame `Sesi …`): kotak nomor / centang, judul, menit · tipe.
 class _SessionRow extends StatelessWidget {
-  const _SessionRow({required this.session, required this.done, required this.onTap});
+  const _SessionRow({required this.index, required this.session, required this.done, required this.onTap});
+  final int index;
   final BetterMeSession session;
   final bool done;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final t = context.s.betterme;
+    return RiungGlassCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Row(
-          children: [
-            Icon(done ? Icons.check_circle_rounded : Icons.circle_outlined, size: 18, color: done ? AppColors.sukses : AppColors.teksRedup),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(child: Text(context.s.betterme.session(session.id).judul, style: AppTextStyles.chipLabel.copyWith(fontSize: 13))),
-            Text(context.s.betterme.minutes(session.estimasiMenit), style: AppTextStyles.caption.copyWith(fontSize: 11)),
-          ],
-        ),
+      radius: 22,
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(color: done ? AppColors.primer : AppColors.primerLembut, borderRadius: BorderRadius.circular(12)),
+            alignment: Alignment.center,
+            child: done
+                ? const Icon(Icons.check_rounded, size: 16, color: AppColors.diAtasTinta)
+                : Text('$index', style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.primer)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(t.session(session.id).judul, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+                Text('${t.minutes(session.estimasiMenit)} · ${t.typeLabel(session.tipe.name)}', style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

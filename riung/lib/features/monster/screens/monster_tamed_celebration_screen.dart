@@ -51,121 +51,115 @@ class _MonsterTamedCelebrationScreenState extends State<MonsterTamedCelebrationS
     final monsterName = context.s.common.monsterName(saboteur.id);
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              Expanded(
                 child: Center(
                   child: SingleChildScrollView(
+                    clipBehavior: Clip.none,
+                    // Kartu yang dibagikan = area ini (latar kabut ikut terekam).
                     child: RepaintBoundary(
                       key: _cardKey,
-                      child: Container(
-                        color: AppColors.latar,
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('✨ 🎉 ✨', style: AppTextStyles.title.copyWith(letterSpacing: 6, fontSize: 22)),
-                    const SizedBox(height: AppSpacing.md),
-                    SizedBox(
-                      width: 170,
-                      height: 179,
-                      child: RiungMonster(monsterId: saboteur.id, state: MonsterVisualState.jinak, size: 170),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      t.monsterNumberTamed(tamedCount),
-                      style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangat, fontWeight: FontWeight.w700, letterSpacing: 1.4, fontSize: 10),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      t.friendNow(monsterName),
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.display.copyWith(fontSize: 24),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      t.celebrationBody,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.55),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _StatChip(icon: Icons.monetization_on, color: AppColors.aksenHangat, value: '+${EconomyEarn.monsterJinak}', label: t.bonusCoins),
-                        const SizedBox(width: AppSpacing.sm),
-                        _StatChip(icon: Icons.pest_control, color: AppColors.sekunder, value: '$tamedCount/7', label: t.tamedLabel),
-                      ],
-                    ),
-                  ],
-                ),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(gradient: AppGlass.backdrop, borderRadius: BorderRadius.circular(32)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg, horizontal: AppSpacing.sm),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(color: AppColors.primerLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                                child: Text(t.monsterNumberTamed(tamedCount), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.primer)),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              _TamedStage(monsterId: saboteur.id),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(t.friendNow(monsterName), textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(t.celebrationBody, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5, color: AppColors.teksSekunder)),
+                              const SizedBox(height: AppSpacing.lg),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: RiungStatTile(leading: const RiungIcon3D(RiungIcon.koin, size: 40), value: '+${EconomyEarn.monsterJinak}', label: t.bonusCoins),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: RiungStatTile(
+                                      leading: RiungMonster(monsterId: saboteur.id, state: MonsterVisualState.jinak, size: 40, applyBossScale: false),
+                                      value: '$tamedCount/7',
+                                      label: t.tamedLabel,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 54,
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _busy ? null : () => _bagikan(t.shareCaption(monsterName, tamedCount)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.aksenHangat,
-                        foregroundColor: AppColors.latar,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-                      ),
-                      icon: const Icon(Icons.ios_share, size: 17),
-                      label: Text(t.shareAchievement, style: AppTextStyles.chipLabel.copyWith(color: AppColors.latar, fontSize: 15)),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    t.shareNote,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.caption.copyWith(fontSize: 11),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-                    child: Text(context.s.common.lanjut, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13)),
-                  ),
-                ],
+              const SizedBox(height: AppSpacing.md),
+              RiungButton(
+                label: t.shareAchievement,
+                icon: Icons.ios_share_rounded,
+                onPressed: _busy ? null : () => _bagikan(t.shareCaption(monsterName, tamedCount)),
               ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.sm),
+              Text(t.shareNote, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
+              TextButton(
+                onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+                child: Text(context.s.common.lanjut, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _StatChip extends StatelessWidget {
-  const _StatChip({required this.icon, required this.color, required this.value, required this.label});
+/// Panggung perayaan (frame `Perayaan`): cincin tipis, aura, monster jinak
+/// 3D besar, kilau emas.
+class _TamedStage extends StatelessWidget {
+  const _TamedStage({required this.monsterId});
 
-  final IconData icon;
-  final Color color;
-  final String value;
-  final String label;
+  final String monsterId;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 13),
-      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(16)),
-      child: Column(
+    Widget spark(double l, double tp, double size) => Positioned(left: l, top: tp, child: Icon(Icons.auto_awesome, size: size, color: AppColors.emas));
+    return SizedBox(
+      width: 320,
+      height: 300,
+      child: Stack(
         children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.chipLabel.copyWith(fontSize: 16, color: color)),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10)),
+          Positioned(
+            left: 20,
+            top: 10,
+            child: Container(width: 280, height: 280, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.garis, width: 1.5))),
+          ),
+          Positioned(
+            left: 40,
+            top: 30,
+            child: Container(
+              width: 240,
+              height: 240,
+              decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+            ),
+          ),
+          Positioned(left: 50, top: 40, child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 220, applyBossScale: false)),
+          spark(20, 40, 24),
+          spark(280, 30, 18),
+          spark(290, 200, 22),
+          spark(10, 220, 16),
+          spark(150, 0, 14),
         ],
       ),
     );

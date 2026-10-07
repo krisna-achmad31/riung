@@ -166,180 +166,182 @@ class _BlockBreakerScreenState extends State<BlockBreakerScreen> with SingleTick
         if (!didPop) _confirmKeluar();
       },
       child: Scaffold(
-        backgroundColor: AppColors.latar,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-                child: ValueListenableBuilder<int>(
-                  valueListenable: _frame,
-                  builder: (context, _, _) {
-                    final seconds = _engine.timeLeft.ceil();
-                    final menit = (seconds ~/ 60).toString();
-                    final detik = (seconds % 60).toString().padLeft(2, '0');
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(onPressed: _confirmKeluar, icon: const Icon(Icons.pause, color: AppColors.teksRedup)),
-                        Row(
-                          children: [
-                            Text('$menit:$detik', style: AppTextStyles.chipLabel.copyWith(color: AppColors.sekunder, fontSize: 14)),
-                            const SizedBox(width: AppSpacing.md),
-                            Text('${_engine.score} ${t.points}', style: AppTextStyles.chipLabel.copyWith(color: AppColors.aksenHangat, fontSize: 14)),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: ValueListenableBuilder<int>(
-                  valueListenable: _frame,
-                  builder: (context, _, _) {
-                    final hp = _engine.bossHp.ceil();
-                    return Row(
-                      children: [
-                        SizedBox(
-                          width: 40,
-                          height: 42,
-                          child: RiungMonster(monsterId: widget.saboteur.id, state: MonsterVisualState.liar, size: 40, applyBossScale: false),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(AppRadius.pill),
-                                child: LinearProgressIndicator(
-                                  value: hp / 100,
-                                  minHeight: 8,
-                                  backgroundColor: AppColors.permukaan,
-                                  valueColor: AlwaysStoppedAnimation(color),
+        body: RiungGlassBackdrop(
+          night: true,
+          child: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: _frame,
+                    builder: (context, _, _) {
+                      final hp = _engine.bossHp.ceil();
+                      final seconds = _engine.timeLeft.ceil();
+                      final waktu = '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
+                      return Row(
+                        children: [
+                          RiungGlassIconButton(icon: Icons.pause_rounded, night: true, onTap: _confirmKeluar),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${t.hpLabel(widget.saboteur.nama, hp)} · $waktu',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.kabutLavender),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(t.hpLabel(widget.saboteur.nama, hp), style: AppTextStyles.caption.copyWith(fontSize: 10)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        for (var i = 0; i < MinigameConfig.lives; i++)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 2),
-                            child: Icon(Icons.favorite, size: 14, color: i < _engine.lives ? AppColors.error : AppColors.garis),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      // Arena rasio tetap 320:480, diskalakan supaya muat.
-                      final scale = (constraints.maxWidth / BlockBreakerEngine.width)
-                          .clamp(0.0, constraints.maxHeight / _engine.height);
-                      final w = BlockBreakerEngine.width * scale;
-                      final h = _engine.height * scale;
-                      final boss = _engine.bossRect;
-                      return Center(
-                        child: SizedBox(
-                          width: w,
-                          height: h,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTapDown: (d) {
-                              _movePaddle(d.localPosition.dx, scale);
-                              _engine.launch();
-                            },
-                            onPanUpdate: (d) => _movePaddle(d.localPosition.dx, scale),
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: AppColors.latar,
-                                border: Border.all(color: AppColors.kartu),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(19),
-                                child: Stack(
-                                  children: [
-                                    // Bos di tengah blok, bergoyang kalau terkena.
-                                    Positioned(
-                                      left: boss.left * scale,
-                                      top: boss.top * scale,
-                                      width: boss.width * scale,
-                                      height: boss.height * scale,
-                                      child: ValueListenableBuilder<int>(
-                                        valueListenable: _frame,
-                                        builder: (context, _, _) {
-                                          final flash = _engine.bossFlash > 0;
-                                          return Opacity(
-                                            opacity: flash ? 0.55 : 1,
-                                            child: FittedBox(
-                                              child: SizedBox(
-                                                width: boss.height,
-                                                height: boss.height,
-                                                child: RiungMonster(
-                                                  monsterId: widget.saboteur.id,
-                                                  state: flash ? MonsterVisualState.jinak : MonsterVisualState.liar,
-                                                  size: boss.height,
-                                                  applyBossScale: false,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                const SizedBox(height: 4),
+                                Container(
+                                  height: 8,
+                                  decoration: BoxDecoration(color: AppNight.pil, borderRadius: BorderRadius.circular(4)),
+                                  alignment: Alignment.centerLeft,
+                                  child: FractionallySizedBox(
+                                    heightFactor: 1,
+                                    widthFactor: (hp / 100).clamp(0.0, 1.0),
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(colors: [AppNight.aksen, AppColors.sekunder]),
+                                        borderRadius: BorderRadius.circular(4),
                                       ),
                                     ),
-                                    Positioned.fill(
-                                      child: CustomPaint(
-                                        painter: BlockBreakerPainter(
-                                          engine: _engine,
-                                          blockColor: color,
-                                          labels: t.verdictLabels,
-                                          repaint: _frame,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 0,
-                                      right: 0,
-                                      bottom: 56 * scale,
-                                      child: ValueListenableBuilder<int>(
-                                        valueListenable: _frame,
-                                        builder: (context, _, _) => Text(
-                                          _engine.launched ? t.dragHint : t.tapToLaunch,
-                                          textAlign: TextAlign.center,
-                                          style: AppTextStyles.caption.copyWith(fontSize: 11),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: 52,
+                            height: 42,
+                            decoration: AppNight.card(radius: 14),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('${_engine.score}', style: AppTextStyles.title.copyWith(fontSize: 16, height: 1.1, color: AppNight.teks)),
+                                Text(t.points, style: AppTextStyles.caption.copyWith(fontSize: 9, color: AppNight.teksSekunder)),
+                              ],
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
-                child: SizedBox(
-                  height: 16,
-                  child: _flash == null ? null : Text(_flash!, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                const SizedBox(height: AppSpacing.sm),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Arena rasio tetap 320:480, diskalakan supaya muat.
+                        final scale = (constraints.maxWidth / BlockBreakerEngine.width).clamp(0.0, constraints.maxHeight / _engine.height);
+                        final w = BlockBreakerEngine.width * scale;
+                        final h = _engine.height * scale;
+                        final boss = _engine.bossRect;
+                        return Center(
+                          child: SizedBox(
+                            width: w,
+                            height: h,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTapDown: (d) {
+                                _movePaddle(d.localPosition.dx, scale);
+                                _engine.launch();
+                              },
+                              onPanUpdate: (d) => _movePaddle(d.localPosition.dx, scale),
+                              child: DecoratedBox(
+                                decoration: AppNight.card(radius: 30),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(29),
+                                  child: Stack(
+                                    children: [
+                                      // Bos di tengah blok, bergoyang kalau terkena.
+                                      Positioned(
+                                        left: boss.left * scale,
+                                        top: boss.top * scale,
+                                        width: boss.width * scale,
+                                        height: boss.height * scale,
+                                        child: ValueListenableBuilder<int>(
+                                          valueListenable: _frame,
+                                          builder: (context, _, _) {
+                                            final flash = _engine.bossFlash > 0;
+                                            return Opacity(
+                                              opacity: flash ? 0.55 : 1,
+                                              child: FittedBox(
+                                                child: SizedBox(
+                                                  width: boss.height,
+                                                  height: boss.height,
+                                                  child: RiungMonster(
+                                                    monsterId: widget.saboteur.id,
+                                                    state: flash ? MonsterVisualState.jinak : MonsterVisualState.liar,
+                                                    size: boss.height,
+                                                    applyBossScale: false,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      Positioned.fill(
+                                        child: CustomPaint(
+                                          painter: BlockBreakerPainter(engine: _engine, blockColor: color, labels: t.verdictLabels, repaint: _frame),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 56 * scale,
+                                        child: ValueListenableBuilder<int>(
+                                          valueListenable: _frame,
+                                          builder: (context, _, _) => Text(
+                                            _engine.launched ? t.dragHint : t.tapToLaunch,
+                                            textAlign: TextAlign.center,
+                                            style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksSekunder),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.md),
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: _frame,
+                    builder: (context, _, _) => Row(
+                      children: [
+                        for (var i = 0; i < MinigameConfig.lives; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: Icon(Icons.favorite_rounded, size: 18, color: i < _engine.lives ? AppNight.nyawa : AppNight.tepi),
+                          ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _flash ?? '',
+                            textAlign: TextAlign.end,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksSekunder),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

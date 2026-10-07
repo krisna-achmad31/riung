@@ -26,14 +26,14 @@ class CheckInFactorOption {
 }
 
 const List<CheckInFactorOption> checkInFactors = [
-  CheckInFactorOption(id: 'kerjaan', icon: Icons.bar_chart),
-  CheckInFactorOption(id: 'kuliah', icon: Icons.menu_book_rounded),
-  CheckInFactorOption(id: 'takut_gagal', icon: Icons.pest_control),
-  CheckInFactorOption(id: 'keluarga', icon: Icons.favorite),
-  CheckInFactorOption(id: 'uang', icon: Icons.monetization_on),
-  CheckInFactorOption(id: 'hubungan', icon: Icons.person),
-  CheckInFactorOption(id: 'kurang_tidur', icon: Icons.nightlight_round),
-  CheckInFactorOption(id: 'kesehatan', icon: Icons.shield),
-  CheckInFactorOption(id: 'medsos', icon: Icons.visibility),
-  CheckInFactorOption(id: 'lainnya', icon: Icons.add),
+  CheckInFactorOption(id: 'kerjaan', icon: Icons.work_outline_rounded),
+  CheckInFactorOption(id: 'kuliah', icon: Icons.school_outlined),
+  CheckInFactorOption(id: 'takut_gagal', icon: Icons.terrain_outlined),
+  CheckInFactorOption(id: 'keluarga', icon: Icons.home_outlined),
+  CheckInFactorOption(id: 'uang', icon: Icons.account_balance_wallet_outlined),
+  CheckInFactorOption(id: 'hubungan', icon: Icons.favorite_border_rounded),
+  CheckInFactorOption(id: 'kurang_tidur', icon: Icons.bedtime_outlined),
+  CheckInFactorOption(id: 'kesehatan', icon: Icons.health_and_safety_outlined),
+  CheckInFactorOption(id: 'medsos', icon: Icons.phone_iphone_rounded),
+  CheckInFactorOption(id: 'lainnya', icon: Icons.add_rounded),
 ];

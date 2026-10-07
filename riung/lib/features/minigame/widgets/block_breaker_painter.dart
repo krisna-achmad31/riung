@@ -31,20 +31,19 @@ class BlockBreakerPainter extends CustomPainter {
   }
 
   void _paintBlocks(Canvas canvas) {
-    final fill = Paint()..color = blockColor.withValues(alpha: 0.18);
     final stroke = Paint()
-      ..color = blockColor
+      ..color = AppNight.tepi
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
+      ..strokeWidth = 0.6;
     for (final block in engine.blocks) {
       if (!block.alive) continue;
-      final rrect = RRect.fromRectAndRadius(block.rect, const Radius.circular(5));
-      canvas.drawRRect(rrect, fill);
+      final rrect = RRect.fromRectAndRadius(block.rect, const Radius.circular(4));
+      canvas.drawRRect(rrect, Paint()..color = AppNight.balok[block.labelIndex % AppNight.balok.length]);
       canvas.drawRRect(rrect, stroke);
       final painter = TextPainter(
         text: TextSpan(
-          text: labels[block.labelIndex % labels.length],
-          style: TextStyle(color: blockColor, fontSize: 5, height: 1.05, fontWeight: FontWeight.w700),
+          text: labels[block.labelIndex % labels.length].toUpperCase(),
+          style: const TextStyle(color: AppNight.teksBalok, fontSize: 4.6, height: 1.05, fontWeight: FontWeight.w700),
         ),
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
@@ -56,8 +55,13 @@ class BlockBreakerPainter extends CustomPainter {
 
   void _paintBall(Canvas canvas) {
     final center = engine.ball;
-    canvas.drawCircle(center, BlockBreakerEngine.ballRadius + 5, Paint()..color = AppColors.sekunder.withValues(alpha: 0.18));
-    canvas.drawCircle(center, BlockBreakerEngine.ballRadius, Paint()..color = AppColors.sekunder);
+    const r = BlockBreakerEngine.ballRadius;
+    canvas.drawCircle(center, r + 4, Paint()..color = AppNight.aksen.withValues(alpha: 0.25));
+    canvas.drawCircle(
+      center,
+      r,
+      Paint()..shader = const RadialGradient(colors: [AppNight.teks, AppNight.aksen]).createShader(Rect.fromCircle(center: center, radius: r)),
+    );
   }
 
   void _paintPaddle(Canvas canvas) {
@@ -66,9 +70,7 @@ class BlockBreakerPainter extends CustomPainter {
       width: BlockBreakerEngine.paddleWidth,
       height: BlockBreakerEngine.paddleHeight,
     );
-    final paint = Paint()
-      ..shader = const LinearGradient(colors: [AppColors.primer, AppColors.sekunder]).createShader(rect);
-    canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(6)), paint);
+    canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(BlockBreakerEngine.paddleHeight / 2)), Paint()..color = AppNight.teks);
   }
 
   @override

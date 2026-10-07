@@ -147,71 +147,59 @@ class _WaswasReactionScreenState extends State<WaswasReactionScreen> with Single
         if (!didPop) _confirmKeluar();
       },
       child: Scaffold(
-        backgroundColor: AppColors.latar,
         body: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-                child: ValueListenableBuilder<int>(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+            child: Column(
+              children: [
+                ValueListenableBuilder<int>(
                   valueListenable: _frame,
                   builder: (context, _, _) {
                     final seconds = _engine.timeLeft.ceil();
-                    final menit = (seconds ~/ 60).toString();
-                    final detik = (seconds % 60).toString().padLeft(2, '0');
+                    final waktu = '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
                     return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        IconButton(onPressed: _confirmKeluar, icon: const Icon(Icons.pause, color: AppColors.teksRedup)),
-                        Row(
-                          children: [
-                            Text('$menit:$detik', style: AppTextStyles.chipLabel.copyWith(color: AppColors.monsterWaswas, fontSize: 14)),
-                            const SizedBox(width: AppSpacing.md),
-                            Text('${_engine.score} ${t.points}', style: AppTextStyles.chipLabel.copyWith(color: AppColors.aksenHangat, fontSize: 14)),
-                          ],
+                        RiungGlassIconButton(icon: Icons.pause_rounded, onTap: _confirmKeluar),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(waktu, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.aksenHangatGelap)),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  for (var i = 0; i < MinigameConfig.lives; i++)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 4),
+                                      child: Icon(Icons.favorite_rounded, size: 16, color: i < _engine.lives ? AppColors.aksenHangat : AppColors.permukaan),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 52,
+                          height: 42,
+                          decoration: AppGlass.card(radius: 14),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('${_engine.score}', style: AppTextStyles.title.copyWith(fontSize: 16, height: 1.1)),
+                              Text(t.points, style: AppTextStyles.caption.copyWith(fontSize: 9, color: AppColors.teksSekunder)),
+                            ],
+                          ),
                         ),
                       ],
                     );
                   },
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 40,
-                      height: 42,
-                      child: RiungMonster(monsterId: widget.saboteur.id, state: MonsterVisualState.liar, size: 40, applyBossScale: false),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(t.waswasReactionHint, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4)),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    ValueListenableBuilder<int>(
-                      valueListenable: _frame,
-                      builder: (context, _, _) => Row(
-                        children: [
-                          for (var i = 0; i < MinigameConfig.lives; i++)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 2),
-                              child: Icon(Icons.favorite, size: 14, color: i < _engine.lives ? AppColors.error : AppColors.garis),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.md),
+                Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final scale = (constraints.maxWidth / WaswasReactionEngine.width)
-                          .clamp(0.0, constraints.maxHeight / WaswasReactionEngine.height);
+                      final scale = (constraints.maxWidth / WaswasReactionEngine.width).clamp(0.0, constraints.maxHeight / WaswasReactionEngine.height);
                       final w = WaswasReactionEngine.width * scale;
                       final h = WaswasReactionEngine.height * scale;
                       return Center(
@@ -222,16 +210,22 @@ class _WaswasReactionScreenState extends State<WaswasReactionScreen> with Single
                             behavior: HitTestBehavior.opaque,
                             onTapDown: (d) => _handleTap(d.localPosition, scale),
                             child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: AppColors.latar,
-                                border: Border.all(color: AppColors.kartu),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                              decoration: AppGlass.card(radius: 30, color: AppColors.permukaan.withValues(alpha: 0.5)),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(19),
-                                child: CustomPaint(
-                                  painter: WaswasReactionPainter(engine: _engine, labels: t.worryLabels, repaint: _frame),
-                                  size: Size(w, h),
+                                borderRadius: BorderRadius.circular(29),
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      right: 8,
+                                      bottom: 8,
+                                      child: RiungMonster(monsterId: widget.saboteur.id, state: MonsterVisualState.liar, size: 110 * scale.clamp(0.6, 1.0), applyBossScale: false),
+                                    ),
+                                    Positioned.fill(
+                                      child: CustomPaint(
+                                        painter: WaswasReactionPainter(engine: _engine, labels: t.worryLabels, repaint: _frame),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -241,9 +235,10 @@ class _WaswasReactionScreenState extends State<WaswasReactionScreen> with Single
                     },
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-            ],
+                const SizedBox(height: AppSpacing.md),
+                Text(t.waswasReactionHint, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.teksSekunder)),
+              ],
+            ),
           ),
         ),
       ),

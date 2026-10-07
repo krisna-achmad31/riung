@@ -114,67 +114,76 @@ class _AppBekuNapasScreenState extends State<AppBekuNapasScreen> with SingleTick
     final totalDetikTersisa = (_totalCycles * _fasePerCycle * 3) - detikBerlalu;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.sekunder,
-        alignment: const Alignment(0, -0.5),
-        opacity: 0.18,
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.xl),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                child: Text(
-                  t.breatheHeader(entry?.name),
-                  style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 12),
-                ),
-              ),
+              Text(t.breatheHeader(entry?.name), style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.teksSekunder)),
               Expanded(
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AnimatedBuilder(
-                        animation: _circleController,
-                        builder: (context, child) {
-                          final scale = 0.8 + (_circleController.value * 0.35);
-                          return Transform.scale(scale: scale, child: child);
-                        },
-                        child: Container(
-                          width: 180,
-                          height: 180,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.sekunder.withValues(alpha: 0.16),
-                            border: Border.all(color: AppColors.sekunder, width: 2),
-                          ),
+                      SizedBox(
+                        width: 320,
+                        height: 320,
+                        child: Stack(
                           alignment: Alignment.center,
-                          child: Icon(Icons.spa_rounded, size: 48, color: AppColors.sekunder),
+                          children: [
+                            AnimatedBuilder(
+                              animation: _circleController,
+                              builder: (context, _) {
+                                final v = _circleController.value;
+                                return Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    _Ring(size: 260 + 60 * v, color: AppColors.langitLembut.withValues(alpha: 0.3)),
+                                    _Ring(size: 214 + 50 * v, color: AppColors.langitLembut.withValues(alpha: 0.5)),
+                                    _Ring(size: 170 + 38 * v, color: AppColors.permukaan),
+                                  ],
+                                );
+                              },
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 150, applyBossScale: false),
+                                Text(_labelFase(t), style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2)),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xl),
-                      Text(_labelFase(t), style: AppTextStyles.display.copyWith(fontSize: 26)),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        t.secondsLeft(totalDetikTersisa.clamp(0, 60)),
-                        style: AppTextStyles.body.copyWith(fontSize: 13),
-                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(t.secondsLeft(totalDetikTersisa.clamp(0, 60)), style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.langit)),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(t.breatheHint, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
                     ],
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
-                child: Text(
-                  t.breatheHint,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.caption.copyWith(fontSize: 12),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Gelombang napas (frame `Gelombang`): lingkaran kaca tipis.
+class _Ring extends StatelessWidget {
+  const _Ring({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color, border: Border.all(color: AppColors.garis)),
     );
   }
 }

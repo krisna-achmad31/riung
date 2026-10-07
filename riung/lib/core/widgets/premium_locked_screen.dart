@@ -5,6 +5,9 @@ import '../config/economy.dart';
 import '../l10n/l10n.dart';
 import '../theme/theme.dart';
 import 'riung_button.dart';
+import 'riung_glass_icon_button.dart';
+import 'riung_icon_3d.dart';
+import 'riung_sparkle_hero.dart';
 
 /// Konten premium terkunci — upsell ringan, dipakai lintas fitur (Meditasi,
 /// Tidur, dsb). Bukan dark pattern (CLAUDE.md aturan #4): tidak ada
@@ -18,46 +21,32 @@ class PremiumLockedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xxl),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
           child: Column(
             children: [
               Align(
                 alignment: Alignment.topLeft,
-                child: IconButton(
-                  onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.close, color: AppColors.teksRedup),
-                ),
+                child: RiungGlassIconButton(icon: Icons.close_rounded, onTap: () => Navigator.of(context).maybePop()),
               ),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 74,
-                      height: 74,
-                      decoration: BoxDecoration(
-                        color: AppColors.aksenHangat.withValues(alpha: 0.12),
-                        border: Border.all(color: AppColors.aksenHangat.withValues(alpha: 0.3)),
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.workspace_premium, size: 32, color: AppColors.aksenHangat),
-                    ),
+                    const RiungSparkleHero(child: RiungIcon3D(RiungIcon.premium, size: 150)),
                     const SizedBox(height: AppSpacing.lg),
-                    Text(title, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 21)),
+                    Text(title, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2)),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       context.s.common.premiumLockedBody(freeTierNote),
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.body,
+                      style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder),
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
                       context.s.common.premiumPriceLine(EconomyPremium.hargaBulananIdr, EconomyPremium.trialHari),
-                      style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangat, fontWeight: FontWeight.w700),
+                      style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.primer, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -71,11 +60,8 @@ class PremiumLockedScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const PaywallPremiumScreen()),
                 ),
               ),
-              const SizedBox(height: AppSpacing.sm),
-              TextButton(
-                onPressed: () => Navigator.of(context).maybePop(),
-                child: Text(context.s.common.skipForNow, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13)),
-              ),
+              const SizedBox(height: 10),
+              RiungButton(label: context.s.common.skipForNow, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(context).maybePop()),
             ],
           ),
         ),

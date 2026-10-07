@@ -33,10 +33,15 @@ class HomeTopBar extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(tanggal, style: AppTextStyles.caption.copyWith(fontSize: 13)),
-              Text(
-                context.s.home.greeting(userName),
-                style: AppTextStyles.display.copyWith(fontSize: 22),
+              Text(tanggal, style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  context.s.home.greeting(userName),
+                  maxLines: 1,
+                  style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2),
+                ),
               ),
             ],
           ),

@@ -46,7 +46,6 @@ class _BerandaTiketSeranganScreenState extends State<BerandaTiketSeranganScreen>
   Widget build(BuildContext context) {
     final scope = AppScope.of(context);
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: ListenableBuilder(
           listenable: Listenable.merge([scope.wallet, scope.streak, scope.auth]),
@@ -102,7 +101,7 @@ class BerandaTiketSeranganBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+      padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -117,107 +116,108 @@ class BerandaTiketSeranganBody extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const KoinHistoriScreen()),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xl),
           _TiketSeranganCard(tickets: tickets),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xl),
           _CheckInSelesaiCard(
             sudahCheckin: sudahCheckin,
             onTap: sudahCheckin ? onLihatRiwayat : onCheckIn,
           ),
-          const SizedBox(height: AppSpacing.lg),
-          const LaporanHomeCard(),
-          const SizedBox(height: AppSpacing.lg),
-          const KarakterHomeCard(),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xl),
           const HomeQuickActionGrid(),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.xl),
+          const KarakterHomeCard(),
+          const SizedBox(height: AppSpacing.xl),
+          const LaporanHomeCard(),
         ],
       ),
     );
   }
 }
 
+/// Kartu tiket serangan bos (frame `Kartu Tiket Serangan` di
+/// `Glass — Beranda`): gradien ungu malam→primer, cahaya lavender, Si
+/// Hakim liar 3D di kanan, tombol pil putih "Serang".
 class _TiketSeranganCard extends StatelessWidget {
   const _TiketSeranganCard({required this.tickets});
 
   final int tickets;
 
+  Future<void> _serang(BuildContext context) async {
+    final saboteurs = await AppScope.of(context).contentRepository.getSaboteurs();
+    if (!context.mounted) return;
+    final hakim = saboteurs.firstWhere((s) => s.id == 'hakim', orElse: () => saboteurs.first);
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: hakim)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = context.s.home;
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.monsterHakim.withValues(alpha: 0.2), AppColors.kartu.withValues(alpha: 0.9)],
-        ),
-        border: Border.all(color: AppColors.monsterHakim, width: 1.5),
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.tiketAwal, AppColors.primer]),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: AppGlass.shadow,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          const SizedBox(
-            width: 74,
-            height: 78,
-            child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.liar, size: 74, applyBossScale: false),
+          Positioned(
+            right: -40,
+            top: -60,
+            width: 240,
+            height: 240,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(colors: [AppColors.tiketCahaya, AppColors.tiketCahaya.withValues(alpha: 0)]),
+              ),
+            ),
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
+          const Positioned(
+            right: -10,
+            top: 4,
+            child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.liar, size: 160, applyBossScale: false),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 150, 18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(context.s.home.ticketTitle(tickets), style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  context.s.home.ticketBody,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontSize: 12),
-                ),
-                const SizedBox(height: AppSpacing.sm),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.latar.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    color: AppColors.diAtasTinta.withValues(alpha: 0.18),
+                    border: Border.all(color: AppColors.diAtasTinta.withValues(alpha: 0.35)),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.confirmation_number, size: 14, color: AppColors.sekunder),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Text(
-                          context.s.home.ticketBreakdown(tickets, EconomyTiket.gratisPerHari, tickets - EconomyTiket.gratisPerHari),
-                          style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w700, fontSize: 12),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    '${t.bossBadge} · ×$tickets',
+                    style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.diAtasTinta),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: GestureDetector(
-                    onTap: () async {
-                      final saboteurs = await AppScope.of(context).contentRepository.getSaboteurs();
-                      if (!context.mounted) return;
-                      final hakim = saboteurs.firstWhere((s) => s.id == 'hakim', orElse: () => saboteurs.first);
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: hakim)),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.monsterHakim,
-                        borderRadius: BorderRadius.circular(11),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.bolt, size: 14, color: AppColors.teksUtama),
-                          const SizedBox(width: 6),
-                          Text(context.s.home.attack, style: AppTextStyles.caption.copyWith(color: AppColors.teksUtama, fontWeight: FontWeight.w700, fontSize: 12)),
-                        ],
-                      ),
+                const SizedBox(height: 8),
+                Text(t.ticketTitle(tickets), style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.2, color: AppColors.diAtasTinta)),
+                const SizedBox(height: 6),
+                Text(t.ticketBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.diAtasTinta.withValues(alpha: 0.8))),
+                const SizedBox(height: 6),
+                Text(
+                  t.ticketBreakdown(tickets, EconomyTiket.gratisPerHari, tickets - EconomyTiket.gratisPerHari),
+                  style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.diAtasTinta.withValues(alpha: 0.9)),
+                ),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () => _serang(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+                    decoration: BoxDecoration(color: AppColors.diAtasTinta, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(t.attack, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksUtama)),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.teksUtama),
+                      ],
                     ),
                   ),
                 ),
@@ -238,44 +238,29 @@ class _CheckInSelesaiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final t = context.s.home;
+    return RiungGlassCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.kartu, AppColors.primerGelap.withValues(alpha: 0.55)],
+      radius: 28,
+      padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
+      color: AppColors.permukaan,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(sudahCheckin ? t.checkinDone : t.checkinSoon, style: AppTextStyles.title.copyWith(fontSize: 18, color: AppColors.teksUtama)),
+                const SizedBox(height: 4),
+                Text(
+                  sudahCheckin ? t.checkinDoneMood(EconomyEarn.checkinHarian) : t.checkinPromptSub(EconomyEarn.checkinHarian),
+                  style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder),
+                ),
+              ],
+            ),
           ),
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.xxl),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    sudahCheckin ? context.s.home.checkinDone : context.s.home.checkinSoon,
-                    style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    sudahCheckin
-                        ? context.s.home.checkinDoneMood(EconomyEarn.checkinHarian)
-                        : context.s.home.checkinPromptSub(EconomyEarn.checkinHarian),
-                    style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              width: 64,
-              height: 67,
-              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 64),
-            ),
-          ],
-        ),
+          const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 84),
+        ],
       ),
     );
   }

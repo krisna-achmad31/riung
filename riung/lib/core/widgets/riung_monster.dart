@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../models/monster_anchor.dart';
 import '../services/monster_anchor_registry.dart';
+import 'riung_ground_shadow.dart';
 
 /// Wujud visual monster — hanya dua varian art, terpisah dari
 /// `MonsterState` (wild/taming/tamed) yang menandai progres penjinakan.
@@ -128,6 +129,7 @@ class _RiungMonsterBody extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          RiungGroundShadow(canvasWidth: renderWidth, canvasHeight: renderHeight),
           ...under,
           Positioned.fill(
             child: _MonsterImage(

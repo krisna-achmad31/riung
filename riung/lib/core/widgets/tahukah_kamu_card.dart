@@ -15,36 +15,20 @@ class TahukahKamuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.kartu,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: AppGlass.card(radius: 28, color: AppColors.sekunderLembut.withValues(alpha: 0.7)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.auto_awesome, size: 16, color: AppColors.sekunder),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                context.s.common.didYouKnow,
-                style: AppTextStyles.chipLabel.copyWith(color: AppColors.sekunder, fontSize: 12),
-              ),
-            ],
+          Text(
+            '💡  ${context.s.common.didYouKnow.replaceAll('?', '').toUpperCase()}',
+            style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: AppColors.sekunder),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(text, style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-          const SizedBox(height: AppSpacing.sm),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.garis),
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-            ),
-            child: Text(source, style: AppTextStyles.caption.copyWith(fontSize: 10)),
-          ),
+          const SizedBox(height: 8),
+          Text(text, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksUtama)),
+          const SizedBox(height: 8),
+          Text(source, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
         ],
       ),
     );

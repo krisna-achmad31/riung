@@ -129,105 +129,62 @@ class _MeditasiPlayerScreenState extends State<MeditasiPlayerScreen> {
     final detik = (remaining.inSeconds % 60).toString().padLeft(2, '0');
     final t = context.s.meditasi;
     final phaseLabel = widget.session.id == 'napas_4_7_8' ? _breathingPhaseLabel(t, _elapsed) : null;
+    final elapsedLabel = '${_elapsed.inMinutes.toString().padLeft(2, '0')}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: widget.session.color,
-        alignment: const Alignment(0, -0.4),
-        opacity: 0.16,
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.close, size: 20, color: AppColors.teksRedup),
-                    ),
-                    Text(t.session(widget.session.id).title, style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontWeight: FontWeight.w600, fontSize: 13)),
-                    const Icon(Icons.nightlight_round, size: 18, color: AppColors.teksRedup),
-                  ],
-                ),
-              ),
+              RiungGlassHeader(title: t.running),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _BreathingRings(color: widget.session.color, monsterId: widget.session.targetMonsterId),
+                    _BreathingRings(monsterId: widget.session.targetMonsterId, label: phaseLabel ?? t.session(widget.session.id).title),
                     const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      phaseLabel ?? t.running,
-                      style: AppTextStyles.subtitle.copyWith(color: widget.session.color, fontSize: 19),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                      child: Text(
-                        t.followRhythm,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.body.copyWith(fontSize: 13),
-                      ),
-                    ),
+                    Text(t.followRhythm, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xl),
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                      child: LinearProgressIndicator(
-                        value: _total.inSeconds == 0 ? 0 : _elapsed.inSeconds / _total.inSeconds,
-                        minHeight: 5,
-                        backgroundColor: AppColors.kartu,
-                        valueColor: AlwaysStoppedAnimation(widget.session.color),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${_elapsed.inMinutes.toString().padLeft(2, '0')}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}',
-                          style: AppTextStyles.caption.copyWith(fontSize: 11),
-                        ),
-                        Text('$menit:$detik', style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () => _seek(-15),
-                          child: Text(t.seekBack, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
-                        ),
-                        const SizedBox(width: AppSpacing.xl),
-                        GestureDetector(
-                          onTap: _togglePlayPause,
-                          child: Container(
-                            width: 64,
-                            height: 64,
-                            decoration: BoxDecoration(shape: BoxShape.circle, color: widget.session.color),
-                            alignment: Alignment.center,
-                            child: Icon(_player.playing ? Icons.pause : Icons.play_arrow, size: 24, color: AppColors.latar),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.xl),
-                        TextButton(
-                          onPressed: () => _seek(15),
-                          child: Text(t.seekForward, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
-                        ),
-                      ],
-                    ),
-                  ],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: LinearProgressIndicator(
+                  value: _total.inSeconds == 0 ? 0 : _elapsed.inSeconds / _total.inSeconds,
+                  minHeight: 6,
+                  backgroundColor: AppColors.permukaan,
+                  valueColor: const AlwaysStoppedAnimation(AppColors.primer),
                 ),
               ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(elapsedLabel, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                  Text('$menit:$detik', style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _SeekButton(label: t.seekBack, onTap: () => _seek(-15)),
+                  const SizedBox(width: 24),
+                  GestureDetector(
+                    onTap: _togglePlayPause,
+                    child: Container(
+                      width: 76,
+                      height: 76,
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.tinta, boxShadow: AppGlass.inkShadow),
+                      child: Icon(_player.playing ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 30, color: AppColors.diAtasTinta),
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  _SeekButton(label: t.seekForward, onTap: () => _seek(15)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
             ],
           ),
         ),
@@ -243,6 +200,28 @@ class _MeditasiPlayerScreenState extends State<MeditasiPlayerScreen> {
   }
 }
 
+/// Tombol lompat ±15 detik: lingkaran kaca 56dp.
+class _SeekButton extends StatelessWidget {
+  const _SeekButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: AppGlass.card(radius: 28),
+        alignment: Alignment.center,
+        child: Text(label, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.teksUtama)),
+      ),
+    );
+  }
+}
+
 class _PreparingView extends StatelessWidget {
   const _PreparingView({required this.session, required this.progress});
 
@@ -252,74 +231,61 @@ class _PreparingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: IconButton(
-                onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(Icons.close, size: 20, color: AppColors.teksRedup),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: context.s.meditasi.running),
+              Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: 88,
-                      height: 88,
+                      width: 96,
+                      height: 96,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
                           SizedBox(
-                            width: 88,
-                            height: 88,
-                            child: CircularProgressIndicator(strokeWidth: 4, backgroundColor: AppColors.kartu, valueColor: AlwaysStoppedAnimation(session.color)),
+                            width: 96,
+                            height: 96,
+                            child: CircularProgressIndicator(strokeWidth: 4, backgroundColor: AppColors.permukaan, valueColor: const AlwaysStoppedAnimation(AppColors.primer)),
                           ),
-                          SizedBox(
-                            width: 52,
-                            height: 55,
-                            child: RiungMonster(monsterId: session.targetMonsterId, state: MonsterVisualState.jinak, size: 52),
-                          ),
+                          RiungMonster(monsterId: session.targetMonsterId, state: MonsterVisualState.jinak, size: 60, applyBossScale: false),
                         ],
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    Text(context.s.meditasi.preparingTitle, style: AppTextStyles.subtitle),
+                    Text(context.s.meditasi.preparingTitle, style: AppTextStyles.title.copyWith(fontSize: 20)),
                     const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      context.s.meditasi.preparingBody,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.caption.copyWith(fontSize: 13),
-                    ),
+                    Text(context.s.meditasi.preparingBody, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13)),
                     const SizedBox(height: AppSpacing.lg),
                     SizedBox(
                       width: 220,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(AppRadius.pill),
-                        child: LinearProgressIndicator(value: progress, minHeight: 5, backgroundColor: AppColors.kartu, valueColor: AlwaysStoppedAnimation(session.color)),
+                        child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: AppColors.permukaan, valueColor: const AlwaysStoppedAnimation(AppColors.primer)),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// Tiga gelombang kaca bernapas (frame `Napas`): lingkaran 320/260/200 sage
+/// tembus bertepi putih, monster 3D di tengah, label fase di bawahnya.
 class _BreathingRings extends StatefulWidget {
-  const _BreathingRings({required this.color, required this.monsterId});
+  const _BreathingRings({required this.monsterId, required this.label});
 
-  final Color color;
   final String monsterId;
+  final String label;
 
   @override
   State<_BreathingRings> createState() => _BreathingRingsState();
@@ -333,7 +299,7 @@ class _BreathingRingsState extends State<_BreathingRings> with SingleTickerProvi
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat(reverse: true);
-    _scale = Tween<double>(begin: 1, end: 1.08).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _scale = Tween<double>(begin: 0.94, end: 1.04).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -342,29 +308,42 @@ class _BreathingRingsState extends State<_BreathingRings> with SingleTickerProvi
     super.dispose();
   }
 
+  Widget _ring(double size, Color fill) => ScaleTransition(
+        scale: _scale,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: fill, border: Border.all(color: AppColors.garis)),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width - 2 * AppSpacing.xl;
+    final k = (w / 320).clamp(0.7, 1.0);
     return SizedBox(
-      width: 230,
-      height: 230,
+      width: 320 * k,
+      height: 320 * k,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          ScaleTransition(
-            scale: _scale,
-            child: Container(width: 230, height: 230, decoration: BoxDecoration(shape: BoxShape.circle, color: widget.color.withValues(alpha: 0.1))),
-          ),
-          ScaleTransition(
-            scale: _scale,
-            child: Container(width: 178, height: 178, decoration: BoxDecoration(shape: BoxShape.circle, color: widget.color.withValues(alpha: 0.14))),
-          ),
-          ScaleTransition(
-            scale: _scale,
-            child: SizedBox(
-              width: 118,
-              height: 124,
-              child: RiungMonster(monsterId: widget.monsterId, state: MonsterVisualState.jinak, size: 118),
-            ),
+          _ring(320 * k, AppColors.kabutSage.withValues(alpha: 0.3)),
+          _ring(260 * k, AppColors.kabutSage.withValues(alpha: 0.5)),
+          _ring(200 * k, AppColors.permukaan),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RiungMonster(monsterId: widget.monsterId, state: MonsterVisualState.jinak, size: 140 * k, applyBossScale: false),
+              SizedBox(
+                width: 170 * k,
+                child: Text(
+                  widget.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.15, color: AppColors.teksUtama),
+                ),
+              ),
+            ],
           ),
         ],
       ),

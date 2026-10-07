@@ -4,6 +4,8 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../logic/onboarding_controller.dart';
+import 'onboarding_header.dart';
+import 'onboarding_tag.dart';
 
 /// Jawaban bebas — teks panjang tanpa dinilai. State kosong vs terisi
 /// mengubah warna border & tombol Kirim. Implement persis
@@ -35,87 +37,81 @@ class _FreeTextStepState extends State<FreeTextStep> {
   @override
   Widget build(BuildContext context) {
     final t = context.s.onboarding;
-    final terisi = _textController.text.trim().isNotEmpty;
     return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-            child: Row(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            OnboardingHeader(progress: 0.8, onBack: widget.controller.canGoBack ? widget.controller.back : null),
+            const SizedBox(height: AppSpacing.md),
+            OnboardingTag(t.freeTextTag),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (widget.controller.canGoBack)
-                  IconButton(
-                    onPressed: widget.controller.back,
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  )
-                else
-                  const SizedBox(width: 48),
+                const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 72, applyBossScale: false),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    child: const LinearProgressIndicator(
-                      value: 0.98,
-                      minHeight: 8,
-                      backgroundColor: AppColors.kartu,
-                      valueColor: AlwaysStoppedAnimation(AppColors.primer),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.permukaanPadat.withValues(alpha: 0.8),
+                      border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24), bottomRight: Radius.circular(24), bottomLeft: Radius.circular(6)),
                     ),
+                    child: Text(t.freeTextQuestion, style: AppTextStyles.title.copyWith(fontSize: 17, height: 1.3)),
                   ),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    t.freeTextQuestion,
-                    style: AppTextStyles.display.copyWith(fontSize: 23, height: 1.3),
+            const SizedBox(height: AppSpacing.md),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: AppColors.permukaan,
+                  border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: TextField(
+                  controller: _textController,
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  cursorColor: AppColors.primer,
+                  style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15, height: 1.5, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: false,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    hintText: t.freeTextHint,
+                    hintStyle: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.teksRedup),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: AppColors.permukaan,
-                        border: Border.all(color: terisi ? AppColors.primer : AppColors.garis, width: 1.5),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                      ),
-                      child: TextField(
-                        controller: _textController,
-                        maxLines: null,
-                        expands: true,
-                        textAlignVertical: TextAlignVertical.top,
-                        cursorColor: AppColors.primer,
-                        style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: InputBorder.none,
-                          hintText: t.freeTextHint,
-                          hintStyle: AppTextStyles.body.copyWith(fontSize: 15),
-                        ),
-                        onChanged: (value) {
-                          widget.controller.setFreeText(value);
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+                  onChanged: (value) {
+                    widget.controller.setFreeText(value);
+                    setState(() {});
+                  },
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.lg),
-            child: RiungButton(
-              label: t.freeTextSend,
-              onPressed: widget.controller.canProceed ? widget.controller.next : null,
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                const Icon(Icons.lock_outline_rounded, size: 14, color: AppColors.teksRedup),
+                const SizedBox(width: 6),
+                Expanded(child: Text(t.freeTextPrivate, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.teksRedup))),
+                SizedBox(
+                  width: 110,
+                  child: RiungButton(label: t.freeTextSend, onPressed: widget.controller.canProceed ? widget.controller.next : null),
+                ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

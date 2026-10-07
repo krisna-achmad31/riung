@@ -5,6 +5,7 @@ import '../../../core/services/afirmasi_reminder.dart';
 import '../../../core/services/services.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 
 class _NotifSetting {
   const _NotifSetting(this.key, this.defaultOn);
@@ -87,113 +88,62 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
   Widget build(BuildContext context) {
     final t = context.s.profil;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.notifScreenTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.notifScreenTitle),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xl),
                   children: [
-                    Text(
-                      t.notifIntro,
-                      style: AppTextStyles.body.copyWith(fontSize: 13),
+                    RiungMenuGroup(
+                      children: [
+                        for (final setting in _settings)
+                          RiungMenuRow(
+                            leading: RiungIcon3D(_iconFor(setting.key), size: 38),
+                            title: _textFor(t, setting.key).$1,
+                            subtitle: _textFor(t, setting.key).$2,
+                            trailing: Switch(
+                              value: _state[setting.key] ?? setting.defaultOn,
+                              onChanged: (v) => _ubah(setting.key, v),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    for (final setting in _settings) ...[
-                      _ToggleRow(
-                        title: _textFor(t, setting.key).$1,
-                        sub: _textFor(t, setting.key).$2,
-                        value: _state[setting.key] ?? setting.defaultOn,
-                        onChanged: (v) => _ubah(setting.key, v),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                    ],
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
-                        color: AppColors.sekunder.withValues(alpha: 0.08),
-                        border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.25)),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        color: AppColors.sekunderLembut.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.nightlight_round, size: 16, color: AppColors.sekunder),
-                          const SizedBox(width: AppSpacing.sm),
+                          const Icon(Icons.dark_mode_outlined, size: 16, color: AppColors.sekunder),
+                          const SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              t.notifQuiet,
-                              style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5),
-                            ),
+                            child: Text(t.notifQuiet, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, fontWeight: FontWeight.w600, color: AppColors.sekunder)),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _ToggleRow extends StatelessWidget {
-  const _ToggleRow({required this.title, required this.sub, required this.value, required this.onChanged});
-
-  final String title;
-  final String sub;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                const SizedBox(height: 3),
-                Text(sub, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45)),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: AppColors.latar,
-            activeTrackColor: AppColors.primer,
-            inactiveThumbColor: AppColors.teksRedup,
-            inactiveTrackColor: AppColors.kartu,
-          ),
-        ],
-      ),
-    );
-  }
-}
+RiungIcon _iconFor(String key) => switch (key) {
+      'checkin_pagi' => RiungIcon.checkin,
+      'afirmasi_harian' => RiungIcon.afirmasi,
+      'pengingat_tidur' => RiungIcon.tidur,
+      'tiket_serangan' => RiungIcon.tiket,
+      _ => RiungIcon.beranda,
+    };

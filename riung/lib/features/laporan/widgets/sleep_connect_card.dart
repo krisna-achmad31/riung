@@ -23,18 +23,14 @@ class SleepConnectCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+      decoration: AppGlass.card(radius: 26),
       child: connected
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.watch_rounded, size: 18, color: AppColors.sukses),
+                    const Icon(Icons.watch_rounded, size: 18, color: AppColors.primer),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(child: Text(t.sleepConnected, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksUtama))),
                     TextButton(onPressed: busy ? null : onDisconnect, child: Text(t.sleepDisconnect, style: AppTextStyles.chipLabel.copyWith(fontSize: 12, color: AppColors.teksRedup))),

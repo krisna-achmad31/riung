@@ -6,6 +6,8 @@ import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../logic/onboarding_controller.dart';
 import '../logic/onboarding_questions.dart';
+import 'onboarding_header.dart';
+import 'onboarding_tag.dart';
 
 /// Renderer generik Q1–Q17 — satu template dipakai untuk semua pertanyaan
 /// (single & multi-select), termasuk varian scrollable (Q3/Q7/Q11 dengan
@@ -21,70 +23,47 @@ class QuestionStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = context.s.onboarding.questions[question.number - 1];
     return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-            child: Row(
-              children: [
-                if (controller.canGoBack)
-                  IconButton(
-                    onPressed: controller.back,
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  )
-                else
-                  const SizedBox(width: 48),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    child: LinearProgressIndicator(
-                      value: question.number / onboardingQuestions.length,
-                      minHeight: 8,
-                      backgroundColor: AppColors.kartu,
-                      valueColor: const AlwaysStoppedAnimation(AppColors.primer),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  '${question.number}/${onboardingQuestions.length}',
-                  style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600),
-                ),
-              ],
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.md),
+        child: Column(
+          children: [
+            OnboardingHeader(
+              progress: question.number / onboardingQuestions.length,
+              onBack: controller.canGoBack ? controller.back : null,
+              trailing: '${question.number}/${onboardingQuestions.length}',
             ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: RiungBleedListView(
+                padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                 children: [
-                  Text(
-                    text.question,
-                    style: AppTextStyles.display.copyWith(fontSize: 23, height: 1.3),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(text.sub, style: AppTextStyles.caption.copyWith(fontSize: 13.5)),
-                  const SizedBox(height: AppSpacing.lg),
+                  Align(alignment: Alignment.centerLeft, child: OnboardingTag(text.tag)),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(text.question, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.15)),
+                  const SizedBox(height: 6),
+                  Text(text.sub, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  const SizedBox(height: AppSpacing.md),
+                  if (!question.isMulti) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: RiungMonster(monsterId: _monsterFor(question.number), state: MonsterVisualState.jinak, size: 110, applyBossScale: false),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
                   for (var i = 0; i < question.options.length; i++)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
                       child: _OptionRow(
-                        option: question.options[i],
                         label: text.options[i],
                         selected: controller.isSelected(question.number, i),
                         multi: question.isMulti,
                         onTap: () => controller.toggleAnswer(question, i),
                       ),
                     ),
-                  const SizedBox(height: AppSpacing.sm),
                 ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-            child: RiungButton(
+            const SizedBox(height: AppSpacing.sm),
+            RiungButton(
               label: context.s.common.lanjut,
               onPressed: controller.canProceed
                   ? () {
@@ -93,17 +72,22 @@ class QuestionStep extends StatelessWidget {
                     }
                   : null,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  /// Monster penemani pertanyaan pilihan tunggal — bergilir supaya tiap
+  /// pertanyaan terasa berbeda (frame Kuis pilihan memakai Si Waswas).
+  static String _monsterFor(int number) => const ['waswas', 'kabut', 'cermin', 'meronta', 'sempurna', 'mengelak'][(number - 1) % 6];
 }
 
+/// Opsi jawaban (frame `Opsi …`): kaca, tebal + bingkai primer saat dipilih;
+/// tanda bulat (pilihan tunggal) atau kotak (multi).
 class _OptionRow extends StatelessWidget {
-  const _OptionRow({required this.option, required this.label, required this.selected, required this.multi, required this.onTap});
+  const _OptionRow({required this.label, required this.selected, required this.multi, required this.onTap});
 
-  final QuestionOption option;
   final String label;
   final bool selected;
   final bool multi;
@@ -113,76 +97,34 @@ class _OptionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        constraints: const BoxConstraints(minHeight: 56),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primer.withValues(alpha: 0.12) : AppColors.permukaan,
-          border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: 1.5),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          color: selected ? AppColors.permukaanPadat.withValues(alpha: 0.9) : AppColors.kartu,
+          border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2 : AppGlass.edgeWidth),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           children: [
-            SizedBox(
-              width: 28,
-              child: Text(option.emoji, textAlign: TextAlign.center, style: const TextStyle(fontSize: 20)),
-            ),
-            const SizedBox(width: AppSpacing.md),
             Expanded(
-              child: Text(
-                label,
-                style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14.5, height: 1.4),
-              ),
+              child: Text(label, style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15, height: 1.3, fontWeight: selected ? FontWeight.w700 : FontWeight.w500)),
             ),
-            if (multi) _CheckBox(selected: selected) else _RadioDot(selected: selected),
+            const SizedBox(width: 12),
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: selected ? AppColors.primer : Colors.transparent,
+                border: Border.all(color: selected ? AppColors.primer : AppColors.teksRedup, width: 1.5),
+                borderRadius: BorderRadius.circular(multi ? 8 : 12),
+              ),
+              child: selected ? const Icon(Icons.check_rounded, size: 14, color: AppColors.diAtasTinta) : null,
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _CheckBox extends StatelessWidget {
-  const _CheckBox({required this.selected});
-
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 22,
-      height: 22,
-      decoration: BoxDecoration(
-        color: selected ? AppColors.primer : Colors.transparent,
-        border: Border.all(color: selected ? AppColors.primer : AppColors.teksRedup, width: 2),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: selected ? const Icon(Icons.check, size: 14, color: AppColors.latar) : null,
-    );
-  }
-}
-
-class _RadioDot extends StatelessWidget {
-  const _RadioDot({required this.selected});
-
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 22,
-      height: 22,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: selected ? AppColors.primer : AppColors.teksRedup, width: 2),
-      ),
-      child: selected
-          ? Container(
-              width: 11,
-              height: 11,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.primer),
-            )
-          : null,
     );
   }
 }

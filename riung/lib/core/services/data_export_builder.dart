@@ -53,6 +53,7 @@ class DataExportBuilder {
       },
       'monster': monsters.map((id, m) => MapEntry(id, {'progres': m.progress, 'status': m.state.name})),
       'kosmetikDimiliki': prefs.ownedCosmetics.toList()..sort(),
+      'kosmetikDipakai': prefs.monsterCosmetics,
       'checkIn': [
         for (final c in checkIns)
           {

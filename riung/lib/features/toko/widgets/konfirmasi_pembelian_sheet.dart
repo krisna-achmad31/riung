@@ -18,14 +18,13 @@ Future<bool> showKonfirmasiPembelianSheet(
   final wallet = AppScope.of(context).wallet;
   final result = await showModalBottomSheet<bool>(
     context: context,
-    backgroundColor: AppColors.permukaan,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    isScrollControlled: true,
     builder: (sheetContext) => ListenableBuilder(
       listenable: wallet,
       builder: (context, _) {
         final sisa = (wallet.coins - price).clamp(0, 1 << 31);
         return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 26),
+          padding: EdgeInsets.fromLTRB(24, 12, 24, 26 + MediaQuery.paddingOf(context).bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -37,25 +36,23 @@ Future<bool> showKonfirmasiPembelianSheet(
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(context.s.toko.confirmTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 17)),
+              const RiungIcon3D(RiungIcon.koin, size: 72),
+              const SizedBox(height: AppSpacing.sm),
+              Text(context.s.toko.confirmTitle, style: AppTextStyles.title.copyWith(fontSize: 20)),
               const SizedBox(height: AppSpacing.lg),
               Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: AppColors.kartu,
-                  border: Border.all(color: AppColors.garis),
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                ),
+                padding: const EdgeInsets.all(16),
+                decoration: AppGlass.card(radius: 24, shadowed: false),
                 child: Column(
                   children: [
-                    _Baris(label: itemLabel, value: '$price', valueColor: AppColors.aksenHangat),
+                    _Baris(label: itemLabel, value: '$price', valueColor: AppColors.teksUtama),
                     const SizedBox(height: AppSpacing.sm),
                     _Baris(label: context.s.toko.coinsNow, value: '${wallet.coins}'),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
                       child: Divider(color: AppColors.garis, height: 1),
                     ),
-                    _Baris(label: context.s.toko.remainingAfter, value: context.s.toko.remainingCoins(sisa), bold: true, valueColor: AppColors.aksenHangat),
+                    _Baris(label: context.s.toko.remainingAfter, value: context.s.toko.remainingCoins(sisa), bold: true, valueColor: AppColors.teksUtama),
                   ],
                 ),
               ),
@@ -63,15 +60,12 @@ Future<bool> showKonfirmasiPembelianSheet(
               Text(
                 context.s.toko.ethicNote,
                 textAlign: TextAlign.center,
-                style: AppTextStyles.caption.copyWith(fontSize: 11),
+                style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup),
               ),
               const SizedBox(height: AppSpacing.lg),
               RiungButton(label: context.s.toko.confirmYes, onPressed: () => Navigator.of(sheetContext).pop(true)),
-              const SizedBox(height: AppSpacing.xs),
-              TextButton(
-                onPressed: () => Navigator.of(sheetContext).pop(false),
-                child: Text(context.s.common.batal, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13)),
-              ),
+              const SizedBox(height: 10),
+              RiungButton(label: context.s.common.batal, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(sheetContext).pop(false)),
             ],
           ),
         );
@@ -94,7 +88,7 @@ class _Baris extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppTextStyles.body.copyWith(fontSize: 13)),
+        Expanded(child: Text(label, style: AppTextStyles.body.copyWith(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.teksSekunder))),
         Text(
           value,
           style: (bold ? AppTextStyles.subtitle : AppTextStyles.chipLabel).copyWith(

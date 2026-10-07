@@ -15,7 +15,15 @@ class AuthTextField extends StatefulWidget {
     this.autofocus = false,
     this.onChanged,
     this.errorText,
+    this.icon,
+    this.hint,
   });
+
+  /// Placeholder saat kosong (frame `Nilai` berwarna ink-faint).
+  final String? hint;
+
+  /// Ikon garis di kiri (frame `Field …`: mail / lock).
+  final IconData? icon;
 
   final String label;
   final TextEditingController controller;
@@ -50,22 +58,25 @@ class _AuthTextFieldState extends State<AuthTextField> {
   Widget build(BuildContext context) {
     final hasError = widget.errorText != null;
     final active = _focusNode.hasFocus || widget.controller.text.isNotEmpty;
-    final borderColor = hasError
-        ? AppColors.error
-        : (active ? AppColors.primer : AppColors.garis);
+    final borderColor = hasError ? AppColors.aksenHangat : (_focusNode.hasFocus ? AppColors.primer : AppColors.garis);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
           decoration: BoxDecoration(
             color: AppColors.permukaan,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: borderColor, width: 1.5),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: borderColor, width: AppGlass.edgeWidth),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 13),
+          padding: const EdgeInsets.fromLTRB(16, 10, 14, 10),
           child: Row(
             children: [
+              if (widget.icon != null) ...[
+                Icon(widget.icon, size: 18, color: active ? AppColors.primer : AppColors.teksRedup),
+                const SizedBox(width: 12),
+              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,15 +84,9 @@ class _AuthTextFieldState extends State<AuthTextField> {
                   children: [
                     Text(
                       widget.label,
-                      style: AppTextStyles.caption.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: hasError
-                            ? AppColors.error
-                            : (active ? AppColors.primer : AppColors.teksRedup),
-                      ),
+                      style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: hasError ? AppColors.aksenHangatGelap : AppColors.teksRedup),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 2),
                     TextField(
                       controller: widget.controller,
                       focusNode: _focusNode,
@@ -92,12 +97,17 @@ class _AuthTextFieldState extends State<AuthTextField> {
                         widget.onChanged?.call(v);
                         setState(() {});
                       },
-                      style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15),
+                      style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 14, fontWeight: FontWeight.w600),
                       cursorColor: AppColors.primer,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
+                        filled: false,
+                        hintText: widget.hint,
+                        hintStyle: AppTextStyles.body.copyWith(color: AppColors.teksRedup, fontSize: 14, fontWeight: FontWeight.w600),
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
                       ),
                     ),
                   ],
@@ -106,11 +116,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
               if (widget.obscureText)
                 IconButton(
                   onPressed: () => setState(() => _obscured = !_obscured),
-                  icon: Icon(
-                    _obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                    color: AppColors.teksRedup,
-                    size: 20,
-                  ),
+                  icon: Icon(_obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: AppColors.teksRedup, size: 20),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   splashRadius: 18,
@@ -120,7 +126,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
         ),
         if (hasError) ...[
           const SizedBox(height: AppSpacing.xs),
-          Text(widget.errorText!, style: AppTextStyles.caption.copyWith(color: AppColors.error)),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(widget.errorText!, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangatGelap)),
+          ),
         ],
       ],
     );

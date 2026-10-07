@@ -42,65 +42,48 @@ class _EksporDataScreenState extends State<EksporDataScreen> {
   Widget build(BuildContext context) {
     final t = context.s.profil;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.downloadData, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _json == null
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.downloadData),
+              Expanded(
+                child: _json == null
+                    ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
+                    : RiungBleedListView(
+                        padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                         children: [
-                          Text(
-                            t.exportIntro,
-                            style: AppTextStyles.body.copyWith(fontSize: 13),
-                          ),
+                          Text(t.exportIntro, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
                           const SizedBox(height: AppSpacing.md),
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.all(AppSpacing.md),
+                            padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: AppColors.permukaan,
-                              border: Border.all(color: AppColors.garis),
-                              borderRadius: BorderRadius.circular(AppRadius.lg),
+                              color: AppColors.tinta.withValues(alpha: 0.9),
+                              border: Border.all(color: AppColors.diAtasTinta.withValues(alpha: 0.2), width: AppGlass.edgeWidth),
+                              borderRadius: BorderRadius.circular(24),
                             ),
                             child: SelectableText(
                               _json!,
-                              style: AppTextStyles.caption.copyWith(fontSize: 11, fontFamily: 'monospace', height: 1.5, color: AppColors.teksSekunder),
+                              style: AppTextStyles.caption.copyWith(fontSize: 12, fontFamily: 'monospace', height: 1.6, color: AppColors.diAtasTinta.withValues(alpha: 0.88)),
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.lg),
                         ],
                       ),
-                    ),
-            ),
-            if (_json != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.lg),
-                child: RiungButton(
+              ),
+              if (_json != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                RiungButton(
                   label: t.exportCopy,
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: _json!));
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.exportCopied)));
                   },
                 ),
-              ),
-          ],
+              ],
+            ],
+          ),
         ),
       ),
     );

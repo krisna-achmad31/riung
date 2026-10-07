@@ -5,6 +5,7 @@ import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../logic/onboarding_controller.dart';
 import '../logic/onboarding_info_screens.dart';
+import 'onboarding_tag.dart';
 
 /// Renderer generik untuk 11 layar info (reality check, masalahmu, dampak,
 /// cara Riung membantu) — satu template, beda konten/aksen per [data].
@@ -19,120 +20,101 @@ class InfoStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.onboarding;
     final text = t.infoScreens[onboardingInfoScreens.indexOf(data)];
-    return RiungGlowBackground(
-      glowColor: data.glowColor,
-      alignment: const Alignment(0, -0.7),
-      opacity: 0.2,
-      child: SafeArea(
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.md),
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-                child: GestureDetector(
+            Row(
+              children: [
+                if (controller.canGoBack) RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: controller.back) else const SizedBox(width: 44),
+                const Spacer(),
+                GestureDetector(
                   onTap: controller.skipToHasil,
                   behavior: HitTestBehavior.opaque,
-                  child: Text(t.skip, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Text(t.skip, style: AppTextStyles.caption.copyWith(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
+                  ),
                 ),
-              ),
+              ],
             ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      text.kicker.toUpperCase(),
-                      style: AppTextStyles.caption.copyWith(
-                        color: data.accentColor,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 2,
-                        fontSize: 12,
-                      ),
-                    ),
-                    if (text.big != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        text.big!,
-                        style: AppTextStyles.display.copyWith(fontSize: 58, color: data.accentColor, height: 1, letterSpacing: -1),
-                      ),
-                    ],
-                    if (data.monsterId != null) ...[
-                      const SizedBox(height: AppSpacing.md),
-                      SizedBox(
-                        width: data.monsterWidth,
-                        height: data.monsterHeight,
-                        child: RiungMonster(
-                          monsterId: data.monsterId!,
-                          state: data.monsterState,
-                          size: data.monsterWidth!,
-                          applyBossScale: false,
-                        ),
-                      ),
-                    ],
-                    if (data.monsterRow != null) ...[
-                      const SizedBox(height: AppSpacing.md),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.end,
+              child: RiungBleedListView(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                children: [
+                  Align(alignment: Alignment.centerLeft, child: OnboardingTag(text.kicker, color: data.accentColor)),
+                  if (text.big != null) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    Text(text.big!, style: AppTextStyles.display.copyWith(fontSize: 58, color: data.accentColor, height: 1, letterSpacing: -1)),
+                  ],
+                  if (data.monsterId != null) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    Center(
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          for (final id in data.monsterRow!)
-                            SizedBox(
-                              width: 62,
-                              height: 65,
-                              child: RiungMonster(monsterId: id, state: MonsterVisualState.liar, size: 62, applyBossScale: false),
-                            ),
+                          Container(
+                            width: (data.monsterWidth ?? 120) * 1.15,
+                            height: (data.monsterWidth ?? 120) * 1.15,
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                          ),
+                          RiungMonster(monsterId: data.monsterId!, state: data.monsterState, size: data.monsterWidth!, applyBossScale: false),
                         ],
                       ),
-                    ],
-                    const SizedBox(height: AppSpacing.md),
-                    Text(text.title, style: AppTextStyles.display.copyWith(fontSize: 22, height: 1.32)),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(text.body, style: AppTextStyles.body.copyWith(fontSize: 15, height: 1.6)),
-                    if (text.src != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.garis),
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
-                        child: Text(text.src!, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                      ),
-                    ],
-                    const SizedBox(height: AppSpacing.lg),
+                    ),
                   ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (var i = 0; i < data.dotTotal; i++)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 3),
-                          child: Container(
-                            width: 7,
-                            height: 7,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: i == data.dotIndex ? AppColors.primer : AppColors.garis,
-                            ),
+                  if (data.monsterRow != null) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (final id in data.monsterRow!)
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.kartu, border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth)),
+                            alignment: Alignment.center,
+                            child: RiungMonster(monsterId: id, state: MonsterVisualState.liar, size: 54, applyBossScale: false),
                           ),
-                        ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(text.title, style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2)),
                   const SizedBox(height: AppSpacing.md),
-                  RiungButton(label: text.cta, onPressed: controller.next),
+                  Text(text.body, style: AppTextStyles.body.copyWith(fontSize: 15, height: 1.55, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  if (text.src != null) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        child: Text(text.src!, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
+            Row(
+              children: [
+                for (var i = 0; i < data.dotTotal; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: i == data.dotIndex ? 26 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(color: i == data.dotIndex ? AppColors.primer : AppColors.permukaan, borderRadius: BorderRadius.circular(4)),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            RiungButton(label: text.cta, onPressed: controller.next),
           ],
         ),
       ),

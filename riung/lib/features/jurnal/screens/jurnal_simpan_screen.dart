@@ -21,86 +21,61 @@ class JurnalSimpanScreen extends StatelessWidget {
     final subjudul = prompt != null ? t.savedBossSub : t.savedSub;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(width: 128, height: 135, child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.liar, size: 128)),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(judul, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 21)),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(subjudul, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.55)),
-                    const SizedBox(height: AppSpacing.lg),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _RewardStat(icon: Icons.monetization_on, value: '+${EconomyEarn.jurnal}', label: t.coins, color: AppColors.aksenHangat),
-                        const SizedBox(width: AppSpacing.sm),
-                        if (prompt != null) ...[
-                          _RewardStat(icon: Icons.pest_control, value: '+2%', label: context.s.common.monsterName(prompt!.monsterId), color: AppColors.sekunder),
-                          const SizedBox(width: AppSpacing.sm),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      constraints: const BoxConstraints(maxWidth: 320),
-                      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(16)),
-                      child: Row(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xl),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  clipBehavior: Clip.none,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RiungCelebrationHero(monsterId: monsterId, icon: RiungIcon.jurnal),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(judul, style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2)),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(subjudul, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                      const SizedBox(height: AppSpacing.lg),
+                      Row(
                         children: [
-                          const Icon(Icons.lock, size: 17, color: AppColors.sukses),
-                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
-                            child: Text(
-                              t.savedNote,
-                              style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.5),
-                            ),
+                            child: RiungStatTile(leading: const RiungIcon3D(RiungIcon.koin, size: 44), value: '+${EconomyEarn.jurnal}', label: t.coins),
                           ),
+                          if (prompt != null) ...[
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: RiungStatTile(
+                                leading: RiungMonster(monsterId: prompt!.monsterId, state: MonsterVisualState.jinak, size: 44, applyBossScale: false),
+                                value: '+2%',
+                                label: context.s.common.monsterName(prompt!.monsterId),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.lg),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(color: AppColors.kabutSage.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(18)),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.lock_rounded, size: 16, color: AppColors.primer),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(t.savedNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.primer))),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-              child: RiungButton(label: t.backToJournal, onPressed: () => Navigator.of(context).pop(true)),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              RiungButton(label: t.backToJournal, onPressed: () => Navigator.of(context).pop(true)),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _RewardStat extends StatelessWidget {
-  const _RewardStat({required this.icon, required this.value, required this.label, required this.color});
-
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 13),
-      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.chipLabel.copyWith(fontSize: 16, color: color)),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10)),
-        ],
       ),
     );
   }

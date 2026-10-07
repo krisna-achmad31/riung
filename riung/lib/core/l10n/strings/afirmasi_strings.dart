@@ -35,6 +35,7 @@ abstract class AfirmasiStrings {
   String get targetCopy;
   String get targetMore;
   String get saveAsImage;
+  String get cardBrand;
   String get cardSaved;
   String get cardSaveFailed;
   String get cardShareFailed;
@@ -59,6 +60,7 @@ abstract class AfirmasiStrings {
   String get preview;
   String get previewSample;
   String get reminderInfo;
+  String get saveReminder;
   String get reminderSaved;
 }
 
@@ -105,6 +107,8 @@ class AfirmasiStringsId extends AfirmasiStrings {
   @override
   String get saveAsImage => 'Simpan sebagai gambar';
   @override
+  String get cardBrand => 'via Riung';
+  @override
   String get cardSaved => 'Kartu tersimpan ke galeri.';
   @override
   String get cardSaveFailed => 'Gagal simpan kartu, coba lagi.';
@@ -150,6 +154,8 @@ class AfirmasiStringsId extends AfirmasiStrings {
   @override
   String get reminderInfo => 'Afirmasi dari koleksimu diputar bergantian. Kalimat buatanmu sendiri muncul lebih sering.';
   @override
+  String get saveReminder => 'Simpan pengingat';
+  @override
   String get reminderSaved => 'Pengingat disimpan.';
 }
 
@@ -161,6 +167,51 @@ class AfirmasiStringsEn extends AfirmasiStrings {
     'af_02': 'My bad thoughts are not predictions.',
     'af_03': 'One small step today is enough.',
     'af_04': 'I measure myself by my own standards.',
+    'af_05': 'Done is better than perfect.',
+    'af_06': 'Mistakes are part of learning, not proof that I failed.',
+    'af_07': 'I am allowed to be happy with "good enough".',
+    'af_08': 'My effort still counts even when the result is not neat yet.',
+    'af_09': 'I can rest without feeling guilty.',
+    'af_10': 'My standards can be gentle with me.',
+    'af_11': 'This feeling is unpleasant, but it will pass.',
+    'af_12': 'I can take a breath before I decide.',
+    'af_13': 'Most of what I fear never actually happens.',
+    'af_14': 'I have made it through harder days than this.',
+    'af_15': 'I only need to handle what is in front of me now.',
+    'af_16': 'Worry is a sign that I care, not a sign of danger.',
+    'af_17': 'Starting with five minutes is enough.',
+    'af_18': 'I do not need to feel motivated to begin.',
+    'af_19': 'Slow is still forward.',
+    'af_20': 'I can do the small version first.',
+    'af_21': 'Today I pick just one thing.',
+    'af_22': 'Being tired is normal. I can keep going slowly.',
+    'af_23': 'I do not have to be as fast as others. My steps are still steps.',
+    'af_24': "What I see on the screen is only a slice of someone's life.",
+    'af_25': "Someone else's success does not lower my worth.",
+    'af_26': 'I compare myself with who I was yesterday.',
+    'af_27': 'My path is different, and that is okay.',
+    'af_28': 'I am enough, even when no one is watching.',
+    'af_29': 'I cannot always choose what happens, but I can choose my next step.',
+    'af_30': 'A bad day is not a bad life.',
+    'af_31': 'Hard things happen to others too. I am not alone.',
+    'af_32': 'I have more control than I feel right now.',
+    'af_33': 'I can be sad, then rise slowly.',
+    'af_34': 'Something small is still going well today.',
+    'af_35': 'I am not the victim of my story. I am its author.',
+    'af_36': 'What I avoid usually gets smaller when I face it.',
+    'af_37': 'I can feel uncomfortable and still be okay.',
+    'af_38': 'One message, one step. Not everything has to happen now.',
+    'af_39': 'Putting it off does not make the fear go away.',
+    'af_40': 'I am brave enough to try for a moment.',
+    'af_41': 'Relief comes after I face it.',
+    'af_42': 'I can ask for help when it feels heavy.',
+    'af_43': "That is Si Hakim's voice, not a fact.",
+    'af_44': 'I deserve to try, whatever the outcome.',
+    'af_45': 'I talk to myself the way I would talk to a friend.',
+    'af_46': 'Failing once does not mean I fail forever.',
+    'af_47': 'I am more than my worst mistake.',
+    'af_48': 'I do not need to prove anything to be worthy of love.',
+    'af_49': 'I can hear the critic in my head without believing it.',
   };
 
   @override
@@ -202,6 +253,8 @@ class AfirmasiStringsEn extends AfirmasiStrings {
   String get targetMore => 'More';
   @override
   String get saveAsImage => 'Save as image';
+  @override
+  String get cardBrand => 'via Riung';
   @override
   String get cardSaved => 'Card saved to your gallery.';
   @override
@@ -247,6 +300,8 @@ class AfirmasiStringsEn extends AfirmasiStrings {
   String get previewSample => '"I am allowed to rest without feeling guilty."';
   @override
   String get reminderInfo => 'Affirmations from your collection rotate. Sentences you wrote yourself show up more often.';
+  @override
+  String get saveReminder => 'Save reminder';
   @override
   String get reminderSaved => 'Reminder saved.';
 }

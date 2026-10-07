@@ -7,6 +7,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../widgets/sleeping_monster.dart';
 import '../logic/sleep_catalog.dart';
 import 'tidur_selesai_screen.dart';
 
@@ -101,71 +102,79 @@ class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
     final t = context.s.tidur;
     final total = Duration(minutes: widget.timerMinutes);
     final progress = total.inSeconds == 0 ? 0.0 : 1 - (_remaining.inSeconds / total.inSeconds);
+    final elapsed = total - _remaining;
+    String fmt(Duration d) => '${d.inMinutes.toString().padLeft(2, '0')}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.close, size: 20, color: AppColors.teksRedup)),
-                  Text(t.nightMode, style: AppTextStyles.caption.copyWith(color: AppColors.teksRedup, fontWeight: FontWeight.w600, fontSize: 12)),
-                  const Icon(Icons.nightlight_round, size: 17, color: AppColors.teksRedup),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Opacity(
-                    opacity: 0.8,
-                    child: _BreathingMonster(monsterId: widget.story.targetMonsterId),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(t.story(widget.story.id).title, textAlign: TextAlign.center, style: AppTextStyles.subtitle.copyWith(color: AppColors.teksSekunder, fontSize: 18)),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    t.playerSub(widget.story.reader, widget.timerMinutes),
-                    style: AppTextStyles.caption.copyWith(color: AppColors.teksRedup, fontSize: 12),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    '${_remaining.inMinutes.toString().padLeft(2, '0')}:${(_remaining.inSeconds % 60).toString().padLeft(2, '0')}',
-                    style: AppTextStyles.display.copyWith(fontSize: 44, letterSpacing: -1, color: AppColors.teksRedup),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xl),
-              child: Column(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    child: LinearProgressIndicator(value: progress, minHeight: 4, backgroundColor: AppColors.permukaan, valueColor: const AlwaysStoppedAnimation(AppColors.garis)),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  GestureDetector(
-                    onTap: _togglePlayPause,
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.kartu, border: Border.all(color: AppColors.garis)),
-                      alignment: Alignment.center,
-                      child: Icon(_player.playing ? Icons.pause : Icons.play_arrow, size: 22, color: AppColors.teksSekunder),
+      body: RiungGlassBackdrop(
+        night: true,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    RiungGlassIconButton(icon: Icons.close_rounded, night: true, onTap: () => Navigator.of(context).maybePop()),
+                    Expanded(
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                          decoration: AppNight.card(radius: AppRadius.pill),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.dark_mode_rounded, size: 14, color: AppNight.aksen),
+                              const SizedBox(width: 6),
+                              Text(t.nightMode, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppNight.teks)),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: 44),
+                  ],
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _BreathingMonster(monsterId: widget.story.targetMonsterId),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(t.story(widget.story.id).title, textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 22, color: AppNight.teks)),
+                      const SizedBox(height: 8),
+                      Text(t.playerSub(widget.story.reader, widget.timerMinutes), style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppNight.teksRedup)),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(t.autoStop, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                ],
-              ),
+                ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(value: progress, minHeight: 4, backgroundColor: AppNight.pil, valueColor: const AlwaysStoppedAnimation(AppNight.aksen)),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(fmt(elapsed), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
+                    Text(fmt(total), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                GestureDetector(
+                  onTap: _togglePlayPause,
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: const BoxDecoration(shape: BoxShape.circle, color: AppNight.teks),
+                    child: Icon(_player.playing ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 28, color: AppNight.latarBawah),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(t.autoStop, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppNight.teksRedup)),
+                const SizedBox(height: AppSpacing.md),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -189,7 +198,7 @@ class _BreathingMonsterState extends State<_BreathingMonster> with SingleTickerP
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 9))..repeat(reverse: true);
-    _scale = Tween<double>(begin: 1, end: 1.05).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _scale = Tween<double>(begin: 1, end: 1.04).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -200,13 +209,6 @@ class _BreathingMonsterState extends State<_BreathingMonster> with SingleTickerP
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scale,
-      child: SizedBox(
-        width: 104,
-        height: 110,
-        child: RiungMonster(monsterId: widget.monsterId, state: MonsterVisualState.jinak, size: 104),
-      ),
-    );
+    return ScaleTransition(scale: _scale, child: SleepingMonster(monsterId: widget.monsterId, size: 210, glow: 273));
   }
 }

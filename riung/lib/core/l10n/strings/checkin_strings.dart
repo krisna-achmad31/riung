@@ -5,6 +5,7 @@ abstract class CheckinStrings {
   // ── Langkah 1: mood ──
   String moodTitle(String name);
   String get moodSub;
+  String get moodHint;
   String get skipToday;
   String moodLabel(String id);
 
@@ -49,6 +50,8 @@ class CheckinStringsId extends CheckinStrings {
   String moodTitle(String name) => 'Pagi, $name. Gimana rasanya hari ini?';
   @override
   String get moodSub => 'Jawaban apa pun nggak ada yang salah.';
+  @override
+  String get moodHint => 'Geser atau ketuk untuk ganti';
   @override
   String get skipToday => 'Lewati hari ini, streak tetap aman';
   @override
@@ -156,6 +159,8 @@ class CheckinStringsEn extends CheckinStrings {
   String moodTitle(String name) => 'Morning, $name. How does today feel?';
   @override
   String get moodSub => 'There are no wrong answers.';
+  @override
+  String get moodHint => 'Swipe or tap to change';
   @override
   String get skipToday => 'Skip today, your streak stays safe';
   @override

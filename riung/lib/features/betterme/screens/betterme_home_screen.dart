@@ -31,145 +31,222 @@ class _BetterMeHomeScreenState extends State<BetterMeHomeScreen> {
     final scope = AppScope.of(context);
     final progress = BetterMeProgress(scope.prefs);
     final total = betterMeTotalSessions;
+    final t = context.s.betterme;
+    final next = [for (final l in betterMeLevels) ...l.sessions].where((s) => !progress.isCompleted(s.id)).firstOrNull;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(context.s.betterme.title, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: scope.auth,
-                builder: (context, _) {
-                  final premiumActive = scope.auth.profile?.premiumNow ?? false;
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.title),
+              Expanded(
+                child: ListenableBuilder(
+                  listenable: scope.auth,
+                  builder: (context, _) {
+                    final premiumActive = scope.auth.profile?.premiumNow ?? false;
+                    return RiungBleedListView(
+                      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xxl),
                       children: [
-                        Text(context.s.betterme.subtitle, style: AppTextStyles.body.copyWith(fontSize: 13)),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(context.s.betterme.totalDone(progress.totalCompleted, total), style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.sekunder)),
-                        const SizedBox(height: AppSpacing.lg),
+                        Text(t.subtitle, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                        const SizedBox(height: AppSpacing.md),
+                        _TotalProgress(
+                          done: progress.totalCompleted,
+                          total: total,
+                          title: t.totalDone(progress.totalCompleted, total),
+                          sub: next == null ? null : t.continueWith(t.session(next.id).judul),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
                         for (final level in betterMeLevels) ...[
                           _LevelCard(
                             level: level,
-                            completedCount: progress.completedInLevel(level.number),
+                            progress: progress,
                             unlocked: progress.isLevelUnlocked(level.number, premiumActive: premiumActive),
                             onTap: () => _bukaLevel(level),
                           ),
                           const SizedBox(height: AppSpacing.md),
                         ],
-                        const SizedBox(height: AppSpacing.lg),
                       ],
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// Kartu progres total (frame `Progres total`): cincin + judul + lanjutan.
+class _TotalProgress extends StatelessWidget {
+  const _TotalProgress({required this.done, required this.total, required this.title, required this.sub});
+
+  final int done;
+  final int total;
+  final String title;
+  final String? sub;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.kabutSage, AppColors.kabutLavender]),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+        boxShadow: AppGlass.shadow,
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 86,
+            height: 86,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 86,
+                  height: 86,
+                  child: CircularProgressIndicator(
+                    value: total == 0 ? 0 : done / total,
+                    strokeWidth: 9,
+                    strokeCap: StrokeCap.round,
+                    backgroundColor: AppColors.permukaan,
+                    valueColor: const AlwaysStoppedAnimation(AppColors.primer),
+                  ),
+                ),
+                Text('$done/$total', style: AppTextStyles.title.copyWith(fontSize: 18)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 16, color: AppColors.teksUtama)),
+                if (sub != null) ...[
+                  const SizedBox(height: 3),
+                  Text(sub!, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Kartu level (frame `Level n`): badge status, judul, daftar sesi bercentang.
 class _LevelCard extends StatelessWidget {
-  const _LevelCard({required this.level, required this.completedCount, required this.unlocked, required this.onTap});
+  const _LevelCard({required this.level, required this.progress, required this.unlocked, required this.onTap});
 
   final BetterMeLevel level;
-  final int completedCount;
+  final BetterMeProgress progress;
   final bool unlocked;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s.betterme;
     final total = level.sessions.length;
-    final selesai = completedCount == total;
+    final doneCount = progress.completedInLevel(level.number);
+    final selesai = doneCount == total;
 
-    return GestureDetector(
+    final Widget badge;
+    if (!unlocked) {
+      badge = Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(14)),
+        child: const Icon(Icons.lock_rounded, size: 16, color: AppColors.teksRedup),
+      );
+    } else if (selesai) {
+      badge = Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(color: AppColors.primer, borderRadius: BorderRadius.circular(14)),
+        child: const Icon(Icons.check_rounded, size: 18, color: AppColors.diAtasTinta),
+      );
+    } else {
+      badge = Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(color: AppColors.aksenHangatLembut, borderRadius: BorderRadius.circular(14)),
+        alignment: Alignment.center,
+        child: Text('${level.number}', style: AppTextStyles.title.copyWith(fontSize: 16, color: AppColors.aksenHangatGelap)),
+      );
+    }
+
+    return RiungGlassCard(
+      radius: 26,
+      color: unlocked ? AppColors.kartu : AppColors.permukaan.withValues(alpha: 0.4),
+      padding: const EdgeInsets.all(16),
       onTap: () {
         if (!unlocked) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => PremiumLockedScreen(
-                title: context.s.betterme.levelLockedTitle(level.number),
-                freeTierNote: context.s.betterme.levelLockedNote(level.number - 1),
-              ),
+              builder: (_) => PremiumLockedScreen(title: t.levelLockedTitle(level.number), freeTierNote: t.levelLockedNote(level.number - 1)),
             ),
           );
           return;
         }
         onTap();
       },
-      child: Opacity(
-        opacity: unlocked ? 1 : 0.6,
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: AppColors.permukaan,
-            border: Border.all(color: selesai ? AppColors.sukses : AppColors.garis, width: selesai ? 1.5 : 1),
-            borderRadius: BorderRadius.circular(AppRadius.xxl),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: (selesai ? AppColors.sukses : AppColors.primer).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      unlocked ? (selesai ? Icons.check_rounded : Icons.auto_awesome_rounded) : Icons.lock_rounded,
-                      size: 19,
-                      color: selesai ? AppColors.sukses : AppColors.primer,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(context.s.betterme.levelTitleWithName(level.number, context.s.betterme.level(level.number).judul), style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                        Text(context.s.betterme.sessionsProgress(completedCount, total), style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.teksRedup),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(context.s.betterme.level(level.number).deskripsi, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5)),
-              const SizedBox(height: AppSpacing.sm),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-                child: LinearProgressIndicator(
-                  value: total == 0 ? 0 : completedCount / total,
-                  minHeight: 6,
-                  backgroundColor: AppColors.latar,
-                  valueColor: AlwaysStoppedAnimation(selesai ? AppColors.sukses : AppColors.primer),
+              badge,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.levelTitleWithName(level.number, t.level(level.number).judul), style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+                    Text(t.sessionsProgress(doneCount, total), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 10),
+          if (!unlocked)
+            Text(t.levelLockedNote(level.number - 1), style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, color: AppColors.teksSekunder))
+          else
+            for (final session in level.sessions)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Row(
+                  children: [
+                    Icon(
+                      progress.isCompleted(session.id) ? Icons.check_circle_outline_rounded : Icons.circle_outlined,
+                      size: 18,
+                      color: progress.isCompleted(session.id) ? AppColors.primer : AppColors.teksRedup,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        t.session(session.id).judul,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.chipLabel.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: progress.isCompleted(session.id) ? AppColors.teksSekunder : AppColors.teksUtama,
+                        ),
+                      ),
+                    ),
+                    Text(t.minutes(session.estimasiMenit), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
+                  ],
+                ),
+              ),
+        ],
       ),
     );
   }

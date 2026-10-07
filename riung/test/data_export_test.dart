@@ -25,6 +25,7 @@ void main() {
     'riung_betterme_completed', 'riung_betterme_reflections_json',
     'riung_language_code', 'riung_sleep_sync_enabled', 'riung_afirmasi_reminder_time', 'riung_sleep_reminder_json',
     'riung_personality_results_json', 'riung_personality_card_style', 'riung_personality_accessories_json',
+    'riung_monster_cosmetics_json',
   };
 
   // Sengaja tidak diekspor: penghitung harian / status internal, bukan data pribadi.

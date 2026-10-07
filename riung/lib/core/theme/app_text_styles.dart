@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 /// Type scale Riung — di-port dari `design/Design System.dc.html` (§02 · Tipografi).
-/// Font: Plus Jakarta Sans. Satu-satunya sumber gaya teks untuk seluruh app.
+/// Font: Plus Jakarta Sans (isi) + Bricolage Grotesque (judul, `g-font-display`
+/// Riung Glass). Satu-satunya sumber gaya teks untuk seluruh app.
 abstract final class AppTextStyles {
   static TextStyle _base({
     required double fontSize,
@@ -12,8 +13,10 @@ abstract final class AppTextStyles {
     required FontWeight weight,
     Color color = AppColors.teksUtama,
     double? letterSpacing,
+    bool display = false,
   }) {
-    return GoogleFonts.plusJakartaSans(
+    final font = display ? GoogleFonts.bricolageGrotesque : GoogleFonts.plusJakartaSans;
+    return font(
       fontSize: fontSize,
       height: height / fontSize,
       fontWeight: weight,
@@ -26,8 +29,9 @@ abstract final class AppTextStyles {
   static TextStyle display = _base(
     fontSize: 32,
     height: 38,
-    weight: FontWeight.w800,
-    letterSpacing: -0.4,
+    weight: FontWeight.w700,
+    letterSpacing: -0.6,
+    display: true,
   );
 
   /// Title · 22/28 · Bold — judul layar/kartu.
@@ -35,6 +39,8 @@ abstract final class AppTextStyles {
     fontSize: 22,
     height: 28,
     weight: FontWeight.w700,
+    letterSpacing: -0.3,
+    display: true,
   );
 
   /// Subtitle · 17/24 · SemiBold.

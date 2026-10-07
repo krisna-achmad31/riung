@@ -21,7 +21,6 @@ class _ComponentGalleryScreenState extends State<ComponentGalleryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
       appBar: AppBar(title: const Text('Galeri Komponen Riung')),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.xl),

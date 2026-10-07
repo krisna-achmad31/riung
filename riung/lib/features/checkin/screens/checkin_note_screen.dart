@@ -70,96 +70,65 @@ class _CheckInNoteScreenState extends State<CheckInNoteScreen> {
   Widget build(BuildContext context) {
     final t = context.s.checkin;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Column(
           children: [
             CheckInStepHeader(step: 3, onBack: () => Navigator.of(context).maybePop()),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      t.noteTitle,
-                      style: AppTextStyles.display.copyWith(fontSize: 20, height: 1.3),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.md),
+                children: [
+                  Text(t.noteTitle, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.15)),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    constraints: const BoxConstraints(minHeight: 220),
+                    padding: const EdgeInsets.all(18),
+                    decoration: AppGlass.card(radius: 28, color: AppColors.permukaan),
+                    child: TextField(
+                      controller: _controller,
+                      maxLines: null,
+                      cursorColor: AppColors.primer,
+                      style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15, height: 1.55, fontWeight: FontWeight.w500),
+                      decoration: const InputDecoration(isDense: true, filled: false, border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none),
+                      onChanged: (_) => setState(() {}),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Container(
-                      constraints: const BoxConstraints(minHeight: 120),
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: AppColors.permukaan,
-                        border: Border.all(color: AppColors.primer, width: 1.5),
-                        borderRadius: BorderRadius.circular(AppRadius.xl),
-                      ),
-                      child: TextField(
-                        controller: _controller,
-                        maxLines: null,
-                        cursorColor: AppColors.primer,
-                        style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15, height: 1.65),
-                        decoration: const InputDecoration(isDense: true, border: InputBorder.none),
-                        onChanged: (_) => setState(() {}),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: [
-                        for (final reply in t.quickReplies)
-                          GestureDetector(
-                            onTap: () {
-                              _controller.text = reply;
-                              setState(() {});
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(AppRadius.pill),
-                                border: Border.all(color: AppColors.garis),
-                              ),
-                              child: Text(
-                                reply,
-                                style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 12),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Row(
-                      children: [
-                        const Icon(Icons.lock, size: 13, color: AppColors.teksRedup),
-                        const SizedBox(width: AppSpacing.xs),
-                        Expanded(
-                          child: Text(
-                            t.noteLock,
-                            style: AppTextStyles.caption.copyWith(fontSize: 11),
-                          ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final reply in t.quickReplies)
+                        RiungFilterChip(
+                          label: reply,
+                          selected: _controller.text == reply,
+                          onTap: () => setState(() => _controller.text = reply),
                         ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(color: AppColors.kabutSage.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(18)),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.lock_rounded, size: 16, color: AppColors.primer),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(t.noteLock, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.primer))),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
               child: Column(
                 children: [
-                  RiungButton(
-                    label: _submitting ? t.saving : t.finish,
-                    onPressed: _submitting ? null : _selesai,
-                  ),
+                  RiungButton(label: _submitting ? t.saving : t.finish, onPressed: _submitting ? null : _selesai),
                   TextButton(
                     onPressed: _submitting ? null : _selesai,
-                    child: Text(
-                      t.skipNote,
-                      style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12),
-                    ),
+                    child: Text(t.skipNote, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.teksSekunder)),
                   ),
                 ],
               ),

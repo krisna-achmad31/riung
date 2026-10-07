@@ -53,172 +53,135 @@ class _MeditasiDetailScreenState extends State<MeditasiDetailScreen> {
     final session = widget.session;
     final t = context.s.meditasi;
     final text = t.session(session.id);
-    final monsterName = context.s.common.monsterName(session.targetMonsterId);
+    final monsterId = session.targetMonsterId;
+    final monsterName = context.s.common.monsterName(monsterId);
+    final tint = AppColors.monsterLembut[monsterId] ?? AppColors.aksenHangatLembut;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: session.color,
-        alignment: const Alignment(0, -1.1),
-        opacity: 0.14,
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              RiungGlassHeader(
+                title: '',
+                trailing: RiungGlassIconButton(
+                  icon: Icons.download_done_rounded,
+                  semanticLabel: t.download,
+                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.alreadyOffline))),
+                ),
+              ),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.lg),
                   children: [
-                    IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                    ),
-                    GestureDetector(
-                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.alreadyOffline))),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.kartu,
-                          border: Border.all(color: AppColors.garis),
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.download_done_rounded, size: 14, color: AppColors.teksSekunder),
-                            const SizedBox(width: 6),
-                            Text(t.download, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
-                          ],
-                        ),
+                    Container(
+                      height: 260,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [tint, AppColors.kabutLavender]),
+                        borderRadius: BorderRadius.circular(36),
+                        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                        boxShadow: AppGlass.shadow,
                       ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 210,
+                            height: 210,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)]),
+                            ),
+                          ),
+                          RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 200, applyBossScale: false),
+                          Positioned(
+                            left: 16,
+                            top: 16,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                              child: Text(
+                                t.fighting(monsterName).toUpperCase(),
+                                style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.aksenHangatGelap),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(text.title, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
+                    const SizedBox(height: 6),
+                    Text(text.description, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, color: AppColors.teksSekunder)),
+                    if (session.durations.length > 1) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(t.duration, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          for (var i = 0; i < session.durations.length; i++)
+                            RiungFilterChip(
+                              label: t.minutes(session.durations[i]),
+                              selected: i == _durationIndex,
+                              selectedColor: AppColors.tinta,
+                              onTap: () => setState(() => _durationIndex = i),
+                            ),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: AppSpacing.lg),
+                    RiungGlassCard(
+                      radius: 22,
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(color: AppColors.primerLembut, borderRadius: BorderRadius.circular(14)),
+                            child: const Icon(Icons.eco_rounded, size: 18, color: AppColors.primer),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.ambientTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+                                const SizedBox(height: 2),
+                                Text(t.ambientNote, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _RewardBox(
+                            leading: const RiungIcon3D(RiungIcon.koin, size: 34),
+                            value: '+${EconomyEarn.meditasi} ${t.coins}',
+                            label: t.whenDone,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _RewardBox(
+                            leading: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 34, applyBossScale: false),
+                            value: '+3%',
+                            label: t.tame(monsterName),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        height: 126,
-                        child: RiungMonster(monsterId: session.targetMonsterId, state: MonsterVisualState.liar, size: 120),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        t.fighting(monsterName),
-                        style: AppTextStyles.caption.copyWith(color: session.color, fontWeight: FontWeight.w700, letterSpacing: 1.2, fontSize: 10),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(text.title, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 23, height: 1.3)),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(text.description, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.55)),
-                      const SizedBox(height: AppSpacing.lg),
-                      if (session.durations.length > 1) ...[
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(t.duration, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Row(
-                          children: [
-                            for (var i = 0; i < session.durations.length; i++)
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(right: i == session.durations.length - 1 ? 0 : AppSpacing.sm),
-                                  child: GestureDetector(
-                                    onTap: () => setState(() => _durationIndex = i),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(color: i == _durationIndex ? session.color : AppColors.garis, width: 1.5),
-                                        color: i == _durationIndex ? session.color.withValues(alpha: 0.12) : Colors.transparent,
-                                      ),
-                                      child: Text(
-                                        t.minutes(session.durations[i]),
-                                        style: AppTextStyles.chipLabel.copyWith(
-                                          fontSize: 14,
-                                          color: i == _durationIndex ? session.color : AppColors.teksSekunder,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                      ],
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: AppColors.permukaan,
-                          border: Border.all(color: AppColors.garis),
-                          borderRadius: BorderRadius.circular(AppRadius.lg),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(colors: [AppColors.primer, AppColors.monsterCermin]),
-                              ),
-                              alignment: Alignment.center,
-                              child: const Icon(Icons.graphic_eq, size: 20, color: AppColors.latar),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(t.ambientTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-                                  Text(t.ambientNote, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StatBox(icon: Icons.monetization_on, iconColor: AppColors.aksenHangat, value: '+${EconomyEarn.meditasi} ${t.coins}', label: t.whenDone),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: _StatBox(icon: Icons.pest_control, iconColor: AppColors.monsterWaswas, value: '+3%', label: t.tame(monsterName)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-                child: SizedBox(
-                  height: 54,
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _mulaiSesi,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: session.color,
-                      foregroundColor: AppColors.latar,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-                    ),
-                    icon: const Icon(Icons.play_arrow, size: 17),
-                    label: Text(t.startSession, style: AppTextStyles.buttonLabel.copyWith(color: AppColors.latar)),
-                  ),
-                ),
-              ),
+              const SizedBox(height: AppSpacing.md),
+              RiungButton(label: t.startSession, onPressed: _mulaiSesi),
             ],
           ),
         ),
@@ -227,29 +190,32 @@ class _MeditasiDetailScreenState extends State<MeditasiDetailScreen> {
   }
 }
 
-class _StatBox extends StatelessWidget {
-  const _StatBox({required this.icon, required this.iconColor, required this.value, required this.label});
+/// Kotak hadiah (frame `Hadiah …`): ikon/monster 3D + nilai + label.
+class _RewardBox extends StatelessWidget {
+  const _RewardBox({required this.leading, required this.value, required this.label});
 
-  final IconData icon;
-  final Color iconColor;
+  final Widget leading;
   final String value;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return RiungGlassCard(
+      radius: 20,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
-      child: Column(
+      child: Row(
         children: [
-          Icon(icon, size: 18, color: iconColor),
-          const SizedBox(height: AppSpacing.xs),
-          Text(value, style: AppTextStyles.chipLabel.copyWith(color: iconColor, fontSize: 13)),
-          Text(label, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 10)),
+          SizedBox(width: 34, height: 34, child: leading),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(value, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+                Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 10, color: AppColors.teksSekunder)),
+              ],
+            ),
+          ),
         ],
       ),
     );

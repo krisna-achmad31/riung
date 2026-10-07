@@ -60,145 +60,106 @@ class MinigameIntroScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final scope = AppScope.of(context);
     final t = context.s.minigame;
-    final color = AppColors.monsterColors[saboteur.id] ?? AppColors.primer;
     final isReaction = _waswasLevel(scope)?.boss == WaswasBossType.reaction;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: ListenableBuilder(
           listenable: scope.wallet,
           builder: (context, _) {
             final bisaMulai = scope.wallet.tickets > 0 && !scope.wallet.dailyFightCapReached;
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+              child: Column(
+                children: [
+                  Row(
                     children: [
-                      IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.close, color: AppColors.teksRedup)),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(color: AppColors.kartu, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.pill)),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.confirmation_number, size: 14, color: AppColors.sekunder),
-                            const SizedBox(width: 6),
-                            Text('×${scope.wallet.tickets}', style: AppTextStyles.chipLabel.copyWith(color: AppColors.sekunder, fontSize: 12)),
-                          ],
-                        ),
-                      ),
+                      RiungGlassIconButton(icon: Icons.close_rounded, onTap: () => Navigator.of(context).maybePop()),
+                      const Spacer(),
+                      TiketChip(count: scope.wallet.tickets),
                     ],
                   ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  Expanded(
+                    child: RiungBleedListView(
+                      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                       children: [
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(color: AppColors.sekunderLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                            child: Text(
+                              saboteur.isBoss ? t.introKickerBoss : t.introKicker(isReaction),
+                              style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.sekunder),
+                            ),
+                          ),
+                        ),
                         SizedBox(
-                          width: 150,
-                          height: 158,
-                          child: RiungMonster(monsterId: saboteur.id, state: MonsterVisualState.liar, size: 150),
+                          height: 280,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 260,
+                                height: 260,
+                                decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                              ),
+                              RiungMonster(monsterId: saboteur.id, state: MonsterVisualState.liar, size: 250, applyBossScale: false),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          saboteur.isBoss ? t.introKickerBoss : t.introKicker(isReaction),
-                          style: AppTextStyles.caption.copyWith(color: color, fontWeight: FontWeight.w700, letterSpacing: 1.4, fontSize: 10),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(t.introTitle(saboteur.nama), textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 23)),
+                        Text(t.introTitle(saboteur.nama), textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           t.introBody(MinigameConfig.sessionSeconds, isReaction),
                           textAlign: TextAlign.center,
-                          style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.6),
+                          style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5, color: AppColors.teksSekunder),
                         ),
                         const SizedBox(height: AppSpacing.lg),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _StatChip(icon: Icons.bolt, color: color, value: '-${EconomyEarn.minigameWinProgressPercent}%', label: t.chipStrength),
-                            const SizedBox(width: AppSpacing.sm),
-                            _StatChip(icon: Icons.monetization_on, color: AppColors.aksenHangat, value: '+${EconomyEarn.menangGame}', label: t.chipCoinsIfWin),
-                            const SizedBox(width: AppSpacing.sm),
-                            _StatChip(icon: Icons.confirmation_number, color: AppColors.sekunder, value: t.chipOneTicket, label: t.chipPerAttack),
-                          ],
+                        IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(child: RiungValueChip(value: '−${EconomyEarn.minigameWinProgressPercent}%', label: t.chipStrength)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: RiungValueChip(
+                                  leading: const RiungIcon3D(RiungIcon.koin, size: 30),
+                                  value: '+${EconomyEarn.menangGame}',
+                                  label: t.chipCoinsIfWin,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: RiungValueChip(leading: const RiungIcon3D(RiungIcon.tiket, size: 30), value: t.chipOneTicket, label: t.chipPerAttack),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         RiungOwlTip(message: t.owlTip(saboteur.id)),
                       ],
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 54,
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: bisaMulai ? () => _mulai(context) : () => Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(builder: (_) => const MinigameDailyCapScreen()),
-                              ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: color,
-                            foregroundColor: AppColors.latar,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-                          ),
-                          icon: const Icon(Icons.bolt, size: 17),
-                          label: Text(t.startAttack, style: AppTextStyles.chipLabel.copyWith(color: AppColors.latar, fontSize: 15)),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        t.introRules(EconomyTiket.maxDariLatihanPerHari, EconomyTiket.maxFightPerHari),
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.caption.copyWith(fontSize: 12),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        t.introEthic,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.5),
-                      ),
-                    ],
+                  const SizedBox(height: AppSpacing.sm),
+                  RiungButton(
+                    label: t.startAttack,
+                    onPressed: bisaMulai
+                        ? () => _mulai(context)
+                        : () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MinigameDailyCapScreen())),
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    t.introRules(EconomyTiket.maxDariLatihanPerHari, EconomyTiket.maxFightPerHari),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(t.introEthic, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, color: AppColors.teksRedup)),
+                ],
+              ),
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _StatChip extends StatelessWidget {
-  const _StatChip({required this.icon, required this.color, required this.value, required this.label});
-
-  final IconData icon;
-  final Color color;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(14)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 17, color: color),
-          const SizedBox(height: 3),
-          Text(value, style: AppTextStyles.chipLabel.copyWith(fontSize: 12, color: color)),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 9)),
-        ],
       ),
     );
   }

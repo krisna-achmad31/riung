@@ -20,14 +20,9 @@ class PremiumDailyCoinsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.profil;
     final wallet = AppScope.of(context).wallet;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: isAnnual ? AppColors.aksenHangat.withValues(alpha: 0.5) : AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+    return RiungGlassCard(
+      radius: 26,
+      padding: const EdgeInsets.all(16),
       child: isAnnual
           ? ListenableBuilder(
               listenable: wallet,
@@ -36,16 +31,8 @@ class PremiumDailyCoinsCard extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.monetization_on, size: 18, color: AppColors.aksenHangat),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(t.dailyCoinsTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(t.dailyCoinsBody(EconomyPremium.koinHarianTahunan), style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5)),
-                    const SizedBox(height: AppSpacing.md),
+                    _Atas(title: t.dailyCoinsTitle, body: t.dailyCoinsBody(EconomyPremium.koinHarianTahunan)),
+                    const SizedBox(height: 10),
                     RiungButton(
                       label: claimable ? t.claimDaily(EconomyPremium.koinHarianTahunan) : t.claimedToday,
                       onPressed: claimable
@@ -57,8 +44,8 @@ class PremiumDailyCoinsCard extends StatelessWidget {
                             }
                           : null,
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(t.dailyCoinsNote, style: AppTextStyles.caption.copyWith(fontSize: 10)),
+                    const SizedBox(height: 10),
+                    Text(t.dailyCoinsNote, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
                   ],
                 );
               },
@@ -66,19 +53,43 @@ class PremiumDailyCoinsCard extends StatelessWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(t.switchYearlyTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  t.switchYearlyBody(EconomyPremium.bulanDibayarPerTahun, EconomyPremium.koinHarianTahunan),
-                  style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                TextButton(
+                _Atas(title: t.switchYearlyTitle, body: t.switchYearlyBody(EconomyPremium.bulanDibayarPerTahun, EconomyPremium.koinHarianTahunan)),
+                const SizedBox(height: 10),
+                RiungButton(
+                  label: t.switchYearly,
+                  variant: RiungButtonVariant.secondary,
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallPremiumScreen())),
-                  child: Text(t.switchYearly, style: AppTextStyles.chipLabel.copyWith(color: AppColors.primer, fontSize: 13)),
                 ),
               ],
             ),
+    );
+  }
+}
+
+/// Baris atas (frame `Atas`): koin 3D + judul + isi.
+class _Atas extends StatelessWidget {
+  const _Atas({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const RiungIcon3D(RiungIcon.koin, size: 48),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+              const SizedBox(height: 2),
+              Text(body, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.35, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

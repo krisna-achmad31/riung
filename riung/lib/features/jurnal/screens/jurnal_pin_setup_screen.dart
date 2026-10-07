@@ -4,6 +4,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../widgets/pin_pad.dart';
 
 /// Setup PIN 6 digit pertama kali (buat lalu konfirmasi). Disimpan via
@@ -82,28 +83,29 @@ class _JurnalPinSetupScreenState extends State<JurnalPinSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 74,
-                height: 74,
-                decoration: BoxDecoration(
-                  color: AppColors.sukses.withValues(alpha: 0.12),
-                  border: Border.all(color: AppColors.sukses.withValues(alpha: 0.3)),
-                  borderRadius: BorderRadius.circular(24),
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                    ),
+                    const RiungIcon3D(RiungIcon.jurnal, size: 100),
+                  ],
                 ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.lock, size: 34, color: AppColors.sukses),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 _confirming ? context.s.jurnal.pinRepeat : context.s.jurnal.pinCreate,
-                style: AppTextStyles.title.copyWith(fontSize: 21),
+                style: AppTextStyles.display.copyWith(fontSize: 24),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
@@ -127,7 +129,7 @@ class _JurnalPinSetupScreenState extends State<JurnalPinSetupScreen> {
               ],
               const SizedBox(height: AppSpacing.xl),
               SizedBox(
-                width: 236,
+                width: 300,
                 child: PinNumpad(onDigit: _onDigit, onBackspace: _onBackspace),
               ),
             ],

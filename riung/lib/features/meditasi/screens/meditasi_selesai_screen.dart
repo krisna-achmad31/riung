@@ -16,98 +16,82 @@ class MeditasiSelesaiScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.s.meditasi;
+    final monsterId = session.targetMonsterId;
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.sukses,
-        alignment: const Alignment(0, -0.75),
-        opacity: 0.16,
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xl),
           child: Column(
             children: [
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
+                child: SingleChildScrollView(
+                  clipBehavior: Clip.none,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: 132,
-                        height: 139,
-                        child: RiungMonster(monsterId: session.targetMonsterId, state: MonsterVisualState.jinak, size: 132),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        t.doneTitle(session.defaultDuration),
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.3),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        t.doneBody,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.body,
+                      Center(
+                        child: SizedBox(
+                          width: 300,
+                          height: 250,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 25,
+                                top: 0,
+                                child: Container(
+                                  width: 250,
+                                  height: 250,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)]),
+                                  ),
+                                ),
+                              ),
+                              const Positioned(left: 16, top: 110, child: RiungIcon3D(RiungIcon.meditasi, size: 130)),
+                              Positioned(
+                                left: 90,
+                                top: 20,
+                                child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 190, applyBossScale: false),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
+                      Text(t.doneTitle(session.defaultDuration), style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(t.doneBody, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                      const SizedBox(height: AppSpacing.lg),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _StatBox(icon: Icons.monetization_on, iconColor: AppColors.aksenHangat, value: '+${EconomyEarn.meditasi}', label: t.coins),
-                          const SizedBox(width: AppSpacing.sm),
-                          _StatBox(icon: Icons.pest_control, iconColor: AppColors.monsterWaswas, value: '+3%', label: context.s.common.monsterName(session.targetMonsterId)),
-                          const SizedBox(width: AppSpacing.sm),
-                          _StatBox(icon: Icons.self_improvement, iconColor: AppColors.sekunder, value: '', label: t.totalSessions),
+                          Expanded(
+                            child: RiungStatTile(
+                              leading: const RiungIcon3D(RiungIcon.koin, size: 44),
+                              value: '+${EconomyEarn.meditasi}',
+                              label: t.coins,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: RiungStatTile(
+                              leading: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 44, applyBossScale: false),
+                              value: '+3%',
+                              label: context.s.common.monsterName(monsterId),
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-                child: Column(
-                  children: [
-                    RiungButton(label: context.s.common.selesai, onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(t.repeatSession, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13)),
-                    ),
-                  ],
-                ),
-              ),
+              const SizedBox(height: AppSpacing.md),
+              RiungButton(label: context.s.home.backToHome, onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
+              const SizedBox(height: 10),
+              RiungButton(label: t.repeatSession, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(context).pop()),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _StatBox extends StatelessWidget {
-  const _StatBox({required this.icon, required this.iconColor, required this.value, required this.label});
-
-  final IconData icon;
-  final Color iconColor;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: iconColor),
-          const SizedBox(height: AppSpacing.xs),
-          Text(value.isEmpty ? '-' : value, style: AppTextStyles.chipLabel.copyWith(color: iconColor, fontSize: 14)),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 9)),
-        ],
       ),
     );
   }

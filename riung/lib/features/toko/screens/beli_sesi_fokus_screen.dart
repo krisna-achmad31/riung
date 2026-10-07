@@ -32,54 +32,36 @@ class _BeliSesiFokusScreenState extends State<BeliSesiFokusScreen> {
     final harga = _paket ? hargaPaket : hargaSatu;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Expanded(
-                    child: Text(t.prepaidTitle, textAlign: TextAlign.center, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                  ),
-                  ListenableBuilder(
-                    listenable: scope.wallet,
-                    builder: (context, _) => KoinChip(balance: scope.wallet.coins),
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(
+                title: t.prepaidTitle,
+                trailing: ListenableBuilder(listenable: scope.wallet, builder: (context, _) => KoinChip(balance: scope.wallet.coins)),
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                   children: [
-                    const SizedBox(height: AppSpacing.sm),
-                    const SizedBox(
-                      width: 100,
-                      height: 105,
-                      child: RiungMonster(monsterId: 'mengelak', state: MonsterVisualState.liar, size: 100),
+                    SizedBox(
+                      height: 170,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 170,
+                            height: 170,
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                          ),
+                          const RiungIcon3D(RiungIcon.fokus, size: 150),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text(
-                      t.prepaidIntro,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body.copyWith(fontSize: 13),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    _OpsiSesi(
-                      title: t.oneSession,
-                      subtitle: t.oneSessionSub,
-                      price: hargaSatu,
-                      selected: !_paket,
-                      onTap: () => setState(() => _paket = false),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
+                    _OpsiSesi(title: t.oneSession, subtitle: t.oneSessionSub, price: hargaSatu, selected: !_paket, onTap: () => setState(() => _paket = false)),
+                    const SizedBox(height: AppSpacing.md),
                     _OpsiSesi(
                       title: t.bundleTitle(TokoFocusBundle.jumlahPaket),
                       subtitle: t.bundleSub,
@@ -88,36 +70,19 @@ class _BeliSesiFokusScreenState extends State<BeliSesiFokusScreen> {
                       selected: _paket,
                       onTap: () => setState(() => _paket = true),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.permukaan,
-                        border: Border.all(color: AppColors.garis),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _Poin(icon: Icons.check_rounded, color: AppColors.sukses, text: t.pointEmergency),
-                          _Poin(icon: Icons.wifi_off_rounded, color: AppColors.sekunder, text: t.pointOffline),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.md),
+                    _Poin(icon: Icons.verified_user_outlined, text: t.pointEmergency),
+                    _Poin(icon: Icons.wifi_off_rounded, text: t.pointOffline),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-              child: RiungButton(
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(
                 label: _paket ? t.buyBundle(jumlah, harga) : t.buyOne(harga),
                 onPressed: () => _beli(context, jumlah: jumlah, harga: harga),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -146,8 +111,8 @@ class _BeliSesiFokusScreenState extends State<BeliSesiFokusScreen> {
         builder: (_) => PembelianSuksesScreen(
           title: t.sessionsReadyTitle(jumlah),
           subtitle: t.sessionsReadySub,
-          statIcon: Icons.center_focus_strong_rounded,
-          statValue: '×$jumlah',
+          statIcon: RiungIcon.fokus,
+          statValue: '$jumlah',
           statLabel: t.sessionsLabel,
           ctaMulaiFokus: true,
         ),
@@ -156,15 +121,9 @@ class _BeliSesiFokusScreenState extends State<BeliSesiFokusScreen> {
   }
 }
 
+/// Opsi paket (frame `1 sesi` / `Paket 5 sesi`) dengan harga koin di kanan.
 class _OpsiSesi extends StatelessWidget {
-  const _OpsiSesi({
-    required this.title,
-    required this.subtitle,
-    required this.price,
-    required this.selected,
-    required this.onTap,
-    this.badge,
-  });
+  const _OpsiSesi({required this.title, required this.subtitle, required this.price, required this.selected, required this.onTap, this.badge});
 
   final String title;
   final String subtitle;
@@ -175,77 +134,40 @@ class _OpsiSesi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return RiungRadioOption(
+      title: title,
+      subtitle: subtitle,
+      selected: selected,
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.sekunder.withValues(alpha: 0.1) : AppColors.permukaan,
-          border: Border.all(color: selected ? AppColors.sekunder : AppColors.garis, width: selected ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            if (badge != null)
-              Positioned(
-                top: -21,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(color: AppColors.sekunder, borderRadius: BorderRadius.circular(AppRadius.pill)),
-                  child: Text(
-                    badge!,
-                    style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5),
-                  ),
-                ),
-              ),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: AppTextStyles.subtitle.copyWith(fontSize: 14)),
-                      const SizedBox(height: 2),
-                      Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.monetization_on, size: 14, color: AppColors.aksenHangat),
-                    const SizedBox(width: 4),
-                    Text('$price', style: AppTextStyles.subtitle.copyWith(fontSize: 15, color: AppColors.aksenHangat)),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+      badge: badge,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const RiungIcon3D(RiungIcon.koin, size: 20),
+          const SizedBox(width: 4),
+          Text('$price', style: AppTextStyles.title.copyWith(fontSize: 16)),
+        ],
       ),
     );
   }
 }
 
 class _Poin extends StatelessWidget {
-  const _Poin({required this.icon, required this.color, required this.text});
+  const _Poin({required this.icon, required this.text});
 
   final IconData icon;
-  final Color color;
   final String text;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(text, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder))),
+          Icon(icon, size: 16, color: AppColors.primer),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
         ],
       ),
     );

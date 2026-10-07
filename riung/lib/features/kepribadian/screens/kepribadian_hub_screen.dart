@@ -5,6 +5,7 @@ import '../../../core/models/journal_entry.dart';
 import '../../../core/models/personality_result.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../jurnal/screens/jurnal_pin_unlock_screen.dart';
 import '../logic/character_accessory.dart';
 import '../logic/character_spec.dart';
@@ -69,54 +70,45 @@ class _KepribadianHubScreenState extends State<KepribadianHubScreen> {
       builder: (context, _, _) {
         final results = AppScope.of(context).prefs.personalityResults;
         return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+              child: Column(
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.title, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                children: [
-                  Text(t.subtitle, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5)),
-                  const SizedBox(height: AppSpacing.lg),
-                  for (final test in PersonalityTest.values) ...[
-                    _TestCard(
-                      test: test,
-                      result: results[test],
-                      onStart: () => _bukaTes(test),
-                      onSee: () => _lihatHasil(results[test]!),
+                  RiungGlassHeader(title: t.title),
+                  Expanded(
+                    child: RiungBleedListView(
+                      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xxl),
+                      children: [
+                        Text(t.subtitle, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                        const SizedBox(height: AppSpacing.lg),
+                        for (final test in PersonalityTest.values) ...[
+                          _TestCard(
+                            test: test,
+                            result: results[test],
+                            onStart: () => _bukaTes(test),
+                            onSee: () => _lihatHasil(results[test]!),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
+                        _SignalsCard(signals: _signals, loading: _loadingSignals, onLoad: _muatPola),
+                        const SizedBox(height: AppSpacing.lg),
+                        Text(t.disclaimer, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45, color: AppColors.teksRedup)),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-                  const SizedBox(height: AppSpacing.sm),
-                  _SignalsCard(signals: _signals, loading: _loadingSignals, onLoad: _muatPola),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(t.disclaimer, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.5)),
-                  const SizedBox(height: AppSpacing.lg),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
+          ),
         );
       },
     );
   }
 }
 
+/// Kartu tes (frame `Tes …`): karakter 3D di kotak kaca, judul, blurb, pil
+/// status (hasil / jumlah pertanyaan).
 class _TestCard extends StatelessWidget {
   const _TestCard({required this.test, required this.result, required this.onStart, required this.onSee});
 
@@ -125,82 +117,91 @@ class _TestCard extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onSee;
 
+  /// Karakter contoh untuk tes yang belum diisi.
+  static CharacterSpec _placeholder(PersonalityTest test) => switch (test) {
+        PersonalityTest.jung => CharacterSpec.jung('INFP'),
+        PersonalityTest.temperament => CharacterSpec.temperament('melankolis'),
+        PersonalityTest.attachment => CharacterSpec.attachment('aman'),
+      };
+
   @override
   Widget build(BuildContext context) {
     final t = context.s.kepribadian;
     final done = result != null;
-    final spec = done ? CharacterSpec.fromResult(result!) : null;
-    String? headline;
+    final spec = done ? CharacterSpec.fromResult(result!) : _placeholder(test);
+    String status;
     if (done) {
-      switch (test) {
-        case PersonalityTest.jung:
-          headline = '${result!.code} · ${t.jungType(result!.code).name}';
-        case PersonalityTest.temperament:
-          headline = t.temperament(result!.code).name;
-        case PersonalityTest.attachment:
-          headline = t.attachment(result!.code).name;
-      }
+      status = switch (test) {
+        PersonalityTest.jung => '${result!.code} · ${t.jungType(result!.code).name}',
+        PersonalityTest.temperament => t.temperament(result!.code).name,
+        PersonalityTest.attachment => t.attachment(result!.code).name,
+      };
+    } else {
+      status = '${t.startTest} · ${t.questionCount(PersonalityConfig.questionsFor(test).length)}';
     }
 
-    return GestureDetector(
+    return RiungGlassCard(
       onTap: done ? onSee : onStart,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: done ? spec!.base.withValues(alpha: 0.6) : AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.xxl),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 84,
-              height: 84,
-              child: done
-                  ? CharacterAvatar(spec: spec!, size: 84, accessories: AccessoryLoadout(AppScope.of(context).prefs).of(test))
-                  : Container(
-                      decoration: BoxDecoration(color: AppColors.kartu, borderRadius: BorderRadius.circular(22)),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.help_outline_rounded, size: 32, color: AppColors.teksRedup),
-                    ),
+      radius: 28,
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Container(
+            width: 93,
+            height: 93,
+            decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(24)),
+            alignment: Alignment.center,
+            child: Opacity(
+              opacity: done ? 1 : 0.55,
+              child: CharacterAvatar(spec: spec, size: 78, accessories: done ? AccessoryLoadout(AppScope.of(context).prefs).of(test) : const []),
             ),
-            const SizedBox(width: AppSpacing.lg),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(t.testName(test), style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
-                  const SizedBox(height: 2),
-                  Text(done ? headline! : t.testBlurb(test), style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: done ? spec!.base : AppColors.teksRedup, fontWeight: done ? FontWeight.w700 : FontWeight.w400)),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    children: [
-                      Text(
-                        done ? t.seeResult : '${t.startTest} · ${t.questionCount(PersonalityConfig.questionsFor(test).length)}',
-                        style: AppTextStyles.chipLabel.copyWith(fontSize: 12, color: AppColors.primer),
-                      ),
-                      const Spacer(),
-                      if (done)
-                        GestureDetector(
-                          onTap: onStart,
-                          behavior: HitTestBehavior.opaque,
-                          child: Padding(
-                            padding: const EdgeInsets.all(4),
-                            child: Text(t.retake, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
-                          ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(t.testName(test), style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+                const SizedBox(height: 4),
+                Text(t.testBlurb(test), style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, color: AppColors.teksSekunder)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                        decoration: BoxDecoration(color: done ? AppColors.primerLembut : AppColors.permukaan, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        child: Text(
+                          status,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: done ? AppColors.primer : AppColors.teksSekunder),
                         ),
+                      ),
+                    ),
+                    if (done) ...[
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: onStart,
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(t.retake, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
+                        ),
+                      ),
                     ],
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
+/// Kartu "Pola dari jurnalmu" (frame `Pola jurnal`).
 class _SignalsCard extends StatelessWidget {
   const _SignalsCard({required this.signals, required this.loading, required this.onLoad});
 
@@ -219,49 +220,44 @@ class _SignalsCard extends StatelessWidget {
       if (s.topPeriod != null) lines.add(t.signalPeriod(t.periodLabel(s.topPeriod!)));
       if (s.topTag != null) lines.add(t.signalMonster(s.topTag!));
     }
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+    return RiungGlassCard(
+      radius: 26,
+      color: AppColors.sekunderLembut.withValues(alpha: 0.7),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.lock_outline_rounded, size: 16, color: AppColors.sukses),
-              const SizedBox(width: AppSpacing.sm),
-              Text(t.signalsTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(t.signalsNote, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.5)),
-          const SizedBox(height: AppSpacing.sm),
+          Text(t.signalsTitle, style: AppTextStyles.title.copyWith(fontSize: 15)),
+          const SizedBox(height: 8),
           if (s == null)
-            TextButton(
-              onPressed: loading ? null : onLoad,
+            GestureDetector(
+              onTap: loading ? null : onLoad,
               child: loading
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primer))
-                  : Text(t.seeResult, style: AppTextStyles.chipLabel.copyWith(color: AppColors.primer, fontSize: 13)),
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.sekunder))
+                  : Text(t.seeResult, style: AppTextStyles.chipLabel.copyWith(color: AppColors.sekunder, fontSize: 13)),
             )
           else if (s.isEmpty)
-            Text(t.signalsEmpty, style: AppTextStyles.body.copyWith(fontSize: 12, height: 1.5))
+            Text(t.signalsEmpty, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.45, color: AppColors.teksUtama))
           else
             for (final line in lines)
               Padding(
-                padding: const EdgeInsets.only(top: 6),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.circle, size: 6, color: AppColors.primer),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(child: Text(line, style: AppTextStyles.body.copyWith(fontSize: 13))),
+                    Container(
+                      margin: const EdgeInsets.only(top: 6),
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(color: AppColors.sekunder, shape: BoxShape.circle),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(line, style: AppTextStyles.body.copyWith(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
                   ],
                 ),
               ),
+          const SizedBox(height: 4),
+          Text(t.signalsNote, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, color: AppColors.teksSekunder)),
         ],
       ),
     );

@@ -7,7 +7,7 @@ import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 
 /// Pengingat notifikasi afirmasi harian. Implement persis
-/// `design/Afirmasi.dc.html` § Pengingat afirmasi.
+/// `design/Afirmasi.dc.html` § Pengingat afirmasi (visual: `Glass — Afirmasi · Pengingat`).
 class AfirmasiPengingatScreen extends StatefulWidget {
   const AfirmasiPengingatScreen({super.key});
 
@@ -51,138 +51,150 @@ class _AfirmasiPengingatScreenState extends State<AfirmasiPengingatScreen> {
     Navigator.of(context).maybePop();
   }
 
+  Future<void> _pilihJam() async {
+    final t = context.s.afirmasi;
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(t.sendTime, style: AppTextStyles.subtitle.copyWith(fontWeight: FontWeight.w700)),
+              const SizedBox(height: AppSpacing.md),
+              for (final (jam, label) in t.timeOptions)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  onTap: () => Navigator.of(context).pop(jam),
+                  title: Text(label, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
+                  trailing: Text(jam, style: AppTextStyles.title.copyWith(fontSize: 16, color: jam == _jam ? AppColors.primer : AppColors.teksSekunder)),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (picked != null && mounted) setState(() => _jam = picked);
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.s.afirmasi;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder)),
-                  Text(t.reminderTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.xxl)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(child: Text(t.reminderSwitch, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14))),
-                            Switch(
-                              value: _aktif,
-                              onChanged: (v) => setState(() => _aktif = v),
-                              activeTrackColor: AppColors.primer,
-                              thumbColor: const WidgetStatePropertyAll(AppColors.latar),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(t.reminderNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(t.sendTime, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    children: [
-                      for (final option in t.timeOptions)
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: AppSpacing.sm),
-                            child: GestureDetector(
-                              onTap: () => setState(() => _jam = option.$1),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 13),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: _jam == option.$1 ? AppColors.primer : AppColors.garis, width: 1.5),
-                                  color: _jam == option.$1 ? AppColors.primer.withValues(alpha: 0.12) : Colors.transparent,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text(option.$1, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: _jam == option.$1 ? AppColors.primer : AppColors.teksSekunder)),
-                                    const SizedBox(height: 2),
-                                    Text(option.$2, style: AppTextStyles.caption.copyWith(fontSize: 10, color: _jam == option.$1 ? AppColors.primer : AppColors.teksRedup)),
-                                  ],
-                                ),
-                              ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.reminderTitle),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.lg),
+                  children: [
+                    RiungGlassCard(
+                      radius: 24,
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.reminderSwitch, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+                                const SizedBox(height: 3),
+                                Text(t.reminderNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.teksSekunder)),
+                              ],
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(t.preview, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
-                  const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-                    decoration: BoxDecoration(color: AppColors.kartu, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(16)),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(gradient: const LinearGradient(colors: [AppColors.primer, AppColors.sekunder]), borderRadius: BorderRadius.circular(11)),
-                          alignment: Alignment.center,
-                          child: const Icon(Icons.auto_awesome, size: 18, color: AppColors.latar),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Riung', style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.teksUtama)),
-                                  Text(_jam, style: AppTextStyles.caption.copyWith(fontSize: 10)),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(t.previewSample, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45)),
-                            ],
+                          const SizedBox(width: AppSpacing.md),
+                          Switch(value: _aktif, onChanged: (v) => setState(() => _aktif = v)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    RiungGlassCard(
+                      radius: 24,
+                      padding: const EdgeInsets.all(16),
+                      onTap: _pilihJam,
+                      child: Row(
+                        children: [
+                          Expanded(child: Text(t.sendTime, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama))),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(color: AppColors.primerLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                            child: Text(_jam, style: AppTextStyles.title.copyWith(fontSize: 16, height: 1.2, color: AppColors.primer)),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: AppColors.sekunder.withValues(alpha: 0.08), border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.25)), borderRadius: BorderRadius.circular(16)),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.info_outline, size: 17, color: AppColors.sekunder),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(child: Text(t.reminderInfo, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5))),
-                      ],
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(t.preview, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
+                    const SizedBox(height: AppSpacing.md),
+                    _NotifPreview(title: t.cardScreenTitle, body: t.previewSample),
+                    const SizedBox(height: AppSpacing.lg),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(color: AppColors.kartu, borderRadius: BorderRadius.circular(18)),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.shuffle_rounded, size: 16, color: AppColors.teksSekunder),
+                          const SizedBox(width: 10),
+                          Expanded(child: Text(t.reminderInfo, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.teksSekunder))),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-              child: RiungButton(label: context.s.common.simpan, onPressed: _menyimpan ? null : _simpan),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              RiungButton(label: t.saveReminder, onPressed: _menyimpan ? null : _simpan),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+/// Pratinjau notifikasi (frame `Notifikasi`): ikon app gradien "R" + teks.
+class _NotifPreview extends StatelessWidget {
+  const _NotifPreview({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return RiungGlassCard(
+      radius: 24,
+      color: AppColors.permukaan,
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primer, AppColors.sekunder]),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: Text('R', style: AppTextStyles.title.copyWith(fontSize: 18, color: AppColors.diAtasTinta)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksUtama)),
+                const SizedBox(height: 2),
+                Text(body, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

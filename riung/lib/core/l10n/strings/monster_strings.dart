@@ -27,6 +27,7 @@ abstract class MonsterStrings {
   String progressToTamed(int percent);
   String get minions;
   String get tamedBadge;
+  String get friendShort;
 
   // ── Detail ──
   String get realWorld;
@@ -54,6 +55,8 @@ abstract class MonsterStrings {
   String get stageNodeBossTitle;
   String stageNodeBossSub(int percent);
   String get stageNodeLabelDone;
+  String get stageNodeStartHere;
+  String stageNodeBossLabel(int percent);
 
   // ── Detail Si Hakim ──
   String get hakimIntro;
@@ -99,6 +102,8 @@ class MonsterStringsId extends MonsterStrings {
   String get minions => 'Anak buahnya';
   @override
   String get tamedBadge => 'JINAK';
+  @override
+  String get friendShort => 'Sekarang temanmu';
 
   @override
   String get realWorld => 'DI DUNIA NYATA, DIA ADALAH…';
@@ -147,6 +152,10 @@ class MonsterStringsId extends MonsterStrings {
   String stageNodeBossSub(int percent) => '$percent% menuju jinak';
   @override
   String get stageNodeLabelDone => 'Selesai';
+  @override
+  String get stageNodeStartHere => 'Mulai di sini';
+  @override
+  String stageNodeBossLabel(int percent) => 'Bos · $percent%';
 
   @override
   String get hakimIntro =>
@@ -276,6 +285,8 @@ class MonsterStringsEn extends MonsterStrings {
   String get minions => 'His minions';
   @override
   String get tamedBadge => 'TAMED';
+  @override
+  String get friendShort => 'Your friend now';
 
   @override
   String get realWorld => 'IN THE REAL WORLD, HE IS…';
@@ -324,6 +335,10 @@ class MonsterStringsEn extends MonsterStrings {
   String stageNodeBossSub(int percent) => '$percent% to tamed';
   @override
   String get stageNodeLabelDone => 'Done';
+  @override
+  String get stageNodeStartHere => 'Start here';
+  @override
+  String stageNodeBossLabel(int percent) => 'Boss · $percent%';
 
   @override
   String get hakimIntro =>

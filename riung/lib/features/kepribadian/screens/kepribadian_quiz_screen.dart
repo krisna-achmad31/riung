@@ -5,6 +5,8 @@ import '../../../core/models/personality_result.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../widgets/character_avatar.dart';
+import '../logic/character_spec.dart';
 import '../logic/personality_config.dart';
 import '../logic/personality_scoring.dart';
 import 'kepribadian_hasil_screen.dart';
@@ -68,11 +70,19 @@ class _KepribadianQuizScreenState extends State<KepribadianQuizScreen> {
     if (keluar == true && mounted) Navigator.of(context).pop();
   }
 
+  /// Karakter ilustrasi per tes (sama dengan contoh di hub).
+  static CharacterSpec _illustration(PersonalityTest test) => switch (test) {
+        PersonalityTest.jung => CharacterSpec.jung('INFP'),
+        PersonalityTest.temperament => CharacterSpec.temperament('melankolis'),
+        PersonalityTest.attachment => CharacterSpec.attachment('aman'),
+      };
+
   @override
   Widget build(BuildContext context) {
     final t = context.s.kepribadian;
     final q = _questions[_index];
     final selected = _answers[q.id];
+    final progress = (_index + (_answeredCurrent ? 1 : 0)) / _questions.length;
 
     return PopScope(
       canPop: false,
@@ -80,51 +90,47 @@ class _KepribadianQuizScreenState extends State<KepribadianQuizScreen> {
         if (!didPop) _konfirmasiKeluar();
       },
       child: Scaffold(
-        backgroundColor: AppColors.latar,
         body: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                child: Row(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    IconButton(onPressed: _konfirmasiKeluar, icon: const Icon(Icons.close, color: AppColors.teksSekunder)),
+                    RiungGlassIconButton(icon: Icons.close_rounded, onTap: _konfirmasiKeluar),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: Text(t.testName(widget.test), textAlign: TextAlign.center, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
-                    ),
-                    const SizedBox(width: 48),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                      child: LinearProgressIndicator(
-                        value: (_index + (_answeredCurrent ? 1 : 0)) / _questions.length,
-                        minHeight: 5,
-                        backgroundColor: AppColors.kartu,
-                        valueColor: const AlwaysStoppedAnimation(AppColors.primer),
+                      child: Container(
+                        height: 8,
+                        decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(4)),
+                        alignment: Alignment.centerLeft,
+                        child: AnimatedFractionallySizedBox(
+                          duration: const Duration(milliseconds: 220),
+                          widthFactor: progress.clamp(0.02, 1.0),
+                          child: DecoratedBox(decoration: BoxDecoration(color: AppColors.sekunder, borderRadius: BorderRadius.circular(4))),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(t.progress(_index + 1, _questions.length), style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                    const SizedBox(width: 12),
+                    Text(t.progress(_index + 1, _questions.length), style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.teksSekunder)),
                   ],
                 ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xl),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: RiungBleedListView(
+                    padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                     children: [
-                      Text(t.question(q.id), style: AppTextStyles.display.copyWith(fontSize: 21, height: 1.4)),
-                      const SizedBox(height: AppSpacing.xl),
+                      Center(child: CharacterAvatar(spec: _illustration(widget.test), size: 140)),
+                      const SizedBox(height: AppSpacing.md),
+                      RiungGlassCard(
+                        radius: 30,
+                        color: AppColors.permukaan,
+                        padding: const EdgeInsets.all(22),
+                        child: Text(t.question(q.id), textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 20, height: 1.3)),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
                       for (var v = PersonalityConfig.scaleMin; v <= PersonalityConfig.scaleMax; v++)
                         Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          padding: const EdgeInsets.only(bottom: 8),
                           child: _ScaleOption(
                             label: t.scaleLabels[v - PersonalityConfig.scaleMin],
                             selected: selected == v,
@@ -134,26 +140,26 @@ class _KepribadianQuizScreenState extends State<KepribadianQuizScreen> {
                     ],
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.lg),
-                child: Row(
+                const SizedBox(height: AppSpacing.sm),
+                Row(
                   children: [
-                    if (_index > 0)
-                      TextButton(
-                        onPressed: () => setState(() => _index--),
-                        child: Text(t.previous, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13)),
+                    Expanded(
+                      child: RiungButton(
+                        label: t.previous,
+                        variant: RiungButtonVariant.secondary,
+                        onPressed: _index > 0 ? () => setState(() => _index--) : null,
                       ),
-                    const Spacer(),
-                    if (_last)
-                      SizedBox(
-                        width: 190,
-                        child: RiungButton(label: t.finish, onPressed: PersonalityScoring.isComplete(widget.test, _answers) ? _selesai : null),
-                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _last
+                          ? RiungButton(label: t.finish, onPressed: PersonalityScoring.isComplete(widget.test, _answers) ? _selesai : null)
+                          : RiungButton(label: context.s.common.lanjut, onPressed: selected == null ? null : () => setState(() => _index++)),
+                    ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -161,6 +167,7 @@ class _KepribadianQuizScreenState extends State<KepribadianQuizScreen> {
   }
 }
 
+/// Opsi skala (frame `Opsi …`): radio + label; terpilih = tepi lavender.
 class _ScaleOption extends StatelessWidget {
   const _ScaleOption({required this.label, required this.selected, required this.onTap});
 
@@ -170,23 +177,40 @@ class _ScaleOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primer.withValues(alpha: 0.14) : AppColors.permukaan,
-          border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Row(
-          children: [
-            Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked, size: 18, color: selected ? AppColors.primer : AppColors.teksRedup),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(child: Text(label, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: selected ? AppColors.teksUtama : AppColors.teksSekunder))),
-          ],
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.garis : AppColors.kartu,
+            border: Border.all(color: selected ? AppColors.sekunder : AppColors.garis, width: selected ? 2 : 1.5),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: selected ? AppColors.sekunder : AppColors.sekunder.withValues(alpha: 0),
+                  border: Border.all(color: selected ? AppColors.sekunder : AppColors.teksRedup, width: 1.5),
+                ),
+                child: selected ? const Icon(Icons.check_rounded, size: 12, color: AppColors.diAtasTinta) : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(label, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, fontWeight: selected ? FontWeight.w700 : FontWeight.w500, color: AppColors.teksUtama)),
+              ),
+            ],
+          ),
         ),
       ),
     );

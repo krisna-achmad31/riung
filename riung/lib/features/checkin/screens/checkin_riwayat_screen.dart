@@ -54,29 +54,18 @@ class _CheckInRiwayatScreenState extends State<CheckInRiwayatScreen> {
   Widget build(BuildContext context) {
     final checkIns = _checkIns;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
-                  Expanded(
-                    child: Text(context.s.checkin.historyTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
-                  ),
-                ],
-              ),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+              child: RiungGlassHeader(title: context.s.checkin.historyTitle),
             ),
             Expanded(
               child: checkIns == null
                   ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
                   : checkIns.isEmpty
-                      ? _EmptyRiwayat()
+                      ? const _EmptyRiwayat()
                       : _RiwayatBody(checkIns: checkIns),
             ),
           ],
@@ -97,17 +86,9 @@ class _EmptyRiwayat extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
-              width: 100,
-              height: 105,
-              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 100),
-            ),
+            const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 130),
             const SizedBox(height: AppSpacing.md),
-            Text(
-              context.s.checkin.historyEmpty,
-              textAlign: TextAlign.center,
-              style: AppTextStyles.body,
-            ),
+            Text(context.s.checkin.historyEmpty, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(color: AppColors.teksSekunder)),
           ],
         ),
       ),
@@ -133,83 +114,85 @@ class _RiwayatBody extends StatelessWidget {
       }
     }
     final topFactors = factorCounts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final maxCount = topFactors.isEmpty ? 1 : topFactors.first.value;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
-            decoration: BoxDecoration(
-              color: AppColors.permukaan,
-              border: Border.all(color: AppColors.garis),
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(context.s.checkin.last7Days, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
-                const SizedBox(height: AppSpacing.md),
-                SizedBox(
-                  height: 120,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      for (final date in last7)
-                        Expanded(
-                          child: _DayBar(
-                            date: date,
-                            checkIn: byDate[date.toIso8601String().split('T').first],
-                          ),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
+      children: [
+        RiungGlassCard(
+          radius: 30,
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(context.s.checkin.last7Days, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+              const SizedBox(height: AppSpacing.md),
+              SizedBox(
+                height: 170,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (var i = 0; i < last7.length; i++)
+                      Expanded(
+                        child: _DayBar(
+                          date: last7[i],
+                          isToday: i == last7.length - 1,
+                          checkIn: byDate[last7[i].toIso8601String().split('T').first],
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
+        if (topFactors.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
-          if (topFactors.isNotEmpty) ...[
-            Text(context.s.checkin.mostFrequent, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
-            const SizedBox(height: AppSpacing.sm),
-            for (final entry in topFactors.take(3)) _FactorSummaryRow(factorId: entry.key, count: entry.value),
-          ],
-          const SizedBox(height: AppSpacing.xl),
+          Text(context.s.checkin.mostFrequent, style: AppTextStyles.title.copyWith(fontSize: 17)),
+          const SizedBox(height: AppSpacing.md),
+          for (final entry in topFactors.take(3)) _FactorSummaryRow(factorId: entry.key, count: entry.value, fraction: entry.value / maxCount),
         ],
-      ),
+      ],
     );
   }
 }
 
+/// Batang mood harian (frame `Hari …`): emoji di atas batang kaca; hari ini
+/// bergradien primer.
 class _DayBar extends StatelessWidget {
-  const _DayBar({required this.date, required this.checkIn});
+  const _DayBar({required this.date, required this.isToday, required this.checkIn});
 
   final DateTime date;
+  final bool isToday;
   final CheckIn? checkIn;
 
   @override
   Widget build(BuildContext context) {
     final weight = checkIn == null ? 0.0 : (_moodWeight[checkIn!.mood] ?? 0.4);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text(checkIn == null ? '' : (_moodEmoji[checkIn!.mood] ?? ''), style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 4),
+          Text(checkIn == null ? '' : (_moodEmoji[checkIn!.mood] ?? ''), style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 6),
           Container(
             width: double.infinity,
-            height: 60 * weight + 4,
+            height: 110 * weight + 10,
             decoration: BoxDecoration(
-              color: checkIn == null ? AppColors.garis : AppColors.primer,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(6), bottom: Radius.circular(3)),
+              color: isToday && checkIn != null ? null : AppColors.permukaan,
+              gradient: isToday && checkIn != null
+                  ? const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.kabutSage, AppColors.primer])
+                  : null,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.garis),
             ),
           ),
-          const SizedBox(height: 4),
-          Text(context.s.profil.weekdayShort[date.weekday - 1], style: AppTextStyles.caption.copyWith(fontSize: 9)),
+          const SizedBox(height: 6),
+          Text(
+            context.s.profil.weekdayShort[date.weekday - 1],
+            style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: isToday ? FontWeight.w700 : FontWeight.w500, color: isToday ? AppColors.primer : AppColors.teksSekunder),
+          ),
         ],
       ),
     );
@@ -217,33 +200,48 @@ class _DayBar extends StatelessWidget {
 }
 
 class _FactorSummaryRow extends StatelessWidget {
-  const _FactorSummaryRow({required this.factorId, required this.count});
+  const _FactorSummaryRow({required this.factorId, required this.count, required this.fraction});
 
   final String factorId;
   final int count;
+  final double fraction;
 
   @override
   Widget build(BuildContext context) {
     final factor = checkInFactors.where((f) => f.id == factorId);
     final label = context.s.checkin.factorLabel(factorId);
-    final icon = factor.isEmpty ? Icons.circle : factor.first.icon;
+    final icon = factor.isEmpty ? Icons.circle_outlined : factor.first.icon;
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: RiungGlassCard(
+        radius: 20,
+        padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.teksSekunder),
-            const SizedBox(width: AppSpacing.md),
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(color: AppColors.primerLembut, borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, size: 18, color: AppColors.primer),
+            ),
+            const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                context.s.checkin.factorCount(label, count),
-                style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(context.s.checkin.factorCount(label, count), style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+                  const SizedBox(height: 6),
+                  Container(
+                    height: 6,
+                    decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(3)),
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      heightFactor: 1,
+                      widthFactor: fraction.clamp(0.05, 1.0),
+                      child: DecoratedBox(decoration: BoxDecoration(color: AppColors.sekunder, borderRadius: BorderRadius.circular(3))),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

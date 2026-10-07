@@ -71,78 +71,54 @@ class _SesiContentScreenState extends State<SesiContentScreen> {
     final t = context.s.betterme;
     final text = t.session(widget.session.id);
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Expanded(child: Text(text.judul, style: AppTextStyles.subtitle.copyWith(fontSize: 15), overflow: TextOverflow.ellipsis)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: text.judul),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                   children: [
-                    const SizedBox(
-                      width: 90,
-                      height: 94,
-                      child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 90, applyBossScale: false),
+                    const Center(child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 110, applyBossScale: false)),
+                    const SizedBox(height: AppSpacing.md),
+                    RiungGlassCard(
+                      radius: 30,
+                      color: AppColors.permukaan,
+                      padding: const EdgeInsets.all(22),
+                      child: Text(text.konten, style: AppTextStyles.body.copyWith(fontSize: 15, height: 1.6, fontWeight: FontWeight.w500, color: AppColors.teksUtama)),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text(text.konten, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.7, color: AppColors.teksUtama)),
-                    const SizedBox(height: AppSpacing.xl),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: AppColors.permukaan,
-                        border: Border.all(color: AppColors.garis),
-                        borderRadius: BorderRadius.circular(AppRadius.xl),
-                      ),
+                    RiungGlassCard(
+                      radius: 28,
+                      padding: const EdgeInsets.all(18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(text.pertanyaanRefleksi, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, height: 1.5)),
-                          const SizedBox(height: AppSpacing.sm),
+                          Text(text.pertanyaanRefleksi, style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.3)),
+                          const SizedBox(height: AppSpacing.md),
                           TextField(
                             controller: _controller,
-                            maxLines: 4,
-                            style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 13),
+                            minLines: 5,
+                            maxLines: 10,
+                            cursorColor: AppColors.primer,
+                            style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15, height: 1.5, fontWeight: FontWeight.w500),
                             decoration: InputDecoration(
                               hintText: t.reflectionHint,
-                              hintStyle: AppTextStyles.caption.copyWith(fontSize: 12),
-                              filled: true,
-                              fillColor: AppColors.latar,
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: const BorderSide(color: AppColors.garis)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: const BorderSide(color: AppColors.garis)),
-                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: const BorderSide(color: AppColors.primer)),
+                              hintStyle: AppTextStyles.body.copyWith(fontSize: 13, color: AppColors.teksRedup),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.xl),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-              child: RiungButton(
-                label: _menyimpan ? t.saving : context.s.common.selesai,
-                onPressed: _menyimpan ? null : _selesai,
-              ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(label: _menyimpan ? t.saving : context.s.common.selesai, onPressed: _menyimpan ? null : _selesai),
+            ],
+          ),
         ),
       ),
     );

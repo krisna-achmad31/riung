@@ -14,39 +14,48 @@ class TidurSelesaiScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s.tidur;
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 110,
-                      height: 116,
-                      child: RiungMonster(monsterId: story.targetMonsterId, state: MonsterVisualState.jinak, size: 110),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(context.s.tidur.doneTitle, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 23)),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      context.s.tidur.doneBody,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body,
-                    ),
-                  ],
+      body: RiungGlassBackdrop(
+        night: true,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xl),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 240,
+                            height: 240,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(colors: [AppNight.cahayaBulan, AppNight.cahayaBulan.withValues(alpha: 0)]),
+                            ),
+                          ),
+                          const RiungIcon3D(RiungIcon.tidur, size: 170),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(t.doneTitle, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 28, color: AppNight.teks)),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(t.doneBody, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppNight.teksSekunder)),
+                    ],
+                  ),
                 ),
-              ),
+                RiungButton(
+                  label: context.s.common.selesai,
+                  variant: RiungButtonVariant.night,
+                  onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-              child: RiungButton(label: context.s.common.selesai, onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
-            ),
-          ],
+          ),
         ),
       ),
     );

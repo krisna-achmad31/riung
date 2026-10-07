@@ -11,6 +11,7 @@ import '../widgets/auth_text_field.dart';
 import '../widgets/google_sign_in_button.dart';
 import 'izin_notifikasi_screen.dart';
 import 'masuk_screen.dart';
+import '../widgets/launch_hero.dart';
 
 /// Buat akun — email, kata sandi, nama. Upgrade sesi anonim (dari
 /// onboarding) jadi akun permanen lewat [AuthNotifier.daftarEmailPassword]
@@ -119,74 +120,45 @@ class _DaftarScreenState extends State<DaftarScreen> {
   Widget build(BuildContext context) {
     final t = context.s.launch;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
+        child: RiungBleedListView(
+          padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.lg),
           children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
-                ],
-              ),
+            const LaunchHero(left: 'sempurna', center: 'waswas', right: 'cermin', height: 170, centerSize: 140, sideSize: 110),
+            const SizedBox(height: AppSpacing.md),
+            Text(t.createAccount, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
+            const SizedBox(height: 6),
+            Text(t.createAccountSub, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+            const SizedBox(height: AppSpacing.md),
+            AuthTextField(
+              label: t.emailLabel,
+              icon: Icons.mail_outline_rounded,
+              hint: t.emailHint,
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              errorText: _emailError,
+              onChanged: (_) => setState(() => _emailError = null),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 70,
-                      height: 74,
-                      child: RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 70),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(t.createAccount, style: AppTextStyles.display.copyWith(fontSize: 26)),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      t.createAccountSub,
-                      style: AppTextStyles.body,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    AuthTextField(
-                      label: t.emailLabel,
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      errorText: _emailError,
-                      onChanged: (_) => setState(() => _emailError = null),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    AuthTextField(
-                      label: t.passwordLabel,
-                      controller: _passwordController,
-                      obscureText: true,
-                      errorText: _passwordError,
-                      onChanged: (_) => setState(() => _passwordError = null),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    RiungButton(
-                      label: _submitting ? context.s.common.memproses : t.signUp,
-                      onPressed: _submitting ? null : _submit,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    const AuthDivider(),
-                    const SizedBox(height: AppSpacing.md),
-                    GoogleSignInButton(onPressed: _submitting ? null : _daftarGoogle),
-                  ],
-                ),
-              ),
+            const SizedBox(height: AppSpacing.md),
+            AuthTextField(
+              label: t.passwordLabel,
+              icon: Icons.lock_outline_rounded,
+              hint: t.passwordHint,
+              controller: _passwordController,
+              obscureText: true,
+              errorText: _passwordError,
+              onChanged: (_) => setState(() => _passwordError = null),
             ),
+            const SizedBox(height: AppSpacing.md),
+            RiungButton(label: _submitting ? context.s.common.memproses : t.signUp, onPressed: _submitting ? null : _submit),
+            const SizedBox(height: AppSpacing.md),
+            const AuthDivider(),
+            const SizedBox(height: AppSpacing.md),
+            GoogleSignInButton(onPressed: _submitting ? null : _daftarGoogle),
             AuthFooterLink(
               text: t.hasAccount,
               actionLabel: t.signIn,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const MasukScreen()),
-              ),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MasukScreen())),
             ),
           ],
         ),

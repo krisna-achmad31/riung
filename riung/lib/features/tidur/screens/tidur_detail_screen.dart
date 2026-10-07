@@ -5,6 +5,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../widgets/sleeping_monster.dart';
 import '../logic/sleep_catalog.dart';
 import 'tidur_player_screen.dart';
 
@@ -50,124 +51,77 @@ class _TidurDetailScreenState extends State<TidurDetailScreen> {
     final t = context.s.tidur;
     final text = t.story(story.id);
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        alignment: const Alignment(0, -1.2),
-        opacity: 0.12,
+      body: RiungGlassBackdrop(
+        night: true,
         child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder)),
-                    GestureDetector(
-                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.alreadyOffline))),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
-                        decoration: BoxDecoration(color: AppColors.kartu, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.pill)),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.download_done_rounded, size: 14, color: AppColors.teksSekunder),
-                            const SizedBox(width: 6),
-                            Text(t.download, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+            child: Column(
+              children: [
+                RiungGlassHeader(
+                  title: '',
+                  night: true,
+                  trailing: RiungGlassIconButton(
+                    icon: Icons.download_done_rounded,
+                    night: true,
+                    semanticLabel: t.download,
+                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.alreadyOffline))),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  child: Column(
+                Expanded(
+                  child: RiungBleedListView(
+                    padding: const EdgeInsets.only(top: AppSpacing.lg),
                     children: [
-                      SizedBox(width: 118, height: 124, child: RiungMonster(monsterId: story.targetMonsterId, state: MonsterVisualState.jinak, size: 118)),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        t.kicker(story.durationMinutes),
-                        style: AppTextStyles.caption.copyWith(color: AppColors.monsterCermin, fontWeight: FontWeight.w700, letterSpacing: 1.2, fontSize: 10),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(text.title, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 23, height: 1.3)),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(text.description, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.6)),
+                      SleepingMonster(monsterId: story.targetMonsterId, size: 200, glow: 260),
                       const SizedBox(height: AppSpacing.lg),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.lg)),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: const BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [AppColors.primer, AppColors.sekunder])),
-                              alignment: Alignment.center,
-                              child: Text(
-                                story.reader.split(' ').map((w) => w.isEmpty ? '' : w[0]).take(2).join(),
-                                style: AppTextStyles.chipLabel.copyWith(color: AppColors.latar, fontSize: 14),
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(t.readBy(story.reader), style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-                                  Text(t.sourceNote, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                                ],
-                              ),
-                            ),
-                          ],
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(color: AppNight.aksenLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                          child: Text(t.kicker(story.durationMinutes), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.kabutLavender)),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(t.timerTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
-                      ),
+                      Text(text.title, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2, color: AppNight.teks)),
                       const SizedBox(height: AppSpacing.sm),
-                      Row(
+                      Text(t.readBy(story.reader), style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppNight.teksSekunder)),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(text.description, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5, color: AppNight.teksSekunder)),
+                      const SizedBox(height: AppSpacing.lg),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: AppNight.card(radius: 20),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.translate_rounded, size: 16, color: AppNight.aksen),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(t.sourceNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppNight.teksSekunder))),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(t.timerTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppNight.teksSekunder)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
                         children: [
                           for (final minutes in sleepTimerPresets)
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.only(right: minutes == sleepTimerPresets.last ? 0 : AppSpacing.sm),
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _timerMinutes = minutes),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      border: Border.all(color: minutes == _timerMinutes ? AppColors.primer : AppColors.garis, width: 1.5),
-                                      color: minutes == _timerMinutes ? AppColors.primer.withValues(alpha: 0.12) : Colors.transparent,
-                                    ),
-                                    child: Text(
-                                      t.minutes(minutes),
-                                      style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: minutes == _timerMinutes ? AppColors.primer : AppColors.teksSekunder),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            RiungFilterChip(
+                              label: t.minutes(minutes),
+                              selected: minutes == _timerMinutes,
+                              night: true,
+                              onTap: () => setState(() => _timerMinutes = minutes),
                             ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-                child: RiungButton(label: t.playStory, onPressed: _putar),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.md),
+                RiungButton(label: t.playStory, icon: Icons.play_arrow_rounded, variant: RiungButtonVariant.night, onPressed: _putar),
+              ],
+            ),
           ),
         ),
       ),

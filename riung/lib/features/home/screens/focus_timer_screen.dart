@@ -5,6 +5,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../focus/widgets/focus_ring.dart';
 import 'sesi_selesai_screen.dart';
 
 /// Sesi Mode Fokus aktif — timer, monster idle bernapas, jeda & keluar
@@ -66,8 +67,7 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
   Widget build(BuildContext context) {
     if (_starting) {
       return const Scaffold(
-        backgroundColor: AppColors.latar,
-        body: Center(child: CircularProgressIndicator(color: AppColors.sekunder)),
+        body: Center(child: CircularProgressIndicator(color: AppColors.primer)),
       );
     }
     if (_insufficientCoins) {
@@ -76,12 +76,11 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
 
     final session = AppScope.of(context).session;
     final t = context.s.home;
+    final profile = AppScope.of(context).auth.profile;
+    final monsterId = (profile != null && profile.dominantSaboteurs.isNotEmpty) ? profile.dominantSaboteurs.first : 'waswas';
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.sekunder,
-        alignment: const Alignment(0, -0.6),
-        opacity: 0.14,
+      body: RiungGlassBackdrop(
+        night: true,
         child: SafeArea(
           child: ListenableBuilder(
             listenable: session,
@@ -96,130 +95,62 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
                 });
               }
               final total = session.totalDuration ?? widget.duration;
-              final elapsedFraction = total.inSeconds == 0
-                  ? 0.0
-                  : 1 - (session.remaining.inSeconds / total.inSeconds);
+              final elapsedFraction = total.inSeconds == 0 ? 0.0 : 1 - (session.remaining.inSeconds / total.inSeconds);
               final menit = session.remaining.inMinutes.toString().padLeft(2, '0');
               final detik = (session.remaining.inSeconds % 60).toString().padLeft(2, '0');
 
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.kartu,
-                            border: Border.all(color: AppColors.garis),
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.phonelink_lock, size: 14, color: AppColors.sekunder),
-                              const SizedBox(width: 6),
-                              Text(
-                                t.appsBlocked,
-                                style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w600, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          t.sessionMinutes(total.inMinutes),
-                          style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Column(
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      decoration: AppNight.card(radius: AppRadius.pill),
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(
-                            width: 250,
-                            height: 250,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 250,
-                                  height: 250,
-                                  child: CircularProgressIndicator(
-                                    value: elapsedFraction,
-                                    strokeWidth: 10,
-                                    backgroundColor: AppColors.kartu,
-                                    valueColor: const AlwaysStoppedAnimation(AppColors.sekunder),
-                                  ),
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '$menit:$detik',
-                                      style: AppTextStyles.display.copyWith(fontSize: 52, letterSpacing: -1),
-                                    ),
-                                    Text(t.remaining, style: AppTextStyles.caption),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          const Icon(Icons.verified_user_outlined, size: 14, color: AppColors.kabutSage),
+                          const SizedBox(width: 6),
+                          Text(t.appsBlocked, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppNight.teks)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(t.sessionMinutes(total.inMinutes), style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppNight.teksSekunder)),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _BreathingMonster(
+                            child: FocusRing(monsterId: monsterId, time: '$menit:$detik', unit: t.remaining, progress: elapsedFraction, night: true),
                           ),
                           const SizedBox(height: AppSpacing.lg),
-                          const _BreathingMonster(),
-                          const SizedBox(height: AppSpacing.lg),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                            child: Text(
-                              t.focusCompanion,
-                              textAlign: TextAlign.center,
-                              style: AppTextStyles.body,
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: AppNight.card(),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.air_rounded, size: 18, color: AppColors.kabutSage),
+                                const SizedBox(width: 10),
+                                Expanded(child: Text(t.focusCompanion, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppNight.teksSekunder))),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 50,
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: session.isPaused ? session.resume : session.pause,
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.garis, width: 1.5),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-                            ),
-                            icon: Icon(
-                              session.isPaused ? Icons.play_arrow : Icons.pause,
-                              size: 16,
-                              color: AppColors.teksSekunder,
-                            ),
-                            label: Text(
-                              session.isPaused ? t.resume : t.pause,
-                              style: AppTextStyles.subtitle.copyWith(fontSize: 15, color: AppColors.teksSekunder),
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: _keluarDarurat,
-                          child: Text(
-                            t.emergencyExit,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12),
-                          ),
-                        ),
-                      ],
+                    RiungButton(
+                      label: session.isPaused ? t.resume : t.pause,
+                      icon: session.isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                      variant: RiungButtonVariant.night,
+                      onPressed: session.isPaused ? session.resume : session.pause,
                     ),
-                  ),
-                ],
+                    TextButton(
+                      onPressed: _keluarDarurat,
+                      child: Text(t.emergencyExit, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 12, color: AppNight.teksRedup)),
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -229,8 +160,11 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
   }
 }
 
+/// Cincin & monster bernapas pelan (skala 1 → 1.03).
 class _BreathingMonster extends StatefulWidget {
-  const _BreathingMonster();
+  const _BreathingMonster({required this.child});
+
+  final Widget child;
 
   @override
   State<_BreathingMonster> createState() => _BreathingMonsterState();
@@ -244,7 +178,7 @@ class _BreathingMonsterState extends State<_BreathingMonster> with SingleTickerP
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat(reverse: true);
-    _scale = Tween<double>(begin: 1, end: 1.06).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _scale = Tween<double>(begin: 1, end: 1.03).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -254,16 +188,7 @@ class _BreathingMonsterState extends State<_BreathingMonster> with SingleTickerP
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scale,
-      child: const SizedBox(
-        width: 96,
-        height: 100,
-        child: RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 96),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => ScaleTransition(scale: _scale, child: widget.child);
 }
 
 class _InsufficientCoinsView extends StatelessWidget {
@@ -276,7 +201,6 @@ class _InsufficientCoinsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.home;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -284,7 +208,7 @@ class _InsufficientCoinsView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.monetization_on_outlined, size: 40, color: AppColors.aksenHangat),
+                const RiungIcon3D(RiungIcon.koin, size: 96),
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   t.notEnoughCoins(priceCoins),

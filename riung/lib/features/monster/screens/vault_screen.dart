@@ -5,6 +5,8 @@ import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../betterme/screens/betterme_home_screen.dart';
+import '../../minigame/screens/minigame_intro_screen.dart';
 import 'hakim_detail_screen.dart';
 import 'saboteur_detail_screen.dart';
 
@@ -42,8 +44,8 @@ class _VaultScreenState extends State<VaultScreen> {
   Widget build(BuildContext context) {
     final scope = AppScope.of(context);
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
+        bottom: false,
         child: ListenableBuilder(
           listenable: Listenable.merge([scope.monsterProgress, scope.wallet]),
           builder: (context, _) => _buildBody(context, scope),
@@ -83,82 +85,81 @@ class _VaultScreenState extends State<VaultScreen> {
     final tamedCount = scope.monsterProgress.all.values.where((m) => m.state == MonsterState.tamed).length;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+      padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
       children: [
         Row(
           children: [
-            // Cuma tampil kalau layar ini di-push (mis. dari Profil §
-            // "Brankas monster") — sebagai tab bawah (Navigator.canPop
-            // == false) sudah ada RiungBottomNav, back di sini jadi ganda.
+            // Cuma tampil kalau layar ini di-push (mis. dari Profil) — sebagai
+            // tab bawah sudah ada RiungBottomNav, back di sini jadi ganda.
             if (Navigator.canPop(context)) ...[
-              IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-              ),
-              const SizedBox(width: AppSpacing.xs),
+              RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
+              const SizedBox(width: AppSpacing.md),
             ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(t.vaultTitle, style: AppTextStyles.display.copyWith(fontSize: 22)),
-                  Text(t.vaultSub(tamedCount), style: AppTextStyles.caption.copyWith(fontSize: 13)),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(t.vaultTitle, maxLines: 1, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2)),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(t.vaultSub(tamedCount), style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.kartu, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.pill)),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.confirmation_number, size: 15, color: AppColors.sekunder),
-                  const SizedBox(width: 5),
-                  Text('×${scope.wallet.tickets}', style: AppTextStyles.chipLabel.copyWith(color: AppColors.sekunder, fontSize: 13)),
-                ],
-              ),
-            ),
+            TiketChip(count: scope.wallet.tickets),
+            const SizedBox(width: 8),
+            KoinChip(balance: scope.wallet.coins),
           ],
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.xl),
         _HakimCard(
           saboteur: hakim,
           progress: hakimProgress,
           onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HakimDetailScreen())),
+          onAttack: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: hakim))),
+          onCbt: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BetterMeHomeScreen())),
         ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(t.minions, style: AppTextStyles.title.copyWith(fontSize: 18)),
         const SizedBox(height: AppSpacing.lg),
-        Text(t.minions, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15)),
-        const SizedBox(height: AppSpacing.sm),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: AppSpacing.md,
-          crossAxisSpacing: AppSpacing.md,
-          childAspectRatio: 0.86,
-          children: [
-            for (final saboteur in anakBuah)
-              _AccompliceCard(
-                saboteur: saboteur,
-                progress: scope.monsterProgress.progressOf(saboteur.id) ?? MonsterProgress.initial(saboteur.id),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => SaboteurDetailScreen(saboteur: saboteur)),
-                ),
+        for (var i = 0; i < anakBuah.length; i += 2)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: _minion(context, scope, anakBuah[i])),
+                  const SizedBox(width: 12),
+                  Expanded(child: i + 1 < anakBuah.length ? _minion(context, scope, anakBuah[i + 1]) : const SizedBox.shrink()),
+                ],
               ),
-          ],
-        ),
+            ),
+          ),
       ],
     );
   }
+
+  Widget _minion(BuildContext context, AppScope scope, Saboteur saboteur) => _AccompliceCard(
+        saboteur: saboteur,
+        progress: scope.monsterProgress.progressOf(saboteur.id) ?? MonsterProgress.initial(saboteur.id),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SaboteurDetailScreen(saboteur: saboteur))),
+      );
 }
 
+/// Kartu bos Si Hakim (frame `Kartu Bos`): panggung lavender dengan Si
+/// Hakim 3D besar, badge "BOS · n%", progres gradien, tombol Serang & CBT.
 class _HakimCard extends StatelessWidget {
-  const _HakimCard({required this.saboteur, required this.progress, required this.onTap});
+  const _HakimCard({required this.saboteur, required this.progress, required this.onTap, required this.onAttack, required this.onCbt});
 
   final Saboteur saboteur;
   final MonsterProgress progress;
   final VoidCallback onTap;
+  final VoidCallback onAttack;
+  final VoidCallback onCbt;
 
   @override
   Widget build(BuildContext context) {
@@ -167,59 +168,55 @@ class _HakimCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [AppColors.monsterHakim.withValues(alpha: 0.18), AppColors.kartu.withValues(alpha: 0.9)]),
-          border: Border.all(color: AppColors.monsterHakim, width: 1.5),
-          borderRadius: BorderRadius.circular(22),
+          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.sekunderLembut, AppColors.kabutLavender]),
+          borderRadius: BorderRadius.circular(36),
+          border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+          boxShadow: AppGlass.shadow,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: 112,
-              height: 118,
-              child: RiungMonster(
-                monsterId: 'hakim',
-                state: isTamed ? MonsterVisualState.jinak : MonsterVisualState.liar,
-                size: 112,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              width: double.infinity,
+              height: 210,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Text(context.s.common.monsterName('hakim'), style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 17)),
-                      const SizedBox(width: AppSpacing.sm),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(border: Border.all(color: AppColors.monsterHakim), borderRadius: BorderRadius.circular(AppRadius.pill)),
-                        child: Text(t.bossBadge, style: AppTextStyles.caption.copyWith(color: AppColors.monsterHakim, fontWeight: FontWeight.w700, fontSize: 10)),
-                      ),
-                    ],
+                  Container(
+                    width: 230,
+                    height: 200,
+                    decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
                   ),
-                  const SizedBox(height: 7),
-                  Text(
-                    t.hakimBlurb,
-                    style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontSize: 12, height: 1.45),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    child: LinearProgressIndicator(
-                      value: progress.progress / 100,
-                      minHeight: 7,
-                      backgroundColor: AppColors.latar,
-                      valueColor: const AlwaysStoppedAnimation(AppColors.monsterHakim),
+                  RiungMonster(monsterId: 'hakim', state: isTamed ? MonsterVisualState.jinak : MonsterVisualState.liar, size: 200, applyBossScale: false),
+                  Positioned(
+                    left: 0,
+                    top: 20,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                      decoration: BoxDecoration(color: AppColors.sekunder, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                      child: Text(t.bossPercent(progress.progress), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.diAtasTinta)),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(t.progressToTamed(progress.progress), style: AppTextStyles.caption.copyWith(fontSize: 11)),
                 ],
               ),
+            ),
+            const SizedBox(height: 10),
+            Text(context.s.common.monsterName('hakim'), style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+            const SizedBox(height: 6),
+            Text(t.hakimBlurb, style: AppTextStyles.caption.copyWith(fontSize: 13, height: 1.45, color: AppColors.teksSekunder)),
+            const SizedBox(height: 10),
+            _GradientProgress(value: progress.progress / 100, colors: const [AppColors.kabutLavender, AppColors.sekunder]),
+            const SizedBox(height: 8),
+            Text(t.progressToTamed(progress.progress), style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(child: RiungButton(label: t.attack, onPressed: onAttack)),
+                const SizedBox(width: 10),
+                Expanded(child: RiungButton(label: t.cbtPractice, variant: RiungButtonVariant.secondary, onPressed: onCbt)),
+              ],
             ),
           ],
         ),
@@ -228,6 +225,29 @@ class _HakimCard extends StatelessWidget {
   }
 }
 
+class _GradientProgress extends StatelessWidget {
+  const _GradientProgress({required this.value, required this.colors});
+
+  final double value;
+  final List<Color> colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 6,
+      decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(3)),
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        heightFactor: 1,
+        widthFactor: value.clamp(0.0, 1.0),
+        child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: colors), borderRadius: BorderRadius.circular(3))),
+      ),
+    );
+  }
+}
+
+/// Kartu anak buah (frame `Kartu Si …`): panggung monster 3D + pil status,
+/// nama, progres persik atau "Sekarang temanmu" bila sudah jinak.
 class _AccompliceCard extends StatelessWidget {
   const _AccompliceCard({required this.saboteur, required this.progress, required this.onTap});
 
@@ -239,45 +259,46 @@ class _AccompliceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTamed = progress.state == MonsterState.tamed;
     final t = context.s.monster;
-    return GestureDetector(
+    return RiungGlassCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.xl)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 78,
-              height: 84,
-              child: Opacity(
-                opacity: isTamed ? 1 : 0.85,
-                child: RiungMonster(
-                  monsterId: saboteur.id,
-                  state: isTamed ? MonsterVisualState.jinak : MonsterVisualState.liar,
-                  size: 78,
+      radius: 28,
+      color: isTamed ? AppColors.permukaan : AppColors.kartu,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 116,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                RiungMonster(monsterId: saboteur.id, state: isTamed ? MonsterVisualState.jinak : MonsterVisualState.liar, size: 118, applyBossScale: false),
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                    decoration: BoxDecoration(color: isTamed ? AppColors.primer : AppColors.permukaan, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                    child: Text(
+                      isTamed ? t.tamedBadge : t.wild,
+                      style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: isTamed ? AppColors.diAtasTinta : AppColors.teksSekunder),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(context.s.common.monsterName(saboteur.id), style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-            const SizedBox(height: 3),
-            Text(
-              isTamed ? t.tamedBadge : t.progressToTamed(progress.progress),
-              style: AppTextStyles.caption.copyWith(color: isTamed ? AppColors.sukses : AppColors.teksRedup, fontWeight: FontWeight.w600, fontSize: 10),
-            ),
+          ),
+          const SizedBox(height: 6),
+          Text(context.s.common.monsterName(saboteur.id), style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+          const SizedBox(height: 6),
+          if (isTamed)
+            Text(t.friendShort, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primer))
+          else ...[
+            _GradientProgress(value: progress.progress / 100, colors: const [AppColors.aksenHangat, AppColors.aksenHangat]),
             const SizedBox(height: 6),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-              child: LinearProgressIndicator(
-                value: progress.progress / 100,
-                minHeight: 5,
-                backgroundColor: AppColors.latar,
-                valueColor: AlwaysStoppedAnimation(isTamed ? AppColors.sukses : (AppColors.monsterColors[saboteur.id] ?? AppColors.primer)),
-              ),
-            ),
+            Text(t.progressToTamed(progress.progress), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
           ],
-        ),
+        ],
       ),
     );
   }

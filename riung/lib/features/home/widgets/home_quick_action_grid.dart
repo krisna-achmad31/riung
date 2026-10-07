@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../afirmasi/screens/afirmasi_kategori_screen.dart';
 import '../../jurnal/screens/jurnal_home_screen.dart';
 import '../../meditasi/screens/meditasi_list_screen.dart';
@@ -12,16 +13,12 @@ class QuickAction {
     required this.icon,
     required this.label,
     required this.sub,
-    required this.background,
-    required this.color,
     required this.builder,
   });
 
-  final IconData icon;
+  final RiungIcon icon;
   final String label;
   final String sub;
-  final Color background;
-  final Color color;
   final WidgetBuilder builder;
 }
 
@@ -32,53 +29,46 @@ class HomeQuickActionGrid extends StatelessWidget {
 
   static List<QuickAction> _actions(HomeStrings t) => [
     QuickAction(
-      icon: Icons.self_improvement,
+      icon: RiungIcon.meditasi,
       label: t.quickMeditation,
       sub: t.quickMeditationSub,
-      background: AppColors.sekunder.withValues(alpha: 0.15),
-      color: AppColors.sekunder,
       builder: (_) => const MeditasiListScreen(),
     ),
     QuickAction(
-      icon: Icons.nightlight_round,
+      icon: RiungIcon.tidur,
       label: t.quickSleep,
       sub: t.quickSleepSub,
-      background: AppColors.primer.withValues(alpha: 0.15),
-      color: AppColors.primer,
       builder: (_) => const TidurListScreen(),
     ),
     QuickAction(
-      icon: Icons.menu_book_rounded,
+      icon: RiungIcon.jurnal,
       label: t.quickJournal,
       sub: t.quickJournalSub,
-      background: AppColors.aksenHangat.withValues(alpha: 0.15),
-      color: AppColors.aksenHangat,
       builder: (_) => const JurnalHomeScreen(),
     ),
     QuickAction(
-      icon: Icons.auto_awesome,
+      icon: RiungIcon.afirmasi,
       label: t.quickAffirmation,
       sub: t.quickAffirmationSub,
-      background: AppColors.monsterCermin.withValues(alpha: 0.18),
-      color: AppColors.monsterCermin,
       builder: (_) => const AfirmasiKategoriScreen(),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: AppSpacing.md,
-      crossAxisSpacing: AppSpacing.md,
-      childAspectRatio: 1.35,
-      children: [for (final action in _actions(context.s.home)) _QuickActionCard(action)],
+    final actions = _actions(context.s.home);
+    return Row(
+      children: [
+        for (var i = 0; i < actions.length; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
+          Expanded(child: _QuickActionCard(actions[i])),
+        ],
+      ],
     );
   }
 }
 
+/// Ubin aksi cepat (frame `Aksi …` di `Glass — Beranda`).
 class _QuickActionCard extends StatelessWidget {
   const _QuickActionCard(this.action);
 
@@ -86,30 +76,27 @@ class _QuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return RiungGlassCard(
+      radius: 24,
+      padding: const EdgeInsets.fromLTRB(6, 10, 6, 12),
       onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: action.builder)),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(color: action.background, borderRadius: BorderRadius.circular(13)),
-              alignment: Alignment.center,
-              child: Icon(action.icon, size: 21, color: action.color),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(action.label, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14)),
-            Text(action.sub, style: AppTextStyles.caption),
-          ],
-        ),
+      child: Column(
+        children: [
+          RiungIcon3D(action.icon, size: 52),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(action.label, maxLines: 1, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksUtama)),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            action.sub,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.caption.copyWith(fontSize: 10, color: AppColors.teksRedup),
+          ),
+        ],
       ),
     );
   }

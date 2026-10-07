@@ -580,6 +580,231 @@
       "id": "af_04",
       "teks": "Aku mengukur diriku dengan nilaiku sendiri.",
       "target_saboteur": "cermin"
+    },
+    {
+      "id": "af_05",
+      "teks": "Selesai lebih baik daripada sempurna.",
+      "target_saboteur": "sempurna"
+    },
+    {
+      "id": "af_06",
+      "teks": "Salah itu bagian dari belajar, bukan bukti aku gagal.",
+      "target_saboteur": "sempurna"
+    },
+    {
+      "id": "af_07",
+      "teks": "Aku boleh puas dengan \"cukup baik\".",
+      "target_saboteur": "sempurna"
+    },
+    {
+      "id": "af_08",
+      "teks": "Usahaku tetap berarti walau hasilnya belum rapi.",
+      "target_saboteur": "sempurna"
+    },
+    {
+      "id": "af_09",
+      "teks": "Aku boleh istirahat tanpa merasa bersalah.",
+      "target_saboteur": "sempurna"
+    },
+    {
+      "id": "af_10",
+      "teks": "Standarku boleh lembut pada diriku sendiri.",
+      "target_saboteur": "sempurna"
+    },
+    {
+      "id": "af_11",
+      "teks": "Perasaan ini nggak enak, tapi dia akan lewat.",
+      "target_saboteur": "waswas"
+    },
+    {
+      "id": "af_12",
+      "teks": "Aku bisa tarik napas dulu sebelum memutuskan.",
+      "target_saboteur": "waswas"
+    },
+    {
+      "id": "af_13",
+      "teks": "Kebanyakan hal yang kutakutkan nggak pernah terjadi.",
+      "target_saboteur": "waswas"
+    },
+    {
+      "id": "af_14",
+      "teks": "Aku sudah melewati hari-hari yang lebih berat dari ini.",
+      "target_saboteur": "waswas"
+    },
+    {
+      "id": "af_15",
+      "teks": "Aku cukup mengurus apa yang ada di depanku sekarang.",
+      "target_saboteur": "waswas"
+    },
+    {
+      "id": "af_16",
+      "teks": "Cemas itu tanda aku peduli, bukan tanda bahaya.",
+      "target_saboteur": "waswas"
+    },
+    {
+      "id": "af_17",
+      "teks": "Mulai lima menit saja sudah cukup.",
+      "target_saboteur": "kabut"
+    },
+    {
+      "id": "af_18",
+      "teks": "Aku nggak perlu semangat dulu untuk mulai.",
+      "target_saboteur": "kabut"
+    },
+    {
+      "id": "af_19",
+      "teks": "Pelan-pelan tetap maju.",
+      "target_saboteur": "kabut"
+    },
+    {
+      "id": "af_20",
+      "teks": "Aku boleh mengerjakan versi kecilnya dulu.",
+      "target_saboteur": "kabut"
+    },
+    {
+      "id": "af_21",
+      "teks": "Hari ini aku pilih satu hal saja.",
+      "target_saboteur": "kabut"
+    },
+    {
+      "id": "af_22",
+      "teks": "Capek itu wajar. Aku boleh lanjut pelan-pelan.",
+      "target_saboteur": "kabut"
+    },
+    {
+      "id": "af_23",
+      "teks": "Aku nggak harus secepat orang lain. Langkahku tetap langkah.",
+      "target_saboteur": "cermin"
+    },
+    {
+      "id": "af_24",
+      "teks": "Yang kulihat di layar cuma potongan hidup orang.",
+      "target_saboteur": "cermin"
+    },
+    {
+      "id": "af_25",
+      "teks": "Keberhasilan orang lain nggak mengurangi nilaiku.",
+      "target_saboteur": "cermin"
+    },
+    {
+      "id": "af_26",
+      "teks": "Aku membandingkan diriku dengan aku yang kemarin.",
+      "target_saboteur": "cermin"
+    },
+    {
+      "id": "af_27",
+      "teks": "Jalanku memang beda, dan itu nggak apa-apa.",
+      "target_saboteur": "cermin"
+    },
+    {
+      "id": "af_28",
+      "teks": "Aku cukup, bahkan saat nggak ada yang melihat.",
+      "target_saboteur": "cermin"
+    },
+    {
+      "id": "af_29",
+      "teks": "Aku nggak selalu bisa memilih keadaan, tapi aku bisa memilih langkahku.",
+      "target_saboteur": "meronta"
+    },
+    {
+      "id": "af_30",
+      "teks": "Hari yang buruk bukan hidup yang buruk.",
+      "target_saboteur": "meronta"
+    },
+    {
+      "id": "af_31",
+      "teks": "Hal sulit juga datang ke orang lain. Aku nggak sendirian.",
+      "target_saboteur": "meronta"
+    },
+    {
+      "id": "af_32",
+      "teks": "Aku punya lebih banyak kendali daripada yang kurasakan sekarang.",
+      "target_saboteur": "meronta"
+    },
+    {
+      "id": "af_33",
+      "teks": "Aku boleh sedih, lalu bangkit pelan-pelan.",
+      "target_saboteur": "meronta"
+    },
+    {
+      "id": "af_34",
+      "teks": "Ada hal kecil yang masih berjalan baik hari ini.",
+      "target_saboteur": "meronta"
+    },
+    {
+      "id": "af_35",
+      "teks": "Aku bukan korban ceritaku. Aku penulisnya.",
+      "target_saboteur": "meronta"
+    },
+    {
+      "id": "af_36",
+      "teks": "Hal yang kuhindari biasanya lebih kecil saat kuhadapi.",
+      "target_saboteur": "mengelak"
+    },
+    {
+      "id": "af_37",
+      "teks": "Aku bisa merasa nggak nyaman dan tetap baik-baik saja.",
+      "target_saboteur": "mengelak"
+    },
+    {
+      "id": "af_38",
+      "teks": "Satu pesan, satu langkah. Nggak perlu semuanya sekarang.",
+      "target_saboteur": "mengelak"
+    },
+    {
+      "id": "af_39",
+      "teks": "Menunda nggak membuat rasa takutnya hilang.",
+      "target_saboteur": "mengelak"
+    },
+    {
+      "id": "af_40",
+      "teks": "Aku cukup berani untuk mencoba sebentar.",
+      "target_saboteur": "mengelak"
+    },
+    {
+      "id": "af_41",
+      "teks": "Lega datang setelah aku menghadapinya.",
+      "target_saboteur": "mengelak"
+    },
+    {
+      "id": "af_42",
+      "teks": "Aku boleh minta bantuan saat terasa berat.",
+      "target_saboteur": "mengelak"
+    },
+    {
+      "id": "af_43",
+      "teks": "Itu suara Si Hakim, bukan fakta.",
+      "target_saboteur": "hakim"
+    },
+    {
+      "id": "af_44",
+      "teks": "Aku pantas mencoba, apa pun hasilnya.",
+      "target_saboteur": "hakim"
+    },
+    {
+      "id": "af_45",
+      "teks": "Aku bicara pada diriku seperti pada sahabat.",
+      "target_saboteur": "hakim"
+    },
+    {
+      "id": "af_46",
+      "teks": "Gagal sekali bukan berarti aku gagal selamanya.",
+      "target_saboteur": "hakim"
+    },
+    {
+      "id": "af_47",
+      "teks": "Aku lebih dari kesalahan terburukku.",
+      "target_saboteur": "hakim"
+    },
+    {
+      "id": "af_48",
+      "teks": "Aku nggak perlu membuktikan apa pun untuk layak dicintai.",
+      "target_saboteur": "hakim"
+    },
+    {
+      "id": "af_49",
+      "teks": "Kritik di kepalaku boleh kudengar, tapi nggak harus kupercaya.",
+      "target_saboteur": "hakim"
     }
   ],
   "betterme_lessons": [

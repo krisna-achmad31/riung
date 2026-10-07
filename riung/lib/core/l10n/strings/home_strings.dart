@@ -85,6 +85,7 @@ abstract class HomeStrings {
 
   // ── Histori koin ──
   String get historyTitle;
+  String get coinsUnit;
   String get historyEmpty;
   String get today;
   String get yesterday;
@@ -254,6 +255,8 @@ class HomeStringsId extends HomeStrings {
 
   @override
   String get historyTitle => 'Histori koin';
+  @override
+  String get coinsUnit => 'koin';
   @override
   String get historyEmpty => 'Belum ada transaksi koin. Mulai dari check-in atau meditasi pertama, yuk.';
   @override
@@ -442,6 +445,8 @@ class HomeStringsEn extends HomeStrings {
 
   @override
   String get historyTitle => 'Coin history';
+  @override
+  String get coinsUnit => 'coins';
   @override
   String get historyEmpty => 'No coin transactions yet. Start with your first check-in or meditation.';
   @override

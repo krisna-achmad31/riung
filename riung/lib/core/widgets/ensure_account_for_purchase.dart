@@ -21,10 +21,9 @@ Future<bool> ensureAccountForPurchase(BuildContext context) async {
 
   final lanjut = await showModalBottomSheet<bool>(
     context: context,
-    backgroundColor: AppColors.permukaan,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    isScrollControlled: true,
     builder: (sheetContext) => Padding(
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 26),
+      padding: EdgeInsets.fromLTRB(24, 12, 24, 26 + MediaQuery.paddingOf(context).bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -36,20 +35,30 @@ Future<bool> ensureAccountForPurchase(BuildContext context) async {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text(sheetContext.s.toko.gateTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 17)),
-          const SizedBox(height: AppSpacing.sm),
+          // Frame `Glass — Toko · Simpan pembelianmu`: orb kaca + perisai.
+          Container(
+            width: 110,
+            height: 110,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.permukaan,
+              border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+              boxShadow: AppGlass.shadow,
+            ),
+            child: const Icon(Icons.verified_user_outlined, size: 46, color: AppColors.primer),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(sheetContext.s.toko.gateTitle, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+          const SizedBox(height: AppSpacing.md),
           Text(
             sheetContext.s.toko.gateBody,
             textAlign: TextAlign.center,
-            style: AppTextStyles.body.copyWith(fontSize: 13),
+            style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder),
           ),
           const SizedBox(height: AppSpacing.lg),
           RiungButton(label: sheetContext.s.toko.gateSignUp, onPressed: () => Navigator.of(sheetContext).pop(true)),
-          const SizedBox(height: AppSpacing.xs),
-          TextButton(
-            onPressed: () => Navigator.of(sheetContext).pop(false),
-            child: Text(sheetContext.s.common.nantiSaja, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13)),
-          ),
+          const SizedBox(height: 10),
+          RiungButton(label: sheetContext.s.common.nantiSaja, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(sheetContext).pop(false)),
         ],
       ),
     ),

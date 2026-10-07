@@ -37,68 +37,72 @@ class PersonalityShareCard extends StatelessWidget {
     }
     final secondary = result.secondary == null ? null : t.temperament(result.secondary!).name;
 
+    final dark = CardBackgroundPainter.isDark(style);
+    final ink = dark ? AppNight.teks : AppColors.teksUtama;
+    final soft = dark ? AppNight.teksSekunder : AppColors.teksSekunder;
+    final accent = dark ? AppNight.aksen : AppColors.sekunder;
+
     return AspectRatio(
       aspectRatio: aspect,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CustomPaint(painter: CardBackgroundPainter(style, spec.base)),
-            LayoutBuilder(
-              builder: (context, box) {
-                final w = box.maxWidth;
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.08, vertical: w * 0.09),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text('Riung', style: AppTextStyles.display.copyWith(fontSize: w * 0.075)),
-                          const Spacer(),
-                          Text(t.testName(result.test), style: AppTextStyles.caption.copyWith(fontSize: w * 0.034, color: AppColors.teksSekunder)),
-                        ],
-                      ),
-                      const Spacer(),
-                      CharacterAvatar(spec: spec, size: w * 0.7, accessories: accessories),
-                      SizedBox(height: w * 0.04),
-                      Text(
-                        t.resultKicker,
-                        style: AppTextStyles.caption.copyWith(fontSize: w * 0.03, letterSpacing: 2, fontWeight: FontWeight.w700, color: spec.base),
-                      ),
-                      SizedBox(height: w * 0.02),
-                      if (result.test == PersonalityTest.jung)
-                        Text(result.code, style: AppTextStyles.display.copyWith(fontSize: w * 0.15, letterSpacing: 4, color: spec.base)),
-                      Text(
-                        secondary == null ? text.name : '${text.name} + $secondary',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.display.copyWith(fontSize: w * (result.test == PersonalityTest.jung ? 0.07 : (secondary == null ? 0.1 : 0.075)), height: 1.15),
-                      ),
-                      SizedBox(height: w * 0.03),
-                      Text(
-                        text.tagline,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.body.copyWith(fontSize: w * 0.04, height: 1.45, color: AppColors.teksSekunder),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: w * 0.05, vertical: w * 0.025),
-                        decoration: BoxDecoration(
-                          color: AppColors.latar.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: AppColors.garis),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(36),
+          border: Border.all(color: AppColors.garis, width: 2),
+          boxShadow: AppGlass.shadow,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(34),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CustomPaint(painter: CardBackgroundPainter(style, spec.base)),
+              LayoutBuilder(
+                builder: (context, box) {
+                  final w = box.maxWidth;
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: w * 0.07, vertical: w * 0.07),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: w * 0.03, vertical: w * 0.012),
+                          decoration: BoxDecoration(color: dark ? AppNight.pil : AppColors.permukaan, borderRadius: BorderRadius.circular(999)),
+                          child: Text(t.resultKicker, style: AppTextStyles.caption.copyWith(fontSize: w * 0.03, letterSpacing: 1.2, fontWeight: FontWeight.w700, color: accent)),
                         ),
-                        child: Text(
-                          '${t.cardTagline(result.test)} · riung.app',
-                          style: AppTextStyles.caption.copyWith(fontSize: w * 0.032, fontWeight: FontWeight.w700, color: AppColors.teksSekunder),
+                        const Spacer(),
+                        CharacterAvatar(spec: spec, size: w * 0.6, accessories: accessories),
+                        SizedBox(height: w * 0.03),
+                        if (result.test == PersonalityTest.jung)
+                          Text(result.code, style: AppTextStyles.chipLabel.copyWith(fontSize: w * 0.045, letterSpacing: 2, color: accent)),
+                        Text(
+                          secondary == null ? text.name : '${text.name} + $secondary',
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.display.copyWith(fontSize: w * (secondary == null ? 0.085 : 0.07), height: 1.15, color: ink),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
+                        SizedBox(height: w * 0.025),
+                        Text(
+                          text.tagline,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.body.copyWith(fontSize: w * 0.04, height: 1.4, fontWeight: FontWeight.w500, color: soft),
+                        ),
+                        const Spacer(),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(width: w * 0.024, height: w * 0.024, decoration: BoxDecoration(color: accent, shape: BoxShape.circle)),
+                            SizedBox(width: w * 0.02),
+                            Text(
+                              '${t.cardTagline(result.test)} · riung.app',
+                              style: AppTextStyles.caption.copyWith(fontSize: w * 0.032, fontWeight: FontWeight.w700, color: soft),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

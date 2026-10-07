@@ -37,37 +37,42 @@ class _MeditasiSearchScreenState extends State<MeditasiSearchScreen> {
         : MeditationCatalog.all.where((s) => context.s.meditasi.session(s.id).title.toLowerCase().contains(_query.toLowerCase())).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              Row(
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
+                  RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 11),
+                      height: 48,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: AppColors.kartu,
-                        border: Border.all(color: AppColors.garis),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        color: AppColors.permukaan,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.search, size: 17, color: AppColors.teksRedup),
-                          const SizedBox(width: AppSpacing.sm),
+                          const Icon(Icons.search_rounded, size: 18, color: AppColors.teksRedup),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: TextField(
                               controller: _controller,
                               autofocus: true,
-                              style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14),
+                              style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14, fontWeight: FontWeight.w600),
                               cursorColor: AppColors.primer,
-                              decoration: InputDecoration(isDense: true, border: InputBorder.none, hintText: context.s.meditasi.searchHint),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                filled: false,
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                hintText: context.s.meditasi.searchHint,
+                              ),
                               onChanged: (v) => setState(() => _query = v),
                             ),
                           ),
@@ -77,26 +82,26 @@ class _MeditasiSearchScreenState extends State<MeditasiSearchScreen> {
                   ),
                 ],
               ),
-            ),
-            Expanded(
-              child: _query.isEmpty
-                  ? const SizedBox.shrink()
-                  : results.isEmpty
-                      ? _EmptyResult(query: _query, onSuggestion: _useSuggestion)
-                      : ListView(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                          children: [
-                            for (final session in results)
-                              _ResultRow(
-                                session: session,
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (_) => MeditasiDetailScreen(session: session)),
+              Expanded(
+                child: _query.isEmpty
+                    ? const SizedBox.shrink()
+                    : results.isEmpty
+                        ? _EmptyResult(query: _query, onSuggestion: _useSuggestion)
+                        : ListView(
+                            padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.xxl),
+                            children: [
+                              for (final session in results)
+                                _ResultRow(
+                                  session: session,
+                                  onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (_) => MeditasiDetailScreen(session: session)),
+                                  ),
                                 ),
-                              ),
-                          ],
-                        ),
-            ),
-          ],
+                            ],
+                          ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -111,24 +116,26 @@ class _ResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final monsterId = session.targetMonsterId;
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: GestureDetector(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: RiungGlassCard(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.permukaan,
-            border: Border.all(color: AppColors.garis),
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-          ),
-          child: Row(
-            children: [
-              Icon(session.icon, size: 20, color: session.color),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(child: Text(context.s.meditasi.session(session.id).title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14))),
-            ],
-          ),
+        radius: 24,
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(color: AppColors.monsterLembut[monsterId] ?? AppColors.kabutSage, borderRadius: BorderRadius.circular(16)),
+              alignment: Alignment.center,
+              child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 50, applyBossScale: false),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(context.s.meditasi.session(session.id).title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15))),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.teksRedup),
+          ],
         ),
       ),
     );
@@ -143,48 +150,37 @@ class _EmptyResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.xxl),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Opacity(
-              opacity: 0.75,
-              child: SizedBox(
-                width: 110,
-                height: 116,
-                child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 110),
+    final t = context.s.meditasi;
+    return ListView(
+      padding: const EdgeInsets.only(top: AppSpacing.xl),
+      children: [
+        Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(context.s.meditasi.searchEmptyTitle, style: AppTextStyles.display.copyWith(fontSize: 18)),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              context.s.meditasi.searchEmptyBody(query),
-              textAlign: TextAlign.center,
-              style: AppTextStyles.body.copyWith(fontSize: 13),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              alignment: WrapAlignment.center,
-              children: [
-                for (final suggestion in context.s.meditasi.searchSuggestions)
-                  GestureDetector(
-                    onTap: () => onSuggestion(suggestion),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.pill), border: Border.all(color: AppColors.garis)),
-                      child: Text(suggestion, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 12)),
-                    ),
-                  ),
-              ],
-            ),
+              const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 150),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(t.searchEmptyTitle, textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 22)),
+        const SizedBox(height: AppSpacing.md),
+        Text(t.searchEmptyBody(query), textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+        const SizedBox(height: AppSpacing.lg),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final suggestion in t.searchSuggestions)
+              RiungFilterChip(label: suggestion, selected: false, onTap: () => onSuggestion(suggestion)),
           ],
         ),
-      ),
+      ],
     );
   }
 }

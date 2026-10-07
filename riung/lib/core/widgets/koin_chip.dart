@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../theme/theme.dart';
+import 'riung_icon_3d.dart';
 import 'riung_pill_chip.dart';
 
-/// Chip saldo koin — icon & teks warna aksen hangat.
+/// Chip saldo koin — ikon koin 3D (`KoinChip` Riung Glass).
 class KoinChip extends StatelessWidget {
   const KoinChip({super.key, required this.balance});
 
@@ -12,10 +12,8 @@ class KoinChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RiungPillChip(
-      icon: Icons.monetization_on_rounded,
+      icon3d: RiungIcon.koin,
       label: '$balance',
-      iconColor: AppColors.aksenHangat,
-      textColor: AppColors.aksenHangat,
     );
   }
 }

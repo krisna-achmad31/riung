@@ -16,14 +16,15 @@ class PinDots extends StatelessWidget {
       children: [
         for (var i = 0; i < length; i++)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Container(
-              width: 13,
-              height: 13,
+            padding: const EdgeInsets.symmetric(horizontal: 7),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 140),
+              width: 16,
+              height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: i < filled ? AppColors.primer : Colors.transparent,
-                border: i < filled ? null : Border.all(color: AppColors.garis, width: 1.5),
+                color: i < filled ? AppColors.primer : AppColors.permukaan.withValues(alpha: 0.6),
+                border: Border.all(color: i < filled ? AppColors.primer : AppColors.teksRedup, width: 1.5),
               ),
             ),
           ),
@@ -43,36 +44,38 @@ class PinNumpad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      mainAxisSpacing: AppSpacing.sm,
-      crossAxisSpacing: AppSpacing.sm,
-      childAspectRatio: 1.2,
-      physics: const NeverScrollableScrollPhysics(),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        for (final key in _keys)
-          if (key.isEmpty)
-            const SizedBox.shrink()
-          else
-            GestureDetector(
-              onTap: () => key == '⌫' ? onBackspace() : onDigit(key),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.permukaan,
-                  border: Border.all(color: AppColors.garis),
-                  borderRadius: BorderRadius.circular(AppRadius.xl),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  key,
-                  style: AppTextStyles.title.copyWith(
-                    fontSize: 20,
-                    color: key == '⌫' ? AppColors.teksRedup : AppColors.teksUtama,
+        for (var row = 0; row < 4; row++)
+          Padding(
+            padding: EdgeInsets.only(bottom: row == 3 ? 0 : 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (final key in _keys.sublist(row * 3, row * 3 + 3))
+                  SizedBox(
+                    width: 72,
+                    height: 72,
+                    child: key.isEmpty
+                        ? null
+                        : key == '⌫'
+                            ? IconButton(
+                                onPressed: onBackspace,
+                                icon: const Icon(Icons.backspace_outlined, color: AppColors.teksSekunder),
+                              )
+                            : GestureDetector(
+                                onTap: () => onDigit(key),
+                                child: Container(
+                                  decoration: AppGlass.card(radius: 36, color: AppColors.permukaan),
+                                  alignment: Alignment.center,
+                                  child: Text(key, style: AppTextStyles.title.copyWith(fontSize: 26, color: AppColors.teksUtama)),
+                                ),
+                              ),
                   ),
-                ),
-              ),
+              ],
             ),
+          ),
       ],
     );
   }

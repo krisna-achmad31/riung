@@ -18,28 +18,33 @@ class ReportInsightTile extends StatelessWidget {
     final s = context.s;
     final (IconData icon, Color color, String text) = switch (insight.kind) {
       InsightKind.moodTrend => switch (insight.direction) {
-          1 => (Icons.trending_up_rounded, AppColors.sukses, t.trendUp),
+          1 => (Icons.trending_up_rounded, AppColors.primer, t.trendUp),
           -1 => (Icons.trending_down_rounded, AppColors.aksenHangat, t.trendDown),
           _ => (Icons.trending_flat_rounded, AppColors.primer, t.trendSteady),
         },
-      InsightKind.bestDay => (Icons.wb_sunny_rounded, AppColors.peringatan, t.bestDay(t.weekday(insight.weekday!))),
-      InsightKind.hardDay => (Icons.cloud_rounded, AppColors.monsterKabut, t.hardDay(t.weekday(insight.weekday!))),
+      InsightKind.bestDay => (Icons.wb_sunny_rounded, AppColors.emas, t.bestDay(t.weekday(insight.weekday!))),
+      InsightKind.hardDay => (Icons.cloud_rounded, AppColors.langit, t.hardDay(t.weekday(insight.weekday!))),
       InsightKind.topFactor => (Icons.label_rounded, AppColors.sekunder, t.topFactor(s.checkin.factorLabel(insight.id!), insight.count)),
-      InsightKind.topMonster => (Icons.edit_note_rounded, AppColors.monsterCermin, t.topMonster(s.common.monsterName(insight.id!), insight.count)),
+      InsightKind.topMonster => (Icons.edit_note_rounded, AppColors.sekunder, t.topMonster(s.common.monsterName(insight.id!), insight.count)),
       InsightKind.sleepAverage => (Icons.bedtime_rounded, AppColors.primer, t.sleepAverage(t.duration(insight.count))),
-      InsightKind.sleepMood => (Icons.link_rounded, AppColors.sukses, t.sleepMood(ReportConfig.restedSleepMinutes ~/ 60, ReportConfig.shortSleepMinutes ~/ 60)),
+      InsightKind.sleepMood => (Icons.link_rounded, AppColors.primer, t.sleepMood(ReportConfig.restedSleepMinutes ~/ 60, ReportConfig.shortSleepMinutes ~/ 60)),
       InsightKind.factorMood => insight.direction < 0
           ? (Icons.link_rounded, AppColors.aksenHangat, t.factorLower(s.checkin.factorLabel(insight.id!)))
-          : (Icons.link_rounded, AppColors.sukses, t.factorHigher(s.checkin.factorLabel(insight.id!))),
+          : (Icons.link_rounded, AppColors.primer, t.factorHigher(s.checkin.factorLabel(insight.id!))),
     };
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: color),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(child: Text(text, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5))),
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, size: 15, color: color),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
         ],
       ),
     );

@@ -41,136 +41,113 @@ class _CheckInFactorScreenState extends State<CheckInFactorScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.s.checkin;
-    CheckInMoodOption? mood;
-    for (final m in checkInMoods) {
-      if (m.id == widget.draft.moodId) {
-        mood = m;
-        break;
-      }
-    }
     final showHakimInsight =
         widget.draft.factorIds.contains('kerjaan') && widget.draft.factorIds.contains('takut_gagal');
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Column(
           children: [
             CheckInStepHeader(step: 2, onBack: () => Navigator.of(context).maybePop()),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (mood != null) Text(mood.emoji, style: const TextStyle(fontSize: 30)),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Text(
-                            t.factorTitle,
-                            style: AppTextStyles.display.copyWith(fontSize: 20, height: 1.3),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      t.factorSub,
-                      style: AppTextStyles.caption.copyWith(fontSize: 13),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: [
-                        for (final factor in checkInFactors)
-                          _FactorChip(
-                            factor: factor,
-                            selected: widget.draft.factorIds.contains(factor.id),
-                            onTap: () => _toggle(factor.id),
-                          ),
-                      ],
-                    ),
-                    if (showHakimInsight) ...[
-                      const SizedBox(height: AppSpacing.md),
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        decoration: BoxDecoration(
-                          color: AppColors.monsterHakim.withValues(alpha: 0.08),
-                          border: Border.all(color: AppColors.monsterHakim.withValues(alpha: 0.25)),
-                          borderRadius: BorderRadius.circular(AppRadius.lg),
-                        ),
-                        child: Row(
-                          children: [
-                            const SizedBox(
-                              width: 40,
-                              height: 42,
-                              child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.liar, size: 40, applyBossScale: false),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            Expanded(
-                              child: Text(
-                                t.hakimInsight,
-                                style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontSize: 12, height: 1.5),
-                              ),
-                            ),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.md),
+                children: [
+                  Text(t.factorTitle, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.15)),
+                  const SizedBox(height: 6),
+                  Text(t.factorSub, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  const SizedBox(height: AppSpacing.lg),
+                  for (var i = 0; i < checkInFactors.length; i += 2)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                      child: Row(
+                        children: [
+                          Expanded(child: _tile(checkInFactors[i])),
+                          if (i + 1 < checkInFactors.length) ...[
+                            const SizedBox(width: 10),
+                            Expanded(child: _tile(checkInFactors[i + 1])),
                           ],
-                        ),
+                        ],
                       ),
-                    ],
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-                ),
+                    ),
+                  if (showHakimInsight)
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: AppGlass.card(radius: 22, color: AppColors.sekunderLembut.withValues(alpha: 0.7), shadowed: false),
+                      child: Row(
+                        children: [
+                          const RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 52, applyBossScale: false),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(t.hakimInsight, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
+                        ],
+                      ),
+                    ),
+                ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-              child: RiungButton(
-                label: context.s.common.lanjut,
-                onPressed: widget.draft.factorIds.isEmpty ? null : _lanjut,
-              ),
+              child: RiungButton(label: context.s.common.lanjut, onPressed: widget.draft.factorIds.isEmpty ? null : _lanjut),
             ),
           ],
         ),
       ),
     );
   }
+
+  Widget _tile(CheckInFactorOption factor) => _FactorTile(
+        factor: factor,
+        selected: widget.draft.factorIds.contains(factor.id),
+        onTap: () => _toggle(factor.id),
+      );
 }
 
-class _FactorChip extends StatelessWidget {
-  const _FactorChip({required this.factor, required this.selected, required this.onTap});
+/// Ubin faktor (frame `Faktor …`): kotak ikon + label; terpilih = tepi primer.
+class _FactorTile extends StatelessWidget {
+  const _FactorTile({required this.factor, required this.selected, required this.onTap});
 
   final CheckInFactorOption factor;
   final bool selected;
   final VoidCallback onTap;
 
+  /// Label 2 baris; satu kata panjang (mis. "Relationships") mengecil
+  /// alih-alih dipatah di tengah kata.
+  Widget _label(BuildContext context) {
+    final text = context.s.checkin.factorLabel(factor.id);
+    final style = AppTextStyles.chipLabel.copyWith(fontSize: 13, height: 1.2, fontWeight: selected ? FontWeight.w700 : FontWeight.w500, color: AppColors.teksUtama);
+    if (text.contains(' ')) return Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: style);
+    return FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(text, maxLines: 1, style: style));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: 1.5),
-          color: selected ? AppColors.primer.withValues(alpha: 0.14) : Colors.transparent,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(factor.icon, size: 15, color: selected ? AppColors.primer : AppColors.teksSekunder),
-            const SizedBox(width: 7),
-            Text(
-              context.s.checkin.factorLabel(factor.id),
-              style: AppTextStyles.chipLabel.copyWith(
-                fontSize: 13,
-                color: selected ? AppColors.primer : AppColors.teksSekunder,
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.garis : AppColors.kartu,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2 : 1.5),
+          ),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(color: selected ? AppColors.primer : AppColors.primerLembut, borderRadius: BorderRadius.circular(12)),
+                child: Icon(factor.icon, size: 18, color: selected ? AppColors.diAtasTinta : AppColors.primer),
               ),
-            ),
-          ],
+              const SizedBox(width: 10),
+              Expanded(child: _label(context)),
+            ],
+          ),
         ),
       ),
     );

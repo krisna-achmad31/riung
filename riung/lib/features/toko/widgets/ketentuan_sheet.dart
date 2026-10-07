@@ -13,8 +13,6 @@ Future<void> showKetentuanSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: AppColors.permukaan,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (sheetContext) {
       final t = sheetContext.s.toko;
       final points = [t.termsTrial(trialDays), t.termsPlay, t.termsCancel, t.termsFree];

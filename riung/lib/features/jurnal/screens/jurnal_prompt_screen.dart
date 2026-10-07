@@ -21,88 +21,85 @@ class JurnalPromptScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s.jurnal;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.close, color: AppColors.teksSekunder)),
-                  Text(context.s.jurnal.promptScreenTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                children: [
-                  GestureDetector(
-                    onTap: () => _openEditor(context),
-                    child: Container(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.dailyLimitTitle),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xxl),
+                  children: [
+                    Text(t.promptScreenTitle, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                    const SizedBox(height: AppSpacing.md),
+                    RiungGlassCard(
+                      onTap: () => _openEditor(context),
+                      color: AppColors.permukaan,
+                      radius: 28,
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [AppColors.aksenHangat.withValues(alpha: 0.15), AppColors.kartu.withValues(alpha: 0.9)]),
-                        border: Border.all(color: AppColors.aksenHangat.withValues(alpha: 0.45), width: 1.5),
-                        borderRadius: BorderRadius.circular(AppRadius.xxl),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Text(context.s.jurnal.freeWriteKicker, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangat, fontWeight: FontWeight.w700, letterSpacing: 1.2, fontSize: 10)),
-                          const SizedBox(height: 6),
-                          Text(context.s.jurnal.freeWriteTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15)),
-                          const SizedBox(height: 6),
-                          Text(context.s.jurnal.freeWriteBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45)),
+                          const RiungIcon3D(RiungIcon.jurnal, size: 64),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.freeWriteKicker, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: AppColors.sekunder)),
+                                const SizedBox(height: 3),
+                                Text(t.freeWriteTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 16, color: AppColors.teksUtama)),
+                                const SizedBox(height: 3),
+                                Text(t.freeWriteBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.teksSekunder)),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(context.s.jurnal.orCbtGuide, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
-                  const SizedBox(height: AppSpacing.sm),
-                  for (final prompt in journalPrompts)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                      child: GestureDetector(
-                        onTap: () => _openEditor(context, prompt: prompt),
-                        child: Container(
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.xxl)),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(t.orCbtGuide, style: AppTextStyles.title.copyWith(fontSize: 16)),
+                    const SizedBox(height: AppSpacing.md),
+                    for (final prompt in journalPrompts)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: RiungGlassCard(
+                          onTap: () => _openEditor(context, prompt: prompt),
+                          radius: 22,
+                          padding: const EdgeInsets.all(12),
                           child: Row(
                             children: [
-                              SizedBox(width: 42, height: 44, child: RiungMonster(monsterId: prompt.monsterId, state: MonsterVisualState.liar, size: 42)),
-                              const SizedBox(width: AppSpacing.md),
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(color: AppColors.monsterLembut[prompt.monsterId] ?? AppColors.kabutSage, borderRadius: BorderRadius.circular(16)),
+                                alignment: Alignment.center,
+                                child: RiungMonster(monsterId: prompt.monsterId, state: MonsterVisualState.jinak, size: 48, applyBossScale: false),
+                              ),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(context.s.jurnal.prompt(prompt.id).title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14)),
-                                    const SizedBox(height: 4),
-                                    Text(context.s.jurnal.prompt(prompt.id).sub, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45)),
+                                    Text(t.prompt(prompt.id).title, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, height: 1.3, color: AppColors.teksUtama)),
+                                    const SizedBox(height: 3),
+                                    Text(t.prompt(prompt.id).sub, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.35, color: AppColors.teksSekunder)),
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.chevron_right, size: 18, color: AppColors.teksRedup),
+                              const Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.teksRedup),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                    child: Text(
-                      context.s.jurnal.threeSentences(EconomyEarn.jurnal),
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.caption.copyWith(fontSize: 11),
-                    ),
-                  ),
-                ],
+                    Text(t.threeSentences(EconomyEarn.jurnal), textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

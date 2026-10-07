@@ -12,8 +12,6 @@ Future<void> showBahasaSheet(BuildContext context) {
   final notifier = AppScope.of(context).language;
   return showModalBottomSheet<void>(
     context: context,
-    backgroundColor: AppColors.permukaan,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (sheetContext) => ListenableBuilder(
       listenable: notifier,
       builder: (context, _) => Padding(

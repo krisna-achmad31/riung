@@ -110,142 +110,65 @@ class _PaywallStepState extends State<PaywallStep> {
     final perBulanTahunan = (rc.premiumHargaTahunanIdr / 12).round();
     final nama = widget.controller.nama.trim();
 
-    return RiungGlowBackground(
-      glowColor: AppColors.aksenHangat,
-      alignment: const Alignment(0, -1),
-      opacity: 0.16,
-      child: SafeArea(
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, AppSpacing.sm, 20, AppSpacing.md),
         child: Column(
           children: [
             Align(
               alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-                child: IconButton(
-                  onPressed: _processing ? null : widget.onSelesai,
-                  icon: const Icon(Icons.close, color: AppColors.teksRedup),
+              child: GestureDetector(
+                onTap: _processing ? null : widget.onSelesai,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(t.continueFree, style: AppTextStyles.caption.copyWith(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
                 ),
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.aksenHangat.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.workspace_premium, size: 16, color: AppColors.aksenHangat),
-                          const SizedBox(width: 6),
-                          Text(
-                            t.premiumPill,
-                            style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangat, fontWeight: FontWeight.w700, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      t.onboardingTitle(nama),
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.display.copyWith(fontSize: 25, height: 1.28),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      t.onboardingSub(rc.premiumTrialHari),
-                      style: AppTextStyles.body,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Column(
-                      children: [
-                        for (final benefit in t.onboardingBenefits)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.check, size: 18, color: AppColors.sukses),
-                                const SizedBox(width: AppSpacing.sm),
-                                Expanded(child: Text(benefit, style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 14))),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _PlanCard(
-                      selected: _plan == _Plan.tahunan,
-                      badge: t.saveYearly,
-                      title: t.planYearly,
-                      subtitle: yearlyProduct != null
-                          ? t.yearlyPrice(yearlyProduct.price)
-                          : t.onboardingYearlyFallback(rupiah.format(rc.premiumHargaTahunanIdr), rupiah.format(perBulanTahunan)),
-                      trailing: t.trialTrailing(rc.premiumTrialHari),
-                      onTap: () => setState(() => _plan = _Plan.tahunan),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _PlanCard(
-                      selected: _plan == _Plan.bulanan,
-                      title: t.monthlySimple,
-                      subtitle: monthlyProduct != null
-                          ? t.monthlyPrice(monthlyProduct.price)
-                          : t.onboardingMonthlyFallback(rupiah.format(rc.premiumHargaBulananIdr)),
-                      onTap: () => setState(() => _plan = _Plan.bulanan),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.sm, AppSpacing.xxl, AppSpacing.lg),
-              child: Column(
+              child: RiungBleedListView(
+                padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.md),
                 children: [
-                  SizedBox(
-                    height: 54,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _processing ? null : _mulaiTrial,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.aksenHangat,
-                        foregroundColor: AppColors.latar,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-                      ),
-                      child: Text(
-                        _processing ? t.processing : t.startTrial(rc.premiumTrialHari),
-                        style: AppTextStyles.buttonLabel,
-                      ),
+                  const _PaywallHero(),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(t.onboardingTitle(nama), style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(t.onboardingSub(rc.premiumTrialHari), style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  const SizedBox(height: AppSpacing.md),
+                  RiungRadioOption(
+                    selected: _plan == _Plan.tahunan,
+                    title: t.planYearly,
+                    subtitle: yearlyProduct != null
+                        ? t.yearlyPrice(yearlyProduct.price)
+                        : t.onboardingYearlyFallback(rupiah.format(rc.premiumHargaTahunanIdr), rupiah.format(perBulanTahunan)),
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(color: AppColors.primerLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                      child: Text(t.trialTrailing(rc.premiumTrialHari), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primer)),
                     ),
+                    onTap: () => setState(() => _plan = _Plan.tahunan),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: _processing ? null : widget.onSelesai,
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
-                          child: Text(t.continueFree, style: AppTextStyles.caption),
-                        ),
-                      ),
-                      Text(' · ', style: AppTextStyles.caption),
-                      GestureDetector(
-                        onTap: _processing ? null : _pulihkanPembelian,
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
-                          child: Text(t.restore, style: AppTextStyles.caption),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: AppSpacing.md),
+                  RiungRadioOption(
+                    selected: _plan == _Plan.bulanan,
+                    title: t.monthlySimple,
+                    subtitle: monthlyProduct != null ? t.monthlyPrice(monthlyProduct.price) : t.onboardingMonthlyFallback(rupiah.format(rc.premiumHargaBulananIdr)),
+                    onTap: () => setState(() => _plan = _Plan.bulanan),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            RiungButton(label: _processing ? t.processing : t.startTrial(rc.premiumTrialHari), onPressed: _processing ? null : _mulaiTrial),
+            const SizedBox(height: AppSpacing.md),
+            Text(t.termsPlay, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
+            GestureDetector(
+              onTap: _processing ? null : _pulihkanPembelian,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.all(6),
+                child: Text(t.restore, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
               ),
             ),
           ],
@@ -255,79 +178,28 @@ class _PaywallStepState extends State<PaywallStep> {
   }
 }
 
-class _PlanCard extends StatelessWidget {
-  const _PlanCard({
-    required this.selected,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    this.badge,
-    this.trailing,
-  });
-
-  final bool selected;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  final String? badge;
-  final String? trailing;
+/// Hero paywall onboarding (frame `Hero`): Si Hakim besar diapit empat
+/// anak buahnya.
+class _PaywallHero extends StatelessWidget {
+  const _PaywallHero();
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    return SizedBox(
+      height: 220,
       child: Stack(
-        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: selected ? AppColors.aksenHangat.withValues(alpha: 0.07) : null,
-              border: Border.all(color: selected ? AppColors.aksenHangat : AppColors.garis, width: selected ? 2 : 1.5),
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 22,
-                  height: 22,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: selected ? AppColors.aksenHangat : AppColors.teksRedup, width: 2),
-                  ),
-                  child: selected
-                      ? Container(width: 11, height: 11, decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.aksenHangat))
-                      : null,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15)),
-                      Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-                    ],
-                  ),
-                ),
-                if (trailing != null)
-                  Text(trailing!, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangat, fontWeight: FontWeight.w700, fontSize: 11)),
-              ],
-            ),
+            width: 230,
+            height: 220,
+            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
           ),
-          if (badge != null)
-            Positioned(
-              top: -10,
-              left: AppSpacing.lg,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 3),
-                decoration: BoxDecoration(color: AppColors.aksenHangat, borderRadius: BorderRadius.circular(AppRadius.pill)),
-                child: Text(
-                  badge!,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontWeight: FontWeight.w800, fontSize: 10),
-                ),
-              ),
-            ),
+          const Positioned(left: 0, top: 120, child: RiungMonster(monsterId: 'meronta', state: MonsterVisualState.jinak, size: 74, applyBossScale: false)),
+          const Positioned(left: 50, top: 60, child: RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 80, applyBossScale: false)),
+          const Positioned(right: 30, top: 62, child: RiungMonster(monsterId: 'cermin', state: MonsterVisualState.jinak, size: 80, applyBossScale: false)),
+          const Positioned(right: 0, top: 124, child: RiungMonster(monsterId: 'mengelak', state: MonsterVisualState.jinak, size: 74, applyBossScale: false)),
+          const Positioned(top: 30, child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 170, applyBossScale: false)),
         ],
       ),
     );

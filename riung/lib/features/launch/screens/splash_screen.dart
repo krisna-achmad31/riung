@@ -71,74 +71,77 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     final t = context.s.launch;
     return Scaffold(
-      body: RiungGlowBackground(
-        alignment: const Alignment(0, -0.16),
-        opacity: 0.24,
-        child: SafeArea(
-          child: Center(
-            child: FadeTransition(
-              opacity: _fade,
-              child: ScaleTransition(
-                scale: _scale,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 112,
-                      height: 112,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [AppColors.primer, AppColors.primerGelap],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primer.withValues(alpha: 0.4),
-                            blurRadius: 50,
-                            offset: const Offset(0, 16),
-                          ),
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fade,
+            child: ScaleTransition(
+              scale: _scale,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const _SplashLogo(),
+                  const SizedBox(height: AppSpacing.md),
+                  Text('Riung', style: AppTextStyles.display.copyWith(fontSize: 52, height: 1.2)),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(t.tagline, style: AppTextStyles.body.copyWith(fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  const SizedBox(height: 26),
+                  if (_gagal)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
+                      child: Column(
+                        children: [
+                          Text(t.connectFailed, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 13, color: AppColors.aksenHangatGelap)),
+                          const SizedBox(height: AppSpacing.md),
+                          RiungButton(label: context.s.common.cobaLagi, onPressed: _goNext),
                         ],
                       ),
-                      alignment: Alignment.center,
-                      child: const SizedBox(
-                        width: 72,
-                        height: 76,
-                        child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 72),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text('Riung', style: AppTextStyles.display),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      t.tagline,
-                      style: AppTextStyles.body.copyWith(fontSize: 14),
-                    ),
-                    const SizedBox(height: 26),
-                    if (_gagal)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                        child: Column(
-                          children: [
-                            Text(
-                              t.connectFailed,
-                              textAlign: TextAlign.center,
-                              style: AppTextStyles.body.copyWith(fontSize: 13, color: AppColors.error),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            RiungButton(label: context.s.common.cobaLagi, onPressed: _goNext),
-                          ],
-                        ),
-                      )
-                    else
-                      const _PulsingDots(),
-                  ],
-                ),
+                    )
+                  else
+                    const _PulsingDots(),
+                ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Logo splash (frame `Logo`): halo tipis, orb kaca, Si Kabut di tengah dan
+/// empat monster kecil mengorbit.
+class _SplashLogo extends StatelessWidget {
+  const _SplashLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 300,
+      height: 300,
+      child: Stack(
+        children: [
+          Container(decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.permukaan, width: AppGlass.edgeWidth))),
+          Positioned(
+            left: 50,
+            top: 50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(colors: [AppColors.permukaanPadat, AppColors.permukaan.withValues(alpha: 0.4)]),
+                border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                boxShadow: AppGlass.shadow,
+              ),
+            ),
+          ),
+          const Positioned(left: 75, top: 62, child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 150, applyBossScale: false)),
+          const Positioned(left: 4, top: 30, child: RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 64, applyBossScale: false)),
+          const Positioned(left: 236, top: 40, child: RiungMonster(monsterId: 'cermin', state: MonsterVisualState.jinak, size: 58, applyBossScale: false)),
+          const Positioned(left: 10, top: 214, child: RiungMonster(monsterId: 'meronta', state: MonsterVisualState.jinak, size: 58, applyBossScale: false)),
+          const Positioned(left: 232, top: 206, child: RiungMonster(monsterId: 'mengelak', state: MonsterVisualState.jinak, size: 62, applyBossScale: false)),
+        ],
       ),
     );
   }

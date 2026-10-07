@@ -22,7 +22,6 @@ class RateUsAjakanStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.onboarding;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: RiungGlowBackground(
         glowColor: AppColors.monsterKabut,
         alignment: const Alignment(0, -0.6),
@@ -101,7 +100,6 @@ class RateUsGooglePlayStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.onboarding;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Column(
           children: [
@@ -265,7 +263,6 @@ class RateUsTerimaKasihStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.onboarding;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: Column(
           children: [

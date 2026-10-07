@@ -115,140 +115,95 @@ class _PaywallPremiumScreenState extends State<PaywallPremiumScreen> {
     final perBulanTahunan = (rc.premiumHargaTahunanIdr / 12).round();
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.aksenHangat,
-        alignment: const Alignment(0, -1),
-        opacity: 0.1,
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
           child: Column(
             children: [
               Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  onPressed: _processing ? null : () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.close, color: AppColors.teksRedup),
-                ),
+                alignment: Alignment.centerLeft,
+                child: RiungGlassIconButton(icon: Icons.close_rounded, onTap: () { if (!_processing) Navigator.of(context).maybePop(); }),
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: const [
-                          SizedBox(width: 52, height: 55, child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 52, applyBossScale: false)),
-                          SizedBox(width: 76, height: 80, child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 76, applyBossScale: false)),
-                          SizedBox(width: 52, height: 55, child: RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 52, applyBossScale: false)),
-                        ],
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
+                  children: [
+                    const _PaywallHero(),
+                    const SizedBox(height: AppSpacing.md),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: AppColors.sekunderLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        child: Text(t.premiumTitle, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.sekunder)),
                       ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.workspace_premium, size: 20, color: AppColors.aksenHangat),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(t.premiumTitle, style: AppTextStyles.title.copyWith(fontSize: 22)),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        t.premiumSub,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.body,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        decoration: BoxDecoration(
-                          color: AppColors.permukaan,
-                          border: Border.all(color: AppColors.garis),
-                          borderRadius: BorderRadius.circular(AppRadius.xl),
-                        ),
-                        child: Column(
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.premiumSub, style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.25)),
+                    const SizedBox(height: AppSpacing.md),
+                    for (final benefit in t.premiumBenefits)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            for (final benefit in t.premiumBenefits)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.check, size: 15, color: AppColors.sukses),
-                                    const SizedBox(width: AppSpacing.sm),
-                                    Expanded(child: Text(benefit, style: AppTextStyles.body.copyWith(fontSize: 13))),
-                                  ],
-                                ),
-                              ),
+                            const Padding(padding: EdgeInsets.only(top: 1), child: Icon(Icons.check_rounded, size: 16, color: AppColors.primer)),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(benefit, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
                           ],
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      _PlanRow(
-                        selected: _plan == _Plan.tahunan,
-                        badge: t.saveYearly,
-                        title: t.planYearly,
-                        subtitle: yearlyProduct != null
-                            ? t.yearlyWithPrice(yearlyProduct.price)
-                            : t.yearlyFallback(rupiah.format(rc.premiumHargaTahunanIdr), rupiah.format(perBulanTahunan)),
-                        onTap: () => setState(() => _plan = _Plan.tahunan),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      _PlanRow(
-                        selected: _plan == _Plan.bulanan,
-                        title: t.planMonthly,
-                        subtitle: monthlyProduct != null
-                            ? t.monthlyWithPrice(monthlyProduct.price)
-                            : t.monthlyFallback(rupiah.format(rc.premiumHargaBulananIdr)),
-                        onTap: () => setState(() => _plan = _Plan.bulanan),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        t.annualPerk(EconomyPremium.koinHarianTahunan),
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.aksenHangat, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        t.premiumNote(rc.premiumTrialHari),
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.caption.copyWith(fontSize: 11),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-                child: Column(
-                  children: [
-                    RiungButton(
-                      label: _processing ? t.processing : t.tryFree(rc.premiumTrialHari),
-                      onPressed: _processing ? null : _mulaiTrial,
-                    ),
                     const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: _processing ? null : _pulihkanPembelian,
-                          child: Text(t.restore, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600)),
-                        ),
-                        const SizedBox(width: AppSpacing.lg),
-                        // Dulu teks biasa (tidak bisa diketuk) — sekarang membuka
-                        // lembar ketentuan langganan.
-                        GestureDetector(
-                          onTap: () => showKetentuanSheet(context),
-                          behavior: HitTestBehavior.opaque,
-                          child: Text(t.terms, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600)),
-                        ),
-                      ],
+                    RiungRadioOption(
+                      selected: _plan == _Plan.tahunan,
+                      title: t.planYearly,
+                      badge: t.saveYearly,
+                      badgeColor: AppColors.primerLembut,
+                      badgeTextColor: AppColors.primer,
+                      subtitle: yearlyProduct != null
+                          ? t.yearlyWithPrice(yearlyProduct.price)
+                          : t.yearlyFallback(rupiah.format(rc.premiumHargaTahunanIdr), rupiah.format(perBulanTahunan)),
+                      onTap: () => setState(() => _plan = _Plan.tahunan),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    RiungRadioOption(
+                      selected: _plan == _Plan.bulanan,
+                      title: t.planMonthly,
+                      subtitle: monthlyProduct != null ? t.monthlyWithPrice(monthlyProduct.price) : t.monthlyFallback(rupiah.format(rc.premiumHargaBulananIdr)),
+                      onTap: () => setState(() => _plan = _Plan.bulanan),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      t.annualPerk(EconomyPremium.koinHarianTahunan),
+                      style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.35, fontWeight: FontWeight.w600, color: AppColors.primer),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(
+                label: _processing ? t.processing : t.tryFree(rc.premiumTrialHari),
+                onPressed: _processing ? null : _mulaiTrial,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: _processing ? null : _pulihkanPembelian,
+                    behavior: HitTestBehavior.opaque,
+                    child: Text(t.restore, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
+                  ),
+                  const SizedBox(width: AppSpacing.lg),
+                  GestureDetector(
+                    onTap: () => showKetentuanSheet(context),
+                    behavior: HitTestBehavior.opaque,
+                    child: Text(t.terms, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(t.premiumNote(rc.premiumTrialHari), textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
             ],
           ),
         ),
@@ -257,62 +212,25 @@ class _PaywallPremiumScreenState extends State<PaywallPremiumScreen> {
   }
 }
 
-class _PlanRow extends StatelessWidget {
-  const _PlanRow({required this.selected, required this.title, required this.subtitle, required this.onTap, this.badge});
-
-  final bool selected;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  final String? badge;
+/// Hero paywall (frame `Hero`): permata premium 3D diapit dua monster jinak.
+class _PaywallHero extends StatelessWidget {
+  const _PaywallHero();
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    return SizedBox(
+      height: 210,
       child: Stack(
-        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-            decoration: BoxDecoration(
-              color: selected ? AppColors.aksenHangat.withValues(alpha: 0.1) : AppColors.permukaan,
-              border: Border.all(color: selected ? AppColors.aksenHangat : AppColors.garis, width: selected ? 1.5 : 1),
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                      const SizedBox(height: 2),
-                      Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: selected ? AppColors.aksenHangat : AppColors.garis, width: selected ? 5 : 1.5),
-                  ),
-                ),
-              ],
-            ),
+            width: 230,
+            height: 210,
+            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
           ),
-          if (badge != null)
-            Positioned(
-              top: -9,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(color: AppColors.aksenHangat, borderRadius: BorderRadius.circular(AppRadius.pill)),
-                child: Text(badge!, style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-              ),
-            ),
+          const Positioned(top: 10, child: RiungIcon3D(RiungIcon.premium, size: 120)),
+          const Positioned(left: 20, top: 90, child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 100, applyBossScale: false)),
+          const Positioned(right: 10, top: 84, child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 110, applyBossScale: false)),
         ],
       ),
     );

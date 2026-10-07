@@ -16,59 +16,79 @@ class SesiDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.betterme;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.levelName(session.level), style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.levelName(session.level)),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(color: AppColors.sekunder.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(AppRadius.pill)),
-                      child: Text(t.typeLabel(session.tipe.name), style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w700, fontSize: 11)),
+                    SizedBox(
+                      height: 220,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 210,
+                            height: 210,
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                          ),
+                          const RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 190, applyBossScale: false),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text(t.session(session.id).judul, style: AppTextStyles.display.copyWith(fontSize: 25)),
-                    const SizedBox(height: AppSpacing.sm),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: AppColors.aksenHangatLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        child: Text(t.typeLabel(session.tipe.name).toUpperCase(), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.aksenHangatGelap)),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.session(session.id).judul, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.2)),
+                    const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
-                        const Icon(Icons.schedule_rounded, size: 15, color: AppColors.teksRedup),
-                        const SizedBox(width: 6),
-                        Text(t.minutesLong(session.estimasiMenit), style: AppTextStyles.caption.copyWith(fontSize: 12)),
+                        _MetaChip(icon: Icons.timer_outlined, label: t.minutesLong(session.estimasiMenit)),
                       ],
                     ),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-              child: RiungButton(
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(
                 label: t.start,
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => SesiContentScreen(session: session)),
-                ),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SesiContentScreen(session: session))),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _MetaChip extends StatelessWidget {
+  const _MetaChip({required this.label, this.icon});
+  final String label;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.pill)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[Icon(icon, size: 14, color: AppColors.teksSekunder), const SizedBox(width: 6)],
+          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksUtama)),
+        ],
       ),
     );
   }

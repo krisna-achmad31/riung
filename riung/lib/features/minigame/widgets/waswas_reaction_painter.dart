@@ -31,7 +31,7 @@ class WaswasReactionPainter extends CustomPainter {
 
   void _paintTopLine(Canvas canvas) {
     final paint = Paint()
-      ..color = AppColors.error.withValues(alpha: 0.35)
+      ..color = AppColors.aksenHangat.withValues(alpha: 0.6)
       ..strokeWidth = 2;
     canvas.drawLine(
       Offset(0, WaswasReactionEngine.topLine),
@@ -43,11 +43,16 @@ class WaswasReactionPainter extends CustomPainter {
   void _paintBubble(Canvas canvas, WorryBubble b) {
     final center = Offset(b.x, b.y);
     const r = 34.0;
-    final glow = Paint()..color = AppColors.monsterWaswas.withValues(alpha: 0.16);
-    canvas.drawCircle(center, r + 8, glow);
-    final fill = Paint()..color = AppColors.permukaan;
+    final glow = Paint()..color = AppColors.bayangan;
+    canvas.drawCircle(center + const Offset(0, 4), r + 4, glow);
+    final fill = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppColors.permukaanPadat, AppColors.aksenHangatLembut],
+      ).createShader(Rect.fromCircle(center: center, radius: r));
     final stroke = Paint()
-      ..color = AppColors.monsterWaswas
+      ..color = AppColors.garis
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     canvas.drawCircle(center, r, fill);
@@ -55,7 +60,7 @@ class WaswasReactionPainter extends CustomPainter {
 
     final label = labels[b.labelIndex % labels.length];
     final tp = TextPainter(
-      text: TextSpan(text: label, style: AppTextStyles.caption.copyWith(fontSize: 9, color: AppColors.teksUtama, height: 1.2)),
+      text: TextSpan(text: label, style: AppTextStyles.caption.copyWith(fontSize: 9, fontWeight: FontWeight.w600, color: AppColors.aksenHangatGelap, height: 1.2)),
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
       maxLines: 3,

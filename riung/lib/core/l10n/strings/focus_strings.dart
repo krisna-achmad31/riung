@@ -12,6 +12,9 @@ abstract class FocusStrings {
   String startFree(int minutes);
   String startPaid(int minutes, int coins);
   String get minutesUnit;
+  String get freeToday;
+  String coinsPrice(int coins);
+  String companionNote(String monsterName);
 }
 
 class FocusStringsId extends FocusStrings {
@@ -37,6 +40,12 @@ class FocusStringsId extends FocusStrings {
   String startPaid(int minutes, int coins) => 'Mulai fokus $minutes menit • $coins koin';
   @override
   String get minutesUnit => 'menit';
+  @override
+  String get freeToday => 'Gratis hari ini';
+  @override
+  String coinsPrice(int coins) => '$coins koin';
+  @override
+  String companionNote(String monsterName) => '$monsterName ikut tenang tiap kali kamu fokus. Tarik napas, biarkan notifikasi menunggu.';
 }
 
 class FocusStringsEn extends FocusStrings {
@@ -62,4 +71,10 @@ class FocusStringsEn extends FocusStrings {
   String startPaid(int minutes, int coins) => 'Start focus $minutes min • $coins coins';
   @override
   String get minutesUnit => 'min';
+  @override
+  String get freeToday => 'Free today';
+  @override
+  String coinsPrice(int coins) => '$coins coins';
+  @override
+  String companionNote(String monsterName) => '$monsterName calms down every time you focus. Breathe in, let notifications wait.';
 }

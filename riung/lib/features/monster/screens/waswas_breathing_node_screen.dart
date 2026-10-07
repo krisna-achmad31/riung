@@ -101,60 +101,74 @@ class _WaswasBreathingNodeScreenState extends State<WaswasBreathingNodeScreen> w
     };
     final detikBerlalu = _cycleIndex * (_fasePerCycle * 3) + faseOffset + (_fasePerCycle - _detikFaseTersisa);
     final totalDetikTersisa = (_totalCycles * _fasePerCycle * 3) - detikBerlalu;
+    final w = MediaQuery.sizeOf(context).width - 2 * AppSpacing.xl;
+    final k = (w / 320).clamp(0.7, 1.0);
+
+    Widget ring(double size, Color fill) => Container(
+          width: size * k,
+          height: size * k,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: fill, border: Border.all(color: AppColors.garis)),
+        );
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.monsterWaswas,
-        alignment: const Alignment(0, -0.5),
-        opacity: 0.18,
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                child: Row(
-                  children: [
-                    IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.close, color: AppColors.teksRedup)),
-                    Expanded(child: Text(t.breatheHeader(null), textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 12))),
-                    const SizedBox(width: 40),
-                  ],
-                ),
-              ),
+              RiungGlassHeader(title: t.breatheHeader(null)),
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedBuilder(
-                        animation: _circleController,
-                        builder: (context, child) {
-                          final scale = 0.8 + (_circleController.value * 0.35);
-                          return Transform.scale(scale: scale, child: child);
-                        },
-                        child: Container(
-                          width: 180,
-                          height: 180,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.monsterWaswas.withValues(alpha: 0.16),
-                            border: Border.all(color: AppColors.monsterWaswas, width: 2),
-                          ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _circleController,
+                      builder: (context, child) => Transform.scale(scale: 0.9 + _circleController.value * 0.12, child: child),
+                      child: SizedBox(
+                        width: 320 * k,
+                        height: 320 * k,
+                        child: Stack(
                           alignment: Alignment.center,
-                          child: const Icon(Icons.spa_rounded, size: 48, color: AppColors.monsterWaswas),
+                          children: [
+                            ring(320, AppColors.aksenHangatLembut.withValues(alpha: 0.3)),
+                            ring(264, AppColors.aksenHangatLembut.withValues(alpha: 0.5)),
+                            ring(208, AppColors.permukaan),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 150 * k, applyBossScale: false),
+                                Text(_labelFase(t), style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2)),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xl),
-                      Text(_labelFase(t), style: AppTextStyles.display.copyWith(fontSize: 26)),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(t.secondsLeft(totalDetikTersisa.clamp(0, _totalCycles * _fasePerCycle * 3)), style: AppTextStyles.body.copyWith(fontSize: 13)),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      t.secondsLeft(totalDetikTersisa.clamp(0, _totalCycles * _fasePerCycle * 3)),
+                      style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.aksenHangatGelap),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (var i = 0; i < _totalCycles; i++)
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 28,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: i <= _cycleIndex ? AppColors.aksenHangat : AppColors.permukaan,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.breatheHint, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
-                child: Text(t.breatheHint, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 12)),
               ),
             ],
           ),

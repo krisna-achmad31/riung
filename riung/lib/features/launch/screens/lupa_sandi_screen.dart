@@ -56,68 +56,49 @@ class _LupaSandiScreenState extends State<LupaSandiScreen> {
   Widget build(BuildContext context) {
     final t = context.s.launch;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
+        child: RiungBleedListView(
+          padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.lg),
           children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
-                ],
-              ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 70,
-                      height: 74,
-                      child: RiungMonster(monsterId: 'meronta', state: MonsterVisualState.jinak, size: 70),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      t.forgotTitle,
-                      style: AppTextStyles.display.copyWith(fontSize: 26),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      t.forgotSub,
-                      style: AppTextStyles.body,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    AuthTextField(
-                      label: t.emailLabel,
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      errorText: _emailError,
-                      onChanged: (_) => setState(() => _emailError = null),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    RiungButton(
-                      label: _sending ? t.sending : t.sendResetLink,
-                      onPressed: _sending ? null : _submit,
-                    ),
-                    if (_sent) ...[
-                      const SizedBox(height: AppSpacing.lg),
-                      const _TautanTerkirimBanner(),
-                    ],
-                  ],
+            const SizedBox(height: AppSpacing.md),
+            Center(
+              child: Container(
+                width: 150,
+                height: 150,
+                margin: const EdgeInsets.symmetric(vertical: 15),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.permukaan,
+                  border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                  boxShadow: AppGlass.shadow,
                 ),
+                child: const Icon(Icons.key_rounded, size: 56, color: AppColors.primer),
               ),
             ),
-            AuthFooterLink(
-              text: t.rememberedPassword,
-              actionLabel: t.signIn,
-              onTap: () => Navigator.of(context).maybePop(),
+            const SizedBox(height: AppSpacing.md),
+            Text(t.forgotTitle, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
+            const SizedBox(height: 6),
+            Text(t.forgotSub, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+            const SizedBox(height: AppSpacing.md),
+            AuthTextField(
+              label: t.emailLabel,
+              icon: Icons.mail_outline_rounded,
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              errorText: _emailError,
+              onChanged: (_) => setState(() => _emailError = null),
             ),
+            const SizedBox(height: AppSpacing.md),
+            RiungButton(label: _sending ? t.sending : t.sendResetLink, onPressed: _sending ? null : _submit),
+            if (_sent) ...[
+              const SizedBox(height: AppSpacing.md),
+              const _TautanTerkirimBanner(),
+            ],
+            AuthFooterLink(text: t.rememberedPassword, actionLabel: t.signIn, onTap: () => Navigator.of(context).maybePop()),
           ],
         ),
       ),
@@ -131,23 +112,13 @@ class _TautanTerkirimBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
-      decoration: BoxDecoration(
-        color: AppColors.sekunder.withValues(alpha: 0.1),
-        border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.3)),
-        borderRadius: BorderRadius.circular(14),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(color: AppColors.primerLembut.withValues(alpha: 0.8), borderRadius: BorderRadius.circular(18)),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.mail_outline, size: 18, color: AppColors.sekunder),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              context.s.launch.linkSent,
-              style: AppTextStyles.body.copyWith(fontSize: 13),
-            ),
-          ),
+          const Icon(Icons.mark_email_read_outlined, size: 18, color: AppColors.primer),
+          const SizedBox(width: 10),
+          Expanded(child: Text(context.s.launch.linkSent, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.primer))),
         ],
       ),
     );

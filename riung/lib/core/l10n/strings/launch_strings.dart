@@ -11,6 +11,8 @@ abstract class LaunchStrings {
 
   // ── Form auth (dipakai bersama) ──
   String get emailLabel;
+  String get emailHint;
+  String get passwordHint;
   String get passwordLabel;
   String get orDivider;
   String get continueWithGoogle;
@@ -61,6 +63,10 @@ class LaunchStringsId extends LaunchStrings {
   @override
   String get connectFailed => 'Gagal tersambung. Cek koneksi internetmu.';
 
+  @override
+  String get emailHint => 'nama@email.com';
+  @override
+  String get passwordHint => 'Minimal 6 karakter';
   @override
   String get emailLabel => 'Email';
   @override
@@ -164,6 +170,10 @@ class LaunchStringsEn extends LaunchStrings {
   @override
   String get connectFailed => 'Could not connect. Check your internet connection.';
 
+  @override
+  String get emailHint => 'name@email.com';
+  @override
+  String get passwordHint => 'At least 6 characters';
   @override
   String get emailLabel => 'Email';
   @override

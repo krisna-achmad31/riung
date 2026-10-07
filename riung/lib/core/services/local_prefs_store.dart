@@ -65,6 +65,7 @@ class LocalPrefsStore {
   static const _kCardStyle = 'riung_personality_card_style';
   static const _kSleepSyncEnabled = 'riung_sleep_sync_enabled';
   static const _kAccessoriesJson = 'riung_personality_accessories_json';
+  static const _kMonsterCosmeticsJson = 'riung_monster_cosmetics_json';
   static const _kWaswasStageJson = 'riung_waswas_stage_json';
 
   /// Kode bahasa pilihan user (`id`/`en`); null = belum pernah memilih
@@ -281,6 +282,27 @@ class LocalPrefsStore {
   Future<void> setPersonalityAccessories(Map<String, Map<String, String>> value) async {
     await _prefs.setString(_kAccessoriesJson, jsonEncode(value));
     personalityRevision.value++;
+  }
+
+  /// Kosmetik yang dipakai PER monster (Lemari): `{kabut: {head: topi_rajut}}`.
+  /// Kepemilikan tetap global di [ownedCosmetics].
+  Map<String, Map<String, String>> get monsterCosmetics {
+    final raw = _prefs.getString(_kMonsterCosmeticsJson);
+    if (raw == null) return const {};
+    try {
+      final map = jsonDecode(raw) as Map<String, dynamic>;
+      return {for (final e in map.entries) e.key: (e.value as Map).map((k, v) => MapEntry(k.toString(), v.toString()))};
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  /// Naik tiap isi Lemari berubah, supaya layar yang merender monster ikut segar.
+  final ValueNotifier<int> monsterCosmeticsRevision = ValueNotifier<int>(0);
+
+  Future<void> setMonsterCosmetics(Map<String, Map<String, String>> value) async {
+    await _prefs.setString(_kMonsterCosmeticsJson, jsonEncode(value));
+    monsterCosmeticsRevision.value++;
   }
 
   /// Gaya kartu yang dipilih PER karakter (per tes): `{jung: taman, ...}`.

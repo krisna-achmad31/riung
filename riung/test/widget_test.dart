@@ -16,7 +16,7 @@ Future<Widget> _galleryApp() async {
   final prefs = await LocalPrefsStore.init();
   return LanguageScope(
     notifier: LanguageNotifier(prefs: prefs),
-    child: MaterialApp(theme: AppTheme.dark, home: const ComponentGalleryScreen()),
+    child: MaterialApp(theme: AppTheme.light, home: const ComponentGalleryScreen()),
   );
 }
 
@@ -54,7 +54,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
     }
 
-    expect(find.text('Riung'), findsNothing);
+    // Tagline splash hilang (logo "Riung" kini juga ada di sambutan onboarding).
+    expect(find.text('Jinakkan monster dalam pikiranmu'), findsNothing);
     expect(find.text('Mulai kenalan (2 menit)'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

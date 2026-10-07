@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/config/firebase_config.dart';
@@ -33,6 +35,18 @@ void _routeNotificationTap(String? payload) {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Edge-to-edge: latar kaca mengalir sampai belakang status & navigation bar.
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(AppTheme.overlayStyle);
+  // Font dibundel di assets/google_fonts/ (offline-first, CLAUDE.md #5) —
+  // jangan unduh saat runtime.
+  GoogleFonts.config.allowRuntimeFetching = false;
+  LicenseRegistry.addLicense(() async* {
+    for (final family in ['PlusJakartaSans', 'BricolageGrotesque']) {
+      final text = await rootBundle.loadString('assets/google_fonts/OFL-$family.txt');
+      yield LicenseEntryWithLineBreaks([family], text);
+    }
+  });
   // Semua desain (`design/*.dc.html`) potret; tanpa kunci ini layar-layar
   // non-scroll overflow begitu HP diputar landscape.
   await SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -311,7 +325,7 @@ class _RiungAppState extends State<RiungApp> {
             title: 'Riung',
             debugShowCheckedModeBanner: false,
             navigatorKey: AppNavigator.key,
-            theme: AppTheme.dark,
+            theme: AppTheme.light,
             locale: Locale(_language.language.code),
             supportedLocales: [for (final language in AppLanguage.values) Locale(language.code)],
             localizationsDelegates: GlobalMaterialLocalizations.delegates,

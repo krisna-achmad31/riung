@@ -7,6 +7,7 @@ import '../../../core/widgets/widgets.dart';
 import '../logic/onboarding_controller.dart';
 import '../logic/scoring_engine.dart';
 import '../../profil/screens/bantuan_krisis_screen.dart';
+import 'onboarding_tag.dart';
 
 /// Hasil asesmen — Si Hakim sebagai "Sang Bos" di atas, 6 anak buah
 /// diurutkan skor tertinggi (dari [ScoringEngine], persis
@@ -37,199 +38,155 @@ class _HasilAsesmenStepState extends State<HasilAsesmenStep> {
     final t = context.s.onboarding;
     final nama = widget.controller.nama.trim();
     return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.md),
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    RiungGlowBackground(
-                      glowColor: AppColors.monsterHakim,
-                      alignment: const Alignment(0, -1),
-                      opacity: 0.3,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.lg, AppSpacing.xxl, AppSpacing.sm),
-                        child: Column(
-                          children: [
-                            Text(
-                              t.resultLabel,
-                              style: AppTextStyles.caption.copyWith(
-                                color: AppColors.monsterCermin,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 2,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              t.resultIntro(nama.isEmpty ? t.defaultName : nama),
-                              textAlign: TextAlign.center,
-                              style: AppTextStyles.display.copyWith(fontSize: 24),
-                            ),
-                            const SizedBox(
-                              width: 170,
-                              height: 178,
-                              child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.liar, size: 170, applyBossScale: false),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(context.s.common.monsterName('hakim'), style: AppTextStyles.title.copyWith(fontSize: 22)),
-                                const SizedBox(width: AppSpacing.sm),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: AppColors.monsterHakim),
-                                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                                  ),
-                                  child: Text(
-                                    t.bossBadge,
-                                    style: AppTextStyles.caption.copyWith(color: AppColors.monsterCermin, fontWeight: FontWeight.w700, fontSize: 10),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                              child: Text(
-                                t.bossTagline,
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.caption.copyWith(fontSize: 13),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.xl),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            decoration: BoxDecoration(
-                              color: AppColors.permukaan,
-                              border: Border.all(color: AppColors.garis),
-                              borderRadius: BorderRadius.circular(AppRadius.xl),
-                            ),
-                            child: Column(
-                              children: [
-                                _ScoreRow(
-                                  monsterId: 'hakim',
-                                  name: context.s.common.monsterName('hakim'),
-                                  pct: result.hakimScore,
-                                  size: 46,
-                                  isBoss: true,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                                  child: Divider(color: AppColors.garis, height: 1),
-                                ),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    t.minionsHeading,
-                                    style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13),
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                for (final id in result.dominantSaboteurs)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                                    child: _ScoreRow(
-                                      monsterId: id,
-                                      name: context.s.common.monsterName(id),
-                                      pct: result.scoreOf(id),
-                                      size: 34,
-                                    ),
-                                  ),
-                              ],
-                            ),
+              child: RiungBleedListView(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                children: [
+                  Align(alignment: Alignment.centerLeft, child: OnboardingTag(t.resultLabel)),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(t.resultIntro(nama.isEmpty ? t.defaultName : nama), style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2)),
+                  const SizedBox(height: AppSpacing.md),
+                  _BossCard(name: context.s.common.monsterName('hakim'), badge: t.bossBadge, tagline: t.bossTagline, pct: result.hakimScore),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(t.minionsHeading, style: AppTextStyles.title.copyWith(fontSize: 16)),
+                  const SizedBox(height: AppSpacing.md),
+                  RiungGlassCard(
+                    radius: 26,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        for (var i = 0; i < result.dominantSaboteurs.length; i++) ...[
+                          if (i > 0) const SizedBox(height: 12),
+                          _ScoreRow(
+                            monsterId: result.dominantSaboteurs[i],
+                            name: context.s.common.monsterName(result.dominantSaboteurs[i]),
+                            pct: result.scoreOf(result.dominantSaboteurs[i]),
                           ),
-                          const SizedBox(height: AppSpacing.md),
-                          TahukahKamuCard(
-                            text: t.didYouKnow,
-                            source: t.didYouKnowSource,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          const _DisclaimerCard(),
                         ],
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TahukahKamuCard(text: t.didYouKnow, source: t.didYouKnowSource),
+                  const SizedBox(height: AppSpacing.md),
+                  const _Disclaimer(),
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-              child: RiungButton(
-                label: _menyimpan ? t.saving : t.startTaming,
-                onPressed: _menyimpan ? null : _mulai,
-              ),
-            ),
+            const SizedBox(height: AppSpacing.sm),
+            RiungButton(label: _menyimpan ? t.saving : t.startTaming, onPressed: _menyimpan ? null : _mulai),
           ],
         ),
-      );
+      ),
+    );
   }
 }
 
+/// Kartu bos (frame `Kartu bos`): gradien lavender, Si Hakim liar di
+/// panggung, badge "SANG BOS", nama + skor bos, tagline.
+class _BossCard extends StatelessWidget {
+  const _BossCard({required this.name, required this.badge, required this.tagline, required this.pct});
+
+  final int pct;
+  final String name;
+  final String badge;
+  final String tagline;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.sekunderPucat, AppColors.sekunderMuda]),
+        border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+        borderRadius: BorderRadius.circular(34),
+        boxShadow: AppGlass.shadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 190,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 190,
+                  height: 180,
+                  decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.permukaan, AppColors.permukaan.withValues(alpha: 0)])),
+                ),
+                const RiungMonster(monsterId: 'hakim', state: MonsterVisualState.liar, size: 180, applyBossScale: false),
+                Positioned(
+                  left: 0,
+                  top: 18,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(color: AppColors.sekunderGelap, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                    child: Text(badge, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.diAtasTinta)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(child: Text(name, style: AppTextStyles.display.copyWith(fontSize: 24, height: 1.2))),
+              Text('$pct%', style: AppTextStyles.title.copyWith(fontSize: 18, color: AppColors.sekunderGelap)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(tagline, style: AppTextStyles.caption.copyWith(fontSize: 13, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Baris anak buah (frame `Baris …`): thumb kaca, nama, %, bar.
 class _ScoreRow extends StatelessWidget {
-  const _ScoreRow({
-    required this.monsterId,
-    required this.name,
-    required this.pct,
-    required this.size,
-    this.isBoss = false,
-  });
+  const _ScoreRow({required this.monsterId, required this.name, required this.pct});
 
   final String monsterId;
   final String name;
   final int pct;
-  final double size;
-  final bool isBoss;
 
   @override
   Widget build(BuildContext context) {
     final color = AppColors.monsterColors[monsterId] ?? AppColors.primer;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(
-          width: size,
-          height: size * 210 / 200,
-          child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.liar, size: size, applyBossScale: false),
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(14)),
+          alignment: Alignment.center,
+          child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.liar, size: 40, applyBossScale: false),
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Expanded(
-                    child: Text(
-                      name,
-                      style: AppTextStyles.chipLabel.copyWith(
-                        color: AppColors.teksUtama,
-                        fontSize: 12.5,
-                        fontWeight: isBoss ? FontWeight.w700 : FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '$pct%',
-                    style: AppTextStyles.chipLabel.copyWith(color: color, fontSize: 12.5),
-                  ),
+                  Expanded(child: Text(name, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14))),
+                  Text('$pct%', style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.teksSekunder)),
                 ],
               ),
-              const SizedBox(height: 4),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-                child: LinearProgressIndicator(
-                  value: pct / 100,
-                  minHeight: 7,
-                  backgroundColor: AppColors.latar,
-                  valueColor: AlwaysStoppedAnimation(color),
+              const SizedBox(height: 5),
+              Container(
+                height: 6,
+                decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(3)),
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  heightFactor: 1,
+                  widthFactor: (pct / 100).clamp(0.0, 1.0),
+                  child: DecoratedBox(decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3))),
                 ),
               ),
             ],
@@ -240,56 +197,23 @@ class _ScoreRow extends StatelessWidget {
   }
 }
 
-class _DisclaimerCard extends StatelessWidget {
-  const _DisclaimerCard();
+/// Disclaimer non-diagnosis (frame `Disclaimer`) + tautan bantuan krisis.
+class _Disclaimer extends StatelessWidget {
+  const _Disclaimer();
 
   @override
   Widget build(BuildContext context) {
     final t = context.s.onboarding;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.08),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.info_outline, size: 18, color: AppColors.error),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontSize: 12, height: 1.55),
-                children: [
-                  TextSpan(text: t.disclaimerText),
-                  // Tampil seperti tautan, jadi harus benar-benar bisa
-                  // diketuk: buka halaman bantuan krisis.
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.baseline,
-                    baseline: TextBaseline.alphabetic,
-                    child: GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const BantuanKrisisScreen()),
-                      ),
-                      child: Text(
-                        t.disclaimerLink,
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.error,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          height: 1.55,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(t.disclaimerText.trim(), style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+        const SizedBox(height: 4),
+        GestureDetector(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BantuanKrisisScreen())),
+          child: Text(t.disclaimerLink, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primer)),
+        ),
+      ],
     );
   }
 }

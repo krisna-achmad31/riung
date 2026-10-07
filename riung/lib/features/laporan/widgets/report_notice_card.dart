@@ -30,11 +30,7 @@ class ReportNoticeCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: accent.withValues(alpha: 0.5)),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+      decoration: AppGlass.card(radius: 26, color: accent.withValues(alpha: 0.12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -46,7 +42,7 @@ class ReportNoticeCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(body, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5)),
+          Text(body, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksSekunder)),
           const SizedBox(height: AppSpacing.md),
           RiungButton(label: cta, onPressed: onCta, variant: filledButton ? RiungButtonVariant.primary : RiungButtonVariant.secondary),
         ],

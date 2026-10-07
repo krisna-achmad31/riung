@@ -84,195 +84,148 @@ class _KartuPemainScreenState extends State<KartuPemainScreen> {
     final scope = AppScope.of(context);
     final t = context.s.home;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder),
-                  ),
-                  Expanded(
-                    child: Text(
-                      t.playerCardTitle,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _busy ? null : () => _bagikan(_caption(scope)),
-                    icon: const Icon(Icons.ios_share, size: 20, color: AppColors.teksSekunder),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: Listenable.merge([scope.auth, scope.streak, scope.monsterProgress]),
-                builder: (context, _) {
-                  final userName = scope.auth.profile?.displayName ?? t.defaultUserName;
-                  final tamedCount =
-                      scope.monsterProgress.all.values.where((m) => m.state == MonsterState.tamed).length;
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.xl),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          RepaintBoundary(
-                            key: _cardKey,
-                            child: _PlayerCard(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.playerCardTitle),
+              Expanded(
+                child: ListenableBuilder(
+                  listenable: Listenable.merge([scope.auth, scope.streak, scope.monsterProgress]),
+                  builder: (context, _) {
+                    final profile = scope.auth.profile;
+                    final userName = profile?.displayName ?? t.defaultUserName;
+                    final tamed = [
+                      for (final e in scope.monsterProgress.all.entries)
+                        if (e.value.state == MonsterState.tamed && e.key != 'hakim') e.key,
+                    ];
+                    final dominant = (profile != null && profile.dominantSaboteurs.isNotEmpty) ? profile.dominantSaboteurs.first : 'waswas';
+                    return RiungBleedListView(
+                      padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.md),
+                      children: [
+                        RepaintBoundary(
+                          key: _cardKey,
+                          child: _PlayerCard(
                             userName: userName,
                             streak: scope.streak.current,
                             journalCount: _journalCount,
-                            tamedCount: tamedCount,
-                            ),
+                            tamedCount: tamed.length,
+                            dominantId: dominant,
+                            companions: tamed.where((id) => id != dominant).take(2).toList(),
                           ),
-                          const SizedBox(height: AppSpacing.md),
-                          Text(
-                            t.shareNote,
-                            style: AppTextStyles.caption,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(t.shareNote, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                      ],
+                    );
+                  },
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.lg),
-              child: Row(
+              const SizedBox(height: AppSpacing.sm),
+              Row(
                 children: [
-                  Expanded(
-                    child: RiungButton(label: t.share, onPressed: _busy ? null : () => _bagikan(_caption(scope))),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _busy ? null : _simpan,
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(52),
-                        side: const BorderSide(color: AppColors.garis, width: 1.5),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-                      ),
-                      icon: const Icon(Icons.download_outlined, size: 17, color: AppColors.teksSekunder),
-                      label: Text(t.saveImage, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 15)),
-                    ),
-                  ),
+                  Expanded(child: RiungButton(label: t.saveImage, variant: RiungButtonVariant.secondary, onPressed: _busy ? null : _simpan)),
+                  const SizedBox(width: 10),
+                  Expanded(child: RiungButton(label: t.share, onPressed: _busy ? null : () => _bagikan(_caption(scope)))),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// Kartu pemain (frame `Kartu`): gradien sage→lavender, logo + pangkat,
+/// panggung monster 3D, nama, empat statistik kaca.
 class _PlayerCard extends StatelessWidget {
   const _PlayerCard({
     required this.userName,
     required this.streak,
     required this.journalCount,
     required this.tamedCount,
+    required this.dominantId,
+    required this.companions,
   });
 
   final String userName;
   final int streak;
   final int? journalCount;
   final int tamedCount;
+  final String dominantId;
+  final List<String> companions;
 
   @override
   Widget build(BuildContext context) {
     final t = context.s.home;
     return Container(
-      width: 300,
-      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.garis),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.kartu, AppColors.permukaan],
-        ),
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.kabutSage, AppColors.kabutLavender]),
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(color: AppColors.garis, width: 2),
+        boxShadow: AppGlass.shadow,
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          RiungGlowBackground(
-            glowColor: AppColors.primer,
-            alignment: const Alignment(0, -1),
-            opacity: 0.3,
-            radius: 1.1,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    width: 96,
-                    height: 100,
-                    child: RiungMonster(monsterId: 'hakim', state: MonsterVisualState.liar, size: 96, applyBossScale: false),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(userName, style: AppTextStyles.title.copyWith(fontSize: 19)),
-                  Text(
-                    t.playerRank,
-                    style: AppTextStyles.caption.copyWith(
-                      color: AppColors.monsterCermin,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ],
+          Row(
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: const BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [AppColors.kabutSage, AppColors.sekunder])),
               ),
-            ),
+              const SizedBox(width: 6),
+              Text('Riung', style: AppTextStyles.title.copyWith(fontSize: 14)),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                child: Text(t.playerRank, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.primer)),
+              ),
+            ],
           ),
-          Container(
-            color: AppColors.garis,
-            child: Column(
+          SizedBox(
+            height: 190,
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Row(
-                  children: [
-                    _StatCell(value: context.s.profil.daysCount(streak), label: t.statStreak, color: AppColors.aksenHangat),
-                    const SizedBox(width: 1),
-                    _StatCell(
-                      value: journalCount == null ? '…' : '$journalCount',
-                      label: t.statJournal,
-                      color: AppColors.monsterCermin,
-                    ),
-                  ],
+                Container(
+                  width: 190,
+                  height: 190,
+                  decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
                 ),
-                const SizedBox(height: 1),
-                Row(
-                  children: [
-                    _StatCell(value: '$tamedCount', label: t.statTamed, color: AppColors.sekunder),
-                    const SizedBox(width: 1),
-                    _StatCell(value: '$tamedCount/7', label: t.statProgress, color: AppColors.primer),
-                  ],
-                ),
+                if (companions.isNotEmpty)
+                  Positioned(left: 4, bottom: 10, child: RiungMonster(monsterId: companions[0], state: MonsterVisualState.jinak, size: 104, applyBossScale: false)),
+                if (companions.length > 1)
+                  Positioned(right: 4, bottom: 12, child: RiungMonster(monsterId: companions[1], state: MonsterVisualState.jinak, size: 100, applyBossScale: false)),
+                RiungMonster(monsterId: dominantId, state: MonsterVisualState.jinak, size: 150, applyBossScale: false),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 13),
-            color: AppColors.permukaan,
-            child: Row(
-              children: [
-                Text(t.tamedOf(tamedCount), style: AppTextStyles.caption.copyWith(fontSize: 10)),
-                const Spacer(),
-                Text(
-                  'riung.app',
-                  style: AppTextStyles.caption.copyWith(color: AppColors.primer, fontWeight: FontWeight.w700, fontSize: 10),
-                ),
-              ],
-            ),
+          const SizedBox(height: 10),
+          Text(userName, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: _StatCell(value: '$streak', label: t.statStreak)),
+              const SizedBox(width: 10),
+              Expanded(child: _StatCell(value: journalCount == null ? '…' : '$journalCount', label: t.statJournal)),
+            ],
           ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(child: _StatCell(value: '$tamedCount', label: t.statTamed)),
+              const SizedBox(width: 10),
+              Expanded(child: _StatCell(value: '$tamedCount/7', label: t.statProgress)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(t.tamedOf(tamedCount), style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
         ],
       ),
     );
@@ -280,24 +233,22 @@ class _PlayerCard extends StatelessWidget {
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.value, required this.label, required this.color});
+  const _StatCell({required this.value, required this.label});
 
   final String value;
   final String label;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        color: AppColors.permukaan,
-        padding: const EdgeInsets.symmetric(vertical: 13),
-        child: Column(
-          children: [
-            Text(value, style: AppTextStyles.title.copyWith(fontSize: 17, color: color)),
-            Text(label, style: AppTextStyles.caption.copyWith(fontSize: 9), textAlign: TextAlign.center),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+      decoration: BoxDecoration(color: AppColors.permukaan.withValues(alpha: 0.8), borderRadius: BorderRadius.circular(20)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(value, style: AppTextStyles.title.copyWith(fontSize: 22, height: 1.15)),
+          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
+        ],
       ),
     );
   }

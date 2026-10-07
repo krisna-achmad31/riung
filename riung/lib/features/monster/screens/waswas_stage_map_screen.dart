@@ -11,6 +11,7 @@ import '../../jurnal/logic/journal_prompts.dart';
 import '../../jurnal/screens/jurnal_editor_screen.dart';
 import '../../minigame/screens/minigame_intro_screen.dart';
 import '../logic/waswas_level_config.dart';
+import '../widgets/waswas_stage_path.dart';
 import 'waswas_breathing_node_screen.dart';
 
 /// Peta latihan Si Waswas — uji coba konsep "jalur ala Duolingo" sebelum
@@ -92,196 +93,69 @@ class _WaswasStageMapScreenState extends State<WaswasStageMapScreen> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: widget.saboteur)));
   }
 
-  _StageNode _nodeFor(WaswasStepType step, MonsterStrings t, Color color) {
-    switch (step) {
-      case WaswasStepType.jurnal:
-        return _StageNode(
-          icon: Icons.edit_note_rounded,
-          color: color,
-          title: t.stageNodeJournalTitle,
-          subtitle: _doneToday.contains('jurnal') ? t.stageNodeJournalDone : null,
-          done: _doneToday.contains('jurnal'),
-          doneLabel: t.stageNodeLabelDone,
-          onTap: _bukaJurnal,
-        );
-      case WaswasStepType.napas:
-        return _StageNode(
-          icon: Icons.spa_rounded,
-          color: color,
-          title: t.stageNodeBreathTitle,
-          subtitle: _doneToday.contains('napas') ? t.stageNodeBreathDone : null,
-          done: _doneToday.contains('napas'),
-          doneLabel: t.stageNodeLabelDone,
-          onTap: _bukaNapas,
-        );
-      case WaswasStepType.afirmasi:
-        return _StageNode(
-          icon: Icons.favorite_rounded,
-          color: color,
-          title: t.stageNodeAfirmasiTitle,
-          subtitle: _doneToday.contains('afirmasi') ? t.stageNodeAfirmasiDone : null,
-          done: _doneToday.contains('afirmasi'),
-          doneLabel: t.stageNodeLabelDone,
-          onTap: _bukaAfirmasi,
-        );
-    }
+  /// Node latihan untuk satu step. Node "sekarang" = node pertama yang
+  /// belum dilakukan hari ini (tidak mengunci yang lain, v1 uji coba).
+  StageStep _stepFor(WaswasStepType step, MonsterStrings t, int level, bool isCurrent) {
+    final (id, icon, title, doneText, onTap) = switch (step) {
+      WaswasStepType.jurnal => ('jurnal', RiungIcon.jurnal, t.stageNodeJournalTitle, t.stageNodeJournalDone, _bukaJurnal),
+      WaswasStepType.napas => ('napas', RiungIcon.meditasi, t.stageNodeBreathTitle, t.stageNodeBreathDone, _bukaNapas),
+      WaswasStepType.afirmasi => ('afirmasi', RiungIcon.afirmasi, t.stageNodeAfirmasiTitle, t.stageNodeAfirmasiDone, _bukaAfirmasi),
+    };
+    final done = _doneToday.contains(id);
+    final status = done ? StageNodeStatus.done : (isCurrent ? StageNodeStatus.current : StageNodeStatus.upcoming);
+    return StageStep(
+      icon: icon,
+      caption: done ? '${t.stageLevelLabel(level)} · ${t.stageNodeLabelDone}' : t.stageLevelLabel(level),
+      title: title,
+      subtitle: switch (status) {
+        StageNodeStatus.done => doneText,
+        StageNodeStatus.current => t.stageNodeStartHere,
+        StageNodeStatus.upcoming => null,
+      },
+      status: status,
+      onTap: onTap,
+    );
   }
+
+  static String _stepId(WaswasStepType s) => s.name;
 
   @override
   Widget build(BuildContext context) {
     final t = context.s.monster;
     final scope = AppScope.of(context);
-    final color = AppColors.monsterWaswas;
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
         child: ListenableBuilder(
           listenable: scope.monsterProgress,
           builder: (context, _) {
             final progress = scope.monsterProgress.progressOf(widget.saboteur.id) ?? MonsterProgress.initial(widget.saboteur.id);
             final level = waswasLevelForProgress(progress.progress);
-            return Column(
+            final currentIndex = level.steps.indexWhere((st) => !_doneToday.contains(_stepId(st)));
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl),
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                  child: Row(
-                    children: [
-                      IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder)),
-                      Expanded(child: Text(t.stageMapTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama))),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(border: Border.all(color: color), borderRadius: BorderRadius.circular(AppRadius.pill)),
-                        child: Text(t.stageLevelLabel(level.level), style: AppTextStyles.caption.copyWith(color: color, fontWeight: FontWeight.w700, fontSize: 11)),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                    children: [
-                      Text(t.stageMapIntro, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5)),
-                      const SizedBox(height: AppSpacing.lg),
-                      RiungOwlTip(message: t.stageOwlIntro),
-                      const SizedBox(height: AppSpacing.xxl),
-                      for (final step in level.steps) ...[
-                        _nodeFor(step, t, color),
-                        _StagePath(color: color),
-                      ],
-                      _StageNode(
-                        icon: Icons.bolt_rounded,
-                        color: color,
-                        title: t.stageNodeBossTitle,
-                        subtitle: t.stageNodeBossSub(progress.progress),
-                        done: false,
-                        big: true,
-                        doneLabel: t.stageNodeLabelDone,
-                        onTap: _bukaHadapi,
-                      ),
-                      const SizedBox(height: AppSpacing.xxl),
-                    ],
+                RiungGlassHeader(title: t.stageMapTitle),
+                const SizedBox(height: AppSpacing.md),
+                Text(t.stageMapIntro, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, fontWeight: FontWeight.w500)),
+                const SizedBox(height: AppSpacing.md),
+                RiungOwlTip(message: t.stageOwlIntro),
+                const SizedBox(height: AppSpacing.md),
+                WaswasStagePath(
+                  steps: [
+                    for (var i = 0; i < level.steps.length; i++) _stepFor(level.steps[i], t, level.level, i == currentIndex),
+                  ],
+                  boss: StageBoss(
+                    monsterId: widget.saboteur.id,
+                    caption: t.stageNodeBossLabel(progress.progress),
+                    title: t.stageNodeBossTitle,
+                    subtitle: t.stageNodeBossSub(progress.progress),
+                    onTap: _bukaHadapi,
                   ),
                 ),
               ],
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _StagePath extends StatelessWidget {
-  const _StagePath({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 3,
-        height: 28,
-        child: DecoratedBox(decoration: BoxDecoration(color: color.withValues(alpha: 0.35))),
-      ),
-    );
-  }
-}
-
-class _StageNode extends StatelessWidget {
-  const _StageNode({
-    required this.icon,
-    required this.color,
-    required this.title,
-    required this.done,
-    required this.doneLabel,
-    required this.onTap,
-    this.subtitle,
-    this.big = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final String title;
-  final String? subtitle;
-  final bool done;
-  final String doneLabel;
-  final bool big;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = big ? 76.0 : 62.0;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: big ? color : AppColors.garis, width: big ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-        ),
-        child: Row(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(color: color.withValues(alpha: 0.16), shape: BoxShape.circle),
-                  alignment: Alignment.center,
-                  child: Icon(icon, size: big ? 32 : 24, color: color),
-                ),
-                if (done)
-                  Positioned(
-                    right: -2,
-                    bottom: -2,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(color: AppColors.sukses, shape: BoxShape.circle),
-                      child: const Icon(Icons.check, size: 12, color: AppColors.latar),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: big ? 15 : 14, color: AppColors.teksUtama)),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 3),
-                    Text(subtitle!, style: AppTextStyles.caption.copyWith(fontSize: 11, color: done ? AppColors.sukses : AppColors.teksRedup)),
-                  ],
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, size: 20, color: AppColors.teksRedup),
-          ],
         ),
       ),
     );

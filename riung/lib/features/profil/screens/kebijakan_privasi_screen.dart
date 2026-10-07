@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 
 /// Ringkasan kebijakan privasi dalam bahasa manusia, konsisten dengan
 /// pesan yang sama di seluruh app (jurnal terenkripsi lokal, data
@@ -19,68 +20,70 @@ class KebijakanPrivasiScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.s.profil;
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(t.privacyPolicy, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: t.privacyPolicy),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xl),
                   children: [
-                    _Bagian(judul: t.privacyJournalTitle, isi: t.privacyJournalBody),
-                    _Bagian(judul: t.privacySyncTitle, isi: t.privacySyncBody),
-                    _Bagian(judul: t.privacyCrisisTitle, isi: t.privacyCrisisBody),
-                    _Bagian(judul: t.privacyFrozenTitle, isi: t.privacyFrozenBody),
-                    _Bagian(judul: t.privacyDataTitle, isi: t.privacyDataBody),
-                    _Bagian(judul: t.privacyAnalyticsTitle, isi: t.privacyAnalyticsBody),
-                    _Bagian(judul: t.privacyDeleteTitle, isi: t.privacyDeleteBody),
+                    _Bagian(icon: Icons.lock_outline_rounded, judul: t.privacyJournalTitle, isi: t.privacyJournalBody),
+                    _Bagian(icon: Icons.cloud_outlined, judul: t.privacySyncTitle, isi: t.privacySyncBody),
+                    _Bagian(icon: Icons.support_outlined, judul: t.privacyCrisisTitle, isi: t.privacyCrisisBody),
+                    _Bagian(icon: Icons.ac_unit_rounded, judul: t.privacyFrozenTitle, isi: t.privacyFrozenBody),
+                    _Bagian(icon: Icons.bar_chart_rounded, judul: t.privacyDataTitle, isi: t.privacyDataBody),
+                    _Bagian(icon: Icons.insights_outlined, judul: t.privacyAnalyticsTitle, isi: t.privacyAnalyticsBody),
+                    _Bagian(icon: Icons.delete_outline_rounded, judul: t.privacyDeleteTitle, isi: t.privacyDeleteBody),
                     TextButton(
                       onPressed: () => launchUrl(Uri.parse(_urlKebijakanLengkap), mode: LaunchMode.externalApplication),
                       style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: AppColors.primer),
                       child: Text(t.privacyFullPolicy, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.primer)),
                     ),
-                    const SizedBox(height: AppSpacing.xl),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// Satu bagian kebijakan (frame kartu kaca + kotak ikon primer lembut).
 class _Bagian extends StatelessWidget {
-  const _Bagian({required this.judul, required this.isi});
+  const _Bagian({required this.icon, required this.judul, required this.isi});
+  final IconData icon;
   final String judul;
   final String isi;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(judul, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-          const SizedBox(height: AppSpacing.xs),
-          Text(isi, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.6)),
-        ],
+      padding: const EdgeInsets.only(bottom: 12),
+      child: RiungGlassCard(
+        radius: 22,
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RiungMenuRow.iconBox(icon),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(judul, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+                  const SizedBox(height: 4),
+                  Text(isi, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

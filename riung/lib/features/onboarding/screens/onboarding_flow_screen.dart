@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/state/state.dart';
-import '../../../core/theme/theme.dart';
 import '../../home/screens/root_shell_screen.dart';
 import '../../launch/screens/masuk_screen.dart';
 import '../logic/onboarding_controller.dart';
@@ -78,7 +77,6 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: ListenableBuilder(
         listenable: _controller,
         builder: (context, _) {

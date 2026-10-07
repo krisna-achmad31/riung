@@ -10,6 +10,7 @@ import '../../../core/widgets/widgets.dart';
 import '../../appbeku/widgets/appbeku_toko_section.dart';
 import '../logic/billing_sku_mapping.dart';
 import '../logic/toko_data.dart';
+import '../widgets/koin_price_pill.dart';
 import '../widgets/konfirmasi_pembelian_sheet.dart';
 import '../widgets/kosmetik_preview_sheet.dart';
 import 'beli_sesi_fokus_screen.dart';
@@ -92,131 +93,128 @@ class _TokoScreenState extends State<TokoScreen> {
     final scope = AppScope.of(context);
     final rc = scope.remoteConfig;
     final t = context.s.toko;
+    final canPop = Navigator.of(context).canPop();
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListenableBuilder(
-                listenable: scope.wallet,
-                builder: (context, _) {
-                  return ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
-                    children: [
-                      Row(
+        child: ListenableBuilder(
+          listenable: scope.wallet,
+          builder: (context, _) {
+            return RiungBleedListView(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (canPop) ...[
+                      RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
+                      const SizedBox(width: 12),
+                    ],
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () => Navigator.of(context).maybePop(),
-                            icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                          ),
-                          const SizedBox(width: AppSpacing.xs),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(t.shopTitle, style: AppTextStyles.title.copyWith(fontSize: 22)),
-                                const SizedBox(height: 2),
-                                Text(t.shopSubtitle, style: AppTextStyles.caption.copyWith(fontSize: 13)),
-                              ],
-                            ),
-                          ),
-                          KoinChip(balance: scope.wallet.coins),
+                          Text(t.shopTitle, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2)),
+                          const SizedBox(height: 4),
+                          Text(t.shopSubtitle, style: AppTextStyles.caption.copyWith(fontSize: 13, height: 1.35, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.xl),
-                      Text(t.sectionRoutine, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                      const SizedBox(height: AppSpacing.md),
-                      _RutinitasCard(
-                        icon: Icons.center_focus_strong_rounded,
-                        iconColor: AppColors.sekunder,
-                        title: t.focusTitle,
-                        subtitle: t.focusSub,
-                        price: rc.spendFokus25Menit,
-                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BeliSesiFokusScreen())),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      _RutinitasCard(
-                        icon: Icons.shield_rounded,
-                        iconColor: AppColors.aksenHangat,
-                        title: t.shieldTitle,
-                        subtitle: t.shieldSub,
-                        price: rc.spendPelindungStreak,
-                        onTap: () => _buyStreakShield(rc.spendPelindungStreak),
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      Text(t.sectionMonster, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                      const SizedBox(height: AppSpacing.md),
-                      GridView.count(
-                        crossAxisCount: 2,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: AppSpacing.md,
-                        crossAxisSpacing: AppSpacing.md,
-                        childAspectRatio: 0.95,
-                        children: [
-                          for (final cosmetic in tokoCosmetics)
-                            _KosmetikCard(
-                              cosmetic: cosmetic,
-                              owned: scope.wallet.ownsCosmetic(cosmetic.id),
-                              onTap: () => _buyCosmetic(cosmetic),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      const AppBekuTokoSection(),
-                      const SizedBox(height: AppSpacing.xl),
-                      Text(t.sectionCoins, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                      const SizedBox(height: AppSpacing.md),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (var i = 0; i < EconomyCoinPacks.all.length; i++) ...[
-                            if (i > 0) const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: _CoinPackCard(
-                                pack: EconomyCoinPacks.all[i],
-                                product: _products[billingSkuFor(EconomyCoinPacks.all[i]).productId],
-                                busy: _purchasingCoinPack,
-                                onTap: () => _buyCoinPack(EconomyCoinPacks.all[i]),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        t.ethicNote,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.caption.copyWith(fontSize: 11),
+                    ),
+                    const SizedBox(width: 12),
+                    KoinChip(balance: scope.wallet.coins),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _SectionTitle(t.sectionRoutine),
+                _RutinitasCard(
+                  icon: RiungIcon.fokus,
+                  title: t.focusTitle,
+                  subtitle: t.focusSub,
+                  price: rc.spendFokus25Menit,
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BeliSesiFokusScreen())),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _RutinitasCard(
+                  icon: RiungIcon.pelindung,
+                  title: t.shieldTitle,
+                  subtitle: t.shieldSub,
+                  price: rc.spendPelindungStreak,
+                  onTap: () => _buyStreakShield(rc.spendPelindungStreak),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _SectionTitle(t.sectionMonster),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 169 / 201,
+                  children: [
+                    for (final cosmetic in tokoCosmetics)
+                      _KosmetikCard(cosmetic: cosmetic, owned: scope.wallet.ownsCosmetic(cosmetic.id), onTap: () => _buyCosmetic(cosmetic)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                const AppBekuTokoSection(),
+                const SizedBox(height: AppSpacing.lg),
+                _SectionTitle(t.sectionCoins),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0; i < EconomyCoinPacks.all.length; i++) ...[
+                      if (i > 0) const SizedBox(width: 10),
+                      Expanded(
+                        child: _CoinPackCard(
+                          pack: EconomyCoinPacks.all[i],
+                          product: _products[billingSkuFor(EconomyCoinPacks.all[i]).productId],
+                          busy: _purchasingCoinPack,
+                          onTap: () => _buyCoinPack(EconomyCoinPacks.all[i]),
+                        ),
                       ),
                     ],
-                  );
-                },
-              ),
-            ),
-          ],
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(color: AppColors.primerLembut.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(18)),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.verified_user_outlined, size: 18, color: AppColors.primer),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(t.ethicNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.primer))),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class _RutinitasCard extends StatelessWidget {
-  const _RutinitasCard({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.price,
-    required this.onTap,
-  });
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text);
+  final String text;
 
-  final IconData icon;
-  final Color iconColor;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Text(text, style: AppTextStyles.title.copyWith(fontSize: 17)),
+    );
+  }
+}
+
+/// Baris "Buat rutinitasmu" (frame `Baris …`): ikon 3D, judul, sub, harga.
+class _RutinitasCard extends StatelessWidget {
+  const _RutinitasCard({required this.icon, required this.title, required this.subtitle, required this.price, required this.onTap});
+
+  final RiungIcon icon;
   final String title;
   final String subtitle;
   final int price;
@@ -224,58 +222,34 @@ class _RutinitasCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return RiungGlassCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(color: iconColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(15)),
-              alignment: Alignment.center,
-              child: Icon(icon, size: 22, color: iconColor),
+      radius: 24,
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          RiungIcon3D(icon, size: 58),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, color: AppColors.teksUtama)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.35, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+              ],
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45)),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.kartu,
-                border: Border.all(color: AppColors.garis),
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.monetization_on, size: 13, color: AppColors.aksenHangat),
-                  const SizedBox(width: 4),
-                  Text('$price', style: AppTextStyles.chipLabel.copyWith(color: AppColors.aksenHangat, fontSize: 13)),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 8),
+          KoinPricePill(label: '$price'),
+        ],
       ),
     );
   }
 }
 
+/// Kartu kosmetik (frame `Kosmetik …`): badge rarity, art item 3D, nama,
+/// harga atau "Dimiliki".
 class _KosmetikCard extends StatelessWidget {
   const _KosmetikCard({required this.cosmetic, required this.owned, required this.onTap});
 
@@ -285,49 +259,53 @@ class _KosmetikCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final t = context.s.toko;
+    final rarity = cosmetic.rarity;
+    return RiungGlassCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppColors.permukaan,
-          border: Border.all(color: AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 62,
-              height: 68,
-              child: RiungMonster(
-                monsterId: cosmetic.monsterId,
-                state: MonsterVisualState.jinak,
-                size: 62,
-                cosmetics: [cosmetic.id],
+      radius: 26,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(color: rarity.background, borderRadius: BorderRadius.circular(AppRadius.pill)),
+            child: Text(rarity.label(t), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: rarity.foreground)),
+          ),
+          Expanded(
+            child: Center(
+              child: LayoutBuilder(
+                builder: (context, c) {
+                  final size = c.biggest.shortestSide.clamp(40.0, 96.0);
+                  return Image.asset(cosmetic.artAsset, width: size, height: size, fit: BoxFit.contain, cacheWidth: (size * 3).round());
+                },
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(context.s.toko.cosmeticName(cosmetic.id), textAlign: TextAlign.center, style: AppTextStyles.chipLabel.copyWith(fontSize: 12, height: 1.35)),
-            const SizedBox(height: 6),
-            if (owned)
-              Text(context.s.toko.owned, style: AppTextStyles.caption.copyWith(color: AppColors.sukses, fontWeight: FontWeight.w700, fontSize: 12))
-            else
-              Row(
-                mainAxisSize: MainAxisSize.min,
+          ),
+          Text(t.cosmeticName(cosmetic.id), maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, height: 1.25, color: AppColors.teksUtama)),
+          const SizedBox(height: 6),
+          if (owned)
+            SizedBox(
+              height: 28,
+              child: Row(
                 children: [
-                  const Icon(Icons.monetization_on, size: 12, color: AppColors.aksenHangat),
+                  const Icon(Icons.check_rounded, size: 14, color: AppColors.primer),
                   const SizedBox(width: 4),
-                  Text('${cosmetic.price}', style: AppTextStyles.chipLabel.copyWith(color: AppColors.aksenHangat, fontSize: 12)),
+                  Text(t.owned, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primer)),
                 ],
               ),
-          ],
-        ),
+            )
+          else
+            KoinPricePill(label: t.coinsPrice(cosmetic.price)),
+        ],
       ),
     );
   }
 }
 
+/// Paket koin (frame `Paket …`): yang terpopuler berbingkai emas, harga
+/// berlatar tinta.
 class _CoinPackCard extends StatelessWidget {
   const _CoinPackCard({required this.pack, required this.product, required this.busy, required this.onTap});
 
@@ -345,54 +323,46 @@ class _CoinPackCard extends StatelessWidget {
       child: Opacity(
         opacity: busy ? 0.6 : 1,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(8, 18, 8, 12),
+          padding: const EdgeInsets.fromLTRB(6, 12, 6, 14),
           decoration: BoxDecoration(
-            color: highlight ? AppColors.aksenHangat.withValues(alpha: 0.08) : AppColors.permukaan,
-            border: Border.all(color: highlight ? AppColors.aksenHangat : AppColors.garis, width: highlight ? 1.5 : 1),
-            borderRadius: BorderRadius.circular(AppRadius.lg),
+            color: highlight ? AppColors.permukaanPadat.withValues(alpha: 0.88) : AppColors.kartu,
+            border: Border.all(color: highlight ? AppColors.emas : AppColors.garis, width: highlight ? 2 : AppGlass.edgeWidth),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: highlight ? AppGlass.shadow : null,
           ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.topCenter,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              if (pack.badge != null)
-                Positioned(
-                  top: -18,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(color: AppColors.aksenHangat, borderRadius: BorderRadius.circular(AppRadius.pill)),
-                    child: Text(
-                      t.coinPackBadge.toUpperCase(),
-                      style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5),
-                    ),
+              SizedBox(
+                height: 15,
+                child: highlight
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(color: AppColors.emasLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        alignment: Alignment.center,
+                        child: Text(t.coinPackBadge, style: AppTextStyles.caption.copyWith(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.emasGelap)),
+                      )
+                    : null,
+              ),
+              const SizedBox(height: 4),
+              RiungIcon3D(RiungIcon.koin, size: highlight ? 60 : 50),
+              const SizedBox(height: 4),
+              Text('${pack.totalCoins}', style: AppTextStyles.title.copyWith(fontSize: 22, height: 1.2)),
+              Text(pack.bonus > 0 ? t.packBonus(pack.bonus) : t.coinUnit, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: highlight ? AppColors.tinta : AppColors.permukaanPadat.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    product?.price ?? t.priceShort(pack.priceIdr),
+                    style: AppTextStyles.chipLabel.copyWith(fontSize: 12, color: highlight ? AppColors.diAtasTinta : AppColors.teksUtama),
                   ),
                 ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(t.coinPackLabel(pack.id), textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontWeight: FontWeight.w700, fontSize: 11)),
-                  const SizedBox(height: 4),
-                  const Icon(Icons.monetization_on, size: 20, color: AppColors.aksenHangat),
-                  const SizedBox(height: 2),
-                  Text('${pack.totalCoins}', style: AppTextStyles.chipLabel.copyWith(color: AppColors.aksenHangat, fontSize: 16)),
-                  Text(
-                    pack.bonus > 0 ? t.packBonus(pack.bonus) : t.coinUnit,
-                    style: AppTextStyles.caption.copyWith(fontSize: 9),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColors.kartu,
-                      border: Border.all(color: AppColors.garis),
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                    child: Text(
-                      product?.price ?? 'Rp${pack.priceIdr}',
-                      style: AppTextStyles.chipLabel.copyWith(fontSize: 11),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),

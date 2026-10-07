@@ -53,6 +53,9 @@ abstract class OnboardingStrings {
 
   // ── Jawaban bebas & nama ──
   String get freeTextQuestion;
+  String get freeTextTag;
+  String get freeTextPrivate;
+  String get nameTag;
   String get freeTextHint;
   String get freeTextSend;
   String get nameQuestion;
@@ -374,6 +377,12 @@ class OnboardingStringsId extends OnboardingStrings {
   @override
   String get skip => 'Lewati';
 
+  @override
+  String get freeTextTag => 'Ceritamu';
+  @override
+  String get freeTextPrivate => 'Hanya di perangkatmu';
+  @override
+  String get nameTag => 'Satu lagi';
   @override
   String get freeTextQuestion => 'Ceritakan dengan katamu sendiri, apa yang paling ingin kamu ubah?';
   @override
@@ -731,6 +740,12 @@ class OnboardingStringsEn extends OnboardingStrings {
   @override
   String get skip => 'Skip';
 
+  @override
+  String get freeTextTag => 'Your story';
+  @override
+  String get freeTextPrivate => 'Only on your device';
+  @override
+  String get nameTag => 'One more';
   @override
   String get freeTextQuestion => 'In your own words, what do you most want to change?';
   @override

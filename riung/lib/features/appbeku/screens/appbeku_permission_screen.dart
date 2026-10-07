@@ -59,139 +59,93 @@ class _AppBekuPermissionScreenState extends State<AppBekuPermissionScreen> with 
     final t = context.s.appbeku;
     final usage = _needsUsage(appBeku);
     return Scaffold(
-      backgroundColor: AppColors.latar,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                  ),
-                  Text(usage ? t.permissionTitle : t.accessibilityTitle, style: AppTextStyles.subtitle.copyWith(fontSize: 15)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                child: Column(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+          child: Column(
+            children: [
+              RiungGlassHeader(title: usage ? t.permissionTitle : t.accessibilityTitle),
+              Expanded(
+                child: RiungBleedListView(
+                  padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                   children: [
-                    const SizedBox(
-                      width: 104,
-                      height: 109,
-                      child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 104),
+                    Center(
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.permukaan,
+                          border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+                          boxShadow: AppGlass.shadow,
+                        ),
+                        child: Icon(usage ? Icons.bar_chart_rounded : Icons.lock_outline_rounded, size: 48, color: usage ? AppColors.langit : AppColors.sekunder),
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text(
-                      usage ? t.permissionHeadline : t.accessibilityHeadline,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.display.copyWith(fontSize: 22, height: 1.3),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      usage ? t.permissionBody : t.accessibilityBody,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body.copyWith(fontSize: 13),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
+                    Text(usage ? t.permissionHeadline : t.accessibilityHeadline, style: AppTextStyles.display.copyWith(fontSize: 22, height: 1.2)),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(usage ? t.permissionBody : t.accessibilityBody, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                    const SizedBox(height: AppSpacing.md),
                     _InfoCard(
                       title: usage ? t.readTitle : t.accessibilityReadTitle,
-                      titleColor: AppColors.sukses,
-                      items: [for (final item in (usage ? t.readItems : t.accessibilityReadItems)) (Icons.check_rounded, item)],
-                      itemColor: AppColors.sukses,
+                      color: AppColors.primer,
+                      icon: Icons.visibility_outlined,
+                      items: usage ? t.readItems : t.accessibilityReadItems,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _InfoCard(
                       title: t.cannotSeeTitle,
-                      titleColor: AppColors.error,
-                      items: [for (final item in (usage ? t.cannotSeeItems : t.accessibilityCannotItems)) (Icons.close_rounded, item)],
-                      itemColor: AppColors.error,
+                      color: AppColors.aksenHangatGelap,
+                      icon: Icons.visibility_off_outlined,
+                      items: usage ? t.cannotSeeItems : t.accessibilityCannotItems,
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.primer.withValues(alpha: 0.08),
-                        border: Border.all(color: AppColors.primer.withValues(alpha: 0.25)),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.shield_rounded, size: 17, color: AppColors.primer),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(
-                              usage ? t.permissionRevoke : t.accessibilityRevoke,
-                              style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
+                    Text(usage ? t.permissionRevoke : t.accessibilityRevoke, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.45, fontWeight: FontWeight.w500, color: AppColors.teksRedup)),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-              child: Column(
-                children: [
-                  RiungButton(
-                    label: usage ? t.openAndroidSettings : t.openAccessibilitySettings,
-                    onPressed: () => usage ? appBeku.openUsageAccessSettings() : appBeku.openAccessibilitySettings(),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    child: Text(context.s.common.nantiSaja, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksRedup, fontSize: 13)),
-                  ),
-                ],
+              const SizedBox(height: AppSpacing.sm),
+              RiungButton(
+                label: usage ? t.openAndroidSettings : t.openAccessibilitySettings,
+                onPressed: () => usage ? appBeku.openUsageAccessSettings() : appBeku.openAccessibilitySettings(),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// Kartu "yang Riung baca / nggak bisa lihat" (frame `YANG RIUNG …`).
 class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.title, required this.titleColor, required this.items, required this.itemColor});
+  const _InfoCard({required this.title, required this.color, required this.icon, required this.items});
 
   final String title;
-  final Color titleColor;
-  final List<(IconData, String)> items;
-  final Color itemColor;
+  final Color color;
+  final IconData icon;
+  final List<String> items;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+    return RiungGlassCard(
+      radius: 24,
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTextStyles.caption.copyWith(color: titleColor, fontWeight: FontWeight.w700, fontSize: 12, letterSpacing: 0.6)),
-          const SizedBox(height: AppSpacing.sm),
+          Text(title, style: AppTextStyles.caption.copyWith(color: color, fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.5)),
           for (final item in items)
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(item.$1, size: 15, color: itemColor),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(child: Text(item.$2, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5, color: AppColors.teksSekunder))),
+                  Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icon, size: 16, color: color)),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(item, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.4, fontWeight: FontWeight.w500, color: AppColors.teksUtama))),
                 ],
               ),
             ),

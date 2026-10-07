@@ -24,100 +24,70 @@ class BetterMeSesiSelesaiScreen extends StatelessWidget {
     final selesaiDiLevel = progress.completedInLevel(level.number);
 
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        glowColor: AppColors.sukses,
-        alignment: const Alignment(0, -0.6),
-        opacity: 0.16,
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.md),
           child: Column(
             children: [
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xxl),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.sukses.withValues(alpha: 0.14),
-                          border: Border.all(color: AppColors.sukses, width: 1.5),
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 280,
+                      height: 230,
+                      child: Stack(
                         alignment: Alignment.center,
-                        child: const Icon(Icons.check_rounded, size: 38, color: AppColors.sukses),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(t.sessionDone, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 23)),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(t.session(session.id).judul, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 14)),
-                      const SizedBox(height: AppSpacing.lg),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (!sudahDapatKoinSebelumnya)
-                            _StatBox(icon: Icons.monetization_on, color: AppColors.aksenHangat, value: '+${EconomyEarn.betterMeLesson}', label: t.coins),
-                          if (!sudahDapatKoinSebelumnya) const SizedBox(width: AppSpacing.sm),
-                          _StatBox(icon: Icons.auto_awesome_rounded, color: AppColors.sekunder, value: '$selesaiDiLevel/${level.sessions.length}', label: t.sessionsInLevel),
+                          Container(
+                            width: 230,
+                            height: 230,
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                          ),
+                          const RiungIcon3D(RiungIcon.kepribadian, size: 170),
+                          const Positioned(left: 20, top: 40, child: Icon(Icons.auto_awesome, size: 22, color: AppColors.emas)),
+                          const Positioned(right: 22, top: 40, child: Icon(Icons.auto_awesome, size: 18, color: AppColors.emas)),
+                          const Positioned(right: 12, bottom: 30, child: Icon(Icons.auto_awesome, size: 20, color: AppColors.emas)),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, 0, AppSpacing.xxl, AppSpacing.lg),
-                child: Column(
-                  children: [
-                    RiungButton(
-                      label: context.s.common.lanjut,
-                      onPressed: () {
-                        // Balik ke LevelIntroScreen (lewati SesiDetailScreen
-                        // di antaranya) — SesiContentScreen sudah diganti
-                        // (pushReplacement) jadi layar ini sendiri, bukan
-                        // ditumpuk di atasnya.
-                        final nav = Navigator.of(context);
-                        nav.pop();
-                        nav.pop();
-                      },
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(t.sessionDone, textAlign: TextAlign.center, style: AppTextStyles.display.copyWith(fontSize: 28)),
+                    const SizedBox(height: 6),
+                    Text(t.session(session.id).judul, textAlign: TextAlign.center, style: AppTextStyles.body.copyWith(fontSize: 14, color: AppColors.teksSekunder)),
+                    const SizedBox(height: AppSpacing.lg),
+                    Row(
+                      children: [
+                        if (!sudahDapatKoinSebelumnya) ...[
+                          Expanded(child: RiungStatTile(leading: const RiungIcon3D(RiungIcon.koin, size: 40), value: '+${EconomyEarn.betterMeLesson}', label: t.coins)),
+                          const SizedBox(width: 10),
+                        ],
+                        Expanded(
+                          child: RiungStatTile(
+                            leading: const RiungIcon3D(RiungIcon.kepribadian, size: 40),
+                            value: '$selesaiDiLevel/${level.sessions.length}',
+                            label: t.sessionsInLevel,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
+              RiungButton(
+                label: context.s.common.lanjut,
+                onPressed: () {
+                  // Balik ke LevelIntroScreen (lewati SesiDetailScreen di
+                  // antaranya) — SesiContentScreen sudah diganti
+                  // (pushReplacement) jadi layar ini sendiri.
+                  final nav = Navigator.of(context);
+                  nav.pop();
+                  nav.pop();
+                },
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _StatBox extends StatelessWidget {
-  const _StatBox({required this.icon, required this.color, required this.value, required this.label});
-  final IconData icon;
-  final Color color;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 13),
-      decoration: BoxDecoration(
-        color: AppColors.permukaan,
-        border: Border.all(color: AppColors.garis),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(height: AppSpacing.xs),
-          Text(value, style: AppTextStyles.chipLabel.copyWith(color: color, fontSize: 16)),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10)),
-        ],
       ),
     );
   }

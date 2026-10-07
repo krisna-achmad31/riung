@@ -55,109 +55,102 @@ class _MeditasiListScreenState extends State<MeditasiListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s.meditasi;
+    final featured = MeditationCatalog.byId('jeda_kerja');
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: RiungGlowBackground(
-        alignment: const Alignment(0, -1.2),
-        opacity: 0.14,
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
-            children: [
-              Row(
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
+          children: [
+            Row(
+              children: [
+                // Cuma tampil kalau layar ini di-push (mis. dari kartu
+                // cepat di Beranda) — sebagai tab Jelajah, Navigator.canPop
+                // == false, jadi tidak ada back ganda.
+                if (Navigator.canPop(context)) ...[
+                  RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
+                  const SizedBox(width: AppSpacing.md),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(t.title, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2)),
+                      const SizedBox(height: 4),
+                      Text(t.subtitle, style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            _SearchBar(
+              hint: t.searchHint,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MeditasiSearchScreen())),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            if (_filter == MeditationFilter.semua) ...[
+              _FeaturedCard(session: featured, onTap: () => _openSession(featured)),
+              const SizedBox(height: AppSpacing.lg),
+            ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              child: Row(
                 children: [
-                  // Cuma tampil kalau layar ini di-push (mis. dari kartu
-                  // cepat di Beranda) — sebagai tab Jelajah, Navigator.canPop
-                  // == false, jadi tidak ada back ganda.
-                  if (Navigator.canPop(context)) ...[
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back_rounded, color: AppColors.teksSekunder),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                  ],
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(context.s.meditasi.title, style: AppTextStyles.display.copyWith(fontSize: 22)),
-                        Text(context.s.meditasi.subtitle, style: AppTextStyles.caption.copyWith(fontSize: 13)),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const MeditasiSearchScreen()),
-                    ),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.kartu,
-                        border: Border.all(color: AppColors.garis),
-                        borderRadius: BorderRadius.circular(13),
+                  for (final filter in MeditationFilter.values)
+                    Padding(
+                      padding: const EdgeInsets.only(right: AppSpacing.sm),
+                      child: RiungFilterChip(
+                        label: t.filterLabel(filter),
+                        selected: filter == _filter,
+                        onTap: () => setState(() => _filter = filter),
                       ),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.search, size: 19, color: AppColors.teksSekunder),
                     ),
-                  ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-              SizedBox(
-                height: 34,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (final filter in MeditationFilter.values)
-                      Padding(
-                        padding: const EdgeInsets.only(right: AppSpacing.sm),
-                        child: _CategoryChip(
-                          label: context.s.meditasi.filterLabel(filter),
-                          selected: filter == _filter,
-                          onTap: () => setState(() => _filter = filter),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              if (_filter == MeditationFilter.semua) ...[
-                _FeaturedCard(session: MeditationCatalog.byId('jeda_kerja'), onTap: () => _openSession(MeditationCatalog.byId('jeda_kerja'))),
-                const SizedBox(height: AppSpacing.lg),
-                Text(context.s.meditasi.sectionAnxiety, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15)),
-                const SizedBox(height: AppSpacing.sm),
-                for (final session in _cemas) _SessionRow(session: session, onTap: () => _openSession(session)),
-                const SizedBox(height: AppSpacing.md),
-                Text(context.s.meditasi.sectionStudents, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 15)),
-                const SizedBox(height: AppSpacing.sm),
-                for (final session in _pelajar) _SessionRow(session: session, onTap: () => _openSession(session)),
-              ] else if (_filteredByChip.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
-                  child: Text(
-                    context.s.meditasi.emptyCategory(context.s.meditasi.filterLabel(_filter)),
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body,
-                  ),
-                )
-              else
-                for (final session in _filteredByChip) _SessionRow(session: session, onTap: () => _openSession(session)),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            if (_filter == MeditationFilter.semua) ...[
+              _SectionTitle(t.sectionAnxiety),
+              for (final session in _cemas) _SessionRow(session: session, onTap: () => _openSession(session)),
               const SizedBox(height: AppSpacing.sm),
-            ],
-          ),
+              _SectionTitle(t.sectionStudents),
+              for (final session in _pelajar) _SessionRow(session: session, onTap: () => _openSession(session)),
+            ] else if (_filteredByChip.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
+                child: Text(t.emptyCategory(t.filterLabel(_filter)), textAlign: TextAlign.center, style: AppTextStyles.body),
+              )
+            else
+              for (final session in _filteredByChip) _SessionRow(session: session, onTap: () => _openSession(session)),
+          ],
         ),
       ),
     );
   }
 }
 
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({required this.label, required this.selected, required this.onTap});
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text);
 
-  final String label;
-  final bool selected;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md, top: AppSpacing.xs),
+      child: Text(text, style: AppTextStyles.title.copyWith(fontSize: 17, color: AppColors.teksUtama)),
+    );
+  }
+}
+
+/// Bilah cari kaca (frame `Cari`) — membuka layar pencarian.
+class _SearchBar extends StatelessWidget {
+  const _SearchBar({required this.hint, required this.onTap});
+
+  final String hint;
   final VoidCallback onTap;
 
   @override
@@ -165,25 +158,27 @@ class _CategoryChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primer : Colors.transparent,
-          border: Border.all(color: selected ? AppColors.primer : AppColors.garis),
-          borderRadius: BorderRadius.circular(AppRadius.pill),
+          color: AppColors.permukaan.withValues(alpha: 0.75),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
         ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: AppTextStyles.chipLabel.copyWith(
-            fontSize: 12,
-            color: selected ? AppColors.latar : AppColors.teksSekunder,
-          ),
+        child: Row(
+          children: [
+            const Icon(Icons.search_rounded, size: 18, color: AppColors.teksRedup),
+            const SizedBox(width: 10),
+            Text(hint, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksRedup)),
+          ],
         ),
       ),
     );
   }
 }
 
+/// Kartu unggulan (frame `Unggulan`): gradien sage→biru, teratai 3D, tombol
+/// pil tinta "Putar".
 class _FeaturedCard extends StatelessWidget {
   const _FeaturedCard({required this.session, required this.onTap});
 
@@ -192,63 +187,78 @@ class _FeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [AppColors.sekunder.withValues(alpha: 0.18), AppColors.kartu.withValues(alpha: 0.9)]),
-        border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.4)),
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.s.meditasi.featuredKicker,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w700, letterSpacing: 1.2, fontSize: 10),
+    final t = context.s.meditasi;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 200),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.primerLembut, AppColors.kabutSage, AppColors.langitLembut],
+          ),
+          borderRadius: BorderRadius.circular(34),
+          border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
+          boxShadow: AppGlass.shadow,
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -40,
+              top: -40,
+              width: 240,
+              height: 240,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)]),
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(context.s.meditasi.session(session.id).title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 17)),
-                const SizedBox(height: AppSpacing.xs),
-                Text(context.s.meditasi.session(session.id).description, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45)),
-                const SizedBox(height: AppSpacing.sm),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: onTap,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(color: AppColors.sekunder, borderRadius: BorderRadius.circular(11)),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.play_arrow, size: 13, color: AppColors.latar),
-                            const SizedBox(width: 6),
-                            Text(context.s.meditasi.play, style: AppTextStyles.caption.copyWith(color: AppColors.latar, fontWeight: FontWeight.w700, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(context.s.meditasi.durationCoins(session.defaultDuration, EconomyEarn.meditasi), style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-          const SizedBox(
-            width: 84,
-            height: 88,
-            child: RiungMonster(monsterId: 'waswas', state: MonsterVisualState.jinak, size: 84),
-          ),
-        ],
+            const Positioned(right: 0, bottom: 0, child: RiungIcon3D(RiungIcon.meditasi, size: 170)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 150, 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.featuredKicker.toUpperCase(), style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: AppColors.primer)),
+                  const SizedBox(height: 6),
+                  Text(t.session(session.id).title, style: AppTextStyles.title.copyWith(fontSize: 22, height: 1.1, color: AppColors.teksUtama)),
+                  const SizedBox(height: 6),
+                  Text(t.durationCoins(session.defaultDuration, EconomyEarn.meditasi), style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                  const SizedBox(height: 26),
+                  Container(
+                    height: 40,
+                    padding: const EdgeInsets.fromLTRB(7, 7, 18, 7),
+                    decoration: BoxDecoration(color: AppColors.tinta, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 26,
+                          height: 26,
+                          decoration: const BoxDecoration(color: AppColors.diAtasTinta, shape: BoxShape.circle),
+                          child: const Icon(Icons.play_arrow_rounded, size: 16, color: AppColors.tinta),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(t.play, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.diAtasTinta)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+/// Baris sesi (frame `Sesi …`): thumbnail pastel + monster sasaran 3D,
+/// eyebrow "MELAWAN …", judul, meta, tombol putar / kunci premium.
 class _SessionRow extends StatelessWidget {
   const _SessionRow({required this.session, required this.onTap});
 
@@ -257,43 +267,52 @@ class _SessionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s.meditasi;
     final free = MeditationCatalog.isSessionFree(session.id);
+    final monsterId = session.targetMonsterId;
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: GestureDetector(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: RiungGlassCard(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.permukaan,
-            border: Border.all(color: AppColors.garis),
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(color: session.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14)),
-                alignment: Alignment.center,
-                child: Icon(session.icon, size: 21, color: session.color),
+        radius: 24,
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(color: AppColors.monsterLembut[monsterId] ?? AppColors.kabutSage, borderRadius: BorderRadius.circular(18)),
+              alignment: Alignment.center,
+              child: RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: 58, applyBossScale: false),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.s.afirmasi.deckAgainst(context.s.common.monsterName(monsterId)).toUpperCase(),
+                    style: AppTextStyles.caption.copyWith(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.teksRedup),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(t.session(session.id).title, maxLines: 2, style: AppTextStyles.chipLabel.copyWith(fontSize: 15, height: 1.25, color: AppColors.teksUtama)),
+                  const SizedBox(height: 3),
+                  Text(t.durationCoins(session.defaultDuration, EconomyEarn.meditasi), style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                ],
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(context.s.meditasi.session(session.id).title, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 14)),
-                    Text(context.s.meditasi.durationAmbient(session.defaultDuration), style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                  ],
-                ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: free ? AppColors.permukaan : AppColors.sekunderLembut,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.garis),
               ),
-              if (!free)
-                const Icon(Icons.lock, size: 15, color: AppColors.teksRedup)
-              else
-                Icon(Icons.play_arrow, size: 18, color: session.color),
-            ],
-          ),
+              child: Icon(free ? Icons.play_arrow_rounded : Icons.lock_rounded, size: 18, color: free ? AppColors.teksUtama : AppColors.sekunder),
+            ),
+          ],
         ),
       ),
     );

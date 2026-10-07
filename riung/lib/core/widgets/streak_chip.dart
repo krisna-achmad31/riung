@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import '../theme/theme.dart';
+import 'riung_icon_3d.dart';
 import 'riung_pill_chip.dart';
 
-/// Chip streak harian — icon api warna aksen hangat, teks warna utama.
+/// Chip streak harian — ikon api 3D (`StreakChip` Riung Glass).
 /// `compact: true` (mis. top bar Beranda) hanya menampilkan angka tanpa
 /// akhiran "hari".
 class StreakChip extends StatelessWidget {
@@ -16,10 +16,8 @@ class StreakChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RiungPillChip(
-      icon: Icons.local_fire_department_rounded,
+      icon3d: RiungIcon.streak,
       label: compact ? '$days' : context.s.common.daysCount(days),
-      iconColor: AppColors.aksenHangat,
-      textColor: AppColors.teksUtama,
     );
   }
 }

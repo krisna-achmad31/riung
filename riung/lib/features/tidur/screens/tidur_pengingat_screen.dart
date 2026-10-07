@@ -56,159 +56,120 @@ class _TidurPengingatScreenState extends State<TidurPengingatScreen> {
   Widget build(BuildContext context) {
     final t = context.s.tidur;
     final userName = AppScope.of(context).auth.profile?.displayName;
+    final time = '${(_targetMinutes ~/ 60).toString().padLeft(2, '0')}:${(_targetMinutes % 60).toString().padLeft(2, '0')}';
     return Scaffold(
-      backgroundColor: AppColors.latar,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: AppColors.teksSekunder)),
-                  Text(t.reminderTitle, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      t.reminderIntro,
-                      style: AppTextStyles.body.copyWith(fontSize: 13),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppSpacing.xl),
-                      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.xxl)),
-                      child: Column(
-                        children: [
-                          Text(t.targetKicker, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700)),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            '${(_targetMinutes ~/ 60).toString().padLeft(2, '0')}:${(_targetMinutes % 60).toString().padLeft(2, '0')}',
-                            style: AppTextStyles.display.copyWith(fontSize: 48, letterSpacing: -1, color: AppColors.primer),
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _AdjustChip(label: t.adjustMinutes(-15), onTap: () => _adjust(-15)),
-                              const SizedBox(width: AppSpacing.sm),
-                              _AdjustChip(label: t.adjustMinutes(15), onTap: () => _adjust(15)),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.lg)),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+      body: RiungGlassBackdrop(
+        night: true,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+            child: Column(
+              children: [
+                RiungGlassHeader(title: t.reminderTitle, night: true),
+                Expanded(
+                  child: RiungBleedListView(
+                    padding: const EdgeInsets.only(top: AppSpacing.lg),
+                    children: [
+                      Text(t.reminderIntro, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppNight.teksSekunder)),
+                      const SizedBox(height: AppSpacing.lg),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                        decoration: AppNight.card(radius: 30),
+                        child: Column(
+                          children: [
+                            Text(t.targetKicker, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: AppNight.aksen)),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(t.remindBefore(SleepReminderSettings.leadMinutes), style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-                                Text('"${context.s.notif.sleepBody(userName)}"', style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                              ],
-                            ),
-                          ),
-                          Switch(
-                            value: _aktif,
-                            onChanged: (v) => setState(() => _aktif = v),
-                            activeTrackColor: AppColors.primer,
-                            thumbColor: const WidgetStatePropertyAll(AppColors.latar),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(color: AppColors.permukaan, border: Border.all(color: AppColors.garis), borderRadius: BorderRadius.circular(AppRadius.lg)),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(t.activeDays, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksUtama, fontSize: 13)),
-                                Text(t.daysSummary(_activeDays, context.s.profil.weekdayShort), style: AppTextStyles.caption.copyWith(fontSize: 11)),
-                              ],
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              for (var i = 0; i < 7; i++)
+                                RiungGlassIconButton(icon: Icons.remove_rounded, night: true, semanticLabel: t.adjustMinutes(-15), onTap: () => _adjust(-15)),
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 4),
-                                  child: GestureDetector(
-                                    onTap: () => setState(() => _activeDays.contains(i) ? _activeDays.remove(i) : _activeDays.add(i)),
-                                    child: Container(
-                                      width: 24,
-                                      height: 24,
-                                      decoration: BoxDecoration(shape: BoxShape.circle, color: _activeDays.contains(i) ? AppColors.primer : AppColors.kartu),
-                                      alignment: Alignment.center,
-                                      child: Text(t.dayInitials[i], style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: _activeDays.contains(i) ? AppColors.latar : AppColors.teksRedup)),
-                                    ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(time, style: AppTextStyles.display.copyWith(fontSize: 52, height: 1.15, color: AppNight.teks)),
+                                ),
+                                RiungGlassIconButton(icon: Icons.add_rounded, night: true, semanticLabel: t.adjustMinutes(15), onTap: () => _adjust(15)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+                        decoration: AppNight.card(),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.notifications_none_rounded, size: 18, color: AppNight.aksen),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(t.remindBefore(SleepReminderSettings.leadMinutes), style: AppTextStyles.chipLabel.copyWith(fontSize: 14, fontWeight: FontWeight.w600, color: AppNight.teks)),
+                                  Text('"${context.s.notif.sleepBody(userName)}"', style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
+                                ],
+                              ),
+                            ),
+                            Switch(
+                              value: _aktif,
+                              onChanged: (v) => setState(() => _aktif = v),
+                              activeTrackColor: AppColors.kabutSage,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(t.activeDays, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppNight.teksSekunder)),
+                      const SizedBox(height: 4),
+                      Text(t.daysSummary(_activeDays, context.s.profil.weekdayShort), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
+                      const SizedBox(height: AppSpacing.md),
+                      Row(
+                        children: [
+                          for (var i = 0; i < 7; i++) ...[
+                            if (i > 0) const SizedBox(width: 6),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => setState(() => _activeDays.contains(i) ? _activeDays.remove(i) : _activeDays.add(i)),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 160),
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: _activeDays.contains(i) ? AppNight.aksen : AppNight.kaca,
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(color: _activeDays.contains(i) ? AppNight.aksen : AppNight.tepi),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    t.dayInitials[i],
+                                    style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: _activeDays.contains(i) ? AppNight.latarBawah : AppNight.teksSekunder),
                                   ),
                                 ),
-                            ],
-                          ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(color: AppColors.sekunder.withValues(alpha: 0.08), border: Border.all(color: AppColors.sekunder.withValues(alpha: 0.25)), borderRadius: BorderRadius.circular(AppRadius.lg)),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.info_outline, size: 17, color: AppColors.sekunder),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(t.streakNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5)),
-                          ),
-                        ],
+                      const SizedBox(height: AppSpacing.lg),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(color: AppColors.kabutSage.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(18)),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.favorite_border_rounded, size: 16, color: AppColors.kabutSage),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(t.streakNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.primerLembut))),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: AppSpacing.md),
+                RiungButton(label: t.saveReminder, variant: RiungButtonVariant.night, onPressed: _simpan),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
-              child: RiungButton(label: t.saveReminder, onPressed: _simpan),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _AdjustChip extends StatelessWidget {
-  const _AdjustChip({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.pill), border: Border.all(color: AppColors.garis)),
-        child: Text(label, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 12)),
       ),
     );
   }

@@ -18,6 +18,8 @@ abstract class JurnalStrings {
   String get emptyTitle;
   String get emptyBody;
   String writeFirst(int coins);
+  String writeCta(int coins);
+  String get recentEntries;
   String get encryptedNote;
   String get dailyLimitTitle;
   String get lockedTitle;
@@ -92,6 +94,10 @@ class JurnalStringsId extends JurnalStrings {
       'Nggak perlu rapi, nggak perlu panjang. Tiga kalimat tentang harimu udah cukup buat mulai, dan Si Kabut paling nggak tahan sama pikiran yang dituliskan.';
   @override
   String writeFirst(int coins) => 'Tulis entri pertama · +$coins koin';
+  @override
+  String writeCta(int coins) => 'Tulis · +$coins koin';
+  @override
+  String get recentEntries => 'Entri terakhir';
   @override
   String get encryptedNote => 'Terkunci, terenkripsi, hanya untukmu';
   @override
@@ -246,6 +252,10 @@ class JurnalStringsEn extends JurnalStrings {
       "It doesn't need to be neat or long. Three sentences about your day are enough to start, and Si Kabut can't stand thoughts that get written down.";
   @override
   String writeFirst(int coins) => 'Write your first entry · +$coins coins';
+  @override
+  String writeCta(int coins) => 'Write · +$coins coins';
+  @override
+  String get recentEntries => 'Recent entries';
   @override
   String get encryptedNote => 'Locked, encrypted, only for you';
   @override
