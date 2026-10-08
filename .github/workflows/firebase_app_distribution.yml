@@ -47,19 +47,21 @@ jobs:
           file: riung/build/app/outputs/flutter-apk/app-release.apk
 
       # ================== IOS ==================
-      # Note: Building a valid IPA requires iOS code signing (Certificates & Provisioning Profiles).
-      # If you haven't set up fastlane/match or manual provisioning profiles, this step might fail.
-      - name: Build iOS IPA
-        # run: flutter build ipa --release
-        # Uncomment the above line when you have Apple certificates set up.
-        # Below is a dummy command so the CI doesn't completely break if signing isn't configured yet.
+      - name: Build unsigned iOS App
         run: flutter build ios --release --no-codesign
 
-      # Uncomment below to upload IPA once iOS code signing is configured
-      # - name: Upload IPA to Firebase App Distribution
-      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
-      #   with:
-      #     appId: ${{ secrets.FIREBASE_APP_ID_IOS }}
-      #     serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
-      #     groups: tester
-      #     file: riung/build/ios/ipa/*.ipa
+      - name: Create Unsigned IPA
+        run: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -qq -r riung_unsigned.ipa Payload
+          rm -rf Payload
+
+      - name: Upload Unsigned IPA to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_IOS }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
+          groups: tester
+          file: riung/build/ios/iphoneos/riung_unsigned.ipa
