@@ -1,0 +1,65 @@
+name: CI/CD Build and Distribute
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build-and-distribute:
+    name: Build and Distribute to Firebase
+    runs-on: macos-latest
+
+    defaults:
+      run:
+        working-directory: ./riung
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # ================== ANDROID ==================
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      - name: Upload APK to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
+          groups: tester
+          file: riung/build/app/outputs/flutter-apk/app-release.apk
+
+      # ================== IOS ==================
+      # Note: Building a valid IPA requires iOS code signing (Certificates & Provisioning Profiles).
+      # If you haven't set up fastlane/match or manual provisioning profiles, this step might fail.
+      - name: Build iOS IPA
+        # run: flutter build ipa --release
+        # Uncomment the above line when you have Apple certificates set up.
+        # Below is a dummy command so the CI doesn't completely break if signing isn't configured yet.
+        run: flutter build ios --release --no-codesign
+
+      # Uncomment below to upload IPA once iOS code signing is configured
+      # - name: Upload IPA to Firebase App Distribution
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{ secrets.FIREBASE_APP_ID_IOS }}
+      #     serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
+      #     groups: tester
+      #     file: riung/build/ios/ipa/*.ipa
