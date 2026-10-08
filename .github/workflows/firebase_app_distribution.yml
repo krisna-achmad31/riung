@@ -7,14 +7,12 @@ on:
       - main
 
 jobs:
-  build-and-distribute:
-    name: Build and Distribute to Firebase
-    runs-on: macos-latest
-
+  build-android:
+    name: Build and Distribute Android
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./riung
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -31,20 +29,15 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install dependencies
-        run: flutter pub get
-
       - name: Setup Firebase Config Files
         run: |
           cat << 'EOF' > android/app/google-services.json
           ${{ secrets.GOOGLE_SERVICES_JSON }}
           EOF
-          
-          cat << 'EOF' > ios/Runner/GoogleService-Info.plist
-          ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
-          EOF
 
-      # ================== ANDROID ==================
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Build Android APK
         run: flutter build apk --release
 
@@ -56,17 +49,57 @@ jobs:
           groups: tester
           file: riung/build/app/outputs/flutter-apk/app-release.apk
 
-      # ================== IOS ==================
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ./riung
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+          
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Firebase Config Files
+        run: |
+          cat << 'EOF' > ios/Runner/GoogleService-Info.plist
+          ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+          EOF
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Build unsigned iOS App
         run: flutter build ios --release --no-codesign
 
       - name: Create Unsigned IPA
         run: |
           cd build/ios/iphoneos
-          mkdir Payload
+          mkdir -p Payload
           cp -r Runner.app Payload/
           zip -qq -r riung_unsigned.ipa Payload
           rm -rf Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: riung/build/ios/iphoneos/riung_unsigned.ipa
+
+  upload-ios:
+    name: Upload iOS to Firebase
+    needs: build-ios
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download IPA Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-ipa
 
       - name: Upload Unsigned IPA to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -74,4 +107,4 @@ jobs:
           appId: ${{ secrets.FIREBASE_APP_ID_IOS }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
           groups: tester
-          file: riung/build/ios/iphoneos/riung_unsigned.ipa
+          file: riung_unsigned.ipa
