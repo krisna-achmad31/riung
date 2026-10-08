@@ -93,10 +93,10 @@ dependency_overrides:
 # dengan latar gelap tema app (`AppColors.latar` = #0D1030).
 flutter_launcher_icons:
   android: "launcher_icon"
-  ios: false
-  image_path: "assets/icon/icon.png"
-  adaptive_icon_background: "#0D1030"
-  adaptive_icon_foreground: "assets/icon/icon.png"
+  ios: true
+  image_path: "assets/ikon/riung_icon_1024.png"
+  adaptive_icon_background: "assets/ikon/riung_icon_adaptive_background.png"
+  adaptive_icon_foreground: "assets/ikon/riung_icon_adaptive_foreground.png"
   min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
