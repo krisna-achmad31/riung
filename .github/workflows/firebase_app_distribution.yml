@@ -36,8 +36,13 @@ jobs:
 
       - name: Setup Firebase Config Files
         run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
-          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
+          cat << 'EOF' > android/app/google-services.json
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+          
+          cat << 'EOF' > ios/Runner/GoogleService-Info.plist
+          ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+          EOF
 
       # ================== ANDROID ==================
       - name: Build Android APK
