@@ -1,0 +1,131 @@
+{
+  "id": "narcissistic_partner_test",
+  "title": "Narcissistic Partner Test",
+  "description": "Evaluasi perilaku pasanganmu untuk melihat apakah ada bendera merah (red flags) sifat narsistik dan manipulatif dalam hubungan kalian.",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari kriteria Diagnostic and Statistical Manual of Mental Disorders (DSM-5) untuk NPD",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      {
+        "value": 0,
+        "label": "Tidak Pernah"
+      },
+      {
+        "value": 1,
+        "label": "Jarang"
+      },
+      {
+        "value": 2,
+        "label": "Sering"
+      },
+      {
+        "value": 3,
+        "label": "Hampir Selalu"
+      }
+    ]
+  },
+  "results": [
+    {
+      "minScore": 0,
+      "maxScore": 15,
+      "category": "Aman",
+      "description": "Pasanganmu menunjukkan perilaku yang wajar, tidak ada tanda narsisme toksik yang menonjol."
+    },
+    {
+      "minScore": 16,
+      "maxScore": 35,
+      "category": "Bendera Kuning (Waspada)",
+      "description": "Ada beberapa sifat egois atau tidak sensitif, pertimbangkan untuk mengomunikasikan batasan dengan jelas."
+    },
+    {
+      "minScore": 36,
+      "maxScore": 60,
+      "category": "Sangat Indikatif Toksik / Narsistik",
+      "description": "Ada banyak pola manipulatif dan kurangnya empati. Hubungan ini berisiko menguras emosionalmu."
+    }
+  ],
+  "questions": [
+    {
+      "id": "npt_1",
+      "text": "Pasangan saya selalu mendominasi percakapan dan mengarahkan topik kembali ke dirinya sendiri."
+    },
+    {
+      "id": "npt_2",
+      "text": "Dia jarang bertanya tentang hari saya atau bagaimana perasaan saya secara tulus."
+    },
+    {
+      "id": "npt_3",
+      "text": "Pasangan saya secara eksplisit atau implisit merasa dirinya lebih pintar, lebih baik, atau lebih penting dari orang lain."
+    },
+    {
+      "id": "npt_4",
+      "text": "Jika terjadi kesalahan dalam hubungan kami, dia selalu menyalahkan saya atau keadaan, tidak pernah dirinya sendiri."
+    },
+    {
+      "id": "npt_5",
+      "text": "Dia sering bereaksi dengan amarah atau sangat defensif jika diberi kritik sekecil apa pun."
+    },
+    {
+      "id": "npt_6",
+      "text": "Pasangan saya sering meremehkan pencapaian, karier, atau impian saya."
+    },
+    {
+      "id": "npt_7",
+      "text": "Dia menuntut perlakuan khusus atau istimewa di berbagai tempat (misal: di restoran, toko)."
+    },
+    {
+      "id": "npt_8",
+      "text": "Dia suka memutarbalikkan fakta (gaslighting) hingga saya meragukan ingatan atau kewarasan saya sendiri."
+    },
+    {
+      "id": "npt_9",
+      "text": "Pasangan saya sangat terobsesi pada penampilan, status, dan bagaimana orang lain memandang dirinya."
+    },
+    {
+      "id": "npt_10",
+      "text": "Dia sering menganggap kebutuhan dan keinginannya jauh lebih mendesak daripada kebutuhan saya."
+    },
+    {
+      "id": "npt_11",
+      "text": "Dia sering memberikan 'silent treatment' (mendiamkan) sebagai bentuk hukuman saat marah pada saya."
+    },
+    {
+      "id": "npt_12",
+      "text": "Pasangan saya sering iri pada kesuksesan orang lain dan menganggap orang tersebut tidak pantas mendapatkannya."
+    },
+    {
+      "id": "npt_13",
+      "text": "Dia bisa bersikap sangat memesona dan ramah di depan orang lain, namun dingin atau kasar saat hanya berdua dengan saya."
+    },
+    {
+      "id": "npt_14",
+      "text": "Dia sering memanfaatkan kebaikan, uang, atau waktu saya tanpa rasa terima kasih yang berarti."
+    },
+    {
+      "id": "npt_15",
+      "text": "Pasangan saya menuntut pujian dan pengakuan terus-menerus dari saya."
+    },
+    {
+      "id": "npt_16",
+      "text": "Dia sering memotong pembicaraan saya karena merasa apa yang ingin dikatakannya lebih penting."
+    },
+    {
+      "id": "npt_17",
+      "text": "Dia jarang, bahkan tidak pernah, mengucapkan kata maaf dengan tulus tanpa embel-embel 'tapi kamu juga...'."
+    },
+    {
+      "id": "npt_18",
+      "text": "Pasangan saya merasa berhak mengetahui semua isi pesan saya atau mengontrol dengan siapa saya bergaul."
+    },
+    {
+      "id": "npt_19",
+      "text": "Dia sering kali tidak sensitif dan mengabaikan saya ketika saya sedang sedih atau menghadapi masalah berat."
+    },
+    {
+      "id": "npt_20",
+      "text": "Hubungan ini membuat saya merasa selalu 'berjalan di atas cangkang telur' (harus sangat berhati-hati agar dia tidak marah)."
+    }
+  ]
+}

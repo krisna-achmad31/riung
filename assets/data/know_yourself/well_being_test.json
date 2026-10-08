@@ -1,0 +1,40 @@
+{
+  "id": "well_being_test",
+  "title": "Well-being Test",
+  "description": "Skrining ringkas untuk mengukur tingkat kesejahteraan mental, kepuasan hidup, dan kebahagiaanmu secara keseluruhan dalam dua minggu terakhir.",
+  "isPremium": true,
+  "questionCount": 15,
+  "theoryReference": "Diadaptasi dari Warwick-Edinburgh Mental Well-being Scale (WEMWBS) dan WHO-5",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 1, "label": "Sama Sekali Tidak Pernah" },
+      { "value": 2, "label": "Jarang" },
+      { "value": 3, "label": "Kadang-Kadang" },
+      { "value": 4, "label": "Sering" },
+      { "value": 5, "label": "Selalu" }
+    ]
+  },
+  "results": [
+    { "minScore": 15, "maxScore": 30, "category": "Kesejahteraan Rendah", "description": "Kamu tampaknya sedang mengalami masa yang cukup berat. Kesejahteraan emosionalmu butuh perhatian lebih." },
+    { "minScore": 31, "maxScore": 55, "category": "Kesejahteraan Cukup (Menengah)", "description": "Ada pasang surut dalam kebahagiaanmu belakangan ini, namun secara umum kamu masih bisa mengelolanya." },
+    { "minScore": 56, "maxScore": 75, "category": "Kesejahteraan Sangat Baik", "description": "Kamu merasa bahagia, optimis, sehat secara emosional, dan puas dengan kualitas hidupmu saat ini." }
+  ],
+  "questions": [
+    { "id": "wb_1", "text": "Dalam dua minggu terakhir, saya merasa sangat optimis dan penuh harapan mengenai masa depan saya." },
+    { "id": "wb_2", "text": "Dalam dua minggu terakhir, saya merasa hidup saya memiliki makna dan tujuan yang jelas." },
+    { "id": "wb_3", "text": "Dalam dua minggu terakhir, saya sering merasa rileks, tenang, dan santai." },
+    { "id": "wb_4", "text": "Dalam dua minggu terakhir, saya merasa mampu menangani berbagai masalah yang muncul dengan cukup baik." },
+    { "id": "wb_5", "text": "Dalam dua minggu terakhir, saya merasa memiliki energi dan stamina fisik yang cukup untuk menjalani aktivitas sehari-hari." },
+    { "id": "wb_6", "text": "Dalam dua minggu terakhir, saya merasa pikiran saya tidak berkabut (brain fog) dan bisa berpikir jernih dengan baik." },
+    { "id": "wb_7", "text": "Dalam dua minggu terakhir, saya memiliki pandangan yang positif dan menghargai diri saya sendiri." },
+    { "id": "wb_8", "text": "Dalam dua minggu terakhir, saya merasa sangat dekat dan terhubung secara batin dengan orang-orang di sekitar saya." },
+    { "id": "wb_9", "text": "Dalam dua minggu terakhir, saya merasa percaya diri dan mantap dalam membuat keputusan (bahkan keputusan kecil sekalipun)." },
+    { "id": "wb_10", "text": "Dalam dua minggu terakhir, saya merasa disayangi, diperhatikan, dan dipedulikan oleh orang-orang terdekat saya." },
+    { "id": "wb_11", "text": "Dalam dua minggu terakhir, saya sering menantikan hal-hal atau tantangan baru dengan rasa antusias." },
+    { "id": "wb_12", "text": "Dalam dua minggu terakhir, saya lebih sering merasa ceria, ringan, dan dalam suasana hati yang baik dibandingkan bersedih." },
+    { "id": "wb_13", "text": "Dalam dua minggu terakhir, saya merasa berguna bagi lingkungan dan bisa memberikan kontribusi yang baik." },
+    { "id": "wb_14", "text": "Dalam dua minggu terakhir, saya merasa tertarik pada banyak hal di sekitar saya dan merasa ingin tahu/belajar." },
+    { "id": "wb_15", "text": "Dalam dua minggu terakhir, secara keseluruhan saya merasa sangat bersyukur dan puas dengan hidup saya saat ini." }
+  ]
+}

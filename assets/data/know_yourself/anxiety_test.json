@@ -1,0 +1,175 @@
+{
+  "id": "anxiety_test",
+  "title": "Anxiety Test",
+  "description": "Ketahui tingkat kecemasanmu dan bagaimana hal itu memengaruhi fisik dan pikiranmu sehari-hari.",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Zung Self-Rating Anxiety Scale (SAS)",
+  "scoringLogic": {
+    "type": "sum_with_reverse",
+    "options": [
+      {
+        "value": 1,
+        "label": "Tidak pernah atau jarang"
+      },
+      {
+        "value": 2,
+        "label": "Kadang-kadang"
+      },
+      {
+        "value": 3,
+        "label": "Sering"
+      },
+      {
+        "value": 4,
+        "label": "Hampir selalu"
+      }
+    ],
+    "reverseOptions": [
+      {
+        "value": 4,
+        "label": "Tidak pernah atau jarang"
+      },
+      {
+        "value": 3,
+        "label": "Kadang-kadang"
+      },
+      {
+        "value": 2,
+        "label": "Sering"
+      },
+      {
+        "value": 1,
+        "label": "Hampir selalu"
+      }
+    ]
+  },
+  "results": [
+    {
+      "minScore": 20,
+      "maxScore": 44,
+      "category": "Kecemasan Normal / Ringan",
+      "description": "Kamu mampu mengelola kecemasan harian dengan baik."
+    },
+    {
+      "minScore": 45,
+      "maxScore": 59,
+      "category": "Kecemasan Sedang",
+      "description": "Kecemasan mulai sedikit mengganggu aktivitas dan kenyamananmu."
+    },
+    {
+      "minScore": 60,
+      "maxScore": 74,
+      "category": "Kecemasan Berat",
+      "description": "Tingkat kecemasanmu cukup tinggi dan mengganggu fungsi sehari-hari."
+    },
+    {
+      "minScore": 75,
+      "maxScore": 80,
+      "category": "Kecemasan Sangat Berat",
+      "description": "Kecemasan ekstrem, sangat disarankan untuk berbicara dengan profesional."
+    }
+  ],
+  "questions": [
+    {
+      "id": "sas_1",
+      "text": "Saya merasa lebih gugup dan cemas dari biasanya.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_2",
+      "text": "Saya merasa takut tanpa alasan yang jelas.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_3",
+      "text": "Saya mudah marah atau merasa panik.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_4",
+      "text": "Saya merasa seperti akan hancur atau berantakan.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_5",
+      "text": "Saya merasa semuanya baik-baik saja dan tidak ada hal buruk yang akan terjadi.",
+      "isReverse": true
+    },
+    {
+      "id": "sas_6",
+      "text": "Tangan dan kaki saya gemetar.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_7",
+      "text": "Saya terganggu oleh sakit kepala, leher, atau punggung.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_8",
+      "text": "Saya merasa lemah dan mudah lelah.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_9",
+      "text": "Saya merasa tenang dan bisa duduk diam dengan mudah.",
+      "isReverse": true
+    },
+    {
+      "id": "sas_10",
+      "text": "Saya bisa merasakan jantung saya berdetak cepat.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_11",
+      "text": "Saya sering merasa pusing.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_12",
+      "text": "Saya merasa ingin pingsan.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_13",
+      "text": "Saya bisa bernapas dengan mudah dan lega.",
+      "isReverse": true
+    },
+    {
+      "id": "sas_14",
+      "text": "Jari-jari tangan dan kaki saya terasa mati rasa atau kesemutan.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_15",
+      "text": "Saya terganggu oleh sakit perut atau gangguan pencernaan.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_16",
+      "text": "Saya merasa harus sering buang air kecil.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_17",
+      "text": "Tangan saya biasanya hangat dan kering.",
+      "isReverse": true
+    },
+    {
+      "id": "sas_18",
+      "text": "Wajah saya terasa panas dan memerah.",
+      "isReverse": false
+    },
+    {
+      "id": "sas_19",
+      "text": "Saya bisa tidur dengan mudah dan nyenyak di malam hari.",
+      "isReverse": true
+    },
+    {
+      "id": "sas_20",
+      "text": "Saya sering mengalami mimpi buruk.",
+      "isReverse": false
+    }
+  ]
+}

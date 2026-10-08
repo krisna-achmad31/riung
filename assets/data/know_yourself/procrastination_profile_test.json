@@ -1,0 +1,54 @@
+{
+  "id": "procrastination_profile",
+  "title": "Your Procrastination Profile",
+  "description": "Cari tahu alasan emosional di balik kebiasaanmu menunda-nunda pekerjaan. Penundaan bukan tentang kemalasan, tapi tentang regulasi emosi.",
+  "isPremium": true,
+  "questionCount": 24,
+  "theoryReference": "Berdasarkan arketipe Procrastination Equation (Piers Steel) & profil Tuckman",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Jarang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Sangat Sering" }
+    ]
+  },
+  "results": [
+    { "dominantTrait": "Perfectionist", "category": "The Perfectionist (Si Takut Salah)", "description": "Kamu menunda karena rasa takut gagal dan obsesi bahwa semuanya harus sempurna sejak percobaan pertama." },
+    { "dominantTrait": "Overwhelmed", "category": "The Overwhelmed (Si Kewalahan)", "description": "Kamu menunda karena merasa tugasnya terlalu raksasa, membuatmu lumpuh dan tidak tahu harus mulai dari mana." },
+    { "dominantTrait": "ThrillSeeker", "category": "The Thrill-Seeker (Si Pengejar Adrenalin)", "description": "Kamu menunda karena kamu secara tidak sadar menikmati dorongan panik bekerja secara magis menjelang deadline." },
+    { "dominantTrait": "BusyBee", "category": "The Busy Bee (Si Sibuk Palsu)", "description": "Kamu menunda dengan mengerjakan seribu hal kecil yang tidak penting agar kamu tetap merasa produktif dan lepas dari rasa bersalah." }
+  ],
+  "questions": [
+    { "id": "proc_1", "trait": "Perfectionist", "text": "Saya sering menunda memulai suatu pekerjaan semata-mata karena takut hasilnya nanti tidak akan sempurna." },
+    { "id": "proc_2", "trait": "Overwhelmed", "text": "Saat tugas terlihat terlalu besar, saya merasa lumpuh, panik, dan bingung harus memulainya dari langkah mana." },
+    { "id": "proc_3", "trait": "ThrillSeeker", "text": "Saya sengaja menunda tugas karena dorongan adrenalin bekerja mepet waktu (Sistem Kebut Semalam) selalu membuat saya lebih produktif." },
+    { "id": "proc_4", "trait": "BusyBee", "text": "Saat ada tugas penting yang harus diselesaikan, saya malah tiba-tiba asyik membersihkan kamar atau merapikan laci." },
+    
+    { "id": "proc_5", "trait": "Perfectionist", "text": "Saya menghabiskan terlalu banyak waktu untuk melakukan riset dan merencanakan sesuatu tanpa pernah benar-benar mengeksekusinya." },
+    { "id": "proc_6", "trait": "Overwhelmed", "text": "Hanya dengan memikirkan seberapa banyak langkah yang harus saya lakukan untuk tugas tersebut, membuat saya ingin tidur saja." },
+    { "id": "proc_7", "trait": "ThrillSeeker", "text": "Bagi saya, mengerjakan tugas jauh-jauh hari terasa sangat membosankan, kurang gereget, dan tidak menantang." },
+    { "id": "proc_8", "trait": "BusyBee", "text": "Saya sering mencari pembenaran bahwa membalas email remeh atau merapikan inbox adalah bagian dari 'bekerja produktif'." },
+    
+    { "id": "proc_9", "trait": "Perfectionist", "text": "Jika saya merasa tidak punya banyak waktu untuk menyelesaikannya dengan sempurna, saya lebih memilih tidak memulainya sama sekali." },
+    { "id": "proc_10", "trait": "Overwhelmed", "text": "Melihat panjangnya daftar 'To-Do List' saya justru menimbulkan kecemasan besar sehingga saya menghindari melihatnya total." },
+    { "id": "proc_11", "trait": "ThrillSeeker", "text": "Saya percaya bahwa saya adalah tipe orang ajaib yang hasil kerjanya paling optimal justru ketika berada di bawah tekanan besar." },
+    { "id": "proc_12", "trait": "BusyBee", "text": "Di penghujung hari, saya merasa sudah sibuk seharian, tapi tugas yang paling utama (Prioritas 1) justru tetap tidak tersentuh." },
+
+    { "id": "proc_13", "trait": "Perfectionist", "text": "Alasan terbesar penundaan saya adalah karena saya terlalu peduli/cemas pada apa yang akan dipikirkan orang (kritik) tentang hasil kerja saya." },
+    { "id": "proc_14", "trait": "Overwhelmed", "text": "Saya kesulitan untuk memecah proyek raksasa menjadi langkah-langkah harian kecil yang realistis dan bisa dicicil." },
+    { "id": "proc_15", "trait": "ThrillSeeker", "text": "Saya merasa tidak memiliki motivasi sama sekali untuk bekerja kecuali saat saya menyadari bahwa sisa waktu saya tinggal sedikit." },
+    { "id": "proc_16", "trait": "BusyBee", "text": "Saya terus melompat dari satu tugas kecil ke tugas kecil lain agar otak saya bisa merasa mendapat kepuasan (dopamin) menyelesaikan sesuatu." },
+
+    { "id": "proc_17", "trait": "Perfectionist", "text": "Terus-menerus mengedit, merevisi, dan tidak pernah puas pada satu bagian berulang kali adalah kelemahan utama saya." },
+    { "id": "proc_18", "trait": "Overwhelmed", "text": "Ketakutan atau beban mental yang saya bayangkan terhadap tugas tersebut sering kali jauh lebih buruk dari proses mengerjakan tugasnya itu sendiri." },
+    { "id": "proc_19", "trait": "ThrillSeeker", "text": "Saya sangat menikmati perasaan kelegaan luar biasa (euforia) setelah sukses mengumpulkan sesuatu tepat detik-detik terakhir di menit terakhir." },
+    { "id": "proc_20", "trait": "BusyBee", "text": "Saya sering terjebak mengecek notifikasi atau membalas pesan orang lain hingga akhirnya saya lupa apa niat awal saya membuka laptop." },
+
+    { "id": "proc_21", "trait": "Perfectionist", "text": "Standar dan ekspektasi kinerja saya terhadap diri saya sendiri sering kali terlalu tinggi dan tidak realistis." },
+    { "id": "proc_22", "trait": "Overwhelmed", "text": "Jika saya mengalami kebuntuan atau terjebak pada satu bagian tersulit, saya akan berhenti sepenuhnya alih-alih melompat ke bagian lain." },
+    { "id": "proc_23", "trait": "ThrillSeeker", "text": "Teman/rekan kerja sering jantungan melihat kebiasaan menunda saya, tapi secara internal saya selalu yakin 'ah, ini pasti bisa kuselesaikan'." },
+    { "id": "proc_24", "trait": "BusyBee", "text": "Saya memiliki banyak tab browser terbuka sekaligus dan sering berpindah antartugas tanpa arah yang jelas untuk menghindar dari beban inti." }
+  ]
+}

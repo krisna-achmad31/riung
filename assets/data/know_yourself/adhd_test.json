@@ -1,0 +1,127 @@
+{
+  "id": "adhd_test",
+  "title": "ADHD Test",
+  "description": "Evaluasi seberapa sering kamu mengalami tantangan dalam fokus, pengaturan diri, dan hiperaktivitas.",
+  "isPremium": true,
+  "questionCount": 18,
+  "theoryReference": "WHO Adult ADHD Self-Report Scale (ASRS v1.1)",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      {
+        "value": 0,
+        "label": "Tidak pernah"
+      },
+      {
+        "value": 1,
+        "label": "Jarang"
+      },
+      {
+        "value": 2,
+        "label": "Kadang-kadang"
+      },
+      {
+        "value": 3,
+        "label": "Sering"
+      },
+      {
+        "value": 4,
+        "label": "Sangat sering"
+      }
+    ]
+  },
+  "results": [
+    {
+      "minScore": 0,
+      "maxScore": 24,
+      "category": "Indikasi Sangat Rendah",
+      "description": "Tingkat fokus dan energimu cukup terkendali."
+    },
+    {
+      "minScore": 25,
+      "maxScore": 42,
+      "category": "Indikasi Sedang",
+      "description": "Ada beberapa gejala inatensi atau hiperaktivitas, tetapi mungkin belum memenuhi kriteria penuh."
+    },
+    {
+      "minScore": 43,
+      "maxScore": 72,
+      "category": "Indikasi Tinggi",
+      "description": "Gejala yang kamu alami sangat mirip dengan pola ADHD, dianjurkan berkonsultasi lebih lanjut."
+    }
+  ],
+  "questions": [
+    {
+      "id": "asrs_1",
+      "text": "Seberapa sering kamu kesulitan menyelesaikan detail akhir dari sebuah tugas, setelah bagian tersulitnya selesai?"
+    },
+    {
+      "id": "asrs_2",
+      "text": "Seberapa sering kamu kesulitan mengatur sesuatu jika tugas tersebut membutuhkan pengorganisasian tinggi?"
+    },
+    {
+      "id": "asrs_3",
+      "text": "Seberapa sering kamu lupa akan janji pertemuan atau kewajiban?"
+    },
+    {
+      "id": "asrs_4",
+      "text": "Saat diberi tugas yang butuh banyak pemikiran, seberapa sering kamu menghindarinya atau menunda memulainya?"
+    },
+    {
+      "id": "asrs_5",
+      "text": "Seberapa sering kamu gelisah atau memainkan tangan/kaki saat harus duduk lama?"
+    },
+    {
+      "id": "asrs_6",
+      "text": "Seberapa sering kamu merasa terlalu aktif seolah-olah didorong oleh mesin?"
+    },
+    {
+      "id": "asrs_7",
+      "text": "Seberapa sering kamu membuat kecerobohan saat harus mengerjakan proyek membosankan atau sulit?"
+    },
+    {
+      "id": "asrs_8",
+      "text": "Seberapa sering kamu sulit mempertahankan perhatian saat melakukan pekerjaan yang membosankan?"
+    },
+    {
+      "id": "asrs_9",
+      "text": "Seberapa sering kamu sulit berkonsentrasi pada apa yang dikatakan orang kepadamu, meski mereka berbicara langsung padamu?"
+    },
+    {
+      "id": "asrs_10",
+      "text": "Seberapa sering kamu salah menaruh atau kesulitan menemukan barang di rumah/tempat kerja?"
+    },
+    {
+      "id": "asrs_11",
+      "text": "Seberapa sering kamu terdistraksi (teralihkan) oleh aktivitas atau kebisingan di sekitarmu?"
+    },
+    {
+      "id": "asrs_12",
+      "text": "Seberapa sering kamu meninggalkan tempat duduk dalam rapat atau situasi di mana kamu diharapkan tetap duduk?"
+    },
+    {
+      "id": "asrs_13",
+      "text": "Seberapa sering kamu merasa gelisah atau resah di dalam hati?"
+    },
+    {
+      "id": "asrs_14",
+      "text": "Seberapa sering kamu sulit bersantai dan rileks saat ada waktu luang?"
+    },
+    {
+      "id": "asrs_15",
+      "text": "Seberapa sering kamu mendapati dirimu terlalu banyak bicara dalam situasi sosial?"
+    },
+    {
+      "id": "asrs_16",
+      "text": "Seberapa sering kamu menyelesaikan kalimat orang lain secara refleks sebelum mereka selesai bicara?"
+    },
+    {
+      "id": "asrs_17",
+      "text": "Seberapa sering kamu kesulitan menunggu giliranmu dalam situasi yang mengharuskan antre?"
+    },
+    {
+      "id": "asrs_18",
+      "text": "Seberapa sering kamu menyela orang lain saat mereka sedang sibuk?"
+    }
+  ]
+}

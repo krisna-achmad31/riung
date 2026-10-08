@@ -1,0 +1,44 @@
+{
+  "id": "toxic_trait_test",
+  "title": "Toxic Trait Test",
+  "description": "Menilai sisi gelap kepribadianmu dan mengidentifikasi perilaku tidak sehat dalam hubungan antarmanusia.",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari Short Dark Triad (SD3) dan pedoman perilaku manipulatif",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Sangat Tidak Sesuai" },
+      { "value": 1, "label": "Jarang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Sangat Sesuai" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 15, "category": "Self-Aware & Tulus", "description": "Kamu berinteraksi dengan orang lain secara jujur dan memiliki kesadaran diri yang sangat baik." },
+    { "minScore": 16, "maxScore": 35, "category": "Egois Sesekali", "description": "Kamu memiliki beberapa sifat defensif atau egois, tetapi kamu bukan manipulator yang intens." },
+    { "minScore": 36, "maxScore": 60, "category": "Indikasi Sifat Toksik", "description": "Hati-hati, banyak pola perilaku manipulatif dan mementingkan diri sendiri yang dapat merusak hubunganmu." }
+  ],
+  "questions": [
+    { "id": "tox_1", "text": "Saya sering memanipulasi situasi agar hasilnya selalu menguntungkan saya." },
+    { "id": "tox_2", "text": "Jika saya bersalah, saya lebih memilih menyalahkan keadaan atau orang lain agar tidak terlihat buruk." },
+    { "id": "tox_3", "text": "Saya kesulitan merasa ikut bahagia secara tulus saat teman saya mendapatkan pencapaian besar." },
+    { "id": "tox_4", "text": "Saya sering membocorkan rahasia orang lain sebagai bahan gosip agar percakapan lebih seru." },
+    { "id": "tox_5", "text": "Saya merasa wajar jika saya sesekali berbohong agar terhindar dari konflik atau mendapat keuntungan." },
+    { "id": "tox_6", "text": "Saat ada orang yang menyakiti saya, saya akan menyusun rencana untuk membalas dendam." },
+    { "id": "tox_7", "text": "Saya cenderung merasa bahwa aturan umum tidak berlaku untuk saya jika saya cukup pintar untuk mengakalinya." },
+    { "id": "tox_8", "text": "Saya suka memancing keributan atau argumen di media sosial/grup obrolan hanya untuk hiburan." },
+    { "id": "tox_9", "text": "Saya jarang meminta maaf secara langsung dan lebih suka bersikap seolah tidak ada masalah keesokan harinya." },
+    { "id": "tox_10", "text": "Saya sering memberikan pujian palsu (pasif-agresif) untuk menjatuhkan mental seseorang secara halus." },
+    { "id": "tox_11", "text": "Saya mudah kehilangan simpati terhadap masalah orang lain yang menurut saya sepele atau bodoh." },
+    { "id": "tox_12", "text": "Saya mendekati orang tertentu hanya karena mereka bisa memberikan status, uang, atau koneksi." },
+    { "id": "tox_13", "text": "Jika saya tidak menyukai seseorang, saya akan mencoba memengaruhi orang lain agar ikut membencinya." },
+    { "id": "tox_14", "text": "Saya sering membuat janji atau komitmen yang dari awal saya tahu tidak akan saya tepati." },
+    { "id": "tox_15", "text": "Saat berdebat, tujuan utama saya adalah memenangkan argumen, bukan mencari solusi." },
+    { "id": "tox_16", "text": "Saya cenderung meremehkan masalah orang lain karena merasa masalah saya jauh lebih penting/berat." },
+    { "id": "tox_17", "text": "Saya diam-diam merasa senang saat melihat orang yang tidak saya sukai mengalami kegagalan." },
+    { "id": "tox_18", "text": "Saya sering memposisikan diri sebagai korban (playing victim) agar mendapat simpati atau bantuan." },
+    { "id": "tox_19", "text": "Jika orang lain menetapkan batasan (boundaries) pada saya, saya merasa tersinggung dan berusaha melanggarnya." },
+    { "id": "tox_20", "text": "Saya percaya bahwa bersikap egois dan licik adalah satu-satunya cara untuk bisa sukses di dunia ini." }
+  ]
+}

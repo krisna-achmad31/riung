@@ -1,0 +1,42 @@
+{
+  "id": "ocd_test",
+  "title": "OCD Test",
+  "description": "Mengenali kecenderungan obsesi pikiran dan perilaku berulang (kompulsi).",
+  "isPremium": true,
+  "questionCount": 18,
+  "theoryReference": "Obsessive-Compulsive Inventory-Revised (OCI-R) oleh Foa et al. (2002)",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Sama sekali tidak" },
+      { "value": 1, "label": "Sedikit" },
+      { "value": 2, "label": "Cukup terganggu" },
+      { "value": 3, "label": "Sangat terganggu" },
+      { "value": 4, "label": "Sangat ekstrem" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 20, "category": "Kecenderungan Rendah", "description": "Kamu tidak memiliki gejala OCD yang mengganggu." },
+    { "minScore": 21, "maxScore": 72, "category": "Indikasi Gejala OCD", "description": "Skor di atas 21 mengindikasikan adanya pikiran obsesif atau perilaku kompulsif yang signifikan secara klinis." }
+  ],
+  "questions": [
+    { "id": "ocir_1", "text": "Saya mengumpulkan begitu banyak barang sampai-sampai memenuhi ruang dan mengganggu." },
+    { "id": "ocir_2", "text": "Saya mengecek barang-barang (seperti kompor, kunci, jendela) lebih sering dari yang seharusnya." },
+    { "id": "ocir_3", "text": "Saya merasa kesal jika orang lain mengubah susunan barang-barang saya." },
+    { "id": "ocir_4", "text": "Saya merasa terdorong untuk menghitung benda-benda atau hal lainnya (seperti langkah kaki)." },
+    { "id": "ocir_5", "text": "Saya merasa sangat kesulitan membuang barang yang sebenarnya tidak saya butuhkan." },
+    { "id": "ocir_6", "text": "Saya memiliki pikiran-pikiran tidak menyenangkan yang terus berulang tanpa saya inginkan." },
+    { "id": "ocir_7", "text": "Saya mengulang-ulang tindakan tertentu untuk memastikan bahwa saya telah melakukannya dengan benar." },
+    { "id": "ocir_8", "text": "Saya mencuci tangan secara berlebihan atau lebih lama dari yang diperlukan." },
+    { "id": "ocir_9", "text": "Saya merasa harus memeriksa semuanya secara teliti dan berulang kali." },
+    { "id": "ocir_10", "text": "Saya sering memikirkan hal-hal buruk yang tidak bisa saya hilangkan dari kepala saya." },
+    { "id": "ocir_11", "text": "Saya merasa harus melakukan sebuah rutinitas atau kebiasaan tanpa ada yang terlewat." },
+    { "id": "ocir_12", "text": "Saya sering memikirkan hal kotor, menakutkan, atau aneh tanpa alasan." },
+    { "id": "ocir_13", "text": "Saya harus mengatur barang-barang di sekitar saya dalam susunan/posisi tertentu agar merasa tenang." },
+    { "id": "ocir_14", "text": "Saya merasa terganggu jika ada benda di meja atau ruangan yang tidak simetris/tidak lurus." },
+    { "id": "ocir_15", "text": "Saya mengulang-ulang angka atau kata tertentu di dalam pikiran untuk mencegah hal buruk terjadi." },
+    { "id": "ocir_16", "text": "Saya mandi dengan waktu yang sangat lama melebihi orang pada umumnya." },
+    { "id": "ocir_17", "text": "Saya merasa tangan saya tetap kotor walaupun baru saja dicuci." },
+    { "id": "ocir_18", "text": "Saya menghafal atau mengingat kembali urutan kejadian masa lalu dengan sangat detail tanpa henti." }
+  ]
+}

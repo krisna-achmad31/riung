@@ -1,0 +1,42 @@
+{
+  "id": "anger_test",
+  "title": "Anger Test",
+  "description": "Kenali pemicu amarahmu dan pahami gayamu dalam mengekspresikan kekesalan.",
+  "isPremium": true,
+  "questionCount": 18,
+  "theoryReference": "Diadaptasi dari Clinical Anger Scale (CAS)",
+  "scoringLogic": {
+    "type": "sum_standard",
+    "options": [
+      { "value": 0, "label": "Sama Sekali Tidak" },
+      { "value": 1, "label": "Jarang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Hampir Selalu" }
+    ]
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 13, "category": "Anger Management Baik", "description": "Kamu sangat sabar dan mengontrol amarah dengan sangat baik." },
+    { "minScore": 14, "maxScore": 30, "category": "Reaktif Sedang", "description": "Kamu kadang meledak atau memendam marah, namun masih dalam batas wajar." },
+    { "minScore": 31, "maxScore": 54, "category": "Tingkat Amarah Klinis", "description": "Amarah sering mengambil alih kendali dan memengaruhi kehidupan serta hubunganmu." }
+  ],
+  "questions": [
+    { "id": "ang_1", "text": "Hal-hal kecil mudah membuat saya merasa sangat jengkel atau frustrasi." },
+    { "id": "ang_2", "text": "Saat marah, saya cenderung memendamnya sampai akhirnya meledak dengan hebat." },
+    { "id": "ang_3", "text": "Saya sering mengatakan atau melakukan hal-hal yang saya sesali saat sedang emosi." },
+    { "id": "ang_4", "text": "Jantung saya berdebar kencang dan otot saya menegang secara fisik saat saya marah." },
+    { "id": "ang_5", "text": "Saya merasa orang lain sengaja mencoba membuat saya marah atau mengganggu saya." },
+    { "id": "ang_6", "text": "Saya sering meninggikan suara atau membentak saat sedang berdebat." },
+    { "id": "ang_7", "text": "Sulit bagi saya untuk memaafkan orang yang telah menyakiti saya, meskipun itu sudah lama." },
+    { "id": "ang_8", "text": "Saat marah, saya merasa ingin merusak barang atau membanting pintu." },
+    { "id": "ang_9", "text": "Saya bisa marah berhari-hari hanya karena satu kejadian kecil." },
+    { "id": "ang_10", "text": "Saya sering memberikan silent treatment (mendiamkan) ketika kesal dengan seseorang." },
+    { "id": "ang_11", "text": "Saya merasa tidak ada yang mau mendengarkan pendapat saya kecuali saya marah." },
+    { "id": "ang_12", "text": "Terkadang saya memukul tembok atau meja untuk melampiaskan kekesalan." },
+    { "id": "ang_13", "text": "Saya merenungkan dan mengingat-ingat lagi kejadian yang membuat saya marah saat sendirian." },
+    { "id": "ang_14", "text": "Orang-orang terdekat pernah mengatakan bahwa saya memiliki masalah dalam mengelola amarah." },
+    { "id": "ang_15", "text": "Saya sering berdebat panas dengan orang asing (misal: di jalan raya atau media sosial)." },
+    { "id": "ang_16", "text": "Saya merasa sangat marah ketika rencana saya tidak berjalan persis seperti yang saya harapkan." },
+    { "id": "ang_17", "text": "Saya merasa marah saat melihat orang lain melanggar aturan, meskipun itu tidak merugikan saya secara langsung." },
+    { "id": "ang_18", "text": "Ketika kemarahan saya reda, saya sering merasa sangat bersalah." }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "id": "attachment_style_test",
+  "title": "Attachment Style Test",
+  "description": "Temukan gaya kelekatanmu dan bagaimana caramu memandang kedekatan, intimasi, serta penolakan dalam hubungan romantis.",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari Experiences in Close Relationships (ECR) scale",
+  "scoringLogic": {
+    "type": "two_dimensions",
+    "dimension1": {
+      "key": "anxiety",
+      "name": "Attachment Anxiety (Kecemasan)"
+    },
+    "dimension2": {
+      "key": "avoidance",
+      "name": "Attachment Avoidance (Penghindaran)"
+    },
+    "options": [
+      {
+        "value": 1,
+        "label": "Sangat Tidak Setuju"
+      },
+      {
+        "value": 2,
+        "label": "Tidak Setuju"
+      },
+      {
+        "value": 3,
+        "label": "Netral"
+      },
+      {
+        "value": 4,
+        "label": "Setuju"
+      },
+      {
+        "value": 5,
+        "label": "Sangat Setuju"
+      }
+    ]
+  },
+  "results": [
+    {
+      "condition": "anxiety < 25 && avoidance < 25",
+      "category": "Secure (Aman)",
+      "description": "Kamu merasa nyaman dengan kedekatan intim dan tidak terlalu khawatir diabaikan."
+    },
+    {
+      "condition": "anxiety >= 25 && avoidance < 25",
+      "category": "Anxious-Preoccupied (Cemas)",
+      "description": "Kamu mendambakan kedekatan yang sangat dalam, namun sering cemas pasanganmu akan meninggalkanmu."
+    },
+    {
+      "condition": "anxiety < 25 && avoidance >= 25",
+      "category": "Dismissive-Avoidant (Menghindar)",
+      "description": "Kamu sangat mandiri dan cenderung menjaga jarak emosional dari pasanganmu."
+    },
+    {
+      "condition": "anxiety >= 25 && avoidance >= 25",
+      "category": "Fearful-Avoidant (Takut-Menghindar)",
+      "description": "Kamu menginginkan hubungan yang dekat, namun ketakutan akan disakiti membuatmu sering menarik diri."
+    }
+  ],
+  "questions": [
+    {
+      "id": "att_1",
+      "dimension": "anxiety",
+      "text": "Saya sering khawatir pasangan saya tidak benar-benar mencintai saya."
+    },
+    {
+      "id": "att_2",
+      "dimension": "anxiety",
+      "text": "Saya takut diabaikan jika saya menunjukkan diri saya yang sebenarnya."
+    },
+    {
+      "id": "att_3",
+      "dimension": "anxiety",
+      "text": "Saya merasa pasangan saya tidak ingin sedekat yang saya inginkan."
+    },
+    {
+      "id": "att_4",
+      "dimension": "anxiety",
+      "text": "Saya butuh kepastian dan validasi terus-menerus bahwa pasangan saya peduli pada saya."
+    },
+    {
+      "id": "att_5",
+      "dimension": "anxiety",
+      "text": "Saya sering cemas pasangan saya akan meninggalkan saya untuk orang lain."
+    },
+    {
+      "id": "att_6",
+      "dimension": "anxiety",
+      "text": "Saat pasangan tidak membalas pesan, saya langsung merasa ada yang salah dengan hubungan kami."
+    },
+    {
+      "id": "att_7",
+      "dimension": "anxiety",
+      "text": "Saya merasa frustrasi jika pasangan saya membutuhkan waktu sendiri (me-time)."
+    },
+    {
+      "id": "att_8",
+      "dimension": "anxiety",
+      "text": "Terkadang saya sengaja memancing emosi pasangan hanya untuk melihat apakah dia peduli."
+    },
+    {
+      "id": "att_9",
+      "dimension": "anxiety",
+      "text": "Saya sering merasa memberikan lebih banyak kasih sayang daripada yang saya terima."
+    },
+    {
+      "id": "att_10",
+      "dimension": "anxiety",
+      "text": "Saya sangat takut ditolak oleh orang yang sangat saya sayangi."
+    },
+    {
+      "id": "att_11",
+      "dimension": "avoidance",
+      "text": "Saya merasa tidak nyaman jika orang lain terlalu dekat secara emosional dengan saya."
+    },
+    {
+      "id": "att_12",
+      "dimension": "avoidance",
+      "text": "Saya lebih suka tidak bergantung secara emosional pada pasangan romantis."
+    },
+    {
+      "id": "att_13",
+      "dimension": "avoidance",
+      "text": "Terkadang saya menarik diri ketika pasangan saya mulai menunjukkan komitmen yang terlalu dalam."
+    },
+    {
+      "id": "att_14",
+      "dimension": "avoidance",
+      "text": "Sulit bagi saya untuk menceritakan perasaan dan pikiran terdalam saya kepada pasangan."
+    },
+    {
+      "id": "att_15",
+      "dimension": "avoidance",
+      "text": "Saya merasa gugup saat seseorang mencoba terlalu bergantung pada saya."
+    },
+    {
+      "id": "att_16",
+      "dimension": "avoidance",
+      "text": "Saya sering merasa hubungan asmara membatasi kebebasan saya."
+    },
+    {
+      "id": "att_17",
+      "dimension": "avoidance",
+      "text": "Saya tidak suka menunjukkan sisi lemah atau rentan saya kepada pasangan."
+    },
+    {
+      "id": "att_18",
+      "dimension": "avoidance",
+      "text": "Saya cenderung menjaga jarak jika pasangan mulai bersikap terlalu manis atau menuntut kedekatan."
+    },
+    {
+      "id": "att_19",
+      "dimension": "avoidance",
+      "text": "Saya merasa bisa bahagia secara maksimal meskipun tidak memiliki hubungan romantis yang dekat."
+    },
+    {
+      "id": "att_20",
+      "dimension": "avoidance",
+      "text": "Sangat mudah bagi saya untuk tidak melibatkan perasaan terlalu dalam pada sebuah hubungan."
+    }
+  ]
+}

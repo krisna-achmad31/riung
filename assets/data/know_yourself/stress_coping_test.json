@@ -1,0 +1,44 @@
+{
+  "id": "stress_coping_test",
+  "title": "Stress Coping Style",
+  "description": "Pahami bagaimana kamu merespons krisis. Apakah kamu langsung bertindak, mencari sandaran emosional, atau melarikan diri?",
+  "isPremium": true,
+  "questionCount": 20,
+  "theoryReference": "Diadaptasi dari Brief COPE Inventory (Carver, 1997)",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Saya Lakukan" },
+      { "value": 1, "label": "Sedikit Saya Lakukan" },
+      { "value": 2, "label": "Sering Saya Lakukan" },
+      { "value": 3, "label": "Paling Sering Saya Lakukan" }
+    ]
+  },
+  "results": [
+    { "dominantTrait": "ProblemFocused", "category": "Problem-Focused Coping (Si Eksekutor)", "description": "Saat stres, kamu fokus mencari solusi nyata dan mengubah situasi." },
+    { "dominantTrait": "EmotionFocused", "category": "Emotion-Focused Coping (Si Pengolah Rasa)", "description": "Kamu mengutamakan dukungan sosial dan validasi emosional agar merasa lebih tenang sebelum bertindak." },
+    { "dominantTrait": "Avoidant", "category": "Avoidant Coping (Si Pelari)", "description": "Kamu cenderung lari dari kenyataan dengan hiburan, penolakan fakta, atau tidur untuk mengubur masalah sementara." }
+  ],
+  "questions": [
+    { "id": "cop_1", "trait": "ProblemFocused", "text": "Saya memusatkan semua upaya saya untuk mencari cara mengatasi masalah." },
+    { "id": "cop_2", "trait": "ProblemFocused", "text": "Saya segera menyusun rencana dan langkah nyata mengenai apa yang harus saya lakukan." },
+    { "id": "cop_3", "trait": "EmotionFocused", "text": "Saya mendapatkan dukungan emosional, simpati, atau pengertian dari orang terdekat." },
+    { "id": "cop_4", "trait": "EmotionFocused", "text": "Saya mencari orang (bercerita) untuk meluapkan perasaan saya mengenai apa yang terjadi." },
+    { "id": "cop_5", "trait": "Avoidant", "text": "Saya menggunakan alkohol, obat-obatan, atau tidur seharian penuh untuk melupakan stres." },
+    { "id": "cop_6", "trait": "Avoidant", "text": "Saya menghabiskan waktu bermain game, menonton TV, atau me-scroll media sosial agar bisa lari dari masalah." },
+    { "id": "cop_7", "trait": "ProblemFocused", "text": "Saya mencoba mencari informasi ahli atau saran spesifik tentang strategi mengatasi masalah ini." },
+    { "id": "cop_8", "trait": "ProblemFocused", "text": "Saya mengambil tindakan keras untuk langsung mencoba melenyapkan sumber masalah tersebut." },
+    { "id": "cop_9", "trait": "EmotionFocused", "text": "Saya mendapatkan kenyamanan dalam beragama, berdoa, atau melakukan meditasi/kegiatan spiritual." },
+    { "id": "cop_10", "trait": "EmotionFocused", "text": "Saya mencoba melihat kejadian buruk ini dalam sudut pandang yang berbeda agar tampak lebih positif (hikmahnya)." },
+    { "id": "cop_11", "trait": "Avoidant", "text": "Saya menyangkal bahwa masalah ini benar-benar terjadi (pura-pura bodoh / denial)." },
+    { "id": "cop_12", "trait": "Avoidant", "text": "Saya sengaja menolak untuk mempercayai bahwa hal seburuk itu baru saja menimpa saya." },
+    { "id": "cop_13", "trait": "ProblemFocused", "text": "Saya mencoba mencari tahu strategi apa saja yang harus saya ubah pada diri saya untuk menyelesaikan krisis ini." },
+    { "id": "cop_14", "trait": "EmotionFocused", "text": "Saya mencari orang yang mau mendengarkan keluh kesah saya dengan empati penuh." },
+    { "id": "cop_15", "trait": "Avoidant", "text": "Saya mencurahkan kekesalan saya dengan marah-marah atau meledakkan emosi pada hal yang salah." },
+    { "id": "cop_16", "trait": "Avoidant", "text": "Saya menyerah secara mental untuk mencoba menyelesaikan krisis ini (merasa takdir terlalu jahat)." },
+    { "id": "cop_17", "trait": "ProblemFocused", "text": "Saya menyisihkan aktivitas saya yang lain dan membatalkan jadwal santai saya agar bisa fokus pada masalah ini." },
+    { "id": "cop_18", "trait": "EmotionFocused", "text": "Saya menertawakan masalah saya dan mencoba meresponsnya dengan dark-jokes atau candaan satir." },
+    { "id": "cop_19", "trait": "Avoidant", "text": "Saya mengalihkan perhatian ke pekerjaan atau proyek lain sehingga saya tidak perlu menghadapi krisis utamanya." },
+    { "id": "cop_20", "trait": "EmotionFocused", "text": "Saya menerima kenyataan bahwa krisis ini telah terjadi dan saya mencoba memvalidasi rasa sakit yang saya alami." }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "decision_making_test",
+  "title": "You and Decisions",
+  "description": "Kenali apa yang menjadi rintangan utamamu saat harus mengambil keputusan besar.",
+  "isPremium": true,
+  "questionCount": 24,
+  "theoryReference": "Diadaptasi dari Decision-Making Styles Inventory (Scott & Bruce)",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Sesuai" },
+      { "value": 1, "label": "Jarang Sesuai" },
+      { "value": 2, "label": "Sering Sesuai" },
+      { "value": 3, "label": "Sangat Sesuai" }
+    ]
+  },
+  "results": [
+    { "dominantTrait": "Overthinker", "category": "The Overthinker (Lumpuh karena Analisis)", "description": "Kamu memikirkan semua kemungkinan terburuk dan melakukan riset tiada akhir sampai akhirnya kehabisan waktu untuk memilih." },
+    { "dominantTrait": "Consensus", "category": "The Consensus Seeker (Tergantung Orang Lain)", "description": "Kamu merasa tidak aman membuat keputusan sendiri dan harus meminta validasi dari 10 orang berbeda sebelum melangkah." },
+    { "dominantTrait": "Impulsive", "category": "The Impulsive Decider (Si Tergesa-gesa)", "description": "Kamu benci proses menunggu, sehingga kamu asal memilih yang paling cepat untuk segera menghilangkan stres, tanpa memikirkan dampaknya." }
+  ],
+  "questions": [
+    { "id": "dec_1", "trait": "Overthinker", "text": "Saat membeli barang mahal, saya melakukan riset berhari-hari membaca ratusan review sampai pusing sendiri (analysis paralysis)." },
+    { "id": "dec_2", "trait": "Consensus", "text": "Bahkan untuk masalah pribadi saya, saya harus bertanya 'Menurutmu aku harus bagaimana?' kepada banyak teman." },
+    { "id": "dec_3", "trait": "Impulsive", "text": "Saya sering membuat keputusan besar dalam hitungan menit hanya karena dipandu oleh emosi saat itu." },
+    { "id": "dec_4", "trait": "Overthinker", "text": "Saya sangat takut membuat keputusan yang salah sehingga saya membiarkan opsi tersebut hangus dimakan waktu." },
+    { "id": "dec_5", "trait": "Consensus", "text": "Saya akan mengubah keputusan saya jika ada figur otoritas (orang tua/atasan) yang meragukannya, meski sedikit saja." },
+    { "id": "dec_6", "trait": "Impulsive", "text": "Bagi saya, keputusan yang buruk jauh lebih baik daripada tidak membuat keputusan sama sekali." },
+    { "id": "dec_7", "trait": "Overthinker", "text": "Setelah memutuskan sesuatu, saya terus-menerus memikirkan skenario 'bagaimana jika saya memilih yang satunya?'" },
+    { "id": "dec_8", "trait": "Consensus", "text": "Saya sangat menghindari mengambil tanggung jawab sebagai pengambil keputusan tunggal dalam proyek tim." },
+    { "id": "dec_9", "trait": "Impulsive", "text": "Saya sering mengandalkan firasat tiba-tiba (gut feeling) dan mengabaikan fakta atau data logis yang bertentangan." },
+    { "id": "dec_10", "trait": "Overthinker", "text": "Saya membuat daftar panjang 'Pro dan Kontra' (Kelebihan dan Kekurangan) untuk hampir semua pilihan penting dalam hidup." },
+    { "id": "dec_11", "trait": "Consensus", "text": "Keputusan saya sering kali merupakan kompromi dari apa yang diinginkan oleh keluarga atau pasangan saya." },
+    { "id": "dec_12", "trait": "Impulsive", "text": "Saya mudah terpengaruh oleh diskon, promosi terbatas, atau tawaran mendesak tanpa pikir panjang." },
+    { "id": "dec_13", "trait": "Overthinker", "text": "Pikiran bahwa tidak ada keputusan yang '100% sempurna' sangat mengganggu dan menyiksa saya." },
+    { "id": "dec_14", "trait": "Consensus", "text": "Jika hasil keputusan ternyata buruk, saya merasa sedikit lega jika orang lain juga setuju dengan pilihan itu (bukan murni salah saya)." },
+    { "id": "dec_15", "trait": "Impulsive", "text": "Saat sedang kesal atau stres berlebihan, saya cenderung mengambil langkah drastis seperti *resign* mendadak atau memutuskan hubungan." },
+    { "id": "dec_16", "trait": "Overthinker", "text": "Saya kesulitan mengambil keputusan sederhana (seperti memilih menu makan siang) jika opsinya terlalu banyak." },
+    { "id": "dec_17", "trait": "Consensus", "text": "Mendapat dukungan suara terbanyak sangat krusial bagi saya sebelum berani melakukan perubahan arah." },
+    { "id": "dec_18", "trait": "Impulsive", "text": "Saya jarang merencanakan rencana cadangan (Plan B); saya langsung saja terjun ke Plan A dan berharap semua baik-baik saja." },
+    { "id": "dec_19", "trait": "Overthinker", "text": "Saya sering begadang semalaman hanya untuk menimbang-nimbang dua pilihan yang sebenarnya sama-sama baik." },
+    { "id": "dec_20", "trait": "Consensus", "text": "Saya sering menelepon orang tua atau sahabat saya dari toko pakaian hanya untuk meminta persetujuan sebelum membeli baju." },
+    { "id": "dec_21", "trait": "Impulsive", "text": "Begitu ide segar muncul di kepala saya, saya langsung mengeksekusinya di detik itu juga tanpa mempertimbangkan modal atau tenaga." },
+    { "id": "dec_22", "trait": "Overthinker", "text": "Saya merasa bahwa informasi yang saya miliki tidak pernah cukup (selalu kurang) untuk mengambil keputusan akhir yang solid." },
+    { "id": "dec_23", "trait": "Consensus", "text": "Beban kebebasan memilih membuat saya berharap ada orang yang lebih dewasa/pintar yang mengambil kendali atas hidup saya." },
+    { "id": "dec_24", "trait": "Impulsive", "text": "Saya memiliki kecenderungan mengabaikan peringatan dan nasihat dari orang-orang terdekat jika saya sudah terlanjur sangat menginginkan sesuatu." }
+  ]
+}

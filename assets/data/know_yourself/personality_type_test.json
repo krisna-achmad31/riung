@@ -1,0 +1,48 @@
+{
+  "id": "personality_type_test",
+  "title": "Personality Type Test",
+  "description": "Kenali karakteristik intimu berdasarkan teori dimensi kepribadian klasik: bagaimana kamu mendapatkan energi, memproses informasi, membuat keputusan, dan mengelola waktu.",
+  "isPremium": true,
+  "questionCount": 24,
+  "theoryReference": "Diadaptasi dari teori preferensi tipe psikologis Carl Jung (Basis E/I, S/N, T/F, J/P)",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Setuju" },
+      { "value": 1, "label": "Setuju" }
+    ],
+    "explanation": "Tiap jawaban setuju (1) akan menambah poin ke trait spesifik. Huruf dengan poin terbanyak dalam tiap pasangan (E vs I, S vs N, T vs F, J vs P) akan menyusun tipe 4 huruf kepribadian."
+  },
+  "results": [
+    { "minScore": 0, "maxScore": 0, "category": "Profil Tersimpan", "description": "Tipe Kepribadian Anda dikalkulasi berdasarkan kombinasi dari Energi (Extrovert/Introvert), Pikiran (Sensing/Intuition), Sifat (Thinking/Feeling), dan Taktik (Judging/Perceiving)." }
+  ],
+  "questions": [
+    { "id": "mbti_1", "trait": "E", "text": "Saya merasa bersemangat dan mendapat energi ekstra (recharge) saat berada di tengah keramaian atau acara sosial." },
+    { "id": "mbti_2", "trait": "I", "text": "Saya membutuhkan waktu menyendiri yang cukup lama di kamar untuk memulihkan energi setelah bersosialisasi seharian." },
+    { "id": "mbti_3", "trait": "E", "text": "Saat menyelesaikan pekerjaan, saya lebih suka bekerja dalam tim besar dan berdiskusi secara vokal (langsung)." },
+    { "id": "mbti_4", "trait": "I", "text": "Saya sangat lebih suka mengerjakan dan menyelesaikan pekerjaan saya sendiri di lingkungan yang tenang." },
+    { "id": "mbti_5", "trait": "E", "text": "Saya sangat mudah dan merasa nyaman untuk memulai percakapan panjang dengan orang asing." },
+    { "id": "mbti_6", "trait": "I", "text": "Saya sering merasa canggung dan cenderung diam saat berada di kelompok yang dipenuhi orang-orang baru." },
+    
+    { "id": "mbti_7", "trait": "S", "text": "Saat menyelesaikan masalah, saya lebih fokus melihat fakta-fakta nyata, angka, dan detail konkret yang ada di depan mata." },
+    { "id": "mbti_8", "trait": "N", "text": "Saat berdiskusi, saya jauh lebih tertarik membahas ide-ide besar, teori abstrak, filosofi, dan kemungkinan masa depan." },
+    { "id": "mbti_9", "trait": "S", "text": "Saya jauh lebih mempercayai pengalaman masa lalu (apa yang sudah terbukti berhasil) daripada mengandalkan intuisi/firasat acak." },
+    { "id": "mbti_10", "trait": "N", "text": "Saya sering membayangkan bagaimana sesuatu yang sudah mapan bisa dirombak dan diubah menjadi sesuatu yang lebih inovatif." },
+    { "id": "mbti_11", "trait": "S", "text": "Saya sangat suka mengikuti instruksi yang jelas, terperinci langkah demi langkah, secara berurutan tanpa terlewat." },
+    { "id": "mbti_12", "trait": "N", "text": "Saya lebih suka memikirkan 'gambaran besar' (big picture) suatu proyek daripada memusingkan eksekusi detail teknisnya." },
+
+    { "id": "mbti_13", "trait": "T", "text": "Saat mengambil keputusan krusial, saya selalu menjadikan logika dan analisis objektif sebagai faktor utama." },
+    { "id": "mbti_14", "trait": "F", "text": "Saat mengambil keputusan krusial, pertimbangan utama saya adalah suara hati (perasaan) saya dan bagaimana dampaknya bagi orang lain." },
+    { "id": "mbti_15", "trait": "T", "text": "Saya lebih menghargai orang yang sangat jujur dan rasional meskipun kata-katanya mungkin terdengar tajam." },
+    { "id": "mbti_16", "trait": "F", "text": "Saya sangat berhati-hati dalam memilah kata-kata saat berbicara agar tidak menyinggung perasaan dan empati orang lain." },
+    { "id": "mbti_17", "trait": "T", "text": "Dalam sebuah konflik kelompok, menemukan 'siapa yang paling benar secara fakta' lebih penting daripada sekadar menjaga harmoni kelompok." },
+    { "id": "mbti_18", "trait": "F", "text": "Menjaga keharmonisan dan kedamaian kelompok jauh lebih berharga dibandingkan rasa bangga karena memenangkan sebuah argumen." },
+
+    { "id": "mbti_19", "trait": "J", "text": "Saya merasa sangat stres dan terganggu jika rencana kegiatan atau jadwal yang sudah saya susun rapi berubah mendadak." },
+    { "id": "mbti_20", "trait": "P", "text": "Saya sangat menikmati jadwal yang fleksibel (terbuka) dan bertindak secara spontan mengikuti arus (go with the flow)." },
+    { "id": "mbti_21", "trait": "J", "text": "Kebiasaan utama saya adalah memastikan tugas-tugas saya selesai jauh-jauh hari sebelum tenggat waktu (deadline) tiba." },
+    { "id": "mbti_22", "trait": "P", "text": "Saya sering kali baru mendapatkan ide-ide terbaik dan dorongan semangat bekerja yang luar biasa justru saat mendekati tenggat waktu." },
+    { "id": "mbti_23", "trait": "J", "text": "Saya hanya bisa merasa tenang dan fokus bekerja jika lingkungan dan meja kerja saya sangat rapi serta terstruktur." },
+    { "id": "mbti_24", "trait": "P", "text": "Saya merasa lingkungan atau meja yang sedikit berantakan sama sekali tidak mengganggu kreativitas dan fokus kerja saya." }
+  ]
+}

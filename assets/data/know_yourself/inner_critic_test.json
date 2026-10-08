@@ -1,0 +1,48 @@
+{
+  "id": "inner_critic_test",
+  "title": "Your Inner Critic",
+  "description": "Ketahui suara siapa yang mendikte pikiran negatif di kepalamu saat kamu membuat kesalahan.",
+  "isPremium": true,
+  "questionCount": 24,
+  "theoryReference": "Diadaptasi dari terapi kognitif (CBT) tentang profil pengkritik batin (Inner Critic Archetypes)",
+  "scoringLogic": {
+    "type": "trait_based",
+    "options": [
+      { "value": 0, "label": "Tidak Pernah" },
+      { "value": 1, "label": "Kadang-Kadang" },
+      { "value": 2, "label": "Sering" },
+      { "value": 3, "label": "Selalu" }
+    ]
+  },
+  "results": [
+    { "dominantTrait": "Taskmaster", "category": "The Taskmaster", "description": "Pengkritikmu menuntut kesempurnaan mutlak. Kamu merasa harga dirimu ditentukan oleh prestasi dan produktivitas." },
+    { "dominantTrait": "GuiltTripper", "category": "The Guilt-Tripper", "description": "Pengkritikmu suka membuatmu merasa bersalah atas masa lalu atau meyakinkanmu bahwa kamu adalah beban bagi orang lain." },
+    { "dominantTrait": "MindReader", "category": "The Mind-Reader", "description": "Pengkritikmu selalu menebak hal terburuk tentang apa yang orang lain pikirkan tentangmu (takut dinilai)." }
+  ],
+  "questions": [
+    { "id": "ic_1", "trait": "Taskmaster", "text": "Jika saya tidak produktif seharian, suara di kepala saya mengatakan bahwa saya tidak berguna." },
+    { "id": "ic_2", "trait": "GuiltTripper", "text": "Saya sering menyalahkan diri sendiri secara berlebihan atas kesalahan kecil yang terjadi di masa lalu." },
+    { "id": "ic_3", "trait": "MindReader", "text": "Saat seseorang membalas pesan saya dengan singkat, saya langsung yakin mereka sedang marah pada saya." },
+    { "id": "ic_4", "trait": "Taskmaster", "text": "Saya merasa tidak ada ruang untuk beristirahat sampai semua pekerjaan saya selesai sempurna." },
+    { "id": "ic_5", "trait": "GuiltTripper", "text": "Suara di kepala saya sering mengingatkan saya tentang betapa egois atau merepotkannya diri saya." },
+    { "id": "ic_6", "trait": "MindReader", "text": "Saya sering menganalisis ulang interaksi sosial karena takut saya mengatakan hal yang membuat orang lain diam-diam membenci saya." },
+    { "id": "ic_7", "trait": "Taskmaster", "text": "Kata 'seharusnya' (saya seharusnya bisa lebih baik, seharusnya saya lebih pintar) terus mendominasi pikiran saya." },
+    { "id": "ic_8", "trait": "GuiltTripper", "text": "Saya merasa saya pantas dihukum atau pantas mendapatkan hal buruk ketika hal-hal tidak berjalan lancar." },
+    { "id": "ic_9", "trait": "MindReader", "text": "Saya membatalkan niat berbicara di rapat/kelas karena yakin orang lain akan menganggap ide saya bodoh." },
+    { "id": "ic_10", "trait": "Taskmaster", "text": "Mendapat nilai B atau teguran kecil terasa seperti kegagalan total yang memalukan bagi saya." },
+    { "id": "ic_11", "trait": "GuiltTripper", "text": "Saya merasa bertanggung jawab penuh atas kebahagiaan orang tua atau pasangan saya." },
+    { "id": "ic_12", "trait": "MindReader", "text": "Saat dipanggil atasan/guru, pikiran pertama saya adalah: 'Pasti ada orang yang melaporkan keburukan saya'." },
+    { "id": "ic_13", "trait": "Taskmaster", "text": "Saya sulit merayakan keberhasilan karena suara di kepala saya berkata 'Ini belum cukup hebat'." },
+    { "id": "ic_14", "trait": "GuiltTripper", "text": "Saya merasa bahwa keberuntungan yang saya dapatkan suatu saat akan direbut karena saya tidak pantas menerimanya." },
+    { "id": "ic_15", "trait": "MindReader", "text": "Jika teman saya memuji saya, saya sering berpikir bahwa mereka hanya berbohong demi sopan santun." },
+    { "id": "ic_16", "trait": "Taskmaster", "text": "Saya mengukur harga diri saya semata-mata dari seberapa banyak hal yang berhasil saya capai hari ini." },
+    { "id": "ic_17", "trait": "GuiltTripper", "text": "Saat menolak permintaan orang lain, saya dihantui rasa bersalah berhari-hari." },
+    { "id": "ic_18", "trait": "MindReader", "text": "Berada di tempat umum membuat saya tegang karena saya merasa semua mata sedang menilai penampilan saya." },
+    { "id": "ic_19", "trait": "Taskmaster", "text": "Jika saya sakit dan harus istirahat, saya justru merasa stres karena membuang-buang waktu." },
+    { "id": "ic_20", "trait": "GuiltTripper", "text": "Saya merasa meminta bantuan orang lain sama saja dengan menunjukkan bahwa saya lemah dan merepotkan." },
+    { "id": "ic_21", "trait": "MindReader", "text": "Saya sering mengubah pendapat pribadi saya agar sesuai dengan mayoritas supaya tidak dihakimi." },
+    { "id": "ic_22", "trait": "Taskmaster", "text": "Saya sering membandingkan kecepatan kesuksesan saya dengan orang lain yang sebaya." },
+    { "id": "ic_23", "trait": "GuiltTripper", "text": "Saya merasa saya tidak boleh bahagia saat orang terdekat saya sedang mengalami kesusahan." },
+    { "id": "ic_24", "trait": "MindReader", "text": "Ketakutan terbesar saya adalah dianggap 'aneh' atau 'tidak kompeten' oleh lingkungan saya." }
+  ]
+}
