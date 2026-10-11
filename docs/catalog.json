@@ -1,0 +1,580 @@
+{
+  "version": "2026-10-12.1",
+  "_comment": "Katalog item & konten yang menentukan aturan ekonomi. Harga TIDAK ditulis di sini: priceTier merujuk ke kunci di economy-props.json bagian spend. Mirror app: features/toko/logic/toko_data.dart, features/kepribadian/logic/{character_accessory,card_style}.dart, features/meditasi/logic/meditation_catalog.dart, features/jurnal/logic/journal_prompts.dart, features/betterme/data/betterme_content.dart, features/monster/logic/habit_monsters.dart. Salinan server: backend/internal/catalog/catalog.json (wajib identik, dijaga tes). Id inventori: kosmetik monster = id-nya, aksesori = 'acc_' + id, gaya kartu = 'cardstyle_' + id.",
+  "monsters": [
+    {
+      "id": "meronta",
+      "family": "saboteur"
+    },
+    {
+      "id": "waswas",
+      "family": "saboteur"
+    },
+    {
+      "id": "kabut",
+      "family": "saboteur"
+    },
+    {
+      "id": "cermin",
+      "family": "saboteur"
+    },
+    {
+      "id": "sempurna",
+      "family": "saboteur"
+    },
+    {
+      "id": "mengelak",
+      "family": "saboteur"
+    },
+    {
+      "id": "hakim",
+      "family": "saboteur"
+    },
+    {
+      "id": "nanti",
+      "family": "habit"
+    },
+    {
+      "id": "gulir",
+      "family": "habit"
+    },
+    {
+      "id": "begadang",
+      "family": "habit"
+    },
+    {
+      "id": "bunglon",
+      "family": "habit"
+    },
+    {
+      "id": "bimbang",
+      "family": "habit"
+    },
+    {
+      "id": "bara",
+      "family": "habit"
+    }
+  ],
+  "monsterCosmetics": [
+    {
+      "id": "topi_rajut",
+      "monsterId": "kabut",
+      "slot": "head",
+      "priceTier": "cosmeticCommon",
+      "exclusive": false
+    },
+    {
+      "id": "syal_hangat",
+      "monsterId": "waswas",
+      "slot": "neck",
+      "priceTier": "cosmeticCommon",
+      "exclusive": false
+    },
+    {
+      "id": "bantal_mini",
+      "monsterId": "meronta",
+      "slot": "base",
+      "priceTier": "cosmeticEpic",
+      "exclusive": false
+    },
+    {
+      "id": "bingkai_emas",
+      "monsterId": "cermin",
+      "slot": "none",
+      "priceTier": "cosmeticLegendary",
+      "exclusive": true
+    },
+    {
+      "id": "batu_tenang",
+      "monsterId": "waswas",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "lentera",
+      "monsterId": "kabut",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "bintang_kintsugi",
+      "monsterId": "sempurna",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "senter",
+      "monsterId": "mengelak",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "selimut_peluk",
+      "monsterId": "meronta",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "palu_busa",
+      "monsterId": "hakim",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "jam_pasir",
+      "monsterId": "nanti",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "kantong_hp",
+      "monsterId": "gulir",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "topi_tidur",
+      "monsterId": "begadang",
+      "slot": "head",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "pin_berani",
+      "monsterId": "bunglon",
+      "slot": "neck",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "kompas",
+      "monsterId": "bimbang",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    },
+    {
+      "id": "cangkir_teh",
+      "monsterId": "bara",
+      "slot": "side",
+      "priceTier": "cosmeticEpic",
+      "exclusive": true
+    }
+  ],
+  "personalityTests": [
+    "jung",
+    "temperament",
+    "attachment"
+  ],
+  "accessories": [
+    {
+      "id": "beanie",
+      "slot": "head",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": null
+    },
+    {
+      "id": "ribbon",
+      "slot": "head",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": null
+    },
+    {
+      "id": "flower",
+      "slot": "head",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": null
+    },
+    {
+      "id": "witchHat",
+      "slot": "head",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": null
+    },
+    {
+      "id": "headphones",
+      "slot": "head",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": null
+    },
+    {
+      "id": "halo",
+      "slot": "head",
+      "priceTier": "accessoryRare",
+      "exclusiveTo": null
+    },
+    {
+      "id": "roundGlasses",
+      "slot": "face",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": null
+    },
+    {
+      "id": "starStickers",
+      "slot": "face",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": null
+    },
+    {
+      "id": "sunglasses",
+      "slot": "face",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": null
+    },
+    {
+      "id": "scarf",
+      "slot": "neck",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": null
+    },
+    {
+      "id": "necklace",
+      "slot": "neck",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": null
+    },
+    {
+      "id": "backpack",
+      "slot": "back",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": null
+    },
+    {
+      "id": "cape",
+      "slot": "back",
+      "priceTier": "accessoryRare",
+      "exclusiveTo": null
+    },
+    {
+      "id": "wings",
+      "slot": "back",
+      "priceTier": "accessoryRare",
+      "exclusiveTo": null
+    },
+    {
+      "id": "jungCrown",
+      "slot": "head",
+      "priceTier": "accessoryRare",
+      "exclusiveTo": "jung"
+    },
+    {
+      "id": "jungMask",
+      "slot": "face",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": "jung"
+    },
+    {
+      "id": "jungCompass",
+      "slot": "neck",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": "jung"
+    },
+    {
+      "id": "jungLantern",
+      "slot": "back",
+      "priceTier": "accessoryRare",
+      "exclusiveTo": "jung"
+    },
+    {
+      "id": "tempFlame",
+      "slot": "head",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": "temperament"
+    },
+    {
+      "id": "tempMonocle",
+      "slot": "face",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": "temperament"
+    },
+    {
+      "id": "tempLeaf",
+      "slot": "neck",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": "temperament"
+    },
+    {
+      "id": "tempWave",
+      "slot": "back",
+      "priceTier": "accessoryRare",
+      "exclusiveTo": "temperament"
+    },
+    {
+      "id": "attNightCap",
+      "slot": "head",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": "attachment"
+    },
+    {
+      "id": "attHeartCharm",
+      "slot": "face",
+      "priceTier": "accessorySmall",
+      "exclusiveTo": "attachment"
+    },
+    {
+      "id": "attBlanket",
+      "slot": "neck",
+      "priceTier": "accessoryRegular",
+      "exclusiveTo": "attachment"
+    },
+    {
+      "id": "attCompanion",
+      "slot": "back",
+      "priceTier": "accessoryRare",
+      "exclusiveTo": "attachment"
+    }
+  ],
+  "accessoryBundles": [
+    {
+      "id": "cozy",
+      "items": [
+        "beanie",
+        "scarf",
+        "roundGlasses"
+      ],
+      "exclusiveTo": null
+    },
+    {
+      "id": "stylish",
+      "items": [
+        "headphones",
+        "sunglasses",
+        "necklace"
+      ],
+      "exclusiveTo": null
+    },
+    {
+      "id": "heavenly",
+      "items": [
+        "halo",
+        "wings",
+        "starStickers"
+      ],
+      "exclusiveTo": null
+    },
+    {
+      "id": "jungSet",
+      "items": [
+        "jungCrown",
+        "jungMask",
+        "jungCompass",
+        "jungLantern"
+      ],
+      "exclusiveTo": "jung"
+    },
+    {
+      "id": "temperamentSet",
+      "items": [
+        "tempFlame",
+        "tempMonocle",
+        "tempLeaf",
+        "tempWave"
+      ],
+      "exclusiveTo": "temperament"
+    },
+    {
+      "id": "attachmentSet",
+      "items": [
+        "attNightCap",
+        "attHeartCharm",
+        "attBlanket",
+        "attCompanion"
+      ],
+      "exclusiveTo": "attachment"
+    }
+  ],
+  "cardStyles": [
+    {
+      "id": "klasik",
+      "priceTier": null
+    },
+    {
+      "id": "taman",
+      "priceTier": "cardStyleRegular"
+    },
+    {
+      "id": "arkade",
+      "priceTier": "cardStyleRegular"
+    },
+    {
+      "id": "galaksi",
+      "priceTier": "cardStyleRare"
+    },
+    {
+      "id": "aurora",
+      "priceTier": "cardStyleRare"
+    }
+  ],
+  "focusPacks": [
+    {
+      "id": "focus_1",
+      "sessions": 1,
+      "priceTier": "focus25"
+    },
+    {
+      "id": "focus_5",
+      "sessions": 5,
+      "priceTier": "focusBundle5"
+    }
+  ],
+  "journalPrompts": [
+    {
+      "id": "p_hakim",
+      "monsterId": "hakim",
+      "premium": false
+    },
+    {
+      "id": "p_kabut",
+      "monsterId": "kabut",
+      "premium": false
+    },
+    {
+      "id": "p_cermin",
+      "monsterId": "cermin",
+      "premium": false
+    },
+    {
+      "id": "p_waswas",
+      "monsterId": "waswas",
+      "premium": false
+    },
+    {
+      "id": "p_mengelak",
+      "monsterId": "mengelak",
+      "premium": false
+    }
+  ],
+  "meditations": [
+    {
+      "id": "jeda_kerja",
+      "targetMonsterId": "waswas",
+      "premium": false
+    },
+    {
+      "id": "napas_4_7_8",
+      "targetMonsterId": "waswas",
+      "premium": false
+    },
+    {
+      "id": "tenang_ujian",
+      "targetMonsterId": "waswas",
+      "premium": false
+    },
+    {
+      "id": "body_scan",
+      "targetMonsterId": "waswas",
+      "premium": true
+    },
+    {
+      "id": "menonton_pikiran",
+      "targetMonsterId": "kabut",
+      "premium": true
+    },
+    {
+      "id": "berhenti_membandingkan",
+      "targetMonsterId": "cermin",
+      "premium": true
+    }
+  ],
+  "betterme": {
+    "premiumFromLevel": 2,
+    "lessons": [
+      {
+        "id": "l1_s1",
+        "level": 1
+      },
+      {
+        "id": "l1_s2",
+        "level": 1
+      },
+      {
+        "id": "l1_s3",
+        "level": 1
+      },
+      {
+        "id": "l1_s4",
+        "level": 1
+      },
+      {
+        "id": "l1_s5",
+        "level": 1
+      },
+      {
+        "id": "l1_s6",
+        "level": 1
+      },
+      {
+        "id": "l1_s7",
+        "level": 1
+      },
+      {
+        "id": "l2_s1",
+        "level": 2
+      },
+      {
+        "id": "l2_s2",
+        "level": 2
+      },
+      {
+        "id": "l2_s3",
+        "level": 2
+      },
+      {
+        "id": "l2_s4",
+        "level": 2
+      },
+      {
+        "id": "l2_s5",
+        "level": 2
+      },
+      {
+        "id": "l2_s6",
+        "level": 2
+      },
+      {
+        "id": "l2_s7",
+        "level": 2
+      },
+      {
+        "id": "l3_s1",
+        "level": 3
+      },
+      {
+        "id": "l3_s2",
+        "level": 3
+      },
+      {
+        "id": "l3_s3",
+        "level": 3
+      },
+      {
+        "id": "l3_s4",
+        "level": 3
+      },
+      {
+        "id": "l3_s5",
+        "level": 3
+      },
+      {
+        "id": "l3_s6",
+        "level": 3
+      },
+      {
+        "id": "l3_s7",
+        "level": 3
+      },
+      {
+        "id": "l3_s8",
+        "level": 3
+      }
+    ]
+  }
+}

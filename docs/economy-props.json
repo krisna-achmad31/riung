@@ -1,0 +1,83 @@
+{
+  "version": "2026-10-11.1",
+  "_comment": "Satu-satunya sumber angka ekonomi Riung. Mirror: riung/lib/core/config/economy.dart (app) dan backend/internal/economy/economy-props.json (server, wajib identik — dijaga tes). Ubah di sini, lalu salin ke backend dan sesuaikan economy.dart.",
+  "earn": {
+    "checkin": 5,
+    "journal": 4,
+    "meditation": 3,
+    "mission": 3,
+    "minigameWin": 8,
+    "monsterTamed": 50,
+    "bettermeLesson": 10,
+    "streak7": 20,
+    "streak30": 100,
+    "premiumYearlyDaily": 2
+  },
+  "monsterProgress": {
+    "focus": 4,
+    "minigameWin": 5,
+    "minigameLose": 2,
+    "journalPrompt": 2,
+    "meditation": 3
+  },
+  "spend": {
+    "focus25": 25,
+    "focus45": 40,
+    "focus60": 50,
+    "focusBundle5": 100,
+    "streakShield": 20,
+    "cosmeticCommon": 100,
+    "cosmeticEpic": 300,
+    "cosmeticLegendary": 500,
+    "accessorySmall": 60,
+    "accessoryRegular": 100,
+    "accessoryRare": 300,
+    "cardStyleRegular": 100,
+    "cardStyleRare": 300,
+    "bundleDiscountPercent": 20,
+    "bundleRounding": 5
+  },
+  "appbeku": {
+    "unlock10": 15,
+    "unlock20": 25,
+    "unlock30": 35,
+    "unlock60": 60,
+    "bundleSantai": 35,
+    "bundleSosmed": 75,
+    "maxPaidUnlocksPerDay": 3,
+    "escalationPerUnlock": 10,
+    "unlockCooldownSeconds": 60
+  },
+  "tickets": {
+    "freePerDay": 1,
+    "maxFromPracticePerDay": 3,
+    "maxFightsPerDay": 4
+  },
+  "freeTier": {
+    "meditations": 3,
+    "sleepStories": 2,
+    "journalPerDay": 1,
+    "minigamePerDay": 1,
+    "focusPerDay": 1
+  },
+  "premium": {
+    "monthlyPriceIdr": 59000,
+    "monthsPaidPerYear": 10,
+    "yearlyPriceIdr": 590000,
+    "trialDays": 7,
+    "focusFreePerDay": 3,
+    "yearlyDailyCoins": 2,
+    "graceDays": 3
+  },
+  "coinPacks": [
+    { "productId": "coin_pack_small", "coins": 80, "bonus": 0, "priceIdr": 15000 },
+    { "productId": "coin_pack_medium", "coins": 300, "bonus": 30, "priceIdr": 49000 },
+    { "productId": "coin_pack_large", "coins": 700, "bonus": 120, "priceIdr": 99000 }
+  ],
+  "caps": {
+    "missionsPerDay": 3,
+    "journalRewardsPerDay": 3,
+    "meditationRewardsPerDay": 3,
+    "newAccountsPerIpPerDay": 10
+  }
+}
