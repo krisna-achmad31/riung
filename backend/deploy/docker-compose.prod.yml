@@ -1,0 +1,60 @@
+# Production stack on the VPS (/var/www/riung), following
+# /var/www/core-shared/INTEGRASI-APP-BARU.md: joins vps-shared-net with static
+# IPs, publishes no ports (shared-nginx is the only entry point), restarts
+# unless stopped, TZ Asia/Jakarta. Postgres is shared-postgres (core-shared).
+#
+# Deploy with deploy.sh (pull → migrate → recreate api).
+name: riung
+
+x-hardening: &hardening
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  environment:
+    TZ: Asia/Jakarta
+
+services:
+  riung-migrate:
+    <<: *hardening
+    image: ${RIUNG_IMAGE:?set RIUNG_IMAGE, e.g. ghcr.io/krisna-achmad31/riung-api:<sha>}
+    container_name: riung-migrate
+    command: ["migrate", "up"]
+    # Only this one-shot container holds the DDL credentials.
+    env_file: .env.migrate
+    restart: "no"
+    profiles: ["migrate"]
+    networks:
+      shared-net:
+        ipv4_address: 172.19.0.17
+
+  riung-api:
+    <<: *hardening
+    image: ${RIUNG_IMAGE:?set RIUNG_IMAGE, e.g. ghcr.io/krisna-achmad31/riung-api:<sha>}
+    container_name: riung-api
+    command: ["api"]
+    env_file: .env
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 1.0
+    pids_limit: 200
+    healthcheck:
+      test: ["CMD", "/riung", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      # Service account JSON etc. (chmod 600, readable by uid 65532).
+      - ./secrets:/run/secrets:ro
+    networks:
+      shared-net:
+        ipv4_address: 172.19.0.16
+
+networks:
+  shared-net:
+    external: true
+    name: vps-shared-net

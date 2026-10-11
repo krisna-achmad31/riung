@@ -1,0 +1,5 @@
+/bin/
+/coverage.out
+/deploy/.env
+/deploy/.env.migrate
+/deploy/secrets/

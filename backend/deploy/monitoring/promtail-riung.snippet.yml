@@ -1,0 +1,19 @@
+# Add to the `docker` job in /var/www/core-shared/monitoring/promtail/config.yml
+# (pipeline_stages). riung-api writes one JSON object per line; only the
+# low-cardinality fields become labels (core-shared guide: never user/request
+# ids). Everything else stays searchable with LogQL `| json`.
+pipeline_stages:
+  - match:
+      selector: '{container="riung-api"}'
+      stages:
+        - json:
+            expressions:
+              level: level
+              event: event
+              time: time
+        - labels:
+            level:
+            event:
+        - timestamp:
+            source: time
+            format: RFC3339Nano

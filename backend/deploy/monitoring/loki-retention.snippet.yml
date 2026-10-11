@@ -1,0 +1,9 @@
+# Merge into /var/www/core-shared/monitoring/loki/config.yml (limits_config).
+# Keeps riung-api logs 30 days; every other stream stays on the global 7d.
+# Requires compactor.retention_enabled: true (already set on the VPS).
+limits_config:
+  retention_period: 7d
+  retention_stream:
+    - selector: '{container="riung-api"}'
+      priority: 1
+      period: 720h
