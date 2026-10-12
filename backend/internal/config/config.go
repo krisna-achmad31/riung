@@ -82,6 +82,9 @@ type Config struct {
 	// FocusTicketKid names it so keys can be rotated.
 	FocusTicketKey []byte
 	FocusTicketKid string
+	// AnonRetentionDays: anonymous accounts unseen this long are deleted by
+	// riung cleanup-anon.
+	AnonRetentionDays int
 
 	// CORSLandingOrigin is the only origin allowed to call POST /v1/waitlist
 	// from a browser (empty = no CORS at all).
@@ -164,6 +167,14 @@ func Load(getenv func(string) string) (Config, error) {
 		c.FocusTicketKey = sum[:]
 	}
 	c.FocusTicketKid = orDefault(getenv("FOCUS_TICKET_KID"), "k1")
+	c.AnonRetentionDays = 90
+	if v := strings.TrimSpace(getenv("ANON_RETENTION_DAYS")); v != "" {
+		n, err := strconv.Atoi(v)
+		if err != nil || n < 30 || n > 3650 {
+			errs = append(errs, errors.New("ANON_RETENTION_DAYS must be 30–3650"))
+		}
+		c.AnonRetentionDays = n
+	}
 	if !kidPattern.MatchString(c.FocusTicketKid) {
 		errs = append(errs, errors.New("FOCUS_TICKET_KID must be 1–32 letters, digits, '-' or '_'"))
 	}

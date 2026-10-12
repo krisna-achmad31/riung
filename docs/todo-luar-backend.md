@@ -1,5 +1,5 @@
 # TODO di luar backend
-*Dikumpulkan selama perencanaan & audit backend Go (branch `feat/go-backend`, 2026-10-11).*
+*Dikumpulkan selama perencanaan & audit backend Go (branch `feat/go-backend`, 2026-10-11, diperbarui 2026-10-13).*
 
 Backend dikerjakan sesuai `docs/backend-go-plan.md` dan `docs/backend-api-spec.md`. Daftar ini berisi
 pekerjaan **di luar** `backend/` yang dibutuhkan supaya backend benar-benar terpakai, ditambah celah yang
@@ -19,13 +19,17 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       Pertimbangkan menutup port 22 bila SSH cukup lewat 8443.
 - [ ] **P0 — Rotasi key `firebase-adminsdk`** (`riung-5e979-firebase-adminsdk-…json`). File sempat
       tersimpan di `~/Downloads` dengan izin `-rw-r--r--`. Setelah itu buat **service account khusus**
-      backend dengan peran minimum: Firebase Authentication Admin + akses Android Publisher (ditautkan di
-      Play Console → *API access*).
+      backend berperan *Firebase Authentication Admin* saja (runbook langkah 4b); akses Google Play memakai
+      service account terpisah `riung-play` (langkah 4c).
 - [ ] **P0 — Backup Postgres**: cron harian `pg_dump -Fc` database `riung` (dan `n8n`, yang saat ini juga
       tanpa backup) ke `/var/backups/…`, retensi 14 hari, salin off-site, uji restore.
-- [ ] **P1 — DNS Cloudflare**: `A riung → 76.13.20.72`, mode **DNS only**.
+- [x] **P1 — DNS Cloudflare**: `A riung → 76.13.20.72`, mode **DNS only** (sudah resolve, dicek 2026-10-13).
 - [ ] **P1 — Database**: jalankan `backend/deploy/sql/create-riung-db.sql` di `shared-postgres`
       (membuat DB `riung`, role `riung_migrator` & `riung_app`), simpan password di `/var/www/riung/.env`.
+- [ ] **P1 — File env**: `/var/www/riung/.env` dari `backend/deploy/env.example` — empat secret HMAC
+      berbeda (`openssl rand -hex 32`), `FOCUS_TICKET_KEY` (`openssl rand -base64 32`), path service account.
+      Simpan salinan secret di password manager: `BILLING_ACCOUNT_KEY`/`LOG_PEPPER`/`PIN_PEPPER` tidak bisa
+      diganti tanpa memutus pembelian, `deleted_users`, dan backup PIN.
 - [ ] **P1 — Nginx + TLS**: pasang `backend/deploy/nginx/riung.e55techlab.com.conf` ke
       `core-shared/nginx/conf.d/` mengikuti urutan HTTP-only → certbot → config final (plan §8.4).
       Selalu `nginx -t` sebelum reload — satu nginx dipakai semua situs.
@@ -45,16 +49,16 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
 - [ ] **P1 — Produk Play Console**: id produk persis `coin_pack_small|medium|large` (in-app, consumable) dan
       langganan `premium_monthly|premium_yearly` (satu base plan per langganan, trial 7 hari di offer).
       **Multi-quantity tetap mati** (server mengkredit/menarik per token).
-- [ ] **P1 — Cron billing**: `5 * * * * docker exec riung-api /riung billing-sync` dan
-      `45 2 * * * docker exec riung-api /riung reconcile` (runbook langkah 9); alert Grafana untuk
-      `refund_applied`, `ledger_mismatch`, `job_run ok=false`.
+- [ ] **P1 — Cron** (runbook langkah 9): `cleanup`, `cleanup-anon`, `billing-sync` (tiap jam), `reconcile`,
+      backup `pg_dump`; alert Grafana untuk `refund_applied`, `ledger_mismatch`, `job_run ok=false`, dan umur
+      file backup terbaru (> 26 jam = gagal).
 - [ ] **P1 — Uji sandbox**: license tester beli tiap paket koin & langganan, refund dari Play Console
       (koin tertarik / Premium berakhir), upgrade bulanan→tahunan, batalkan auto-renew (Premium tetap sampai
       akhir periode).
 - [ ] **P1 — Firebase App Check**: aktifkan provider Play Integrity untuk app Android.
 - [ ] **P1 — Isi konten**: setelah deploy, `docker exec -i riung-api /riung seed-content - < dummy-data-seed.json`.
 - [ ] **P1 — Admin**: tentukan email admin; pastikan admin punya akses VPN OpenVPN; jalankan
-      `riung admin grant --email …` setelah deploy.
+      `riung admin grant <email> <alasan>` setelah deploy.
 - [ ] **P2 — Grafana**: kontak notifikasi (email tim) untuk alert di spec §6.6.
 - [ ] **P2 — CI Flutter**: tambahkan `paths-ignore: ['backend/**']` di
       `.github/workflows/firebase_app_distribution.yml` supaya perubahan backend tidak memicu build APK.

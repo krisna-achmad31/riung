@@ -27,7 +27,7 @@ Internet → shared-nginx (TLS, rate limit) → riung-api:8080 → shared-postgr
 riung-api stdout (JSON) → Promtail → Loki (30 hari) → Grafana
 ```
 
-Image kecil (±5 MB, distroless, user `nonroot`, filesystem read-only, tanpa port ke host). Kredensial
+Image kecil (±60 MB — sebagian besar SDK Google/Firebase — distroless, user `nonroot`, filesystem read-only, tanpa port ke host). Kredensial
 DDL hanya ada di `riung-migrate`; `riung-api` hanya memegang role `riung_app`.
 
 ## A. Setup pertama (sekali)
@@ -133,16 +133,26 @@ lalu `docker compose up -d --force-recreate loki promtail` di core-shared.
 ```cron
 # Pembersihan tabel bantu (idempotensi, jti App Check, penghitung lama, tiket Fokus & buka-berbayar > 90 hari)
 15 2 * * * docker exec riung-api /riung cleanup
+# Akun anonim yang tidak dibuka > 90 hari (data server + user Firebase); --dry-run untuk menghitung saja
+20 2 * * * docker exec riung-api /riung cleanup-anon
 # Refund Google Play (tarik koin / cabut Premium) + acknowledge pembelian yang lupa di-ack app (tiap jam).
 # Sebelum billing dikonfigurasi job ini hanya mencatat "skipped" (exit 0); item yang gagal diulang di jam berikutnya.
 5 * * * * docker exec riung-api /riung billing-sync
 # Cocokkan saldo dompet dengan ledger; gagal = ada ledger_mismatch di log
 45 2 * * * docker exec riung-api /riung reconcile
 # mkdir -p /var/backups/riung && chmod 700 /var/backups/riung
-30 2 * * * docker exec shared-postgres pg_dump -Fc -U n8n riung > /var/backups/riung/riung_$(date +\%F).dump && find /var/backups/riung -name '*.dump' -mtime +14 -delete
+30 2 * * * docker exec shared-postgres pg_dump -Fc -U riung_migrator riung > /var/backups/riung/riung_$(date +\%F).dump && find /var/backups/riung -name '*.dump' -mtime +14 -delete
 ```
 
-Salin ke penyimpanan off-site dan uji restore secara berkala.
+Salin ke penyimpanan off-site dan uji restore secara berkala. Restore (DB kosong `riung` dari
+`create-riung-db.sql`, API dihentikan dulu):
+
+```sh
+docker stop riung-api
+docker exec -i shared-postgres pg_restore -U riung_migrator -d riung --clean --if-exists < riung_YYYY-MM-DD.dump
+docker run --rm --env-file .env --network vps-shared-net <image> reapply-deletions   # akun yang dihapus setelah backup
+docker start riung-api
+```
 
 **10. Deploy pertama (manual, sebagai `deploy`)**
 

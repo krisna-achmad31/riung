@@ -59,7 +59,10 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
   | `POST /v1/focus/tickets`, `GET /v1/focus/tickets` | tiket Ed25519 untuk sesi offline: `free_daily` (1/hari, Premium 3), `prepaid` (sesi dari paket), `coins` (25/40/50) |
   | `focus_completed` di `/v1/activities` | menukar tiket sekali (tidak bisa "selesai" sebelum durasinya), +4 progres monster |
   | `POST /v1/appbeku/unlocks` | buka-waktu berbayar hanya dengan koin latihan, maks 3/hari, +10 tiap kali, jeda 60 detik; bundel `santai`/`sosmed` atomik; aplikasi yang dibuka tidak disimpan/dicatat |
-- Berikutnya: B5 (deploy) & B6 (produksi). Lihat plan §10.
+- **B5 — deploy** (berjalan): `riung cleanup-anon` (akun anonim tak dibuka > 90 hari, data server + user
+  Firebase), `riung reapply-deletions` (setelah restore backup), Dependabot untuk modul Go & image. Deploy ke
+  VPS mengikuti [`deploy/README.md`](deploy/README.md).
+- Berikutnya: B6 (App Check `enforce`, alert Grafana, uji beban). Lihat plan §10.
 
 ## Menjalankan lokal
 
@@ -129,6 +132,7 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `MIN_APP_VERSION` | `0.0.0` | app di bawah versi ini mendapat `426 upgrade_required` |
 | `ADMIN_LISTEN_ADDR` | kosong (mati) | port Admin API, mis. `:8081`; tidak pernah dipasang di nginx |
 | `ADMIN_ALLOWED_CIDRS` | — | wajib bila Admin API aktif; prod `172.19.0.7/32` (OpenVPN) |
+| `ANON_RETENTION_DAYS` | `90` | akun anonim yang tidak dibuka selama ini dihapus `riung cleanup-anon` (30–3650) |
 | `SHUTDOWN_TIMEOUT` | `15s` | graceful shutdown |
 
 Contoh file: `deploy/env.example` (API) dan `deploy/env.migrate.example` (migrasi).

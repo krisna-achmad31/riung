@@ -1,5 +1,5 @@
 # Riung Backend — Spesifikasi API, Keamanan, Rate Limit & Logging
-*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · draf 2026-10-11*
+*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-13 (B0–B4 selesai, B5 berjalan)*
 
 Dokumen ini menjawab tiga hal: **endpoint apa saja yang dibutuhkan app**, **bagaimana setiap endpoint
 diamankan (sampai rate limit)**, dan **bagaimana log disiapkan**. Semua angka ekonomi yang disebut di sini
@@ -17,7 +17,7 @@ dibaca server dari `docs/economy-props.json` — bukan hardcode.
 | ID | `[A-Za-z0-9_.:-]{1,64}` untuk id katalog (`topi_rajut`, `acc_jungCrown`, `napas_4_7_8`); UUID v4 untuk id buatan server |
 | Auth | `Authorization: Bearer <Firebase ID token>` |
 | App Check | `X-Firebase-AppCheck: <token>` |
-| Idempotensi | `Idempotency-Key: <UUID v4>` **wajib** di semua `POST/PUT/PATCH/DELETE` yang memutasi |
+| Idempotensi | `Idempotency-Key: <UUID v4>` **wajib** di semua `POST/PUT/PATCH/DELETE` yang memutasi (kolom **Idem**); pengecualian: `DELETE /v1/me` (aman diulang, selalu 204) dan `POST …/journal-pin-backup/verify` |
 | Versi app | `X-App-Version: 1.4.0+27` dan `X-Platform: android` (dipakai untuk paksa update & log) |
 | Request ID | server membuat/meneruskan `X-Request-Id`, selalu dikembalikan di header & body error |
 | Paging | cursor: `?limit=20&cursor=<opaque>` → `{ "items": [...], "nextCursor": "..." }` |
@@ -125,24 +125,29 @@ Kolom **RL** = rate limit aplikasi per user (detail §5). Kolom **Idem** = wajib
 |---|---|---|---|---|---|
 | 1 | `GET /healthz` | public | — | — | liveness (proses hidup) |
 | 2 | `GET /readyz` | internal | — | — | DB siap; **diblokir nginx dari luar** |
-| 3 | `GET /v1/config` | app | 30/mnt | — | ekonomi + katalog + `minAppVersion` + `serverTime`, ETag/304 |
-| 4 | `GET /v1/content/{kind}?locale=id` | app | 30/mnt | — | konten publik: `saboteurs`, `affirmations`, `journal_prompts`, `meditations`, `sleep_stories`, `betterme`, `research_facts`; ETag/304. Opsional — app tetap membawa konten bawaan sebagai fallback |
-| 5 | `POST /v1/waitlist` | public | 5/jam/IP | — | daftar email dari landing (CORS hanya origin landing); respons **selalu sama** (202) baik email baru maupun sudah terdaftar — tidak bisa dipakai menebak email; field honeypot tersembunyi untuk menahan bot |
+| 3 | `GET /v1/config` | app | 600/mnt/IP | — | ekonomi + katalog + `minAppVersion` + `serverTime` + kunci tiket Fokus, ETag/304 |
+| 4 | `GET /v1/content/{kind}?locale=id` | app | 600/mnt/IP | — | konten publik: `saboteurs`, `affirmations`, `research_facts`, `meditations`, `sleep_stories`, `betterme_lessons` (diisi `riung seed-content`); ETag/304. Opsional — app tetap membawa konten bawaan sebagai fallback |
+| 5 | `POST /v1/waitlist` | public | 20/jam/IP | — | daftar email dari landing (CORS hanya origin landing); respons **selalu sama** (202) baik email baru maupun sudah terdaftar — tidak bisa dipakai menebak email; field honeypot tersembunyi untuk menahan bot |
 
-`/v1/config` menggantikan harga dari Remote Config (keputusan plan §6). Implementasi B1 berisi `version`,
-`minAppVersion`, `serverTime`, dan `economy` (seluruh `economy-props.json` + `caps` setelah override admin);
-bagian `catalog` (kosmetik, bundel, gaya kartu, prompt jurnal) ditambahkan di B2. Isi ringkas:
+`/v1/config` menggantikan harga dari Remote Config (keputusan plan §6). Isinya `economy` (seluruh
+`economy-props.json` tanpa komentar, `caps` setelah override admin), `catalog` (`docs/catalog.json` dengan
+harga sudah dihitung), dan `focusTicketKeys` (§3.7). Ringkas:
 
 ```json
 {
   "version": "2026-10-11.1",
-  "minAppVersion": "1.4.0",
+  "minAppVersion": "1.0.0",
   "serverTime": "2026-10-11T03:04:05Z",
-  "economy": { "earn": { "checkin": 5, "journal": 4, "meditation": 3, "mission": 3, "minigameWin": 8,
-               "monsterTamed": 50, "bettermeLesson": 10, "streak7": 20, "streak30": 100 },
-               "caps": { "missionsPerDay": 3, "minigameFightsPerDay": 4, "paidUnlocksPerDay": 3 }, "...": "..." },
-  "catalog": { "cosmetics": [ { "id": "topi_rajut", "price": 100, "tier": "common", "exclusiveTo": null } ],
-               "bundles": [...], "cardStyles": [...], "focusPacks": [...], "appbeku": [...] }
+  "economy": { "earn": { "checkin": 5, "journal": 4, "...": "..." }, "monsterProgress": {}, "spend": {},
+               "appbeku": { "maxPaidUnlocksPerDay": 3, "escalationPerUnlock": 10, "unlockCooldownSeconds": 60, "...": "..." },
+               "tickets": {}, "freeTier": {}, "premium": {}, "coinPacks": [],
+               "caps": { "missionsPerDay": 3, "journalRewardsPerDay": 3, "meditationRewardsPerDay": 3 } },
+  "catalog": { "version": "2026-10-12.2", "monsters": [], "monsterCosmetics": [ { "id": "topi_rajut", "monsterId": "…",
+               "slot": "head", "exclusive": false, "price": 100 } ], "personalityTests": [], "accessories": [],
+               "accessoryBundles": [], "cardStyles": [], "focusPacks": [], "appbeku": { "apps": [], "units": [], "bundles": [] },
+               "streakShield": { "itemId": "streak_shield", "price": 20 }, "journalPrompts": [], "meditations": [],
+               "betterme": {} },
+  "focusTicketKeys": [ { "kid": "k1", "alg": "Ed25519", "publicKey": "…" } ]
 }
 ```
 
@@ -154,7 +159,7 @@ bagian `catalog` (kosmetik, bundel, gaya kartu, prompt jurnal) ditambahkan di B2
 | 7 | `PATCH /v1/me/profile` | user | 20/mnt | ✓ | `displayName`, `avatarId`, `locale`, `persona`, `onboardingDone`, `tz` |
 | 8 | `PUT /v1/me/assessment` | user | 10/mnt | ✓ | hasil asesmen onboarding: `dominantSaboteurs`, `scores` (0–100 per saboteur), `completedAt` |
 | 9 | `POST /v1/me/link` | user (+ cek pencabutan) | 5/jam | ✓ | dipanggil setelah anonim → email/Google; token **harus** sudah ber-provider `password`/`google.com` (bukan `anonymous`), server set `isAnonymous=false`. Tidak memakai syarat `auth_time` karena link tidak memperbarui waktu login |
-| 10 | `DELETE /v1/me` | user+fresh | 3/jam | ✓ | hapus akun: semua data server + user Firebase Auth (§4.9) |
+| 10 | `DELETE /v1/me` | user+fresh | 3/jam | — | hapus akun: semua data server + user Firebase Auth (§4.9) |
 | 11 | `GET /v1/me/export` | user | 3/jam | — | salinan data yang disimpan **server** (melengkapi `DataExportBuilder` lokal) |
 | 12 | `GET /v1/me/journal-pin-backup` | permanent | 10/mnt | — | hanya `salt` + `updatedAt` (hash **tidak** pernah dikirim balik) |
 | 13 | `PUT /v1/me/journal-pin-backup` | permanent | 5/jam | ✓ | simpan `hash` + `salt` PIN (dihitung di HP) |
@@ -167,8 +172,9 @@ bagian `catalog` (kosmetik, bundel, gaya kartu, prompt jurnal) ditambahkan di B2
 {
   "user": { "id": "7b1e…", "billingAccountId": "ba_3f9c…", "isAnonymous": true, "displayName": "", "avatarId": "av1", "locale": "id",
             "tz": "Asia/Jakarta", "onboardingDone": false, "createdAt": "2026-10-11T03:00:00Z" },
-  "premium": { "status": "none", "plan": null, "expiresAt": null },
+  "premium": { "status": "none", "plan": null, "expiresAt": null, "autoRenewing": false },
   "streak": { "current": 0, "longest": 0, "lastCheckinDate": null, "shields": 0 },
+  "assessment": null,
   "wallet": { "coins": 0, "earnedCoins": 0, "purchasedCoins": 0 },
   "monsters": [ { "saboteurId": "waswas", "state": "wild", "progress": 0, "tamedAt": null } ],
   "inventory": { "items": ["topi_rajut"], "prepaidFocus": 0 },
@@ -199,7 +205,7 @@ Body: `{ "type": "...", "ref": "...", "occurredAt": "...", ...field per tipe }`.
 |---|---|---|---|---|
 | `checkin` | `date` | +5; streak +1; milestone 7 hari +20, 30 hari +100; pelindung streak dipakai otomatis bila 1 hari bolong | — | 1×/hari · `checkin:<date>` · **isi mood/faktor/catatan TIDAK dikirim** |
 | `journal_saved` | `entryId`, `promptId?` (atau `promptMonsterId?`) | +4 | +2 ke `promptMonsterId` | `journal:<entryId>`; dapat koin maks `journalRewardsPerDay` entri/hari (diatur admin, §3.11); batas gratis & prompt premium lihat §3.4 · **teks jurnal TIDAK dikirim** |
-| `meditation_completed` | `sessionId`, `targetMonsterId` | +3 | +3 ke target | `meditation:<sessionId>:<date>`; dapat koin maks `meditationRewardsPerDay` sesi/hari (diatur admin, §3.11); sesi premium oleh user non-Premium → tanpa koin & progres, `capReason: "premium_required"` |
+| `meditation_completed` | `sessionId` (`targetMonsterId` diabaikan — target dari katalog) | +3 | +3 ke target | `meditation:<sessionId>:<date>`; dapat koin maks `meditationRewardsPerDay` sesi/hari (diatur admin, §3.11); sesi premium oleh user non-Premium → tanpa koin & progres, `capReason: "premium_required"` |
 | `betterme_lesson_completed` | `lessonId` | +10 | — | sekali seumur akun per lesson · `betterme:<lessonId>`; level terkunci untuk non-Premium → tanpa koin, `capReason: "premium_required"` · **refleksi TIDAK dikirim** |
 | `mission_completed` | `date`, `index` (0–2) | +3 | — | 3/hari · `mission:<date>:<index>` |
 | `minigame_finished` | `saboteurId`, `won`, `ref` | +8 bila menang | +5 menang / +2 kalah | maks 4 pertarungan/hari · `minigame:<ref>` |
@@ -224,9 +230,9 @@ Respons:
 
 ```json
 {
-  "result": { "type": "minigame_finished", "coinsGranted": 8, "capped": false,
-              "monster": { "saboteurId": "waswas", "progress": 47, "state": "taming", "justTamed": false },
-              "streak": null },
+  "result": { "type": "minigame_finished", "key": "minigame:5d1c…", "coinsGranted": 8, "capped": false,
+              "monster": { "saboteurId": "waswas", "state": "taming", "progress": 47, "justTamed": false, "tamedBonus": 0 },
+              "streak": null, "replayed": false },
   "wallet": { "coins": 63, "earnedCoins": 51, "purchasedCoins": 12 }
 }
 ```
@@ -279,7 +285,7 @@ server sumber jawaban "boleh menulis jurnal / prompt ini premium atau tidak".
 
 | # | Method & path | Akses | RL | Idem | Fungsi |
 |---|---|---|---|---|---|
-| 18 | `GET /v1/wallet` | user | 60/mnt | — | saldo (`coins`, `earnedCoins`, `purchasedCoins`) |
+| 18 | `GET /v1/wallet` | user | 60/mnt | — | saldo (`coins`, `earnedCoins`, `purchasedCoins`, `debtCoins`) |
 | 19 | `GET /v1/wallet/transactions` | user | 30/mnt | — | riwayat ledger (paging cursor) untuk `KoinHistoriScreen` |
 | 20 | `POST /v1/premium/daily-coins` | permanent | 10/mnt | ✓ | +2 koin pelanggan **tahunan** aktif, 1×/hari, masuk bucket purchased · `premium_daily:<date>` |
 
@@ -449,9 +455,9 @@ Admin bisa mengubah sebagian angka secara langsung. Supaya aman, Admin API **tid
   terenkripsi di dalam tunnel OpenVPN. App Check tidak dipakai di port ini (dipanggil dari laptop, bukan app).
 - Autentikasi: ID token Firebase akun **non-anonim, email terverifikasi**, punya custom claim
   `riungAdmin: true` **dan** terdaftar di tabel `admins`; token dicek pencabutan + `auth_time` ≤ 15 menit.
-  Admin ditambah/dicabut hanya lewat CLI di server: `riung admin grant --email …` / `riung admin revoke --email …`.
+  Admin ditambah/dicabut hanya lewat CLI di server: `riung admin grant <email> <alasan>` / `riung admin revoke <email> <alasan>`.
 - Setiap perubahan wajib `reason`, dicatat di `admin_audit_log` (append-only) + log `admin_setting_changed`
-  + alert ke tim.
+  (alert ke tim disiapkan di B6, §6.6).
 - Contoh pemakaian (dari laptop yang tersambung VPN):
   Lokal (`DEV_AUTH`): token `dev:<uid>:google.com:admin`.
   `curl -X PUT http://172.19.0.16:8081/admin/v1/settings/journalRewardsPerDay -H "Authorization: Bearer $TOKEN" -H "Idempotency-Key: $(uuidgen)" -d '{"value":5,"reason":"uji batas baru"}'`
@@ -491,10 +497,11 @@ bukan HTTP:
 | `admin grant\|revoke <email> <alasan>` | akses Admin API |
 | `cleanup` (cron harian) | idempotensi > 7 hari, jti, penghitung lama, id RTDN > 30 hari, tiket Fokus & buka-berbayar > 90 hari |
 | `billing-sync` (cron tiap jam) · `reconcile` (cron harian) | §3.9, §4.5 |
+| `cleanup-anon [--dry-run]` (cron harian) | hapus akun anonim yang tidak dibuka > `ANON_RETENTION_DAYS` (default 90): data server lalu user Firebase; maks 1000 per jalan |
+| `reapply-deletions` | setelah restore backup: hapus lagi akun yang tercatat di `deleted_users` (butuh `LOG_PEPPER` yang sama) |
 
-Belum dibuat (menyusul bila dibutuhkan): `cleanup-anon` (akun anonim tak aktif, B5), `wallet-adjust`
-(koreksi saldo manual, wajib alasan, ledger `type=adjust` + `admin_audit_log`). Rotasi kunci tiket Fokus
-lewat env (§4.6).
+Belum dibuat (menyusul bila dibutuhkan): `wallet-adjust` (koreksi saldo manual, wajib alasan, ledger
+`type=adjust` + `admin_audit_log`). Rotasi kunci tiket Fokus lewat env (§4.6).
 
 ---
 
@@ -560,7 +567,7 @@ lewat env (§4.6).
 ### 4.8 Server HTTP & container
 - Go `http.Server`: `ReadHeaderTimeout 5s`, `ReadTimeout 10s`, `WriteTimeout 15s`, `IdleTimeout 60s`,
   `MaxHeaderBytes 16KB`; middleware recover (panic → 500 tanpa stack trace ke client).
-- DB: `statement_timeout 5s`, pool maks 10, query hanya lewat `sqlc` (parameterized → aman SQL injection).
+- DB: `statement_timeout 5s`, pool maks 10, query ditulis tangan di `internal/store` dan selalu memakai parameter pgx (`$1`) — tidak ada SQL dari string gabungan.
 - Container: distroless `nonroot`, `read_only: true` (+ `tmpfs: /tmp`), `cap_drop: [ALL]`, `security_opt:
   [no-new-privileges:true]`, `mem_limit: 256m`, `cpus: 1`, `pids_limit: 200`. Container `riung-api` hanya
   memegang kredensial `riung_app`; kredensial `riung_migrator` hanya ada di `riung-migrate`.
@@ -572,8 +579,10 @@ lewat env (§4.6).
 - `DELETE /v1/me`: hapus semua baris user (cascade) + user Firebase Auth. Catatan `purchases` dianonimkan
   (FK `ON DELETE SET NULL`, tersisa `user_hash`) untuk sengketa/refund — retensi mengikuti kebutuhan pajak.
 - Backup harian (retensi 14 hari) masih memuat data user yang sudah dihapus sampai backup itu kedaluwarsa —
-  dicantumkan di kebijakan privasi; restore dari backup wajib menjalankan ulang daftar penghapusan
-  (`deleted_users`, hanya berisi hash id) sebelum dipakai.
+  dicantumkan di kebijakan privasi; restore dari backup wajib menjalankan `riung reapply-deletions`
+  (`deleted_users`, hanya berisi hash id) sebelum API melayani trafik.
+- Akun **anonim** yang tidak dibuka lebih dari 90 hari (`ANON_RETENTION_DAYS`) dihapus otomatis
+  (`riung cleanup-anon`), termasuk user Firebase-nya.
 - Selaras UU 27/2022 tentang Pelindungan Data Pribadi: tujuan jelas, minimal, bisa diekspor (`/me/export`)
   dan dihapus.
 
@@ -602,9 +611,12 @@ lewat env (§4.6).
 - Secrets di `/var/www/riung/.env` (`chmod 600`): DB URL, path service account, kunci tiket Ed25519,
   pepper PIN & log, audience RTDN. Tidak pernah masuk log/image/repo.
 - Service account khusus berperan minimum (Firebase Auth + Android Publisher), bukan `firebase-adminsdk`.
-- CI: `go mod verify`, `govulncheck`, `golangci-lint` (gosec), scan image (Trivy), base image di-pin
-  digest, Dependabot.
-- Rotasi: kunci tiket & pepper punya `kid`; password DB dirotasi saat ada akses yang tidak lagi perlu.
+- CI: `go mod verify`, `govulncheck`, `golangci-lint` (gosec), scan image (Trivy), base image & action
+  pihak ketiga di-pin digest/SHA, Dependabot (`.github/dependabot.yml`: modul Go & image Docker backend).
+- Rotasi: kunci tiket Fokus punya `kid` (§4.6). `LOG_PEPPER`, `IP_HASH_KEY`, `PIN_PEPPER`,
+  `BILLING_ACCOUNT_KEY` **tidak** bisa dirotasi begitu saja: mengganti `BILLING_ACCOUNT_KEY` membuat pembelian
+  lama tidak cocok lagi dengan akunnya, `PIN_PEPPER` membatalkan semua backup PIN, `LOG_PEPPER` memutus
+  `deleted_users`. Password DB dirotasi saat ada akses yang tidak lagi perlu.
 
 ---
 
@@ -684,7 +696,7 @@ Pipeline Promtail untuk `container="riung-api"`: stage `json` → label **hanya*
 {"time":"2026-10-11T03:04:05.123Z","level":"INFO","event":"http_request","msg":"request",
  "requestId":"01J9Z6…","method":"POST","route":"/v1/activities","status":200,"durationMs":23,
  "bytesOut":412,"user":"u_5f2c9a1e0b7d4c3a","anon":true,"ip":"ip_9e1d…","appVersion":"1.4.0+27",
- "platform":"android","appCheck":"valid"}
+ "platform":"android"}
 ```
 
 - `route` = pola route (`/v1/loadouts/monsters/{saboteurId}`), bukan path mentah.
@@ -717,8 +729,7 @@ tidak mungkin tercatat. Layar krisis tidak menghasilkan request apa pun.
 | `appcheck_failed` | WARN | `reason`, `mode` (`monitor`/`enforce`) |
 | `rate_limited` | WARN | `limit`, `scope` (`user`/`ip`) |
 | `account_created` / `account_linked` / `account_deleted` | INFO | `provider` |
-| `wallet_mutation` | INFO | `type`, `bucket`, `amount`, `kind` (mis. `journal`, `cosmetic`), `balanceAfter` |
-| `activity_capped` | INFO | `type`, `cap` |
+| `wallet_mutation` | INFO | `type` (`earn`/`spend`/`purchase`), `kind` (mis. `checkin`, `cosmetic`, `appbeku_unlock`), `amount`, `bucket` (koin harian tahunan) |
 | `shop_purchase` | INFO | `itemType`, `itemId`, `price` |
 | `appbeku_unlock` / `appbeku_blocked` | INFO / WARN | `target` (`unit`/id bundel — bukan aplikasi), `n`, `price` / `reason` (`limit`, `cooldown`, `earned_only`) |
 | `focus_ticket_issued` / `focus_ticket_redeemed` / `focus_ticket_invalid` | INFO / INFO / WARN | `source`, `durationMin` / — / `reason` (`not_found`, `used`, `too_early`, `expired`, `overlap`) |
@@ -729,10 +740,11 @@ tidak mungkin tercatat. Layar krisis tidak menghasilkan request apa pun.
 | `idempotency_conflict` | WARN | `route` |
 | `ledger_mismatch` | ERROR | `earned`/`ledgerEarned`, `purchased`/`ledgerPurchased`, `debt`/`ledgerDebt` (job `reconcile`) |
 | `dependency_error` | ERROR | `dependency` (`postgres`, `google_play`, `firebase`), `op`, `durationMs` |
-| `slow_query` | WARN | `query` (nama query sqlc), `durationMs` (> 500 ms) |
 | `panic` | ERROR | `stack` (hanya di log, tidak ke client) |
-| `job_run` | INFO / ERROR | `job` (`cleanup`, `cleanup_anon`, `billing_sync`, `reconcile`, `backup`), `ok`, jumlah baris |
-| `activity` | INFO | `type`, `coins`, `capReason` |
+| `job_run` | INFO / ERROR | `job` (`cleanup`, `cleanup_anon`, `billing_sync`, `reconcile`, `reapply_deletions`), `ok`, jumlah baris |
+| `activity` | INFO | `type`, `coins`, `capReason` (bila ter-cap) |
+| `waitlist_signup` / `content_seeded` | INFO (WARN bila honeypot) | `email` (hash), `new`, `honeypot` / `kind`, `locale`, `items` |
+| `startup` / `shutdown` / `migration` / `command_error` | INFO / INFO / INFO / ERROR | `version`, `env`, `billing` / — / `version`, `file` / `command`, `error` |
 | `signup_limited` | WARN | `limit` |
 | `admin_setting_changed` | WARN | `key`, `old`, `new`, `admin` (hash), `reason` |
 | `admin_access_denied` | WARN | `reason` (`source_ip`, `no_claim`, `not_listed`, `stale_token`) |
@@ -769,7 +781,7 @@ Jejak keuangan resmi tetap di DB (`coin_ledger`, `purchases`) — log hanya untu
 | Rate limit melonjak | `rate_limited` > 200 dalam 5 menit |
 | Pembelian | ada `purchase_rejected`, `refund_applied`, atau `rtdn` gagal diproses |
 | Keuangan | ada `ledger_mismatch` |
-| Job | `job_run` dengan `ok=false` (termasuk backup Postgres harian) |
+| Job | `job_run` dengan `ok=false`; backup Postgres dipantau dari umur file dump terbaru (skrip cron, bukan log app) |
 | Admin | setiap `admin_setting_changed` (info ke tim) dan `admin_access_denied` (curiga) |
 | Pendaftaran | `signup_limited` > 20 dalam 1 jam (tanda CGNAT atau serangan) |
 | Container | `riung-api` restart / healthcheck gagal |
@@ -816,6 +828,7 @@ admin_audit_log (id uuid PK, admin_user_id uuid NULL, actor text NOT NULL,      
 | B0 | #1–2, logging §6, middleware request id / recover / limit body / rate limit dasar |
 | B1 | #3–15, auth + App Check (`monitor`), pemetaan identitas |
 | B2 | #16–23, #35 (akses jurnal), #31–34 (Admin API + `app_settings`), ledger, idempotensi, batas harian |
-| B3 | #27–30, job voided purchases, rekonsiliasi |
-| B4 | #24–26 |
-| B5–B6 | App Check `enforce`, rate limit nginx, alert Grafana, uji beban & review keamanan |
+| B3 ✅ | #27–30, `billing-sync` (refund & acknowledge), `reconcile` |
+| B4 ✅ | #24–26, `focus_completed` |
+| B5 | deploy ke VPS, `cleanup-anon`, `reapply-deletions`, Dependabot, rate limit nginx (§5.1) |
+| B6 | App Check `enforce`, alert Grafana (§6.6), uji beban & review keamanan |

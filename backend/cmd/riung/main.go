@@ -7,6 +7,8 @@
 //	riung cleanup                 daily housekeeping (cron)
 //	riung billing-sync            apply Play refunds, acknowledge late subscriptions (cron)
 //	riung reconcile               check every wallet against its ledger (cron)
+//	riung cleanup-anon [--dry-run] delete long-inactive anonymous accounts (cron)
+//	riung reapply-deletions       re-delete deleted accounts after a backup restore
 //	riung admin grant|revoke      give/remove Admin API access (needs Firebase credentials)
 //	riung healthcheck             probe the local /healthz (Docker HEALTHCHECK)
 //	riung version                 print the build version
@@ -53,6 +55,8 @@ const usage = `usage:
   riung cleanup
   riung billing-sync
   riung reconcile
+  riung cleanup-anon [--dry-run]
+  riung reapply-deletions
   riung healthcheck
   riung version`
 
@@ -100,6 +104,10 @@ func run(args []string) int {
 		err = runBillingSync(ctx, cfg, logger)
 	case "reconcile":
 		err = runReconcile(ctx, cfg, logger)
+	case "cleanup-anon":
+		err = runCleanupAnon(ctx, cfg, args[1:], logger)
+	case "reapply-deletions":
+		err = runReapplyDeletions(ctx, cfg, logger)
 	case "admin":
 		err = runAdmin(ctx, cfg, args[1:], logger)
 	case "seed-content":

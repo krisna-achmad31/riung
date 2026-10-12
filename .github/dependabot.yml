@@ -1,0 +1,18 @@
+# Dependency updates for the Go backend only (the Flutter app and its
+# workflows are not covered here). PRs run the backend CI before merge.
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /backend
+    schedule:
+      interval: weekly
+    groups:
+      go-deps:
+        patterns: ["*"]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3

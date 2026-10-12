@@ -1,5 +1,5 @@
 # Riung Backend — Go + PostgreSQL + Docker (Plan)
-*Branch: `feat/go-backend` · status: rencana, belum ada kode · keputusan terakhir: 2026-10-11*
+*Branch: `feat/go-backend` · status: B0–B4 selesai, B5 (deploy) berjalan · diperbarui 2026-10-13*
 
 ## 0. Kenapa, dan apa yang berubah
 
@@ -48,7 +48,7 @@ notifikasi lokal).
 
 | Area | Pilihan | Catatan |
 |---|---|---|
-| Bahasa | Go (versi stabil terbaru, ≥1.25) | |
+| Bahasa | Go 1.27 (toolchain `go1.27.2` di-pin di `go.mod` & CI) | |
 | Router | `net/http` stdlib (pattern routing Go 1.22+) + middleware kecil | minim dependensi |
 | DB | PostgreSQL 16 `shared-postgres` (stack `core-shared` di VPS), DB `riung` + role sendiri | tidak ikut di compose riung (§8); kode tidak memakai fitur khusus PG17 |
 | Driver/query | `pgx/v5`, query ditulis tangan di `internal/store` | semua parameterized, diuji integrasi ke PostgreSQL 16 (sqlc tidak dipakai: lebih sedikit tooling, tanpa CGO) |
@@ -66,41 +66,28 @@ Monorepo, sejajar `riung/` (Flutter) dan `landing/`:
 
 ```
 backend/
-  cmd/
-    riung/               # satu binary: api | migrate | seed-content | healthcheck | version; cleanup-anon, settings, admin menyusul (B2+)
+  cmd/riung/             # satu binary: api | migrate | seed-content | settings | admin | cleanup |
+                         # cleanup-anon | billing-sync | reconcile | reapply-deletions | healthcheck | version
   internal/
-    config/              # env → struct typed
-    economy/             # angka ekonomi, di-load dari docs/economy-props.json (embed)
-    catalog/             # katalog kosmetik/aksesori/gaya kartu/bundel + harga
-    authn/               # interface Verifier + implementasi Firebase (nanti: auth sendiri)
-    logx/                # logger JSON slog + hash user/IP untuk log (B0)
-    database/            # pool pgx + runner migrasi goose (B0)
-    health/              # /healthz, /readyz (B0)
-    httpx/               # router JSON 404/405, middleware request id, real IP, access log, recover, body limit (B0); rate limit & CORS menyusul
-    profile/             # profil, premium, streak, asesmen ringkas
-    wallet/              # ledger, bucket koin earned/purchased, idempotensi
-    activities/          # event latihan → koin, progres monster, streak, cap harian
-    monsters/            # progres penjinakan
-    shop/                # belanja kosmetik, bundel, pelindung streak, sesi fokus
-    focus/               # tiket Fokus bertanda tangan + rekonsiliasi
-    appbeku/             # buka-waktu berbayar (cap, eskalasi, jeda)
-    billing/             # verifikasi Play, RTDN, voided purchases
-    content/             # konten publik (saboteurs, affirmations, ...)
-    settings/            # app_settings (pengaturan yang diubah admin) + cache
-    admin/               # Admin API port 8081 (allowlist sumber + claim admin + audit)
-    waitlist/
-    store/               # akses DB (pgx, query tulisan tangan) (B1)
-    ratelimit/           # token bucket per user/IP (B1)
-    catalog/             # catalog.json (salinan docs/catalog.json) + harga dari economy (B2)
-    settings/            # pengaturan yang bisa diubah admin + cache (B2)
-    rules/               # aturan ekonomi: activities, streak, taming, toko, loadout, jurnal (B2)
-    api/                 # routing, middleware auth/App Check/idempotensi/rate limit, handler (B1)
+    config/              # env → struct typed, validasi prod
+    economy/             # economy-props.json (salinan docs/, embed) — satu-satunya sumber angka
+    catalog/             # catalog.json (salinan docs/, embed) + harga dari economy
+    authn/               # interface Verifier/AppChecker + Firebase (nanti: auth sendiri) + dev
+    logx/                # logger JSON slog + hash user/IP
+    httpx/               # router JSON 404/405, request id, IP asli, access log, recover, body limit, error JSON
+    ratelimit/           # token bucket per user/IP
+    database/            # pool pgx + runner migrasi goose
+    health/              # /healthz, /readyz
+    store/               # akses DB (pgx, query tulisan tangan, transaksi per user)
+    rules/               # aturan ekonomi: aktivitas, streak, taming, toko, loadout, jurnal, Fokus, Aplikasi Beku
+    billing/             # Google Play: verifikasi, RTDN, refund, acknowledge
+    ticket/              # tanda tangan Ed25519 tiket Fokus
+    settings/            # app_settings (diubah admin) + cache
+    api/                 # routing, middleware auth/App Check/idempotensi/rate limit, handler publik & admin
     testdb/              # database sementara untuk tes integrasi
-  db/
-    migrations/
-  api/openapi.yaml       # kontrak API (sumber model request/response Dart & Go)
+  db/migrations/         # goose SQL, di-embed ke binary
   deploy/
-    docker-compose.yml          # dev lokal (termasuk Postgres 16 lokal)
+    docker-compose.yml          # dev lokal (Postgres 16 lokal, DEV_AUTH, DEV_BILLING)
     docker-compose.prod.yml     # VPS: riung-api + riung-migrate di vps-shared-net
     deploy.sh                   # di VPS: pull → migrate → recreate api → tunggu healthy
     env.example, env.migrate.example
@@ -108,10 +95,10 @@ backend/
     sql/create-riung-db.sql     # sekali jalan: DB + role riung di shared-postgres
     monitoring/                 # snippet retensi Loki 30 hari + pipeline Promtail
     dev/initdb.sh               # init DB di compose dev
+    README.md                   # runbook deploy
   Dockerfile
   Makefile
-  sqlc.yaml
-  .env.example
+  .golangci.yml
 ```
 
 ## 3. Skema PostgreSQL (draf `0001_init.sql`)
@@ -201,7 +188,9 @@ monster (aturan #4).
 - **Nominal earn** (dari `economy`): check-in 5, jurnal 4, meditasi 3, misi 3, menang game 8, jinak 50,
   Better Me 10, streak 7 hari 20, 30 hari 100, koin harian tahunan 2.
 - **Idempotency key** per jenis: `checkin:<date>`, `journal:<entryId>`, `meditation:<sessionId>:<date>`,
-  `mission:<date>:<index>`, `minigame:<ref>`, `betterme:<lessonId>`, `premium_daily:<date>`, `tamed:<saboteur>`.
+  `mission:<date>:<index>`, `minigame:<ref>`, `betterme:<lessonId>`, `focus:<ticketId>`, `premium_daily:<date>`,
+  `tamed:<saboteur>`, `streak7|streak30:<date>`; belanja memakai `Idempotency-Key` request (`shop:`, `focus_ticket:`,
+  `appbeku:`), pembelian Play memakai hash token (`purchase:`, `refund:`).
 - **Cap harian** via `daily_counters` (hari dihitung di `users.tz`):
   check-in 1 · **misi 3** (jumlah misi harian di Beranda = 3, jadi maks 3 × 3 = 9 koin/hari dari misi) ·
   pertarungan minigame (menang + kalah) ≤ `maxFightPerHari` (4) · buka-waktu berbayar 3 · koin harian
@@ -287,12 +276,12 @@ Folder `/var/www/riung`, `docker-compose.prod.yml` mengikuti aturan core-shared 
 | `riung-api` | `172.19.0.16` | `riung api` di port internal `8080` (publik via nginx) dan `8081` (Admin API, **tidak** di nginx, hanya dari VPN `172.19.0.7`), healthcheck `riung healthcheck` |
 | `riung-migrate` | `172.19.0.17` | one-shot `riung migrate up` (role `riung_migrator`), `restart: "no"`, dijalankan saat deploy sebelum `riung-api` di-recreate |
 
-`riung cleanup` (pembersihan harian tabel bantu) dan nanti `riung cleanup-anon` dijalankan dari cron
-host via `docker exec riung-api /riung …` (tidak perlu container ketiga).
+`riung cleanup`, `cleanup-anon`, `billing-sync`, dan `reconcile` dijalankan dari cron host via
+`docker exec riung-api /riung …` (tidak perlu container ketiga) — jadwal di runbook langkah 9.
 
 **Dockerfile** multi-stage: `golang:<versi>-alpine` build `CGO_ENABLED=0 go build -trimpath
--ldflags="-s -w"` → `gcr.io/distroless/static-debian12:nonroot`. Satu binary `riung` dengan subcommand
-`api | migrate | cleanup-anon | seed-content | settings | admin | healthcheck`; migrasi di-embed.
+-ldflags="-s -w"` → `gcr.io/distroless/static-debian12:nonroot` (keduanya di-pin digest). Satu binary
+`riung` (subcommand di §2); migrasi di-embed.
 
 ### 8.3 Database `riung` di `shared-postgres`
 
@@ -310,8 +299,8 @@ host via `docker exec riung-api /riung …` (tidak perlu container ketiga).
   container (`shared-postgres` → "n8n + riung"), `INTEGRASI-APP-BARU.md` tabel layanan. Catatan operasional:
   restart/upgrade `shared-postgres` sekarang berdampak ke n8n **dan** riung — jadwalkan di luar jam sibuk.
 - **Backup baru** (cron host, harian): `docker exec shared-postgres pg_dump -Fc -U riung_migrator riung`
-  ke `/var/backups/riung/`, retensi 14 hari, salin off-site; uji restore sebelum rilis. Disarankan
-  sekalian menambah dump `n8n` di cron yang sama (saat ini juga tanpa backup).
+  ke `/var/backups/riung/`, retensi 14 hari, salin off-site; uji restore sebelum rilis (restore →
+  `riung reapply-deletions`). Disarankan sekalian menambah dump `n8n` di cron yang sama (saat ini juga tanpa backup).
 
 ### 8.4 Nginx `riung.e55techlab.com` (Template B core-shared)
 
@@ -320,7 +309,7 @@ host via `docker exec riung-api /riung …` (tidak perlu container ketiga).
    `docker exec shared-nginx nginx -t` → `nginx -s reload`.
 3. `docker compose run --rm certbot certonly --webroot … -d riung.e55techlab.com` (coba `--dry-run` dulu).
 4. Ganti ke config final (`deploy/nginx/riung.e55techlab.com.conf` di repo ini): redirect 80→443,
-   header keamanan, `client_max_body_size 1M`, `resolver 127.0.0.11` + `set $riung_upstream
+   header keamanan, `client_max_body_size 512k`, `resolver 127.0.0.11` + `set $riung_upstream
    http://riung-api:8080` (supaya nginx tetap hidup kalau riung-api mati), tanpa baris WebSocket,
    `limit_req`/`limit_conn` sesuai spec §5.1, `location / { return 404; }` untuk path di luar `/v1/` &
    `/healthz` → `nginx -t` → reload. Port `8081` (Admin API) **tidak** dipasang di nginx.
@@ -334,23 +323,23 @@ host via `docker exec riung-api /riung …` (tidak perlu container ketiga).
 
 ### 8.5 Secrets, logging, CI
 
-- **Secrets** di `/var/www/riung/.env` (`chmod 600`, tidak di repo): `DATABASE_URL`,
-  `MIGRATE_DATABASE_URL`, `FIREBASE_PROJECT_ID`, path service account (scope Firebase Auth + Android
-  Publisher — service account **khusus**, bukan key `firebase-adminsdk` bawaan), `TICKET_SIGNING_KEYS`,
-  `RTDN_AUDIENCE`, `CORS_LANDING_ORIGIN`, `PIN_PEPPER`, `LOG_PEPPER`, `IP_HASH_KEY`,
-  `BILLING_ACCOUNT_KEY`, `APP_CHECK_MODE`, `ADMIN_LISTEN_ADDR`, `ADMIN_ALLOWED_CIDRS`.
+- **Secrets** di `/var/www/riung/.env` (`chmod 600`, tidak di repo; daftar lengkap di `deploy/env.example`):
+  `DATABASE_URL`, `FIREBASE_PROJECT_ID`, `FIREBASE_CREDENTIALS_FILE` (service account **khusus** Firebase Auth
+  Admin, bukan key `firebase-adminsdk` bawaan), `PLAY_*` + `RTDN_*` (service account Play terpisah),
+  `FOCUS_TICKET_KEY`/`KID`, `LOG_PEPPER`, `IP_HASH_KEY`, `PIN_PEPPER`, `BILLING_ACCOUNT_KEY` (berbeda semua),
+  `CORS_LANDING_ORIGIN`, `APP_CHECK_MODE`, `ADMIN_LISTEN_ADDR`, `ADMIN_ALLOWED_CIDRS`, `TRUSTED_PROXIES`.
+  `MIGRATE_DATABASE_URL` ada di `.env.migrate` terpisah.
   `MIGRATE_DATABASE_URL` hanya diberikan ke service `riung-migrate`; `riung-api` tidak pernah memegang
   kredensial DDL.
 - **Log**: `slog` JSON ke stdout → otomatis masuk Loki. Label hanya `level` & `event` (jangan
   `user_id`/`request_id` — panduan core-shared). Tanpa PII, tanpa isi konten. Retensi **30 hari** khusus
   `riung-api` lewat `retention_stream` Loki (global VPS tetap 7 hari) — detail di spec §6.5.
-- **CI** (`.github/workflows/backend.yml`, `paths: backend/**`): `go vet`, `golangci-lint`, `sqlc diff`,
-  `go test -race` (Postgres 16 sebagai service container GitHub Actions), govulncheck, Trivy, build &
-  push `ghcr.io/krisna-achmad31/riung-api:<sha>` (hanya dari `main`), lalu
-  deploy via SSH ke user `deploy` (key-only, anggota grup `docker`): `docker compose pull` →
-  `docker compose run --rm riung-migrate` → `docker compose up -d riung-api`. VPS butuh
-  `docker login ghcr.io` dengan token read-only. Workflow Flutter yang ada diberi
-  `paths-ignore: backend/**`.
+- **CI** (`.github/workflows/backend.yml`, `paths: backend/**`): `go mod verify`, `go vet`, `golangci-lint`,
+  `go test -race` (Postgres 16 sebagai service container), govulncheck, build image + scan Trivy; push
+  `ghcr.io/krisna-achmad31/riung-api:<sha>` hanya dari `main`, lalu (bila `vars.RIUNG_DEPLOY_ENABLED`)
+  deploy via SSH ke user `deploy` (key-only, grup `docker`) dengan `deploy/deploy.sh`. VPS butuh
+  `docker login ghcr.io` dengan token read-only. Dependabot memperbarui modul Go & image Docker backend.
+  Workflow Flutter perlu `paths-ignore: backend/**` (TODO §A).
 
 ## 9. Di luar backend
 
@@ -366,7 +355,7 @@ terbuka dicatat di **`docs/todo-luar-backend.md`**. Dokumen ini dan spec hanya m
 | **B2 Ekonomi** ✅ | `economy-props.json` + katalog, wallet ledger + bucket, activities + cap, check-in/streak, monster progress, shop, Admin API + `app_settings` | tes konkurensi (N request paralel, saldo tidak pernah negatif/dobel), tes idempotensi, tes parity ekonomi |
 | **B3 Billing** ✅ | `/billing/verify` & `/billing/restore` & `/billing/subscription`, RTDN Pub/Sub (OIDC), `riung billing-sync` (refund → tarik koin/utang, cabut Premium, acknowledge yang terlewat), `riung reconcile`, Premium status | beli sandbox dengan license tester: koin & Premium masuk HANYA lewat server |
 | **B4 Fokus & Aplikasi Beku** ✅ | tiket Ed25519 (`free_daily`/`prepaid`/`coins`) + `focus_completed`, unlock dengan cap/eskalasi/jeda/koin latihan, bundel atomik, katalog `appbeku` | Fokus jalan offline penuh; rekonsiliasi idempoten; unlock ke-4 ditolak |
-| **B5 Deploy** | artefak deploy siap pakai (compose prod, nginx conf, SQL DB/role, snippet Loki/Promtail, workflow deploy), deploy `riung-api`, cron `cleanup-anon`. Langkah infra & cutover app ada di `docs/todo-luar-backend.md` §A–B | `https://riung.e55techlab.com/healthz` 200 dari luar; `/readyz` 200 dari dalam; smoke test semua endpoint |
+| **B5 Deploy** | artefak deploy siap pakai (compose prod, nginx conf, SQL DB/role, snippet Loki/Promtail, workflow deploy, Dependabot), `cleanup-anon` + `reapply-deletions`, deploy `riung-api`, cron. Langkah infra & cutover app ada di `docs/todo-luar-backend.md` §A–B | `https://riung.e55techlab.com/healthz` 200 dari luar; `/readyz` 200 dari dalam; smoke test semua endpoint |
 | **B6 Produksi** | App Check `enforce`, query alert Grafana, uji beban (k6), security review | p95 < 200 ms di beban target |
 | **Nanti: Auth sendiri** | implementasi `Verifier` baru + endpoint login/daftar/reset, tambah baris `auth_identities` untuk user lama saat mereka login, lalu lepas Firebase Auth | user lama tetap punya data yang sama setelah pindah auth |
 
@@ -384,3 +373,4 @@ terbuka dicatat di **`docs/todo-luar-backend.md`**. Dokumen ini dan spec hanya m
 | 8 | Batas koin jurnal & meditasi | Diatur admin lewat Admin API (`journalRewardsPerDay`, `meditationRewardsPerDay`, default 3) |
 | 9 | Retensi log | 30 hari untuk `riung-api` (per-stream di Loki) |
 | 10 | Akun baru per IP | Maks 10/hari, bisa diubah admin (`maxNewAccountsPerIpPerDay`) |
+| 11 | Akun anonim tidak aktif | Dihapus setelah 90 hari tidak dibuka (`ANON_RETENTION_DAYS`, 30–3650) |
