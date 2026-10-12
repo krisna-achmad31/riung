@@ -94,7 +94,7 @@ unduh key JSON, simpan sebagai `/var/www/riung/secrets/firebase-service-account.
    peran *Pub/Sub Publisher* di topic itu. Buat service account `riung-rtdn-push` (tanpa peran), lalu
    subscription **push** ke `https://riung.e55techlab.com/v1/webhooks/google-play` dengan *Enable
    authentication* = `riung-rtdn-push@…` dan audience = URL yang sama (`RTDN_AUDIENCE`). Retry policy:
-   exponential backoff.
+   exponential backoff; acknowledgement deadline 60 detik; retensi pesan 7 hari.
 5. Play Console → *Monetization setup* → *Real-time developer notifications*: topic
    `projects/riung-5e979/topics/play-rtdn`, lalu **Send test notification** → di log harus muncul
    `rtdn_received` dengan `kind=test`.
@@ -132,7 +132,8 @@ lalu `docker compose up -d --force-recreate loki promtail` di core-shared.
 ```cron
 # Pembersihan tabel bantu (idempotensi, jti App Check, penghitung lama)
 15 2 * * * docker exec riung-api /riung cleanup
-# Refund Google Play (tarik koin / cabut Premium) + acknowledge pembelian yang lupa di-ack app (tiap jam)
+# Refund Google Play (tarik koin / cabut Premium) + acknowledge pembelian yang lupa di-ack app (tiap jam).
+# Sebelum billing dikonfigurasi job ini hanya mencatat "skipped" (exit 0); item yang gagal diulang di jam berikutnya.
 5 * * * * docker exec riung-api /riung billing-sync
 # Cocokkan saldo dompet dengan ledger; gagal = ada ledger_mismatch di log
 45 2 * * * docker exec riung-api /riung reconcile

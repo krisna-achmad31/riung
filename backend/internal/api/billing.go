@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/krisna-achmad31/riung/backend/internal/billing"
 	"github.com/krisna-achmad31/riung/backend/internal/httpx"
@@ -25,6 +27,10 @@ const (
 
 // maxRestoreItems caps POST /v1/billing/restore.
 const maxRestoreItems = 20
+
+// restoreBudget keeps a restore inside the server's 15 s write timeout; the
+// app retries a 503 and already-verified tokens answer from the database.
+const restoreBudget = 12 * time.Second
 
 var tokenPattern = regexp.MustCompile(`^[A-Za-z0-9._:-]{10,512}$`)
 
@@ -49,7 +55,7 @@ func (s *Server) billingError(w http.ResponseWriter, r *http.Request, err error)
 		httpx.WriteError(w, r, invalid("unknown productId", "productId"))
 	case errors.Is(err, billing.ErrNotConfigured):
 		httpx.WriteError(w, r, errBillingOff)
-	case errors.Is(err, billing.ErrPlayUnavailable):
+	case errors.Is(err, billing.ErrPlayUnavailable), errors.Is(err, context.DeadlineExceeded):
 		s.Logger.LogAttrs(r.Context(), slog.LevelError, "google play unavailable",
 			slog.String(logx.KeyEvent, logx.EventDependencyError),
 			slog.String(logx.KeyRequestID, httpx.RequestIDFrom(r.Context())),
@@ -151,13 +157,15 @@ func (s *Server) postBillingRestore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	c := callerFrom(r.Context())
+	ctx, cancel := context.WithTimeout(r.Context(), restoreBudget)
+	defer cancel()
 	items := make([]restoreItem, 0, len(req.Purchases))
 	for _, ref := range req.Purchases {
 		if !ref.valid() {
 			items = append(items, restoreItem{ProductID: ref.ProductID, Error: &batchError{Code: httpx.CodeInvalidRequest, Message: "invalid purchase reference"}})
 			continue
 		}
-		res, _, err := s.billingSvc.Verify(r.Context(), *c.User, ref.ProductID, ref.PurchaseToken)
+		res, _, err := s.billingSvc.Verify(ctx, *c.User, ref.ProductID, ref.PurchaseToken)
 		s.logPurchase(r, c.User.ID, ref, res, err)
 		switch {
 		case err == nil:
@@ -250,12 +258,20 @@ func (s *Server) postPlayWebhook(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+	// Unless processing completes, forget the id (also on panic or a dropped
+	// connection) so Pub/Sub's retry runs it again.
+	done := false
+	defer func() {
+		if !done {
+			_ = s.Store.ForgetRTDN(context.WithoutCancel(ctx), env.Message.MessageID)
+		}
+	}()
 	out, err := s.billingSvc.HandleNotification(ctx, n, s.Config.PlayPackageName)
 	if err != nil {
-		_ = s.Store.ForgetRTDN(ctx, env.Message.MessageID) // let Pub/Sub's retry run it again
 		s.billingError(w, r, err)
 		return
 	}
+	done = true
 	s.logInfo(r, eventRTDNReceived, "rtdn processed", slog.String("kind", out.Kind),
 		slog.Int("notificationType", out.Type), slog.String("productId", out.ProductID),
 		slog.String("action", strings.SplitN(out.Action, ":", 2)[0]))

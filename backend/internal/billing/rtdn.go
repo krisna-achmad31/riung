@@ -177,8 +177,12 @@ func (s *Service) refreshSubscription(ctx context.Context, token string) (string
 		return "", err
 	}
 	if owner == "" && sp.LinkedToken != "" {
-		if p, err := s.Store.PurchaseByToken(ctx, sp.LinkedToken); err == nil && p.UserID != nil {
+		p, err := s.Store.PurchaseByToken(ctx, sp.LinkedToken)
+		switch {
+		case err == nil && p.UserID != nil:
 			owner = *p.UserID
+		case err != nil && !errors.Is(err, store.ErrNotFound):
+			return "", err
 		}
 	}
 	if owner == "" {

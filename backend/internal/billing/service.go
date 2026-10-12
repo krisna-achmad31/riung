@@ -197,10 +197,12 @@ func subscriptionStatus(state string) (string, bool) {
 
 func (s *Service) verifySubscription(ctx context.Context, user store.User, productID, token string) (Result, store.Wallet, error) {
 	res := Result{ProductID: productID, Kind: store.PurchaseSubscription}
+	owned := false
 	if p, err := s.Store.PurchaseByToken(ctx, token); err == nil {
 		if p.UserID == nil || *p.UserID != user.ID {
 			return res, store.Wallet{}, ErrInvalidPurchase
 		}
+		owned = true
 	} else if !errors.Is(err, store.ErrNotFound) {
 		return res, store.Wallet{}, err
 	}
@@ -212,7 +214,11 @@ func (s *Service) verifySubscription(ctx context.Context, user store.User, produ
 		return res, store.Wallet{}, err
 	}
 	res.Test = sp.Test
-	if sp.ObfuscatedAccount != AccountID(s.AccountKey, user.ID) || !IsSubscription(sp.ProductID) {
+	// A resubscribe from the Play Store can come without the account id; such
+	// a token is accepted only once the server has already tied it to this
+	// user (through its linkedPurchaseToken, see refreshSubscription).
+	account := sp.ObfuscatedAccount
+	if (account != AccountID(s.AccountKey, user.ID) && (account != "" || !owned)) || !IsSubscription(sp.ProductID) {
 		return res, store.Wallet{}, ErrInvalidPurchase
 	}
 	res.ProductID = sp.ProductID
@@ -402,9 +408,14 @@ func (s *Service) voidSubscription(ctx context.Context, userID string, p store.P
 type SyncResult struct {
 	Voided       int
 	Refunded     []RefundResult
+	VoidFailed   int // retried on the next run (Play keeps 30 days)
 	Acknowledged int
-	AckFailed    int
+	AckFailed    int // retried on the next run
+	Errors       []error
 }
+
+// OK reports whether every item was processed.
+func (r SyncResult) OK() bool { return r.VoidFailed == 0 && r.AckFailed == 0 }
 
 // Sync applies refunds from the last 30 days (idempotent) and acknowledges
 // purchases the app verified but failed to acknowledge within an hour, so
@@ -423,7 +434,9 @@ func (s *Service) Sync(ctx context.Context) (SyncResult, error) {
 	for _, v := range voided {
 		r, err := s.ApplyVoided(ctx, v)
 		if err != nil {
-			return out, err
+			out.VoidFailed++
+			out.Errors = append(out.Errors, err)
+			continue
 		}
 		if !r.AlreadyRun && r.ProductID != "" {
 			out.Refunded = append(out.Refunded, r)
@@ -439,7 +452,8 @@ func (s *Service) Sync(ctx context.Context) (SyncResult, error) {
 	}
 	for _, p := range pending {
 		if err := s.acknowledge(ctx, p); err != nil {
-			out.AckFailed++ // retried on the next run
+			out.AckFailed++
+			out.Errors = append(out.Errors, err)
 			continue
 		}
 		if err := s.Store.MarkAcknowledged(ctx, p.Token); err != nil {

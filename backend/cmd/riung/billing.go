@@ -39,7 +39,10 @@ func runBillingSync(ctx context.Context, cfg config.Config, logger *slog.Logger)
 		return errors.New("DATABASE_URL is required")
 	}
 	if !cfg.BillingEnabled() {
-		return errors.New("billing is not configured (PLAY_PACKAGE_NAME)")
+		// Not an error: the hourly cron runs before billing is set up.
+		logger.Info("billing sync skipped: billing is not configured", logx.KeyEvent, "job_run", "job", "billing_sync",
+			"ok", true, "skipped", true)
+		return nil
 	}
 	econ, err := economy.Load()
 	if err != nil {
@@ -56,6 +59,9 @@ func runBillingSync(ctx context.Context, cfg config.Config, logger *slog.Logger)
 		return err
 	}
 	res, err := svc.Sync(ctx)
+	for _, e := range res.Errors {
+		logger.Error("billing sync item failed", logx.KeyEvent, logx.EventDependencyError, "op", "billing_sync", "error", e.Error())
+	}
 	for _, r := range res.Refunded {
 		logger.Warn("refund applied", logx.KeyEvent, "refund_applied", logx.KeyUser, r.UserHash,
 			"productId", r.ProductID, "coinsClawedBack", r.Clawed, "debt", r.Debt, "premiumRevoked", r.Revoked, "orphan", r.WasOrphan)
@@ -64,8 +70,12 @@ func runBillingSync(ctx context.Context, cfg config.Config, logger *slog.Logger)
 		logger.Error("billing sync failed", logx.KeyEvent, "job_run", "job", "billing_sync", "ok", false, "error", err.Error())
 		return err
 	}
-	logger.Info("billing sync done", logx.KeyEvent, "job_run", "job", "billing_sync", "ok", res.AckFailed == 0,
-		"voidedSeen", res.Voided, "refunded", len(res.Refunded), "acknowledged", res.Acknowledged, "ackFailed", res.AckFailed)
+	logger.Info("billing sync done", logx.KeyEvent, "job_run", "job", "billing_sync", "ok", res.OK(),
+		"voidedSeen", res.Voided, "refunded", len(res.Refunded), "voidFailed", res.VoidFailed,
+		"acknowledged", res.Acknowledged, "ackFailed", res.AckFailed)
+	if !res.OK() {
+		return errors.New("some purchases could not be processed; retried on the next run")
+	}
 	return nil
 }
 

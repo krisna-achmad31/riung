@@ -378,11 +378,11 @@ Alur `verify`:
 Respons `verify` (200):
 ```json
 { "result": { "productId": "coin_pack_medium", "kind": "consumable", "status": "credited", "coinsGranted": 330,
-              "premiumUntil": null, "test": false },
+              "test": false },
   "wallet": { "coins": 330, "earnedCoins": 0, "purchasedCoins": 330 },
   "premium": { "status": "none", "plan": null, "expiresAt": null, "autoRenewing": false } }
 ```
-`result.status`: `credited` (koin baru masuk) · `already_credited` (token ini sudah pernah dikreditkan ke akun
+`result.premiumUntil` hanya ada untuk langganan. `result.status`: `credited` (koin baru masuk) · `already_credited` (token ini sudah pernah dikreditkan ke akun
 yang sama — aman untuk retry/restore) · `pending` (pembayaran tertunda; **jangan** `completePurchase`, tunggu
 update pembelian lalu panggil `verify` lagi) · `active` / `inactive` (langganan). App memanggil
 `completePurchase` untuk `credited`, `already_credited`, `active`, `inactive`.
@@ -391,12 +391,18 @@ dibatalkan/sudah di-refund) · `400 invalid_request` (productId tidak dikenal) �
 tidak bisa dihubungi atau billing belum dikonfigurasi — app me-retry nanti, pembelian tetap tersimpan di Play).
 
 `restore` menjawab `{ "results": [{ "productId", "ok", "result" | "error": {code, message} }], "wallet", "premium" }`
-— satu item gagal tidak menggagalkan yang lain; gangguan Google/DB menggagalkan seluruh request (503/500).
+— satu item gagal tidak menggagalkan yang lain; gangguan Google/DB atau melewati anggaran 12 detik menggagalkan
+seluruh request (503/500) dan app mengulang (token yang sudah diverifikasi dijawab dari DB). Setiap panggilan ke
+Google dibatasi 5 detik.
+
+Langganan hasil berlangganan ulang dari Play Store bisa datang tanpa `obfuscatedExternalAccountId`: token seperti
+itu hanya diterima `verify`/`restore` setelah server mengikatnya ke user lewat `linkedPurchaseToken` (RTDN).
 
 Webhook: autentikasi token OIDC Google dari push subscription — tanda tangan, `exp`, `aud` = `RTDN_AUDIENCE`,
 `iss` = `accounts.google.com`, `email` = `RTDN_SERVICE_ACCOUNT` dan `email_verified`. Jawaban: `204` (diproses,
 duplikat, atau isi tidak bisa dibaca — retry tidak akan pernah berhasil, jadi di-ack dan dicatat), `401` token
-salah, `429`/`5xx` gangguan sementara (Pub/Sub mengulang). `packageName` selain `PLAY_PACKAGE_NAME` diabaikan.
+salah, `429`/`5xx` gangguan sementara (Pub/Sub mengulang; id pesan dilepas lagi bila pemrosesan gagal, terputus,
+atau panic, sehingga ulangan tidak dianggap duplikat). `packageName` selain `PLAY_PACKAGE_NAME` diabaikan.
 
 Dev (`DEV_BILLING=true`, hanya `RIUNG_ENV=dev`): Google Play dipalsukan — token
 `dev-coin:<billingAccountId>:<productId>:<n>` dan `dev-sub:<billingAccountId>:<productId>:<hari>:<n>`,

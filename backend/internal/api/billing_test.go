@@ -356,3 +356,78 @@ func TestBillingUnavailableWithoutPublisher(t *testing.T) {
 		t.Fatalf("no publisher: %d %s", r.status, r.raw)
 	}
 }
+
+func TestBillingWebhookRetriesAfterFailure(t *testing.T) {
+	e := newEnv(t)
+	tok := "dev:retry:google.com"
+	_, ba := billingAccount(t, e, tok)
+	end := e.clock.now().Add(30 * 24 * time.Hour).UTC()
+	e.play.PutSubscription("tok-retry-sub-1", billing.SubscriptionPurchase{State: billing.SubActive, ProductID: "premium_monthly",
+		ExpiresAt: &end, AutoRenewing: true, ObfuscatedAccount: ba})
+	verify(e, tok, "premium_monthly", "tok-retry-sub-1")
+
+	// Play is down while the cancellation arrives: Pub/Sub must retry it.
+	e.play.PutSubscription("tok-retry-sub-1", billing.SubscriptionPurchase{State: billing.SubCanceled, ProductID: "premium_monthly",
+		ExpiresAt: &end, ObfuscatedAccount: ba})
+	e.play.Fail("tok-retry-sub-1", billing.ErrPlayUnavailable)
+	if r := push(e, "dev-pubsub", "msg-retry-1", subNotification("tok-retry-sub-1", 3)); r.status != 503 {
+		t.Fatalf("play down: %d %s", r.status, r.raw)
+	}
+	e.play.Fail("tok-retry-sub-1", nil)
+	if r := push(e, "dev-pubsub", "msg-retry-1", subNotification("tok-retry-sub-1", 3)); r.status != 204 {
+		t.Fatalf("retry: %d %s", r.status, r.raw)
+	}
+	if p := premium(t, e, tok); p["autoRenewing"] != false {
+		t.Fatalf("the retried notification must be applied: %v", p)
+	}
+}
+
+func TestBillingResubscribeWithoutAccountID(t *testing.T) {
+	e := newEnv(t)
+	tok := "dev:resub:google.com"
+	_, ba := billingAccount(t, e, tok)
+	end := e.clock.now().Add(10 * 24 * time.Hour).UTC()
+	e.play.PutSubscription("tok-resub-old-1", billing.SubscriptionPurchase{State: billing.SubActive, ProductID: "premium_monthly",
+		ExpiresAt: &end, AutoRenewing: true, ObfuscatedAccount: ba})
+	verify(e, tok, "premium_monthly", "tok-resub-old-1")
+
+	// Resubscribed from the Play Store: no account id, linked to the old token.
+	newEnd := e.clock.now().Add(40 * 24 * time.Hour).UTC()
+	e.play.PutSubscription("tok-resub-new-2", billing.SubscriptionPurchase{State: billing.SubActive, ProductID: "premium_monthly",
+		ExpiresAt: &newEnd, AutoRenewing: true, LinkedToken: "tok-resub-old-1"})
+	if r := verify(e, tok, "premium_monthly", "tok-resub-new-2"); r.status != 409 {
+		t.Fatalf("an unlinked token without account id must be refused: %d %s", r.status, r.raw)
+	}
+	push(e, "dev-pubsub", "msg-resub-1", subNotification("tok-resub-new-2", 7))
+	if r := verify(e, tok, "premium_monthly", "tok-resub-new-2"); r.status != 200 || get(r.body, "result", "status") != "active" {
+		t.Fatalf("token tied to the user by its link: %d %s", r.status, r.raw)
+	}
+	if r := verify(e, "dev:other-resub:google.com", "premium_monthly", "tok-resub-new-2"); r.status != 409 {
+		t.Fatalf("other account: %d %s", r.status, r.raw)
+	}
+}
+
+func TestBillingSyncContinuesPastFailures(t *testing.T) {
+	e := newEnv(t)
+	tok := "dev:partial:google.com"
+	_, ba := billingAccount(t, e, tok)
+	end := e.clock.now().Add(30 * 24 * time.Hour).UTC()
+	e.play.PutSubscription("tok-partial-sub-1", billing.SubscriptionPurchase{State: billing.SubActive, ProductID: "premium_monthly",
+		ExpiresAt: &end, AutoRenewing: true, ObfuscatedAccount: ba, Acknowledged: true})
+	e.play.PutProduct("tok-partial-coins-1", billing.ProductPurchase{ProductID: "coin_pack_small",
+		PurchaseState: billing.ProductPurchased, Quantity: 1, ObfuscatedAccount: ba, Acknowledged: true})
+	verify(e, tok, "premium_monthly", "tok-partial-sub-1")
+	verify(e, tok, "coin_pack_small", "tok-partial-coins-1")
+
+	e.play.Fail("tok-partial-sub-1", billing.ErrPlayUnavailable)
+	e.play.Void(billing.VoidedPurchase{Token: "tok-partial-sub-1", VoidedAt: e.clock.now().UTC(), Quantity: 1})
+	e.play.Void(billing.VoidedPurchase{Token: "tok-partial-coins-1", VoidedAt: e.clock.now().UTC(), Quantity: 1})
+	res, err := e.billing.Sync(context.Background())
+	if err != nil || res.OK() || res.VoidFailed != 1 || len(res.Refunded) != 1 || res.Refunded[0].Clawed != 80 {
+		t.Fatalf("partial sync: %+v %v", res, err)
+	}
+	e.play.Fail("tok-partial-sub-1", nil)
+	if res, err := e.billing.Sync(context.Background()); err != nil || !res.OK() {
+		t.Fatalf("next run: %+v %v", res, err)
+	}
+}

@@ -90,6 +90,11 @@ type Publisher interface {
 
 // --- Google implementation -------------------------------------------------------
 
+// playCallTimeout bounds every Android Publisher call: the HTTP client has
+// no timeout of its own and handlers must answer within the server's write
+// timeout.
+const playCallTimeout = 5 * time.Second
+
 // GooglePublisher calls the Android Publisher API with a service account that
 // is linked to the app in Play Console (API access: view financial data,
 // manage orders and subscriptions).
@@ -126,6 +131,8 @@ func playError(err error) error {
 
 // GetProduct implements Publisher.
 func (g *GooglePublisher) GetProduct(ctx context.Context, productID, token string) (ProductPurchase, error) {
+	ctx, cancel := context.WithTimeout(ctx, playCallTimeout)
+	defer cancel()
 	p, err := g.svc.Purchases.Products.Get(g.packageName, productID, token).Context(ctx).Do()
 	if err != nil {
 		return ProductPurchase{}, playError(err)
@@ -144,6 +151,8 @@ func (g *GooglePublisher) GetProduct(ctx context.Context, productID, token strin
 
 // GetSubscription implements Publisher.
 func (g *GooglePublisher) GetSubscription(ctx context.Context, token string) (SubscriptionPurchase, error) {
+	ctx, cancel := context.WithTimeout(ctx, playCallTimeout)
+	defer cancel()
 	s, err := g.svc.Purchases.Subscriptionsv2.Get(g.packageName, token).Context(ctx).Do()
 	if err != nil {
 		return SubscriptionPurchase{}, playError(err)
@@ -173,6 +182,8 @@ func (g *GooglePublisher) GetSubscription(ctx context.Context, token string) (Su
 
 // AcknowledgeSubscription implements Publisher.
 func (g *GooglePublisher) AcknowledgeSubscription(ctx context.Context, productID, token string) error {
+	ctx, cancel := context.WithTimeout(ctx, playCallTimeout)
+	defer cancel()
 	err := g.svc.Purchases.Subscriptions.Acknowledge(g.packageName, productID, token,
 		&androidpublisher.SubscriptionPurchasesAcknowledgeRequest{}).Context(ctx).Do()
 	if err != nil {
@@ -183,6 +194,8 @@ func (g *GooglePublisher) AcknowledgeSubscription(ctx context.Context, productID
 
 // AcknowledgeProduct implements Publisher (acknowledge only, never consume).
 func (g *GooglePublisher) AcknowledgeProduct(ctx context.Context, productID, token string) error {
+	ctx, cancel := context.WithTimeout(ctx, playCallTimeout)
+	defer cancel()
 	err := g.svc.Purchases.Products.Acknowledge(g.packageName, productID, token,
 		&androidpublisher.ProductPurchasesAcknowledgeRequest{}).Context(ctx).Do()
 	if err != nil {
@@ -196,11 +209,13 @@ func (g *GooglePublisher) ListVoided(ctx context.Context, since time.Time) ([]Vo
 	var out []VoidedPurchase
 	page := ""
 	for {
-		call := g.svc.Purchases.Voidedpurchases.List(g.packageName).StartTime(since.UnixMilli()).Type(1).MaxResults(1000).Context(ctx)
+		callCtx, cancel := context.WithTimeout(ctx, 4*playCallTimeout)
+		call := g.svc.Purchases.Voidedpurchases.List(g.packageName).StartTime(since.UnixMilli()).Type(1).MaxResults(1000).Context(callCtx)
 		if page != "" {
 			call = call.Token(page)
 		}
 		res, err := call.Do()
+		cancel()
 		if err != nil {
 			return nil, playError(err)
 		}
@@ -234,11 +249,23 @@ type FakePublisher struct {
 	subs   map[string]SubscriptionPurchase
 	voided []VoidedPurchase
 	acked  []string
+	fail   map[string]error
 }
 
 // NewFakePublisher returns an empty fake.
 func NewFakePublisher() *FakePublisher {
-	return &FakePublisher{prods: map[string]ProductPurchase{}, subs: map[string]SubscriptionPurchase{}}
+	return &FakePublisher{prods: map[string]ProductPurchase{}, subs: map[string]SubscriptionPurchase{}, fail: map[string]error{}}
+}
+
+// Fail makes every call for token return err (nil clears it).
+func (f *FakePublisher) Fail(token string, err error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if err == nil {
+		delete(f.fail, token)
+		return
+	}
+	f.fail[token] = err
 }
 
 // PutProduct registers a one-time purchase.
@@ -273,6 +300,9 @@ func (f *FakePublisher) Acked() []string {
 func (f *FakePublisher) GetProduct(_ context.Context, productID, token string) (ProductPurchase, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if err := f.fail[token]; err != nil {
+		return ProductPurchase{}, err
+	}
 	if p, ok := f.prods[token]; ok {
 		if p.ProductID != productID {
 			return ProductPurchase{}, ErrPurchaseNotFound
@@ -291,6 +321,9 @@ func (f *FakePublisher) GetProduct(_ context.Context, productID, token string) (
 func (f *FakePublisher) GetSubscription(_ context.Context, token string) (SubscriptionPurchase, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if err := f.fail[token]; err != nil {
+		return SubscriptionPurchase{}, err
+	}
 	if s, ok := f.subs[token]; ok {
 		return s, nil
 	}
