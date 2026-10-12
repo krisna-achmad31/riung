@@ -57,7 +57,7 @@ dari `code`.
 | 409 | `request_in_progress` | request dengan key yang sama masih diproses |
 | 409 | `limit_reached` | batas harian/etis tercapai (`details.reason`, `details.limit`, `details.resetsAt`) |
 | 409 | `cooldown` | jeda belum lewat (`details.retryAfterSeconds`) |
-| 409 | `ticket_invalid` | tiket Fokus tidak bisa dipakai (`details.reason`: `not_found`, `used`, `too_early`, `expired`) |
+| 409 | `ticket_invalid` | tiket Fokus tidak bisa dipakai (`details.reason`: `not_found`, `used`, `too_early`, `expired`, `overlap`) |
 | 409 | `purchase_invalid` | token pembelian ditolak Google / milik akun lain |
 | 409 | `pin_locked` | verifikasi PIN dikunci sementara (`details.retryAfterSeconds`) |
 | 413 | `payload_too_large` | body melebihi batas |
@@ -203,7 +203,7 @@ Body: `{ "type": "...", "ref": "...", "occurredAt": "...", ...field per tipe }`.
 | `betterme_lesson_completed` | `lessonId` | +10 | — | sekali seumur akun per lesson · `betterme:<lessonId>`; level terkunci untuk non-Premium → tanpa koin, `capReason: "premium_required"` · **refleksi TIDAK dikirim** |
 | `mission_completed` | `date`, `index` (0–2) | +3 | — | 3/hari · `mission:<date>:<index>` |
 | `minigame_finished` | `saboteurId`, `won`, `ref` | +8 bila menang | +5 menang / +2 kalah | maks 4 pertarungan/hari · `minigame:<ref>` |
-| `focus_completed` | `ticketId`, `saboteurId` | — | +4 | wajib tiket Fokus milik user & belum dipakai (§3.7) · `focus:<ticketId>`; `occurredAt` ≥ `issuedAt` + durasi − 1 menit (sesi tidak bisa "selesai" instan) dan sesi harus dimulai (`occurredAt` − durasi) sebelum `expiresAt`; gagal → `409 ticket_invalid` (di batch: error per event) |
+| `focus_completed` | `ticketId`, `saboteurId` | — | +4 | wajib tiket Fokus milik user & belum dipakai (§3.7) · `focus:<ticketId>`; `occurredAt` **dan jam server** ≥ `issuedAt` + durasi − 1 menit (sesi tidak bisa "selesai" instan), sesi harus dimulai (`occurredAt` − durasi) sebelum `expiresAt`, dan rentang sesi tidak boleh tumpang tindih (> 1 menit) dengan sesi lain yang sudah ditukar — beberapa tiket tidak bisa dibayar untuk menit yang sama; gagal → `409 ticket_invalid` (di batch: error per event) |
 
 Monster yang mencapai 100 → `state=tamed`, +50 koin **sekali** (`tamed:<saboteurId>`). Tidak ada tipe
 event yang berasal dari pembelian — progres monster tidak bisa dibeli (CLAUDE.md aturan #4).
@@ -480,11 +480,21 @@ Pengaturan yang bisa diubah (allowlist — key lain ditolak):
 
 ### 3.12 Operasional lewat CLI
 
-Operasi yang jarang dan berisiko tinggi tetap lewat CLI di container, bukan HTTP:
-`riung seed-content`, `riung cleanup-anon`, `riung admin grant|revoke`, `riung rotate-keys`,
-`riung settings get|set --key … --value … --reason …` (jalur darurat tanpa VPN, tercatat dengan aktor `cli`),
-`riung wallet-adjust --user … --amount … --reason …` (wajib alasan, tercatat di ledger `type=adjust`
-+ `admin_audit_log`).
+Operasi yang jarang dan berisiko tinggi tetap lewat CLI di container (`docker exec riung-api /riung …`),
+bukan HTTP:
+
+| Perintah | Isi |
+|---|---|
+| `migrate up\|status\|down` | migrasi (container `riung-migrate`, kredensial DDL; `down` ditolak di prod) |
+| `seed-content <file\|->` | ganti konten publik dari seed JSON |
+| `settings list` · `settings set <key> <value> <alasan>` · `settings reset <key> <alasan>` | jalur darurat tanpa VPN, tercatat dengan aktor `cli` |
+| `admin grant\|revoke <email> <alasan>` | akses Admin API |
+| `cleanup` (cron harian) | idempotensi > 7 hari, jti, penghitung lama, id RTDN > 30 hari, tiket Fokus & buka-berbayar > 90 hari |
+| `billing-sync` (cron tiap jam) · `reconcile` (cron harian) | §3.9, §4.5 |
+
+Belum dibuat (menyusul bila dibutuhkan): `cleanup-anon` (akun anonim tak aktif, B5), `wallet-adjust`
+(koreksi saldo manual, wajib alasan, ledger `type=adjust` + `admin_audit_log`). Rotasi kunci tiket Fokus
+lewat env (§4.6).
 
 ---
 
@@ -575,7 +585,12 @@ Operasi yang jarang dan berisiko tinggi tetap lewat CLI di container, bukan HTTP
   mempersulit klien palsu. Memperpendek jendela ke 72 jam adalah keputusan produk
   (`docs/todo-luar-backend.md` §D).
 - **Ganti zona waktu**: user bisa "memajukan" hari esok dengan mengganti zona waktu, tetapi tiap tanggal
-  hanya bisa dipakai sekali per batas, jadi tidak ada keuntungan bersih dalam jangka panjang.
+  hanya bisa dipakai sekali per batas, jadi tidak ada keuntungan bersih dalam jangka panjang. Ini juga
+  berlaku untuk tiket Fokus gratis dan batas 3 buka-berbayar Aplikasi Beku: pengaman etis melindungi dari
+  keputusan impulsif, bukan dari user yang sengaja mengakalinya; jeda 60 detik tetap berlaku lintas hari.
+- **Sesi Fokus tidak bisa dibuktikan**: server tidak tahu apakah user benar-benar fokus. Dibatasi oleh
+  jumlah tiket, durasi minimum menurut jam server, dan larangan sesi tumpang tindih — progres paling cepat
+  sama dengan user jujur yang benar-benar menjalankan sesinya.
 - **Event yang ter-cap dicatat permanen** per kunci bisnis (mis. sesi meditasi premium sebelum berlangganan
   hari itu tidak dibayar ulang setelah berlangganan; sesi lain tetap bisa).
 - **Admin API memakai HTTP biasa** di dalam tunnel VPN dan bridge Docker; token admin wajib login ≤ 15 menit.
@@ -706,7 +721,7 @@ tidak mungkin tercatat. Layar krisis tidak menghasilkan request apa pun.
 | `activity_capped` | INFO | `type`, `cap` |
 | `shop_purchase` | INFO | `itemType`, `itemId`, `price` |
 | `appbeku_unlock` / `appbeku_blocked` | INFO / WARN | `target` (`unit`/id bundel — bukan aplikasi), `n`, `price` / `reason` (`limit`, `cooldown`, `earned_only`) |
-| `focus_ticket_issued` / `focus_ticket_redeemed` / `focus_ticket_invalid` | INFO / INFO / WARN | `source`, `durationMin` / — / `reason` (`not_found`, `used`, `too_early`, `expired`) |
+| `focus_ticket_issued` / `focus_ticket_redeemed` / `focus_ticket_invalid` | INFO / INFO / WARN | `source`, `durationMin` / — / `reason` (`not_found`, `used`, `too_early`, `expired`, `overlap`) |
 | `purchase_verified` / `purchase_rejected` | INFO / WARN | `productId`, `tokenTail` (6 karakter terakhir), `status`, `coins`, `test` / `reason` (`not_valid_for_account`, `unknown_product`) |
 | `rtdn_received` / `rtdn_rejected` | INFO / WARN | `kind`, `notificationType`, `productId`, `action` / `reason` (`auth`, `envelope`, `notification`) |
 | `refund_applied` | WARN | `productId`, `coinsClawedBack`, `debt`, `premiumRevoked`, `orphan` |
@@ -772,7 +787,8 @@ monster_loadouts (user_id, saboteur_id text, item_ids text[], updated_at, PRIMAR
 character_loadouts (user_id, test_id text, accessory_ids text[], card_style text, updated_at,
                     PRIMARY KEY (user_id, test_id))
 betterme_completions (user_id, lesson_id text, completed_at, PRIMARY KEY (user_id, lesson_id))
-appbeku_unlocks (id uuid PK, user_id, app_id text, minutes int, price int, created_at)  -- untuk eskalasi & jeda
+appbeku_unlocks (id uuid PK, user_id, target text, minutes int, price int, created_at)  -- target = 'unit' / id bundel, bukan aplikasi; jeda; dihapus > 90 hari
+focus_tickets   + session_ended_at timestamptz (migrasi 00003)                  -- tolak sesi Fokus yang tumpang tindih
 activity_events (user_id, key text, type text, result jsonb, created_at, PRIMARY KEY (user_id, key))  -- append-only
 pin_attempts (user_id, day date, failures int, locked_until timestamptz, PRIMARY KEY (user_id, day))
 appcheck_jti (jti text PRIMARY KEY, expires_at timestamptz)                    -- token limited-use

@@ -131,7 +131,7 @@ lalu `docker compose up -d --force-recreate loki promtail` di core-shared.
 **9. Backup** — cron harian (contoh, sebagai root):
 
 ```cron
-# Pembersihan tabel bantu (idempotensi, jti App Check, penghitung lama)
+# Pembersihan tabel bantu (idempotensi, jti App Check, penghitung lama, tiket Fokus & buka-berbayar > 90 hari)
 15 2 * * * docker exec riung-api /riung cleanup
 # Refund Google Play (tarik koin / cabut Premium) + acknowledge pembelian yang lupa di-ack app (tiap jam).
 # Sebelum billing dikonfigurasi job ini hanya mencatat "skipped" (exit 0); item yang gagal diulang di jam berikutnya.

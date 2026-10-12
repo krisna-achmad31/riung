@@ -27,7 +27,7 @@ func (e *CooldownError) Error() string { return "cooldown" }
 
 // TicketError: a focus_completed report names an unusable ticket (409 ticket_invalid).
 type TicketError struct {
-	Reason string // not_found | used | too_early | expired
+	Reason string // not_found | used | too_early | expired | overlap
 }
 
 func (e *TicketError) Error() string { return "focus ticket invalid: " + e.Reason }
@@ -167,9 +167,15 @@ func (s *Service) IssueFocusTicket(ctx context.Context, user store.User, in Focu
 	return out, wallet, err
 }
 
+// focusTolerance absorbs clock differences between the phone and the server.
+const focusTolerance = time.Minute
+
 // redeemFocus consumes the ticket of a focus_completed report. The session
-// cannot finish before issuedAt + duration − 1 minute, and must have started
-// (occurredAt − duration) before the ticket expired.
+// cannot finish before issuedAt + duration − 1 minute (by the reported time
+// and by the server clock, since occurredAt may run a few minutes ahead),
+// must have started (occurredAt − duration) before the ticket expired, and
+// must not overlap another redeemed session: one person focuses on one
+// session at a time, so several tickets cannot pay for the same minutes.
 func (s *Service) redeemFocus(tx *store.UserTx, p prepared, res *ActivityResult) error {
 	in := p.in
 	t, err := tx.FocusTicket(in.TicketID)
@@ -180,15 +186,21 @@ func (s *Service) redeemFocus(tx *store.UserTx, p prepared, res *ActivityResult)
 		return err
 	}
 	dur := time.Duration(t.DurationMin) * time.Minute
+	earliest := t.IssuedAt.Add(dur - focusTolerance)
 	switch {
 	case t.ConsumedAt != nil:
 		return &TicketError{Reason: "used"}
-	case in.OccurredAt.Before(t.IssuedAt.Add(dur - time.Minute)):
+	case in.OccurredAt.Before(earliest), s.Now().Before(earliest):
 		return &TicketError{Reason: "too_early"}
 	case in.OccurredAt.Add(-dur).After(t.ExpiresAt):
 		return &TicketError{Reason: "expired"}
 	}
-	if ok, err := tx.ConsumeFocusTicket(t.ID, s.Now()); err != nil {
+	if overlaps, err := tx.FocusSessionOverlaps(t.ID, in.OccurredAt.Add(-dur), in.OccurredAt, focusTolerance); err != nil {
+		return err
+	} else if overlaps {
+		return &TicketError{Reason: "overlap"}
+	}
+	if ok, err := tx.ConsumeFocusTicket(t.ID, s.Now(), in.OccurredAt); err != nil {
 		return err
 	} else if !ok {
 		return &TicketError{Reason: "used"}

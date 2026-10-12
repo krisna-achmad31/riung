@@ -149,5 +149,6 @@ Backend memakai default di kolom kanan sampai diputuskan lain.
 | Jendela laporan offline: 7 hari (sekarang) atau 72 jam (lebih ketat terhadap client yang dimodifikasi)? | 7 hari |
 | Refund satu periode langganan tanpa pencabutan akses oleh Google: Premium tetap jalan atau langsung dicabut? | mengikuti Google (tetap jalan bila Google tidak mencabut) |
 | Tiket Fokus `prepaid`/`coins` yang tidak dipakai sampai kedaluwarsa (30 hari): hangus atau sesi/koin dikembalikan? | hangus (app hanya meminta tiket saat sesi dimulai) |
+| Sesi Fokus yang dibayar koin (bisa dari koin beli) memberi progres monster +4 seperti app sekarang. Aturan #4 dibaca "progres tidak dijual langsung — pembelian hanya membuka akses ke latihan" (sama seperti konten Premium). Atau tiket `coins` dibatasi ke koin latihan saja? | sesuai app: semua koin boleh, progres dari sesi yang dijalankan |
 | Jeda 60 detik antar buka-berbayar Aplikasi Beku juga berlaku untuk pembelian dari Toko (sekarang app hanya menunggu di interstisial)? | ya, server menerapkan jeda untuk semua buka-berbayar |
 | Utang koin hasil refund (`debtCoins`) ditampilkan ke user? Teks apa? | tidak ada copy; API mengembalikan `debtCoins` |

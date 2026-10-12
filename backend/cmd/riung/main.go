@@ -259,7 +259,7 @@ func runCleanup(ctx context.Context, cfg config.Config, logger *slog.Logger) err
 	}
 	logger.Info("cleanup done", logx.KeyEvent, "job_run", "job", "cleanup", "ok", true,
 		"idempotencyKeys", res.IdempotencyKeys, "appCheckJtis", res.AppCheckJTIs, "signupCounters", res.SignupCounters,
-		"dailyCounters", res.DailyCounters, "pinAttempts", res.PinAttempts, "rtdnMessages", res.RTDNMessages, "focusTickets", res.FocusTickets)
+		"dailyCounters", res.DailyCounters, "pinAttempts", res.PinAttempts, "rtdnMessages", res.RTDNMessages, "focusTickets", res.FocusTickets, "appbekuUnlocks", res.AppBekuUnlocks)
 	return nil
 }
 

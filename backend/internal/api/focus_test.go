@@ -344,3 +344,40 @@ func TestFocusAndAppBekuUnderConcurrency(t *testing.T) {
 		t.Fatalf("charged once: %s", w.raw)
 	}
 }
+
+func TestFocusSessionsCannotOverlap(t *testing.T) {
+	e := newEnv(t)
+	tok := "dev:focus-overlap:anonymous"
+	userID := get(e.do(req{method: "GET", path: "/v1/me", token: tok}).body, "user", "id").(string)
+	seed(t, e, userID, 200)
+	coin := func() ticket.Ticket {
+		return signedTicket(t, issueTicket(e, tok, map[string]any{"source": "coins", "durationMin": 25, "expectedPrice": 25}))
+	}
+	a, b, c := coin(), coin(), coin()
+
+	// occurredAt may run ahead of the server, but the server clock must also
+	// have reached the end of the session.
+	e.clock.advance(21 * time.Minute)
+	if r := focusDone(e, tok, a.ID, e.clock.now().Add(4*time.Minute)); r.status != 409 ||
+		get(r.body, "error", "details", "reason") != "too_early" {
+		t.Fatalf("reported ahead of the server clock: %d %s", r.status, r.raw)
+	}
+	e.clock.advance(4 * time.Minute)
+	end := e.clock.now()
+	if r := focusDone(e, tok, a.ID, end); r.status != 200 {
+		t.Fatalf("first session: %d %s", r.status, r.raw)
+	}
+	// Several tickets cannot pay for the same 25 minutes.
+	if r := focusDone(e, tok, b.ID, end); r.status != 409 || get(r.body, "error", "details", "reason") != "overlap" {
+		t.Fatalf("overlapping session: %d %s", r.status, r.raw)
+	}
+	// Back-to-back sessions are fine (a minute of clock slack either way).
+	e.clock.advance(25 * time.Minute)
+	if r := focusDone(e, tok, b.ID, end.Add(25*time.Minute-30*time.Second)); r.status != 200 {
+		t.Fatalf("next session: %d %s", r.status, r.raw)
+	}
+	// A session cannot have ended before its ticket existed.
+	if r := focusDone(e, tok, c.ID, end.Add(-25*time.Minute)); r.status != 409 || get(r.body, "error", "details", "reason") != "too_early" {
+		t.Fatalf("session before the ticket: %d %s", r.status, r.raw)
+	}
+}

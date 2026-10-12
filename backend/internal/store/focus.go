@@ -39,11 +39,24 @@ func (u *UserTx) FocusTicket(id string) (FocusTicket, error) {
 		WHERE id = $1 AND user_id = $2 FOR UPDATE`, id, u.userID))
 }
 
-// ConsumeFocusTicket marks a ticket used; it reports false if it already was.
-func (u *UserTx) ConsumeFocusTicket(id string, at time.Time) (bool, error) {
-	tag, err := u.tx.Exec(u.ctx, `UPDATE focus_tickets SET consumed_at = $3
-		WHERE id = $1 AND user_id = $2 AND consumed_at IS NULL`, id, u.userID, at)
+// ConsumeFocusTicket marks a ticket used by a session that ended at
+// sessionEnd; it reports false if the ticket was already used.
+func (u *UserTx) ConsumeFocusTicket(id string, at, sessionEnd time.Time) (bool, error) {
+	tag, err := u.tx.Exec(u.ctx, `UPDATE focus_tickets SET consumed_at = $3, session_ended_at = $4
+		WHERE id = $1 AND user_id = $2 AND consumed_at IS NULL`, id, u.userID, at, sessionEnd)
 	return tag.RowsAffected() == 1, err
+}
+
+// FocusSessionOverlaps reports whether another redeemed session of the user
+// overlaps [start, end] by more than tolerance at either edge.
+func (u *UserTx) FocusSessionOverlaps(exceptID string, start, end time.Time, tolerance time.Duration) (bool, error) {
+	var overlaps bool
+	err := u.tx.QueryRow(u.ctx, `SELECT EXISTS (SELECT 1 FROM focus_tickets
+		WHERE user_id = $1 AND id <> $2 AND session_ended_at IS NOT NULL
+		  AND session_ended_at > $3
+		  AND session_ended_at - make_interval(mins => duration_min) < $4)`,
+		u.userID, exceptID, start.Add(tolerance), end.Add(-tolerance)).Scan(&overlaps)
+	return overlaps, err
 }
 
 // OpenFocusTickets lists the user's unused tickets that have not expired.
