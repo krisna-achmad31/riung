@@ -2,6 +2,8 @@ module github.com/krisna-achmad31/riung/backend
 
 go 1.26.0
 
+toolchain go1.27.2
+
 require (
 	firebase.google.com/go/v4 v4.22.0
 	github.com/jackc/pgx/v5 v5.11.0
