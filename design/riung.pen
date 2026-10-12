@@ -8543,16 +8543,6 @@
                           "y": 12,
                           "width": 104,
                           "height": 104
-                        },
-                        {
-                          "id": "CJBCP",
-                          "type": "ref",
-                          "ref": "bShhk",
-                          "name": "Topi rajut (slot head)",
-                          "x": 24,
-                          "y": -14,
-                          "width": 64,
-                          "height": 64
                         }
                       ]
                     },
@@ -177864,6 +177854,2683 @@
                   "fontFamily": "$g-font",
                   "fontSize": 12,
                   "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "LcTo5",
+      "x": 3900,
+      "y": 8500,
+      "name": "Glass — Buat Avatar (Wajah)",
+      "clip": true,
+      "width": 390,
+      "height": 850,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D9E4F2",
+          "#E2E8F1",
+          "#D5E6DA",
+          "#E6E2F3",
+          "#F3F1EC",
+          "#E3ECE6",
+          "#E4DEF3",
+          "#F1EDE8",
+          "#F7E4D8"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.5
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.5
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "aYae0",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "u53UG4",
+          "name": "Header",
+          "width": "fill_container",
+          "padding": [
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "OiM5G",
+              "name": "Tutup",
+              "width": 24,
+              "height": 24,
+              "icon": "x",
+              "library": "lucide",
+              "fill": "$g-ink"
+            },
+            {
+              "type": "text",
+              "id": "W9a5HK",
+              "name": "Judul",
+              "fill": "$g-ink",
+              "content": "Buat Avatar",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "DRtI7",
+              "name": "Selesai",
+              "fill": "$g-primary",
+              "content": "Selesai",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ZGA4L",
+          "name": "Panggung wrap",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "zqoDA",
+              "name": "Panggung",
+              "clip": true,
+              "width": "fill_container",
+              "height": 320,
+              "fill": "$g-glass-strong",
+              "cornerRadius": 34,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "strokeAlignment": "inner",
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 28
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "$g-shadow",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 36
+                }
+              ],
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "j7zss",
+                  "x": 85,
+                  "y": 70,
+                  "name": "Kepala 3D",
+                  "clip": true,
+                  "width": 180,
+                  "height": 180,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "generated-136.png",
+                    "mode": "cover"
+                  },
+                  "cornerRadius": 90
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "N7xOw2",
+          "name": "Tab Kategori",
+          "width": "fill_container",
+          "gap": 8,
+          "padding": [
+            24,
+            20,
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "D6IFAC",
+              "name": "Tab Wajah",
+              "fill": "$g-primary-soft",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "YoNpD",
+                  "name": "Wajah",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "user",
+                  "library": "lucide",
+                  "fill": "$g-primary"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "BbW8O",
+              "name": "Tab Rambut",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "yqNxU",
+                  "name": "Rambut",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "scissors",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "WMfEq",
+              "name": "Tab Kacamata",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "H007mn",
+                  "name": "Kacamata",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "glasses",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XsBVX",
+              "name": "Tab Aksesoris",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "K29JRV",
+                  "name": "Aksesoris",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "sparkles",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JLScl",
+              "name": "Tab Latar",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "q024n",
+                  "name": "Latar",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "image",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NhnZ2",
+          "width": "fill_container",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "nHU3H",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$g-glass-edge"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "AoSix",
+          "name": "Opsi Grid",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "WnlSY",
+              "name": "Warna Kulit",
+              "width": "fill_container",
+              "gap": 12,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "HOv84",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#FAD6B9",
+                  "cornerRadius": 22,
+                  "stroke": "$g-primary",
+                  "strokeWidth": 3
+                },
+                {
+                  "type": "frame",
+                  "id": "mLoal",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#E8B993",
+                  "cornerRadius": 22,
+                  "stroke": "#0000001A",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "EPuxb",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#C9956C",
+                  "cornerRadius": 22,
+                  "stroke": "#0000001A",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "RVSlQ",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#9A6841",
+                  "cornerRadius": 22,
+                  "stroke": "#0000001A",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "A3t2NP",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#5C3A21",
+                  "cornerRadius": 22,
+                  "stroke": "#0000001A",
+                  "strokeWidth": 1
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "gNehU",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "M73Mk",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-primary-soft",
+                  "cornerRadius": 24,
+                  "stroke": "$g-primary",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "a0o24",
+                      "clip": true,
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-132.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 35
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "M5PBpY",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "H2xJTf",
+                      "clip": true,
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-127.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 35
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "j2xzAx",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "g0M7rO",
+                      "clip": true,
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-137.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 35
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lCHqd",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "jHnPX",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "txHPv",
+                      "clip": true,
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-128.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 35
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lWMdO",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "hcTWm",
+                      "clip": true,
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-130.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 35
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "KwV1u",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Kotdp",
+                      "clip": true,
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-135.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 35
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "B9W2o2",
+      "x": 4330,
+      "y": 8500,
+      "name": "Glass — Buat Avatar (Rambut)",
+      "clip": true,
+      "width": 390,
+      "height": 850,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D9E4F2",
+          "#E2E8F1",
+          "#D5E6DA",
+          "#E6E2F3",
+          "#F3F1EC",
+          "#E3ECE6",
+          "#E4DEF3",
+          "#F1EDE8",
+          "#F7E4D8"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.5
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.5
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "KvlLy",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "IAMKy",
+          "name": "Header",
+          "width": "fill_container",
+          "padding": [
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "P0XD2D",
+              "name": "Tutup",
+              "width": 24,
+              "height": 24,
+              "icon": "x",
+              "library": "lucide",
+              "fill": "$g-ink"
+            },
+            {
+              "type": "text",
+              "id": "B3Cmx9",
+              "name": "Judul",
+              "fill": "$g-ink",
+              "content": "Buat Avatar",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "vbpLM",
+              "name": "Selesai",
+              "fill": "$g-primary",
+              "content": "Selesai",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "QsTSR",
+          "name": "Panggung wrap",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "jfiGc",
+              "name": "Panggung",
+              "clip": true,
+              "width": "fill_container",
+              "height": 320,
+              "fill": "$g-glass-strong",
+              "cornerRadius": 34,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "strokeAlignment": "inner",
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 28
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "$g-shadow",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 36
+                }
+              ],
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "bjFyH",
+                  "x": 85,
+                  "y": 70,
+                  "name": "Kepala 3D Rambut",
+                  "clip": true,
+                  "width": 180,
+                  "height": 180,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "generated-133.png",
+                    "mode": "cover"
+                  },
+                  "cornerRadius": 90
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Xirp8",
+          "name": "Tab Kategori",
+          "width": "fill_container",
+          "gap": 8,
+          "padding": [
+            24,
+            20,
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "a7Hzbo",
+              "name": "Tab Wajah",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "K1NTmQ",
+                  "name": "Wajah",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "user",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ap8EX",
+              "name": "Tab Rambut",
+              "fill": "$g-primary-soft",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "jWvyi",
+                  "name": "Rambut",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "scissors",
+                  "library": "lucide",
+                  "fill": "$g-primary"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "R4vMX",
+              "name": "Tab Kacamata",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "e8Rob1",
+                  "name": "Kacamata",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "glasses",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "e1AQb5",
+              "name": "Tab Aksesoris",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "Iwtjb",
+                  "name": "Aksesoris",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "sparkles",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "OaJVe",
+              "name": "Tab Latar",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "I75he7",
+                  "name": "Latar",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "image",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Qe5zB",
+          "width": "fill_container",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "IHZee",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$g-glass-edge"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NJs27",
+          "name": "Opsi Grid",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "u746X",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "l042kE",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "BbTZ7",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-126.png",
+                        "mode": "cover"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "b1WG1",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "jcye2",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-129.png",
+                        "mode": "cover"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "BUj4Q",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "bN3kx",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-124.png",
+                        "mode": "cover"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "acVYv",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hXGvH",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-primary-soft",
+                  "cornerRadius": 24,
+                  "stroke": "$g-primary",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "RKbUB",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-123.png",
+                        "mode": "cover"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "g6elrT",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "yXvDp",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-125.png",
+                        "mode": "cover"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "h0hVH",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "fMIbW",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated-122.png",
+                        "mode": "cover"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "qngOr",
+      "x": 4760,
+      "y": 8500,
+      "name": "Glass — Buat Avatar (Kacamata)",
+      "clip": true,
+      "width": 390,
+      "height": 850,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D9E4F2",
+          "#E2E8F1",
+          "#D5E6DA",
+          "#E6E2F3",
+          "#F3F1EC",
+          "#E3ECE6",
+          "#E4DEF3",
+          "#F1EDE8",
+          "#F7E4D8"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.5
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.5
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "Pplor",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "b8c2q",
+          "name": "Header",
+          "width": "fill_container",
+          "padding": [
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "r8K8nz",
+              "name": "Tutup",
+              "width": 24,
+              "height": 24,
+              "icon": "x",
+              "library": "lucide",
+              "fill": "$g-ink"
+            },
+            {
+              "type": "text",
+              "id": "DL7rK",
+              "name": "Judul",
+              "fill": "$g-ink",
+              "content": "Buat Avatar",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "iTrQO",
+              "name": "Selesai",
+              "fill": "$g-primary",
+              "content": "Selesai",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ElkvI",
+          "name": "Panggung wrap",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "HKTzG",
+              "name": "Panggung",
+              "clip": true,
+              "width": "fill_container",
+              "height": 320,
+              "fill": "$g-glass-strong",
+              "cornerRadius": 34,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "strokeAlignment": "inner",
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 28
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "$g-shadow",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 36
+                }
+              ],
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mlZFv",
+                  "x": 85,
+                  "y": 70,
+                  "name": "Kepala 3D Kacamata",
+                  "clip": true,
+                  "width": 180,
+                  "height": 180,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "generated-134.png",
+                    "mode": "cover"
+                  },
+                  "cornerRadius": 90
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Yc7wQ",
+          "name": "Tab Kategori",
+          "width": "fill_container",
+          "gap": 8,
+          "padding": [
+            24,
+            20,
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "BDe83",
+              "name": "Tab Wajah",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "i54Hs",
+                  "name": "Wajah",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "user",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "m56qvi",
+              "name": "Tab Rambut",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "F8ywa0",
+                  "name": "Rambut",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "scissors",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "UQikN",
+              "name": "Tab Kacamata",
+              "fill": "$g-primary-soft",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "Q7c3ik",
+                  "name": "Kacamata",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "glasses",
+                  "library": "lucide",
+                  "fill": "$g-primary"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "MWT7E",
+              "name": "Tab Aksesoris",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "ZxKrI",
+                  "name": "Aksesoris",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "sparkles",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "x37Yt",
+              "name": "Tab Latar",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "QGSW8",
+                  "name": "Latar",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "image",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "lwGQl",
+          "width": "fill_container",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "vAgsx",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$g-glass-edge"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "aj9I3",
+          "name": "Opsi Grid",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "yUPBT",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "EUuer",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-primary-soft",
+                  "cornerRadius": 24,
+                  "stroke": "$g-primary",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "g8BYr",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "aset3d_cut/kacamata_bulat.png?v=2",
+                        "mode": "contain"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NK5ex",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "f1QvSW",
+                      "width": 32,
+                      "height": 32,
+                      "icon": "ban",
+                      "library": "lucide",
+                      "fill": "$g-ink-faint"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "XQqhC",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "wOFNk",
+                      "width": 32,
+                      "height": 32,
+                      "icon": "ban",
+                      "library": "lucide",
+                      "fill": "$g-ink-faint"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "EviIw",
+      "x": 5190,
+      "y": 8500,
+      "name": "Glass — Buat Avatar (Aksesoris)",
+      "clip": true,
+      "width": 390,
+      "height": 850,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D9E4F2",
+          "#E2E8F1",
+          "#D5E6DA",
+          "#E6E2F3",
+          "#F3F1EC",
+          "#E3ECE6",
+          "#E4DEF3",
+          "#F1EDE8",
+          "#F7E4D8"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.5
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.5
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "vVMSY",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "V8PJ4",
+          "name": "Header",
+          "width": "fill_container",
+          "padding": [
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "GLjtc",
+              "name": "Tutup",
+              "width": 24,
+              "height": 24,
+              "icon": "x",
+              "library": "lucide",
+              "fill": "$g-ink"
+            },
+            {
+              "type": "text",
+              "id": "kwPEd",
+              "name": "Judul",
+              "fill": "$g-ink",
+              "content": "Buat Avatar",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "QbJsZ",
+              "name": "Selesai",
+              "fill": "$g-primary",
+              "content": "Selesai",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "XNQZW",
+          "name": "Panggung wrap",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "HZYEO",
+              "name": "Panggung",
+              "clip": true,
+              "width": "fill_container",
+              "height": 320,
+              "fill": "$g-glass-strong",
+              "cornerRadius": 34,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "strokeAlignment": "inner",
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 28
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "$g-shadow",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 36
+                }
+              ],
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "yrSxK",
+                  "x": 85,
+                  "y": 70,
+                  "name": "Kepala 3D Aksesoris",
+                  "clip": true,
+                  "width": 180,
+                  "height": 180,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "generated-131.png",
+                    "mode": "cover"
+                  },
+                  "cornerRadius": 90
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gmeSx",
+          "name": "Tab Kategori",
+          "width": "fill_container",
+          "gap": 8,
+          "padding": [
+            24,
+            20,
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "ljmJg",
+              "name": "Tab Wajah",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "mGBXs",
+                  "name": "Wajah",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "user",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "jtJqb",
+              "name": "Tab Rambut",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "BQ9q3",
+                  "name": "Rambut",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "scissors",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "YAbyC",
+              "name": "Tab Kacamata",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "yO3Tl",
+                  "name": "Kacamata",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "glasses",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wLfS7",
+              "name": "Tab Aksesoris",
+              "fill": "$g-primary-soft",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "cCE5W",
+                  "name": "Aksesoris",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "sparkles",
+                  "library": "lucide",
+                  "fill": "$g-primary"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "oHAtv",
+              "name": "Tab Latar",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "O0ohun",
+                  "name": "Latar",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "image",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YxfiH",
+          "width": "fill_container",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "n9VRY",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$g-glass-edge"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kMgL6",
+          "name": "Opsi Grid",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "p5ni2u",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Opp52",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-primary-soft",
+                  "cornerRadius": 24,
+                  "stroke": "$g-primary",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "AfzZz",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "aset3d_cut/topi_rajut.png",
+                        "mode": "contain"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "JBYdm",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "KZ8PP",
+                      "width": 70,
+                      "height": 70,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "aset3d_cut/headphone.png",
+                        "mode": "contain"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "CKIJU",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "BFpkj",
+                      "width": 32,
+                      "height": 32,
+                      "icon": "ban",
+                      "library": "lucide",
+                      "fill": "$g-ink-faint"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Lx7iU",
+      "x": 5620,
+      "y": 8500,
+      "name": "Glass — Buat Avatar (Latar)",
+      "clip": true,
+      "width": 390,
+      "height": 850,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D9E4F2",
+          "#E2E8F1",
+          "#D5E6DA",
+          "#E6E2F3",
+          "#F3F1EC",
+          "#E3ECE6",
+          "#E4DEF3",
+          "#F1EDE8",
+          "#F7E4D8"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.5
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.5
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "qWR0e",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "pA0bv",
+          "name": "Header",
+          "width": "fill_container",
+          "padding": [
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "XXQ2o",
+              "name": "Tutup",
+              "width": 24,
+              "height": 24,
+              "icon": "x",
+              "library": "lucide",
+              "fill": "$g-ink"
+            },
+            {
+              "type": "text",
+              "id": "FXByN",
+              "name": "Judul",
+              "fill": "$g-ink",
+              "content": "Buat Avatar",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "q9gLoU",
+              "name": "Selesai",
+              "fill": "$g-primary",
+              "content": "Selesai",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "visAT",
+          "name": "Panggung wrap",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "SnIBw",
+              "name": "Panggung",
+              "clip": true,
+              "width": "fill_container",
+              "height": 320,
+              "fill": "$g-glass-strong",
+              "cornerRadius": 34,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "strokeAlignment": "inner",
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 28
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "$g-shadow",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 36
+                }
+              ],
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "egedI",
+                  "x": 85,
+                  "y": 70,
+                  "name": "Kepala 3D",
+                  "clip": true,
+                  "width": 180,
+                  "height": 180,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "generated-136.png",
+                    "mode": "cover"
+                  },
+                  "cornerRadius": 90
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vQXeX",
+          "name": "Tab Kategori",
+          "width": "fill_container",
+          "gap": 8,
+          "padding": [
+            24,
+            20,
+            16,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "eRAA0",
+              "name": "Tab Wajah",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "hUpAQ",
+                  "name": "Wajah",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "user",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "j5xVC",
+              "name": "Tab Rambut",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "gayQg",
+                  "name": "Rambut",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "scissors",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "X1GdK",
+              "name": "Tab Kacamata",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "fwbtF",
+                  "name": "Kacamata",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "glasses",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "W6m0UX",
+              "name": "Tab Aksesoris",
+              "fill": "#FFFFFF00",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "ndyjK",
+                  "name": "Aksesoris",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "sparkles",
+                  "library": "lucide",
+                  "fill": "$g-ink-faint"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "b6RgSI",
+              "name": "Tab Latar",
+              "fill": "$g-primary-soft",
+              "cornerRadius": 20,
+              "padding": [
+                10,
+                14
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "frZ8g",
+                  "name": "Latar",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "image",
+                  "library": "lucide",
+                  "fill": "$g-primary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gG6Bx",
+          "width": "fill_container",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "VCwve",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$g-glass-edge"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "agVQh",
+          "name": "Opsi Grid",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "cHSzd",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "oOp6W",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-primary-soft",
+                  "cornerRadius": 24,
+                  "stroke": "$g-primary",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "YoQYZ",
+                      "width": 70,
+                      "height": 70,
+                      "fill": "#FFD6D6",
+                      "cornerRadius": 35,
+                      "stroke": "$g-glass-edge",
+                      "strokeWidth": 2
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "r2RrB",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "RnpnM",
+                      "width": 70,
+                      "height": 70,
+                      "fill": "#D6FFD6",
+                      "cornerRadius": 35,
+                      "stroke": "$g-glass-edge",
+                      "strokeWidth": 2
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "v7foWC",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "mYw4s",
+                      "width": 70,
+                      "height": 70,
+                      "fill": "#D6D6FF",
+                      "cornerRadius": 35,
+                      "stroke": "$g-glass-edge",
+                      "strokeWidth": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "DDr1t",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "p7ZpmQ",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "rZfo0",
+                      "width": 70,
+                      "height": 70,
+                      "fill": "#FFFFD6",
+                      "cornerRadius": 35,
+                      "stroke": "$g-glass-edge",
+                      "strokeWidth": 2
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "KFA0n",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "s2rrCS",
+                      "width": 70,
+                      "height": 70,
+                      "fill": "#FFD6FF",
+                      "cornerRadius": 35,
+                      "stroke": "$g-glass-edge",
+                      "strokeWidth": 2
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "QdmPl",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 106,
+                  "fill": "$g-glass",
+                  "cornerRadius": 24,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": {
+                    "type": "background_blur",
+                    "radius": 12
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "iM5yO",
+                      "width": 70,
+                      "height": 70,
+                      "fill": "#D6FFFF",
+                      "cornerRadius": 35,
+                      "stroke": "$g-glass-edge",
+                      "strokeWidth": 2
+                    }
+                  ]
                 }
               ]
             }
