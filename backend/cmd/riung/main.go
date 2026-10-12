@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net"
 	"net/http"
@@ -78,7 +79,7 @@ func run(args []string) int {
 	}
 
 	cfg, err := config.Load(os.Getenv)
-	logger := logx.New(os.Stdout, cfg.LogLevel)
+	logger := logx.New(logOutput(cfg.LogTee), cfg.LogLevel)
 	if err != nil {
 		logger.Error("invalid configuration", logx.KeyEvent, logx.EventCommandError, "error", err.Error())
 		return 1
@@ -250,6 +251,20 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 }
 
 func nowFunc() time.Time { return time.Now() }
+
+// logOutput is stdout, plus the LOG_TEE file when it can be opened (a failure
+// there must not stop a job: stdout still gets everything).
+func logOutput(tee string) io.Writer {
+	if tee == "" {
+		return os.Stdout
+	}
+	f, err := os.OpenFile(tee, os.O_WRONLY|os.O_APPEND, 0) //nolint:gosec // G304: operator-set path (cron)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "LOG_TEE:", err)
+		return os.Stdout
+	}
+	return io.MultiWriter(os.Stdout, f)
+}
 
 func runCleanup(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 	if cfg.DatabaseURL == "" {

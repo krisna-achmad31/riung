@@ -132,6 +132,7 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `MIN_APP_VERSION` | `0.0.0` | app di bawah versi ini mendapat `426 upgrade_required` |
 | `ADMIN_LISTEN_ADDR` | kosong (mati) | port Admin API, mis. `:8081`; tidak pernah dipasang di nginx |
 | `ADMIN_ALLOWED_CIDRS` | — | wajib bila Admin API aktif; prod `172.19.0.7/32` (OpenVPN) |
+| `LOG_TEE` | kosong | file tambahan untuk log JSON; cron memakai `/proc/1/fd/1` supaya log job masuk log container |
 | `ANON_RETENTION_DAYS` | `90` | akun anonim yang tidak dibuka selama ini dihapus `riung cleanup-anon` (30–3650) |
 | `SHUTDOWN_TIMEOUT` | `15s` | graceful shutdown |
 

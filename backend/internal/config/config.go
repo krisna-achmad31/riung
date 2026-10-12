@@ -85,6 +85,10 @@ type Config struct {
 	// AnonRetentionDays: anonymous accounts unseen this long are deleted by
 	// riung cleanup-anon.
 	AnonRetentionDays int
+	// LogTee is an extra file the JSON log is also written to. Cron jobs run
+	// with `docker exec -e LOG_TEE=/proc/1/fd/1` so their job_run lines reach
+	// the container log (and Loki) instead of only the cron mail.
+	LogTee string
 
 	// CORSLandingOrigin is the only origin allowed to call POST /v1/waitlist
 	// from a browser (empty = no CORS at all).
@@ -167,6 +171,7 @@ func Load(getenv func(string) string) (Config, error) {
 		c.FocusTicketKey = sum[:]
 	}
 	c.FocusTicketKid = orDefault(getenv("FOCUS_TICKET_KID"), "k1")
+	c.LogTee = strings.TrimSpace(getenv("LOG_TEE"))
 	c.AnonRetentionDays = 90
 	if v := strings.TrimSpace(getenv("ANON_RETENTION_DAYS")); v != "" {
 		n, err := strconv.Atoi(v)

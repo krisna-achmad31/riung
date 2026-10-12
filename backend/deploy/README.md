@@ -128,19 +128,20 @@ Perpanjangan sertifikat sudah ditangani cron certbot core-shared (03:00).
 `core-shared/monitoring/loki/config.yml` dan `monitoring/promtail-riung.snippet.yml` ke config Promtail,
 lalu `docker compose up -d --force-recreate loki promtail` di core-shared.
 
-**9. Backup** — cron harian (contoh, sebagai root):
+**9. Cron** (root, `crontab -e`). Job dijalankan di dalam `riung-api`; `LOG_TEE=/proc/1/fd/1` membuat
+baris `job_run` ikut masuk log container → Loki (output `docker exec` sendiri tidak ditangkap Promtail).
 
 ```cron
+# --- riung ---
 # Pembersihan tabel bantu (idempotensi, jti App Check, penghitung lama, tiket Fokus & buka-berbayar > 90 hari)
-15 2 * * * docker exec riung-api /riung cleanup
+15 2 * * * docker exec -e LOG_TEE=/proc/1/fd/1 riung-api /riung cleanup >/dev/null
 # Akun anonim yang tidak dibuka > 90 hari (data server + user Firebase); --dry-run untuk menghitung saja
-20 2 * * * docker exec riung-api /riung cleanup-anon
-# Refund Google Play (tarik koin / cabut Premium) + acknowledge pembelian yang lupa di-ack app (tiap jam).
-# Sebelum billing dikonfigurasi job ini hanya mencatat "skipped" (exit 0); item yang gagal diulang di jam berikutnya.
-5 * * * * docker exec riung-api /riung billing-sync
+20 2 * * * docker exec -e LOG_TEE=/proc/1/fd/1 riung-api /riung cleanup-anon >/dev/null
+# Refund Google Play + acknowledge yang terlewat (tiap jam). Sebelum billing dikonfigurasi hanya mencatat "skipped".
+5 * * * * docker exec -e LOG_TEE=/proc/1/fd/1 riung-api /riung billing-sync >/dev/null
 # Cocokkan saldo dompet dengan ledger; gagal = ada ledger_mismatch di log
-45 2 * * * docker exec riung-api /riung reconcile
-# mkdir -p /var/backups/riung && chmod 700 /var/backups/riung
+45 2 * * * docker exec -e LOG_TEE=/proc/1/fd/1 riung-api /riung reconcile >/dev/null
+# Backup harian, retensi 14 hari (mkdir -p /var/backups/riung && chmod 700 /var/backups/riung)
 30 2 * * * docker exec shared-postgres pg_dump -Fc -U riung_migrator riung > /var/backups/riung/riung_$(date +\%F).dump && find /var/backups/riung -name '*.dump' -mtime +14 -delete
 ```
 

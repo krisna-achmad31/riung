@@ -13,8 +13,14 @@ IMAGE="${1:?usage: deploy.sh <image>}"
 export RIUNG_IMAGE="$IMAGE"
 COMPOSE="docker compose -f docker-compose.prod.yml"
 
-echo "==> pull $IMAGE"
-$COMPOSE --profile migrate pull
+# An image already on the host (e.g. loaded with `docker load` before the
+# first CI release, or a rollback tag) is used as is.
+if docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  echo "==> using local image $IMAGE"
+else
+  echo "==> pull $IMAGE"
+  $COMPOSE --profile migrate pull
+fi
 
 echo "==> migrate"
 $COMPOSE --profile migrate up --no-deps --abort-on-container-exit --exit-code-from riung-migrate riung-migrate
