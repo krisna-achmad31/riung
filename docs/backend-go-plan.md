@@ -1,5 +1,5 @@
 # Riung Backend — Go + PostgreSQL + Docker (Plan)
-*Branch: `feat/go-backend` · status: B0–B4 selesai, B5 (deploy) berjalan · diperbarui 2026-10-13*
+*Branch: `feat/go-backend` · status: B0–B4 selesai, B5 sudah live di `riung.e55techlab.com` (sisa infra di TODO §A) · diperbarui 2026-10-13*
 
 ## 0. Kenapa, dan apa yang berubah
 
@@ -355,7 +355,7 @@ terbuka dicatat di **`docs/todo-luar-backend.md`**. Dokumen ini dan spec hanya m
 | **B2 Ekonomi** ✅ | `economy-props.json` + katalog, wallet ledger + bucket, activities + cap, check-in/streak, monster progress, shop, Admin API + `app_settings` | tes konkurensi (N request paralel, saldo tidak pernah negatif/dobel), tes idempotensi, tes parity ekonomi |
 | **B3 Billing** ✅ | `/billing/verify` & `/billing/restore` & `/billing/subscription`, RTDN Pub/Sub (OIDC), `riung billing-sync` (refund → tarik koin/utang, cabut Premium, acknowledge yang terlewat), `riung reconcile`, Premium status | beli sandbox dengan license tester: koin & Premium masuk HANYA lewat server |
 | **B4 Fokus & Aplikasi Beku** ✅ | tiket Ed25519 (`free_daily`/`prepaid`/`coins`) + `focus_completed`, unlock dengan cap/eskalasi/jeda/koin latihan, bundel atomik, katalog `appbeku` | Fokus jalan offline penuh; rekonsiliasi idempoten; unlock ke-4 ditolak |
-| **B5 Deploy** | artefak deploy siap pakai (compose prod, nginx conf, SQL DB/role, snippet Loki/Promtail, workflow deploy, Dependabot), `cleanup-anon` + `reapply-deletions`, deploy `riung-api`, cron. Langkah infra & cutover app ada di `docs/todo-luar-backend.md` §A–B | `https://riung.e55techlab.com/healthz` 200 dari luar; `/readyz` 200 dari dalam; smoke test semua endpoint |
+| **B5 Deploy** 🟡 (deploy pertama 2026-10-13, sisa infra di TODO §A) | artefak deploy siap pakai (compose prod, nginx conf, SQL DB/role, snippet Loki/Promtail, workflow deploy, Dependabot), `cleanup-anon` + `reapply-deletions`, deploy `riung-api`, cron. Langkah infra & cutover app ada di `docs/todo-luar-backend.md` §A–B | `https://riung.e55techlab.com/healthz` 200 dari luar; `/readyz` 200 dari dalam; smoke test semua endpoint |
 | **B6 Produksi** | App Check `enforce`, query alert Grafana, uji beban (k6), security review | p95 < 200 ms di beban target |
 | **Nanti: Auth sendiri** | implementasi `Verifier` baru + endpoint login/daftar/reset, tambah baris `auth_identities` untuk user lama saat mereka login, lalu lepas Firebase Auth | user lama tetap punya data yang sama setelah pindah auth |
 

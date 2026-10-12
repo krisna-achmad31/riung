@@ -18,28 +18,32 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `/etc/ssh/sshd_config.d/50-cloud-init.conf` saat ini menimpa jadi `PasswordAuthentication yes`.
       Pertimbangkan menutup port 22 bila SSH cukup lewat 8443.
 - [ ] **P0 — Rotasi key `firebase-adminsdk`** (`riung-5e979-firebase-adminsdk-…json`). File sempat
-      tersimpan di `~/Downloads` dengan izin `-rw-r--r--`. Setelah itu buat **service account khusus**
+      tersimpan di `~/Downloads` dengan izin `-rw-r--r--`, dan **sejak deploy 2026-10-13 key ini yang dipakai
+      `riung-api`** (`/var/www/riung/secrets/firebase-service-account.json`) — hak admin penuh project. Buat
+      **service account khusus**
       backend berperan *Firebase Authentication Admin* saja (runbook langkah 4b); akses Google Play memakai
-      service account terpisah `riung-play` (langkah 4c).
-- [ ] **P0 — Backup Postgres**: cron harian `pg_dump -Fc` database `riung` (dan `n8n`, yang saat ini juga
-      tanpa backup) ke `/var/backups/…`, retensi 14 hari, salin off-site, uji restore.
+      service account terpisah `riung-play` (langkah 4c). Ganti file di VPS, `docker restart riung-api`, lalu
+      cabut key lama di Google Cloud dan hapus salinan di `~/Downloads`.
+- [ ] **P0 — Salin secret prod ke password manager**: `/var/www/riung/.env` dan `.env.migrate` hanya ada di
+      VPS (dibuat 2026-10-13). Tanpa salinan, VPS hilang = pembelian, backup PIN, dan `deleted_users` tidak
+      bisa dipulihkan.
+- [ ] **P0 — Backup Postgres off-site**: dump harian `riung` sudah jalan (`/var/backups/riung`, 14 hari, restore
+      diuji 2026-10-13). Sisa: salin off-site, dan tambah dump `n8n` (masih tanpa backup).
 - [x] **P1 — DNS Cloudflare**: `A riung → 76.13.20.72`, mode **DNS only** (sudah resolve, dicek 2026-10-13).
-- [ ] **P1 — Database**: jalankan `backend/deploy/sql/create-riung-db.sql` di `shared-postgres`
-      (membuat DB `riung`, role `riung_migrator` & `riung_app`), simpan password di `/var/www/riung/.env`.
-- [ ] **P1 — File env**: `/var/www/riung/.env` dari `backend/deploy/env.example` — empat secret HMAC
+- [x] **P1 — Database**: DB `riung`, role `riung_migrator` & `riung_app` dibuat 2026-10-13.
+- [x] **P1 — File env** (dibuat 2026-10-13): `/var/www/riung/.env` dari `backend/deploy/env.example` — empat secret HMAC
       berbeda (`openssl rand -hex 32`), `FOCUS_TICKET_KEY` (`openssl rand -base64 32`), path service account.
       Simpan salinan secret di password manager: `BILLING_ACCOUNT_KEY`/`LOG_PEPPER`/`PIN_PEPPER` tidak bisa
       diganti tanpa memutus pembelian, `deleted_users`, dan backup PIN.
-- [ ] **P1 — Nginx + TLS**: pasang `backend/deploy/nginx/riung.e55techlab.com.conf` ke
-      `core-shared/nginx/conf.d/` mengikuti urutan HTTP-only → certbot → config final (plan §8.4).
-      Selalu `nginx -t` sebelum reload — satu nginx dipakai semua situs.
-- [ ] **P1 — Loki**: tambahkan `retention_stream` 30 hari untuk `{container="riung-api"}` di
+- [x] **P1 — Nginx + TLS**: `riung.e55techlab.com` aktif 2026-10-13 (sertifikat diperpanjang cron certbot yang ada).
+- [ ] **P1 — Loki** (log riung sudah masuk Loki, retensi masih 7 hari): tambahkan `retention_stream` 30 hari untuk `{container="riung-api"}` di
       `core-shared/monitoring/loki/config.yml` (snippet di spec §6.5), dan stage `json` di Promtail
       (label hanya `level`, `event`).
 - [ ] **P1 — Dokumentasi core-shared** (commit ke branch `grafana`): IP `172.19.0.16`/`.17` dipakai
       `riung-api`/`riung-migrate`, `shared-postgres` dipakai "n8n + riung", domain baru di tabel nginx.
-- [ ] **P1 — GHCR**: `docker login ghcr.io` di VPS dengan token **read-only**; secret GitHub Actions untuk
-      deploy (host, port 8443, user `deploy`, private key).
+- [ ] **P1 — GHCR & deploy otomatis**: deploy pertama memakai image build lokal (runbook §B). Untuk CI:
+      merge ke `main`, `docker login ghcr.io` di VPS dengan token **read-only**, user `deploy`, secret GitHub
+      Actions (host, port 8443, private key), `vars.RIUNG_DEPLOY_ENABLED=true`.
 - [ ] **P1 — Google Play billing** (langkah lengkap: `backend/deploy/README.md` 4c): aktifkan Android
       Publisher API & Pub/Sub API; service account `riung-play` diundang di Play Console (*View financial
       data* + *Manage orders and subscriptions*), key → `secrets/play-service-account.json`; topic `play-rtdn`
@@ -49,14 +53,14 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
 - [ ] **P1 — Produk Play Console**: id produk persis `coin_pack_small|medium|large` (in-app, consumable) dan
       langganan `premium_monthly|premium_yearly` (satu base plan per langganan, trial 7 hari di offer).
       **Multi-quantity tetap mati** (server mengkredit/menarik per token).
-- [ ] **P1 — Cron** (runbook langkah 9): `cleanup`, `cleanup-anon`, `billing-sync` (tiap jam), `reconcile`,
-      backup `pg_dump`; alert Grafana untuk `refund_applied`, `ledger_mismatch`, `job_run ok=false`, dan umur
-      file backup terbaru (> 26 jam = gagal).
+- [x] **P1 — Cron** (runbook langkah 9, dipasang 2026-10-13): `cleanup`, `cleanup-anon`, `billing-sync` (tiap jam), `reconcile`,
+      backup `pg_dump`. Sisa: alert Grafana untuk `refund_applied`, `ledger_mismatch`, `job_run ok=false`, dan
+      umur file backup terbaru (> 26 jam = gagal).
 - [ ] **P1 — Uji sandbox**: license tester beli tiap paket koin & langganan, refund dari Play Console
       (koin tertarik / Premium berakhir), upgrade bulanan→tahunan, batalkan auto-renew (Premium tetap sampai
       akhir periode).
 - [ ] **P1 — Firebase App Check**: aktifkan provider Play Integrity untuk app Android.
-- [ ] **P1 — Isi konten**: setelah deploy, `docker exec -i riung-api /riung seed-content - < dummy-data-seed.json`.
+- [x] **P1 — Isi konten**: seed `dummy-data-seed.json` 2026-10-13 (ulangi bila konten berubah).
 - [ ] **P1 — Admin**: tentukan email admin; pastikan admin punya akses VPN OpenVPN; jalankan
       `riung admin grant <email> <alasan>` setelah deploy.
 - [ ] **P2 — Grafana**: kontak notifikasi (email tim) untuk alert di spec §6.6.

@@ -198,6 +198,16 @@ ssh -p 8443 deploy@76.13.20.72 'cd /var/www/riung && ./deploy.sh ghcr.io/krisna-
 
 Image selalu dari CI (linux/amd64). Jangan push image hasil build Mac (arm64) ke produksi.
 
+Sebelum branch di-merge ke `main` (belum ada image di GHCR), image dibuat lokal **untuk linux/amd64** dari commit
+yang sudah di-commit, lalu dimuat langsung ke VPS (`deploy.sh` memakai image lokal tanpa pull):
+
+```sh
+SHA=$(git rev-parse --short HEAD)
+docker buildx build --platform linux/amd64 --build-arg VERSION=$SHA -t ghcr.io/krisna-achmad31/riung-api:$SHA --load backend
+docker save ghcr.io/krisna-achmad31/riung-api:$SHA | gzip -1 | ssh -p 8443 root@76.13.20.72 'gunzip | docker load'
+ssh -p 8443 root@76.13.20.72 "cd /var/www/riung && ./deploy.sh ghcr.io/krisna-achmad31/riung-api:$SHA"
+```
+
 ## C. Verifikasi setelah deploy
 
 ```sh
@@ -246,4 +256,19 @@ pengganti GHCR, dan Postgres 16 sebagai `shared-postgres`:
 - Trust proxy: request dari IP nginx memakai `X-Request-Id`/`X-Real-IP`-nya; dari container lain
   header diabaikan.
 
-Belum diuji: config nginx dengan `nginx -t` dan certbot sungguhan (hanya bisa di VPS).
+## G. Deploy pertama (2026-10-13)
+
+Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:825085e` (build lokal amd64):
+- Langkah 3 (DB `riung`, role `riung_migrator`/`riung_app` bukan superuser), 4 (`.env`, `.env.migrate`
+  dibuat di server, `chmod 600`, secret acak baru), 4b (key `firebase-adminsdk` — **sementara**, lihat TODO
+  P0), 7 (bootstrap → certbot → config final; `nginx -t` lolos di tiap langkah, situs lain tetap 200),
+  9 (cron + backup pertama; crontab lama disalin ke `/root/crontab.before-riung.2026-10-13`), 10b (seed konten).
+- Belum: langkah 1 (user `deploy` & pengerasan SSH), 4c (billing, `PLAY_PACKAGE_NAME` kosong → 503),
+  5 (GHCR), 8 (retensi Loki 30 hari & stage `json` — `core-shared` punya perubahan orang lain yang belum
+  di-commit), 10c (admin), 11 (deploy otomatis), 12 (dokumentasi core-shared).
+- Hasil: `https://riung.e55techlab.com/healthz` 200 (TLS s.d. 2027-01-10, HSTS, HTTP → 301), `/readyz` &
+  `/admin` 404 dari luar, `/readyz` ready dari dalam, Admin API 403 dari container non-VPN, request tanpa token
+  401, `X-Request-Id` nginx diteruskan, container read-only/nonroot/`cap_drop: ALL`/256 MB, kredensial Firebase
+  Admin terhubung ke Google, restore backup ke DB sementara lolos (31 tabel, migrasi v3), log `riung-api`
+  (termasuk `job_run` cron) masuk Loki.
+- Belum diuji dengan ID token Firebase sungguhan dari app (butuh build app yang memakai backend Go).
