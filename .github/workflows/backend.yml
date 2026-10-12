@@ -102,7 +102,9 @@ jobs:
           provenance: false
 
       - name: Scan image (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        # Pinned to a commit: trivy-action tags were rewritten after the March
+        # 2026 supply-chain incident. v0.36.0 = signed tag a9c7b0f.
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ steps.meta.outputs.image }}
           severity: CRITICAL,HIGH
