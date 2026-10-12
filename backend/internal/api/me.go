@@ -1,9 +1,6 @@
 package api
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -12,6 +9,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/krisna-achmad31/riung/backend/internal/billing"
 	"github.com/krisna-achmad31/riung/backend/internal/httpx"
 	"github.com/krisna-achmad31/riung/backend/internal/logx"
 	"github.com/krisna-achmad31/riung/backend/internal/rules"
@@ -105,9 +103,7 @@ type loadoutsJSON struct {
 // billingAccountID is the obfuscated account id the app passes to Play
 // (applicationUserName); only the server knows the key (spec §3.9).
 func (s *Server) billingAccountID(userID string) string {
-	m := hmac.New(sha256.New, s.Config.BillingAccountKey)
-	m.Write([]byte(userID))
-	return "ba_" + hex.EncodeToString(m.Sum(nil))[:32]
+	return billing.AccountID(s.Config.BillingAccountKey, userID)
 }
 
 func (s *Server) userJSON(u store.User) userJSON {

@@ -82,6 +82,24 @@ unduh key JSON, simpan sebagai `/var/www/riung/secrets/firebase-service-account.
 `chown 65532:65532` dan `chmod 400` (container berjalan sebagai uid 65532). Jangan pakai key
 `firebase-adminsdk` bawaan.
 
+**4c. Google Play billing** (bisa menyusul; tanpa ini `PLAY_PACKAGE_NAME` dikosongkan dan
+`/v1/billing/*` menjawab 503)
+
+1. Google Cloud project `riung-5e979` → aktifkan *Google Play Android Developer API* dan *Cloud Pub/Sub API*.
+2. Buat service account `riung-play` (tanpa peran GCP), unduh key JSON →
+   `/var/www/riung/secrets/play-service-account.json` (`chown 65532:65532`, `chmod 400`).
+3. Play Console → *Users and permissions* → undang email `riung-play@…` dengan izin aplikasi Riung:
+   *View financial data* dan *Manage orders and subscriptions* (tanpa izin lain).
+4. Pub/Sub: topic `play-rtdn`; beri `google-play-developer-notifications@system.gserviceaccount.com`
+   peran *Pub/Sub Publisher* di topic itu. Buat service account `riung-rtdn-push` (tanpa peran), lalu
+   subscription **push** ke `https://riung.e55techlab.com/v1/webhooks/google-play` dengan *Enable
+   authentication* = `riung-rtdn-push@…` dan audience = URL yang sama (`RTDN_AUDIENCE`). Retry policy:
+   exponential backoff.
+5. Play Console → *Monetization setup* → *Real-time developer notifications*: topic
+   `projects/riung-5e979/topics/play-rtdn`, lalu **Send test notification** → di log harus muncul
+   `rtdn_received` dengan `kind=test`.
+6. Isi `PLAY_*`/`RTDN_*` di `.env` (lihat `env.example`), `./deploy.sh` ulang.
+
 **5. Akses GHCR** (sebagai user `deploy`; token GitHub dengan scope `read:packages` saja)
 
 ```sh
@@ -114,6 +132,10 @@ lalu `docker compose up -d --force-recreate loki promtail` di core-shared.
 ```cron
 # Pembersihan tabel bantu (idempotensi, jti App Check, penghitung lama)
 15 2 * * * docker exec riung-api /riung cleanup
+# Refund Google Play (tarik koin / cabut Premium) + acknowledge pembelian yang lupa di-ack app (tiap jam)
+5 * * * * docker exec riung-api /riung billing-sync
+# Cocokkan saldo dompet dengan ledger; gagal = ada ledger_mismatch di log
+45 2 * * * docker exec riung-api /riung reconcile
 # mkdir -p /var/backups/riung && chmod 700 /var/backups/riung
 30 2 * * * docker exec shared-postgres pg_dump -Fc -U n8n riung > /var/backups/riung/riung_$(date +\%F).dump && find /var/backups/riung -name '*.dump' -mtime +14 -delete
 ```

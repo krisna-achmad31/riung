@@ -17,6 +17,7 @@ import (
 
 	"github.com/krisna-achmad31/riung/backend/internal/api"
 	"github.com/krisna-achmad31/riung/backend/internal/authn"
+	"github.com/krisna-achmad31/riung/backend/internal/billing"
 	"github.com/krisna-achmad31/riung/backend/internal/config"
 	"github.com/krisna-achmad31/riung/backend/internal/economy"
 	"github.com/krisna-achmad31/riung/backend/internal/logx"
@@ -70,6 +71,8 @@ type env struct {
 	verifier *authn.DevVerifier
 	clock    *clock
 	logs     *syncBuffer
+	play     *billing.FakePublisher
+	billing  *billing.Service
 }
 
 type option func(*config.Config)
@@ -83,7 +86,7 @@ func newEnvWith(t *testing.T, appCheck authn.AppChecker, opts ...option) *env {
 	t.Helper()
 	pool := testdb.Pool(t)
 	cfg, err := config.Load(func(k string) string {
-		return map[string]string{"DEV_AUTH": "true", "TRUSTED_PROXIES": "127.0.0.1/32",
+		return map[string]string{"DEV_AUTH": "true", "DEV_BILLING": "true", "TRUSTED_PROXIES": "127.0.0.1/32",
 			"ADMIN_LISTEN_ADDR": "127.0.0.1:0", "ADMIN_ALLOWED_CIDRS": "127.0.0.1/32"}[k]
 	})
 	if err != nil {
@@ -92,18 +95,27 @@ func newEnvWith(t *testing.T, appCheck authn.AppChecker, opts ...option) *env {
 	for _, o := range opts {
 		o(&cfg)
 	}
-	e := &env{t: t, store: store.New(pool), verifier: &authn.DevVerifier{}, clock: &clock{}, logs: &syncBuffer{}}
+	e := &env{t: t, store: store.New(pool), verifier: &authn.DevVerifier{}, clock: &clock{}, logs: &syncBuffer{},
+		play: billing.NewFakePublisher()}
 	econ := economy.MustLoad()
+	hasher := logx.NewHasher(cfg.LogPepper, cfg.IPHashKey)
+	e.billing = &billing.Service{Store: e.store, Economy: econ, Hasher: hasher,
+		AccountKey: cfg.BillingAccountKey, Now: e.clock.now, AckAfter: time.Nanosecond}
+	if cfg.DevBilling {
+		e.billing.Publisher = e.play
+	}
 	deps := api.Deps{
 		Config:   cfg,
 		Logger:   logx.New(e.logs, slog.LevelInfo),
-		Hasher:   logx.NewHasher(cfg.LogPepper, cfg.IPHashKey),
+		Hasher:   hasher,
 		Store:    e.store,
 		Verifier: e.verifier,
 		AppCheck: appCheck,
 		Economy:  econ,
 		Limiter:  ratelimit.New(e.clock.now),
 		Settings: settings.NewCache(e.store, econ.Caps, 30*time.Second, e.clock.now),
+		Billing:  e.billing,
+		Push:     billing.DevPushVerifier{},
 		Now:      e.clock.now,
 	}
 	srv := httptest.NewServer(api.NewHandler(deps))

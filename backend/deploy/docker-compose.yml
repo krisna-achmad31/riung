@@ -51,6 +51,9 @@ services:
       # tokens and App Check token "dev" instead of real Firebase tokens.
       DEV_AUTH: "true"
       APP_CHECK_MODE: "off"
+      # Fake Google Play: purchase tokens "dev-coin:<billingAccountId>:<productId>:<n>"
+      # and "dev-sub:<billingAccountId>:<productId>:<days>:<n>"; RTDN bearer "dev-pubsub".
+      DEV_BILLING: "true"
       CORS_LANDING_ORIGIN: http://localhost:5000
       # Admin API on its own port; locally reachable from the host via the
       # Docker bridge (prod allows only the VPN gateway, see env.example).

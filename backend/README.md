@@ -41,7 +41,18 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
 
   CLI operator: `riung settings list|set|reset`, `riung admin grant|revoke <email> <alasan>`,
   `riung cleanup` (cron harian).
-- Berikutnya: B3 (billing Google Play), B4 (tiket Fokus & Aplikasi Beku). Lihat plan §10.
+- **B3 — billing Google Play** ✅: verifikasi ke Android Publisher API (state PURCHASED, `obfuscatedExternalAccountId`
+  = `billingAccountId`, satu token hanya untuk satu akun & dikreditkan sekali), koin paket ke bucket beli, Premium
+  dari `subscriptionsv2` (upgrade/`linkedPurchaseToken`, batal tetap aktif sampai akhir periode):
+
+  | Endpoint / perintah | Isi |
+  |---|---|
+  | `POST /v1/billing/verify`, `/restore` (≤ 20) | akun permanen, idempoten, App Check limited-use untuk `verify` |
+  | `GET /v1/billing/subscription` | status Premium |
+  | `POST /v1/webhooks/google-play` | RTDN Pub/Sub (OIDC), dedupe, status selalu dibaca ulang dari Play |
+  | `riung billing-sync` (cron tiap jam) | refund → tarik koin (sisa jadi utang) / cabut Premium; acknowledge pembelian yang terlewat app |
+  | `riung reconcile` (cron harian) | saldo dompet vs jumlah ledger; selisih → `ledger_mismatch` + exit 1 |
+- Berikutnya: B4 (tiket Fokus & Aplikasi Beku). Lihat plan §10.
 
 ## Menjalankan lokal
 
@@ -65,6 +76,16 @@ curl -X PATCH localhost:8080/v1/me/profile -H 'Authorization: Bearer dev:rani:an
 
 `DEV_AUTH` ditolak saat `RIUNG_ENV=prod`.
 
+Stack dev juga memakai `DEV_BILLING=true` (Google Play palsu). Ambil `billingAccountId` dari `/v1/me`, lalu:
+
+```sh
+BA=ba_...   # dari /v1/me; di zsh tulis ${BA} — "$BA:c..." dibaca zsh sebagai modifier
+curl -X POST localhost:8080/v1/billing/verify -H 'Authorization: Bearer dev:rani:google.com' \
+  -H 'X-Firebase-AppCheck: dev' -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" \
+  -d "{\"productId\":\"coin_pack_small\",\"purchaseToken\":\"dev-coin:${BA}:coin_pack_small:1\"}"
+# langganan: "dev-sub:${BA}:premium_yearly:365:1"; webhook: Authorization: Bearer dev-pubsub
+```
+
 Tanpa Docker (Postgres sudah ada, role dibuat dengan `deploy/sql/create-riung-db.sql`):
 
 ```sh
@@ -86,11 +107,15 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `DB_STATEMENT_TIMEOUT` | `5s` | batas waktu per query |
 | `TRUSTED_PROXIES` | kosong | IP/CIDR yang boleh mengisi `X-Real-IP`/`X-Request-Id` (prod: `172.19.0.2/32`) |
 | `LOG_PEPPER`, `IP_HASH_KEY` | dev placeholder | kunci hash log; prod wajib ≥ 32 karakter |
-| `PIN_PEPPER`, `BILLING_ACCOUNT_KEY` | dev placeholder | HMAC backup PIN jurnal & id akun Play; prod wajib ≥ 32 karakter |
+| `PIN_PEPPER`, `BILLING_ACCOUNT_KEY` | dev placeholder | HMAC backup PIN jurnal & id akun Play; prod wajib ≥ 32 karakter; keempat secret wajib berbeda |
 | `FIREBASE_PROJECT_ID` | — | project Firebase (`riung-5e979`); wajib kecuali `DEV_AUTH` |
 | `FIREBASE_CREDENTIALS_FILE` | — | service account (Firebase Auth Admin); wajib di prod (cek pencabutan, hapus akun) |
 | `APP_CHECK_MODE` | dev `off`, prod `monitor` | `off` / `monitor` (catat saja) / `enforce` (tolak); `off` ditolak di prod |
 | `DEV_AUTH` | `false` | token `dev:<uid>:<provider>`; hanya di `RIUNG_ENV=dev` |
+| `PLAY_PACKAGE_NAME` | kosong (billing mati, 503) | `com.riung.riung`; mengaktifkan billing |
+| `PLAY_CREDENTIALS_FILE` | `FIREBASE_CREDENTIALS_FILE` | service account yang diundang di Play Console |
+| `RTDN_AUDIENCE`, `RTDN_SERVICE_ACCOUNT` | — | wajib bila billing aktif: audience & service account push subscription Pub/Sub |
+| `DEV_BILLING` | `false` | Google Play palsu (`dev-coin:`/`dev-sub:`); hanya di `RIUNG_ENV=dev` |
 | `CORS_LANDING_ORIGIN` | kosong | satu-satunya origin browser untuk `POST /v1/waitlist` |
 | `MIN_APP_VERSION` | `0.0.0` | app di bawah versi ini mendapat `426 upgrade_required` |
 | `ADMIN_LISTEN_ADDR` | kosong (mati) | port Admin API, mis. `:8081`; tidak pernah dipasang di nginx |

@@ -5,6 +5,8 @@
 //	riung seed-content <file|->   load public content from a seed JSON (DATABASE_URL)
 //	riung settings list|set|reset admin-adjustable settings (audited as "cli")
 //	riung cleanup                 daily housekeeping (cron)
+//	riung billing-sync            apply Play refunds, acknowledge late subscriptions (cron)
+//	riung reconcile               check every wallet against its ledger (cron)
 //	riung admin grant|revoke      give/remove Admin API access (needs Firebase credentials)
 //	riung healthcheck             probe the local /healthz (Docker HEALTHCHECK)
 //	riung version                 print the build version
@@ -48,6 +50,8 @@ const usage = `usage:
   riung settings reset <key> <reason...>
   riung admin grant|revoke <email> <reason...>
   riung cleanup
+  riung billing-sync
+  riung reconcile
   riung healthcheck
   riung version`
 
@@ -91,6 +95,10 @@ func run(args []string) int {
 		err = runSettings(ctx, cfg, args[1:], logger)
 	case "cleanup":
 		err = runCleanup(ctx, cfg, logger)
+	case "billing-sync":
+		err = runBillingSync(ctx, cfg, logger)
+	case "reconcile":
+		err = runReconcile(ctx, cfg, logger)
 	case "admin":
 		err = runAdmin(ctx, cfg, args[1:], logger)
 	case "seed-content":
@@ -169,10 +177,15 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 	limiter := ratelimit.New(nil)
 	go limiter.Run(ctx, 5*time.Minute, 2*time.Hour)
 
+	hasher := logx.NewHasher(cfg.LogPepper, cfg.IPHashKey)
+	bill, push, err := newBilling(ctx, cfg, st, econ, hasher, logger)
+	if err != nil {
+		return err
+	}
 	deps := api.Deps{
 		Config:   cfg,
 		Logger:   logger,
-		Hasher:   logx.NewHasher(cfg.LogPepper, cfg.IPHashKey),
+		Hasher:   hasher,
 		Store:    st,
 		Verifier: verifier,
 		AppCheck: appCheck,
@@ -180,6 +193,8 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 		Catalog:  cat,
 		Limiter:  limiter,
 		Settings: settings.NewCache(st, econ.Caps, 30*time.Second, time.Now),
+		Billing:  bill,
+		Push:     push,
 	}
 	servers := []*http.Server{httpx.NewServer(cfg.ListenAddr, api.NewHandler(deps))}
 	if cfg.AdminListenAddr != "" {
@@ -195,7 +210,8 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 		}
 		go func(srv *http.Server, name string) {
 			logger.Info(name+" listening", logx.KeyEvent, logx.EventStartup, "addr", srv.Addr, "version", version,
-				"env", cfg.Env, "appCheck", cfg.AppCheckMode, "economy", econ.Version, "catalog", cat.Version)
+				"env", cfg.Env, "appCheck", cfg.AppCheckMode, "economy", econ.Version, "catalog", cat.Version,
+				"billing", cfg.BillingEnabled())
 			if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				errCh <- fmt.Errorf("%s server: %w", name, err)
 			}
@@ -237,7 +253,7 @@ func runCleanup(ctx context.Context, cfg config.Config, logger *slog.Logger) err
 	}
 	logger.Info("cleanup done", logx.KeyEvent, "job_run", "job", "cleanup", "ok", true,
 		"idempotencyKeys", res.IdempotencyKeys, "appCheckJtis", res.AppCheckJTIs, "signupCounters", res.SignupCounters,
-		"dailyCounters", res.DailyCounters, "pinAttempts", res.PinAttempts)
+		"dailyCounters", res.DailyCounters, "pinAttempts", res.PinAttempts, "rtdnMessages", res.RTDNMessages)
 	return nil
 }
 

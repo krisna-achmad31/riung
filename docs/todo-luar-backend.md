@@ -36,9 +36,21 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `riung-api`/`riung-migrate`, `shared-postgres` dipakai "n8n + riung", domain baru di tabel nginx.
 - [ ] **P1 — GHCR**: `docker login ghcr.io` di VPS dengan token **read-only**; secret GitHub Actions untuk
       deploy (host, port 8443, user `deploy`, private key).
-- [ ] **P1 — Google Play RTDN**: buat topic Pub/Sub + push subscription ke
-      `https://riung.e55techlab.com/v1/webhooks/google-play` dengan autentikasi OIDC (service account
-      khusus), lalu isi `RTDN_AUDIENCE`.
+- [ ] **P1 — Google Play billing** (langkah lengkap: `backend/deploy/README.md` 4c): aktifkan Android
+      Publisher API & Pub/Sub API; service account `riung-play` diundang di Play Console (*View financial
+      data* + *Manage orders and subscriptions*), key → `secrets/play-service-account.json`; topic `play-rtdn`
+      (publisher: `google-play-developer-notifications@system.gserviceaccount.com`) + push subscription OIDC
+      (`riung-rtdn-push`, audience = URL webhook); set topic RTDN di Play Console + *Send test notification*;
+      isi `PLAY_PACKAGE_NAME`, `PLAY_CREDENTIALS_FILE`, `RTDN_AUDIENCE`, `RTDN_SERVICE_ACCOUNT`.
+- [ ] **P1 — Produk Play Console**: id produk persis `coin_pack_small|medium|large` (in-app, consumable) dan
+      langganan `premium_monthly|premium_yearly` (satu base plan per langganan, trial 7 hari di offer).
+      **Multi-quantity tetap mati** (server mengkredit/menarik per token).
+- [ ] **P1 — Cron billing**: `5 * * * * docker exec riung-api /riung billing-sync` dan
+      `45 2 * * * docker exec riung-api /riung reconcile` (runbook langkah 9); alert Grafana untuk
+      `refund_applied`, `ledger_mismatch`, `job_run ok=false`.
+- [ ] **P1 — Uji sandbox**: license tester beli tiap paket koin & langganan, refund dari Play Console
+      (koin tertarik / Premium berakhir), upgrade bulanan→tahunan, batalkan auto-renew (Premium tetap sampai
+      akhir periode).
 - [ ] **P1 — Firebase App Check**: aktifkan provider Play Integrity untuk app Android.
 - [ ] **P1 — Isi konten**: setelah deploy, `docker exec -i riung-api /riung seed-content - < dummy-data-seed.json`.
 - [ ] **P1 — Admin**: tentukan email admin; pastikan admin punya akses VPN OpenVPN; jalankan
@@ -60,9 +72,15 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       tahunan, misi hari ini → dari `GET /v1/me`, bukan `LocalPrefsStore`.
 - [ ] `AuthNotifier._linkAndMigrate` → `POST /v1/me/link` (hapus `migrateAnonymousSnapshot`).
 - [ ] Outbox offline untuk `POST /v1/activities/batch` (idempotency key per event).
-- [ ] `BillingService`: `applicationUserName` = `billingAccountId` dari `/v1/me`; panggil
-      `/v1/billing/verify` & `/v1/billing/restore`; `completePurchase` hanya setelah server sukses; berhenti
-      mengkredit koin/Premium dari perangkat.
+- [ ] `BillingService`: `applicationUserName` (= `obfuscatedAccountId`) = `billingAccountId` dari `/v1/me`;
+      tombol beli hanya untuk akun permanen (anonim → ajak tautkan akun dulu, server menjawab 403);
+      panggil `/v1/billing/verify` (Idempotency-Key + App Check limited-use) untuk setiap update pembelian;
+      `completePurchase` hanya bila `result.status` ∈ `credited|already_credited|active|inactive` — **tidak**
+      untuk `pending` dan tidak untuk error; `503` → coba lagi nanti (pembelian tetap ada di Play);
+      `/v1/billing/restore` saat app dibuka/login dengan hasil `queryPastPurchases`; status Premium dari
+      `GET /v1/billing/subscription` / `GET /v1/me`; berhenti mengkredit koin/Premium dari perangkat.
+- [ ] Hapus akun saat langganan aktif: tampilkan peringatan "batalkan langganan di Play Store dulu" —
+      langganan terikat ke `billingAccountId` akun lama dan tidak bisa dipindah ke akun baru.
 - [ ] Tiket Fokus bertanda tangan disimpan terenkripsi di perangkat; ambil tiket `free_daily` saat online.
 - [ ] Harga & batas dari `GET /v1/config` (cache + fallback `economy.dart`); hapus key ekonomi dari
       Remote Config.
@@ -118,3 +136,5 @@ Backend memakai default di kolom kanan sampai diputuskan lain.
 | Jurnal/meditasi di atas batas harian: tanpa koin saja, atau tanpa koin **dan** tanpa progres monster? | tanpa koin & tanpa progres |
 | Nilai awal `journalRewardsPerDay` / `meditationRewardsPerDay` | 3 / 3 (bisa diubah admin) |
 | Jendela laporan offline: 7 hari (sekarang) atau 72 jam (lebih ketat terhadap client yang dimodifikasi)? | 7 hari |
+| Refund satu periode langganan tanpa pencabutan akses oleh Google: Premium tetap jalan atau langsung dicabut? | mengikuti Google (tetap jalan bila Google tidak mencabut) |
+| Utang koin hasil refund (`debtCoins`) ditampilkan ke user? Teks apa? | tidak ada copy; API mengembalikan `debtCoins` |

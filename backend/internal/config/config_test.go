@@ -26,8 +26,8 @@ func TestLoadDefaults(t *testing.T) {
 	if len(c.TrustedProxies) != 0 {
 		t.Fatalf("no proxy must be trusted by default, got %v", c.TrustedProxies)
 	}
-	if string(c.LogPepper) != devSecret || string(c.IPHashKey) != devSecret {
-		t.Fatal("dev should fall back to the dev secret")
+	if !strings.HasPrefix(string(c.LogPepper), devSecret) || string(c.LogPepper) == string(c.BillingAccountKey) {
+		t.Fatal("dev should fall back to distinct dev secrets")
 	}
 }
 
@@ -77,7 +77,7 @@ func TestValidateAPIProdNeedsSecrets(t *testing.T) {
 	long := strings.Repeat("k", 40)
 	valid := map[string]string{
 		"RIUNG_ENV": "prod", "DATABASE_URL": "postgres://x",
-		"LOG_PEPPER": long, "IP_HASH_KEY": long, "PIN_PEPPER": long, "BILLING_ACCOUNT_KEY": long,
+		"LOG_PEPPER": long + "1", "IP_HASH_KEY": long + "2", "PIN_PEPPER": long + "3", "BILLING_ACCOUNT_KEY": long + "4",
 		"FIREBASE_PROJECT_ID": "riung-5e979", "FIREBASE_CREDENTIALS_FILE": "/run/secrets/firebase.json",
 		"TRUSTED_PROXIES": "172.19.0.2/32",
 	}
@@ -86,7 +86,13 @@ func TestValidateAPIProdNeedsSecrets(t *testing.T) {
 		t.Fatalf("valid prod config rejected: %v", err)
 	}
 
-	valid["LOG_PEPPER"] = devSecret
+	valid["LOG_PEPPER"] = valid["BILLING_ACCOUNT_KEY"]
+	c, _ = Load(env(valid))
+	if err := c.ValidateAPI(); err == nil || !strings.Contains(err.Error(), "must be different") {
+		t.Fatalf("prod must reject a reused secret: %v", err)
+	}
+
+	valid["LOG_PEPPER"] = devSecret + "/LOG_PEPPER"
 	c, _ = Load(env(valid))
 	if err := c.ValidateAPI(); err == nil {
 		t.Fatal("prod must reject the dev secret")
@@ -164,5 +170,27 @@ func TestAdminListener(t *testing.T) {
 	c, err := Load(env(map[string]string{"ADMIN_LISTEN_ADDR": ":8081", "ADMIN_ALLOWED_CIDRS": "172.19.0.7"}))
 	if err != nil || len(c.AdminAllowedCIDRs) != 1 {
 		t.Fatalf("valid admin config: %v %v", c.AdminAllowedCIDRs, err)
+	}
+}
+
+func TestBillingConfig(t *testing.T) {
+	c, _ := Load(env(nil))
+	if c.BillingEnabled() {
+		t.Fatal("billing is off by default")
+	}
+	if _, err := Load(env(map[string]string{"RIUNG_ENV": "prod", "DEV_BILLING": "true"})); err == nil || !strings.Contains(err.Error(), "DEV_BILLING") {
+		t.Fatalf("DEV_BILLING refused in prod: %v", err)
+	}
+	if _, err := Load(env(map[string]string{"PLAY_PACKAGE_NAME": "com.riung.riung", "FIREBASE_CREDENTIALS_FILE": "/x.json"})); err == nil || !strings.Contains(err.Error(), "RTDN_AUDIENCE") {
+		t.Fatalf("billing needs RTDN settings: %v", err)
+	}
+	c, err := Load(env(map[string]string{"PLAY_PACKAGE_NAME": "com.riung.riung", "FIREBASE_CREDENTIALS_FILE": "/x.json",
+		"RTDN_AUDIENCE": "https://riung.e55techlab.com/v1/webhooks/google-play", "RTDN_SERVICE_ACCOUNT": "rtdn@riung.iam.gserviceaccount.com"}))
+	if err != nil || !c.BillingEnabled() || c.PlayCredentialsFile != "/x.json" {
+		t.Fatalf("valid billing config: %+v %v", c, err)
+	}
+	c, _ = Load(env(map[string]string{"DEV_BILLING": "true"}))
+	if !c.BillingEnabled() || c.PlayPackageName != "com.riung.riung" {
+		t.Fatalf("dev billing: %+v", c)
 	}
 }

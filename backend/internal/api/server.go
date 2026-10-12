@@ -9,6 +9,7 @@ import (
 	_ "time/tzdata" // distroless has no zoneinfo; users.tz must always resolve
 
 	"github.com/krisna-achmad31/riung/backend/internal/authn"
+	"github.com/krisna-achmad31/riung/backend/internal/billing"
 	"github.com/krisna-achmad31/riung/backend/internal/catalog"
 	"github.com/krisna-achmad31/riung/backend/internal/config"
 	"github.com/krisna-achmad31/riung/backend/internal/economy"
@@ -35,6 +36,10 @@ type Deps struct {
 	// Settings is shared with the Admin API so changes apply at once.
 	// Optional: built from Store when nil.
 	Settings *settings.Cache
+	// Billing verifies Play purchases; nil = billing not configured (503).
+	Billing *billing.Service
+	// Push authenticates RTDN Pub/Sub pushes.
+	Push billing.PushVerifier
 	// Now is the clock (tests inject a fixed one). Defaults to time.Now.
 	Now func() time.Time
 }
@@ -44,6 +49,7 @@ type Server struct {
 	Deps
 	settings     *settings.Cache
 	rules        *rules.Service
+	billingSvc   *billing.Service
 	publicConfig configResponse
 }
 
@@ -59,6 +65,10 @@ func newServer(d Deps) *Server {
 	}
 	s := &Server{Deps: d, settings: d.Settings}
 	s.rules = &rules.Service{Store: d.Store, Economy: d.Economy, Catalog: d.Catalog, Settings: d.Settings, Now: d.Now}
+	s.billingSvc = d.Billing
+	if s.billingSvc == nil {
+		s.billingSvc = &billing.Service{Store: d.Store, Economy: d.Economy, Hasher: d.Hasher, AccountKey: d.Config.BillingAccountKey, Now: d.Now}
+	}
 	s.publicConfig = buildPublicConfig(d)
 	return s
 }
@@ -117,6 +127,12 @@ func (s *Server) routes(mux *http.ServeMux) {
 	s.handle(mux, "POST /v1/shop/purchase", s.postPurchase, route{access: accessUser, limits: []ratelimit.Policy{rlShop}, idempotent: true})
 	s.handle(mux, "PUT /v1/loadouts/monsters/{saboteurId}", s.putMonsterLoadout, route{access: accessUser, limits: []ratelimit.Policy{rlLoadout}, idempotent: true})
 	s.handle(mux, "PUT /v1/loadouts/characters/{testId}", s.putCharacterLoadout, route{access: accessUser, limits: []ratelimit.Policy{rlLoadout}, idempotent: true})
+
+	// §3.9 Google Play billing
+	s.handle(mux, "POST /v1/billing/verify", s.postBillingVerify, route{access: accessPermanent, checkRevoked: true, limitedUseAppCheck: true, limits: []ratelimit.Policy{rlVerifyMin, rlVerifyHour}, idempotent: true})
+	s.handle(mux, "POST /v1/billing/restore", s.postBillingRestore, route{access: accessPermanent, limits: []ratelimit.Policy{rlRestore}, idempotent: true})
+	s.handle(mux, "GET /v1/billing/subscription", s.getSubscription, route{access: accessUser, limits: []ratelimit.Policy{rlSubscription}})
+	s.handle(mux, "POST /v1/webhooks/google-play", s.postPlayWebhook, route{access: accessPublic, bodyLimit: 256 << 10})
 }
 
 func (s *Server) now() time.Time { return s.Now() }

@@ -76,12 +76,16 @@ func (p Premium) Active() bool { return p.Status == "active" || p.Status == "in_
 func (p Premium) Yearly() bool { return p.Active() && p.Plan != nil && *p.Plan == "premium_yearly" }
 
 // PremiumStatus derives the effective status: past expiry an active
-// subscription is in grace for graceDays, then expired.
+// subscription is in grace for graceDays, then expired. A canceled
+// subscription (auto-renew turned off) stays active until the paid period ends.
 func PremiumStatus(sub *store.Subscription, now time.Time, graceDays int) Premium {
 	if sub == nil {
 		return Premium{Status: "none"}
 	}
 	p := Premium{Status: sub.Status, Plan: &sub.Plan, ExpiresAt: sub.ExpiresAt, AutoRenewing: sub.AutoRenewing}
+	if p.Status == "canceled" && sub.ExpiresAt != nil && now.Before(*sub.ExpiresAt) {
+		p.Status, p.AutoRenewing = "active", false
+	}
 	if sub.ExpiresAt != nil {
 		grace := time.Duration(graceDays) * 24 * time.Hour
 		switch {

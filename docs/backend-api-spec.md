@@ -346,7 +346,7 @@ memasangnya di karakter lain. Gaya kartu berbayar boleh dipasang tanpa dibeli bi
 | 27 | `POST /v1/billing/verify` | permanent | 10/mnt, 30/jam | ✓ | `{ productId, purchaseToken }` → verifikasi ke Google → kredit koin / aktifkan Premium |
 | 28 | `POST /v1/billing/restore` | permanent | 5/jam | ✓ | `{ purchases: [{productId, purchaseToken}] }` (≤ 20) — dari `restorePurchases()` |
 | 29 | `GET /v1/billing/subscription` | user | 30/mnt | — | status Premium terbaru |
-| 30 | `POST /v1/webhooks/google-play` | google | 300/mnt global | — | Real-time Developer Notifications (Pub/Sub push): renew, cancel, expire, revoke, refund |
+| 30 | `POST /v1/webhooks/google-play` | google | 120/mnt per IP + 300/mnt global | — | Real-time Developer Notifications (Pub/Sub push): renew, cancel, expire, revoke, refund |
 
 Alur `verify`:
 1. `productId` harus ada di daftar SKU server (`coin_pack_small|medium|large`, `premium_monthly|yearly`).
@@ -355,16 +355,52 @@ Alur `verify`:
    token belum pernah dikreditkan ke akun **mana pun** (`purchases.purchase_token` PRIMARY KEY).
 4. Koin paket → bucket **purchased** (80 / 330 / 820). Premium → `subscriptions.expires_at` dari Google.
 5. Server **tidak** meng-consume. Setelah server menjawab sukses, app memanggil `completePurchase`
-   (acknowledge/consume di sisi Play). Kalau app gagal menyelesaikan, Google me-refund otomatis dalam 3 hari
-   dan job voided purchases (langkah 6) menarik koinnya. Untuk langganan, handler RTDN meng-acknowledge
-   dari server bila setelah 1 jam masih `ACKNOWLEDGEMENT_STATE_PENDING`.
-6. Job harian `voidedpurchases.list` → refund: koin ditarik dari bucket purchased dulu, lalu earned; sisa
-   yang tidak tertutup dicatat di `wallets.debt_coins` dan dilunasi dari earn berikutnya (saldo tidak pernah
-   negatif). Premium dicabut. Semua tercatat di ledger `type=refund`.
+   (acknowledge/consume di sisi Play). Kalau app gagal menyelesaikan, job `riung billing-sync` (cron tiap jam)
+   meng-**acknowledge** (bukan consume) pembelian yang sudah dikreditkan/diaktifkan tapi masih belum di-ack
+   setelah 1 jam — koin paket maupun langganan — supaya Google tidak me-refund otomatis di hari ke-3.
+   App tetap wajib meng-consume paket koin agar paket yang sama bisa dibeli lagi.
+6. `riung billing-sync` juga membaca `voidedpurchases.list` (30 hari terakhir, idempoten); notifikasi RTDN
+   `voidedPurchaseNotification` menjalankan hal yang sama seketika. Paket koin: ditarik **persis sebanyak yang
+   dulu dikreditkan** (dari ledger), bucket purchased dulu lalu earned; sisa yang tidak tertutup dicatat di
+   `wallets.debt_coins` dan dilunasi dari kredit berikutnya (saldo tidak pernah negatif); ledger `type=refund`;
+   token ditandai `voided` dan tidak bisa diverifikasi lagi. Langganan: status dibaca ulang dari Play — kalau
+   Google mencabut akses (atau token sudah tidak dikenal) Premium berakhir saat itu juga; refund satu periode
+   tanpa pencabutan membiarkan Premium tetap jalan sesuai keputusan Google.
 7. Langganan diperpanjang/di-upgrade: token baru membawa `linkedPurchaseToken` → token lama ditandai
-   `superseded`, hak Premium pindah ke token baru (tidak dobel).
+   `superseded_by`, hak Premium pindah ke token baru (tidak dobel). Token lama/yang berakhir lebih cepat tidak
+   pernah menimpa langganan yang sedang berlaku (mis. lewat restore).
 8. RTDN: pesan Pub/Sub diproses idempoten (`rtdn_messages.message_id`), lalu status selalu dibaca ulang
-   dari Android Publisher API — isi notifikasi tidak dipercaya mentah.
+   dari Android Publisher API — isi notifikasi tidak dipercaya mentah. Notifikasi untuk token yang belum
+   pernah diverifikasi (dan bukan penerus token milik user) diabaikan sampai app memanggil `verify`.
+9. Status Premium: `canceled` (auto-renew dimatikan) tetap aktif sampai `expiresAt`; `in_grace` aktif;
+   `on_hold`, `paused`, `expired`, `revoked` tidak aktif.
+
+Respons `verify` (200):
+```json
+{ "result": { "productId": "coin_pack_medium", "kind": "consumable", "status": "credited", "coinsGranted": 330,
+              "premiumUntil": null, "test": false },
+  "wallet": { "coins": 330, "earnedCoins": 0, "purchasedCoins": 330 },
+  "premium": { "status": "none", "plan": null, "expiresAt": null, "autoRenewing": false } }
+```
+`result.status`: `credited` (koin baru masuk) · `already_credited` (token ini sudah pernah dikreditkan ke akun
+yang sama — aman untuk retry/restore) · `pending` (pembayaran tertunda; **jangan** `completePurchase`, tunggu
+update pembelian lalu panggil `verify` lagi) · `active` / `inactive` (langganan). App memanggil
+`completePurchase` untuk `credited`, `already_credited`, `active`, `inactive`.
+Error: `409 purchase_invalid` (Google tidak mengonfirmasi pembelian untuk akun ini: token palsu/milik akun lain/
+dibatalkan/sudah di-refund) · `400 invalid_request` (productId tidak dikenal) · `503 unavailable` (Google Play
+tidak bisa dihubungi atau billing belum dikonfigurasi — app me-retry nanti, pembelian tetap tersimpan di Play).
+
+`restore` menjawab `{ "results": [{ "productId", "ok", "result" | "error": {code, message} }], "wallet", "premium" }`
+— satu item gagal tidak menggagalkan yang lain; gangguan Google/DB menggagalkan seluruh request (503/500).
+
+Webhook: autentikasi token OIDC Google dari push subscription — tanda tangan, `exp`, `aud` = `RTDN_AUDIENCE`,
+`iss` = `accounts.google.com`, `email` = `RTDN_SERVICE_ACCOUNT` dan `email_verified`. Jawaban: `204` (diproses,
+duplikat, atau isi tidak bisa dibaca — retry tidak akan pernah berhasil, jadi di-ack dan dicatat), `401` token
+salah, `429`/`5xx` gangguan sementara (Pub/Sub mengulang). `packageName` selain `PLAY_PACKAGE_NAME` diabaikan.
+
+Dev (`DEV_BILLING=true`, hanya `RIUNG_ENV=dev`): Google Play dipalsukan — token
+`dev-coin:<billingAccountId>:<productId>:<n>` dan `dev-sub:<billingAccountId>:<productId>:<hari>:<n>`,
+bearer webhook `dev-pubsub`.
 
 ### 3.10 Daftar yang sengaja TIDAK ada di server (privasi)
 
@@ -573,7 +609,8 @@ location /                   { return 404; }       # termasuk /readyz dan path l
 | Akun baru (anonim/permanen) | 10/hari (`maxNewAccountsPerIpPerDay`, diatur admin) | IP |
 | Admin API `GET` / `PUT`·`DELETE` | 30/mnt / 10/mnt | admin |
 | `POST /v1/waitlist` | 20/jam | IP |
-| `POST /v1/webhooks/google-play` | 300/mnt | global |
+| `GET /billing/subscription` | 30/mnt | user |
+| `POST /v1/webhooks/google-play` | 120/mnt per IP sebelum autentikasi, 300/mnt global sesudahnya | IP / global |
 
 - Setiap endpoint punya **bucket sendiri** walau angkanya sama (mis. ekspor data tidak pernah memblokir hapus
   akun, `GET /v1/me` tidak berbagi kuota dengan `/v1/wallet`).
@@ -639,16 +676,16 @@ tidak mungkin tercatat. Layar krisis tidak menghasilkan request apa pun.
 | `shop_purchase` | INFO | `itemType`, `itemId`, `price` |
 | `appbeku_unlock` / `appbeku_blocked` | INFO / WARN | `n`, `price` / `reason` (`limit`, `cooldown`, `earned_only`) |
 | `focus_ticket_issued` / `focus_ticket_redeemed` / `focus_ticket_invalid` | INFO / INFO / WARN | `source`, `durationMin` / — / `reason` |
-| `purchase_verified` / `purchase_rejected` | INFO / WARN | `productId`, `tokenTail`, `reason` |
-| `rtdn_received` | INFO | `notificationType`, `productId` |
-| `refund_applied` | WARN | `productId`, `coinsClawedBack`, `debt` |
+| `purchase_verified` / `purchase_rejected` | INFO / WARN | `productId`, `tokenTail` (6 karakter terakhir), `status`, `coins`, `test` / `reason` (`not_valid_for_account`, `unknown_product`) |
+| `rtdn_received` / `rtdn_rejected` | INFO / WARN | `kind`, `notificationType`, `productId`, `action` / `reason` (`auth`, `envelope`, `notification`) |
+| `refund_applied` | WARN | `productId`, `coinsClawedBack`, `debt`, `premiumRevoked`, `orphan` |
 | `pin_verify_failed` / `pin_locked` | WARN | `attemptsToday` |
 | `idempotency_conflict` | WARN | `route` |
-| `ledger_mismatch` | ERROR | `expected`, `actual` (job rekonsiliasi) |
-| `dependency_error` | ERROR | `dependency` (`postgres`, `google_publisher`, `firebase`), `op`, `durationMs` |
+| `ledger_mismatch` | ERROR | `earned`/`ledgerEarned`, `purchased`/`ledgerPurchased`, `debt`/`ledgerDebt` (job `reconcile`) |
+| `dependency_error` | ERROR | `dependency` (`postgres`, `google_play`, `firebase`), `op`, `durationMs` |
 | `slow_query` | WARN | `query` (nama query sqlc), `durationMs` (> 500 ms) |
 | `panic` | ERROR | `stack` (hanya di log, tidak ke client) |
-| `job_run` | INFO / ERROR | `job` (`cleanup`, `cleanup_anon`, `voided_purchases`, `reconcile`, `backup`), `ok`, jumlah baris |
+| `job_run` | INFO / ERROR | `job` (`cleanup`, `cleanup_anon`, `billing_sync`, `reconcile`, `backup`), `ok`, jumlah baris |
 | `activity` | INFO | `type`, `coins`, `capReason` |
 | `signup_limited` | WARN | `limit` |
 | `admin_setting_changed` | WARN | `key`, `old`, `new`, `admin` (hash), `reason` |

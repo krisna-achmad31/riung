@@ -86,7 +86,20 @@ type Config struct {
 	// by nginx; only AdminAllowedCIDRs may connect (prod: OpenVPN 172.19.0.7/32).
 	AdminListenAddr   string
 	AdminAllowedCIDRs []netip.Prefix
+
+	// Google Play billing. Enabled when PlayPackageName is set (or DevBilling).
+	PlayPackageName     string
+	PlayCredentialsFile string // defaults to FirebaseCredentialsFile
+	// RTDN push authentication (Pub/Sub OIDC): audience configured on the
+	// push subscription and the service account it signs as.
+	RTDNAudience       string
+	RTDNServiceAccount string
+	// DevBilling fakes Play (dev-coin:/dev-sub: tokens). Only in dev.
+	DevBilling bool
 }
+
+// BillingEnabled reports whether purchase verification is configured.
+func (c Config) BillingEnabled() bool { return c.DevBilling || c.PlayPackageName != "" }
 
 // Load parses the environment through getenv (os.Getenv in production,
 // a map lookup in tests). It applies defaults but does not check that
@@ -134,9 +147,11 @@ func Load(getenv func(string) string) (Config, error) {
 	c.PinPepper = []byte(getenv("PIN_PEPPER"))
 	c.BillingAccountKey = []byte(getenv("BILLING_ACCOUNT_KEY"))
 	if c.Env == EnvDev {
-		for _, s := range []*[]byte{&c.LogPepper, &c.IPHashKey, &c.PinPepper, &c.BillingAccountKey} {
+		// Distinct per purpose even in dev: one shared key would make the log
+		// user hash a prefix of the billingAccountId sent to Google.
+		for name, s := range c.secrets() {
 			if len(*s) == 0 {
-				*s = []byte(devSecret)
+				*s = []byte(devSecret + "/" + name)
 			}
 		}
 	}
@@ -182,6 +197,31 @@ func Load(getenv func(string) string) (Config, error) {
 	if c.AdminListenAddr != "" && c.AdminListenAddr == c.ListenAddr {
 		errs = append(errs, errors.New("ADMIN_LISTEN_ADDR must differ from LISTEN_ADDR"))
 	}
+	c.PlayPackageName = strings.TrimSpace(getenv("PLAY_PACKAGE_NAME"))
+	c.PlayCredentialsFile = orDefault(getenv("PLAY_CREDENTIALS_FILE"), c.FirebaseCredentialsFile)
+	c.RTDNAudience = strings.TrimSpace(getenv("RTDN_AUDIENCE"))
+	c.RTDNServiceAccount = strings.TrimSpace(getenv("RTDN_SERVICE_ACCOUNT"))
+	if v := strings.TrimSpace(getenv("DEV_BILLING")); v != "" {
+		b, err := strconv.ParseBool(v)
+		if err != nil {
+			errs = append(errs, errors.New("DEV_BILLING must be true or false"))
+		}
+		c.DevBilling = b
+	}
+	if c.DevBilling && c.Env != EnvDev {
+		errs = append(errs, errors.New("DEV_BILLING is only allowed when RIUNG_ENV=dev"))
+	}
+	if c.DevBilling && c.PlayPackageName == "" {
+		c.PlayPackageName = "com.riung.riung"
+	}
+	if c.PlayPackageName != "" && !c.DevBilling {
+		if c.PlayCredentialsFile == "" {
+			errs = append(errs, errors.New("PLAY_CREDENTIALS_FILE (or FIREBASE_CREDENTIALS_FILE) is required for billing"))
+		}
+		if c.RTDNAudience == "" || c.RTDNServiceAccount == "" {
+			errs = append(errs, errors.New("RTDN_AUDIENCE and RTDN_SERVICE_ACCOUNT are required for billing"))
+		}
+	}
 	c.MinAppVersion = orDefault(getenv("MIN_APP_VERSION"), "0.0.0")
 	if _, ok := ParseVersion(c.MinAppVersion); !ok {
 		errs = append(errs, fmt.Errorf("MIN_APP_VERSION must look like 1.4.0"))
@@ -205,6 +245,7 @@ func (c Config) ValidateAPI() error {
 			checkSecret("IP_HASH_KEY", c.IPHashKey),
 			checkSecret("PIN_PEPPER", c.PinPepper),
 			checkSecret("BILLING_ACCOUNT_KEY", c.BillingAccountKey),
+			c.checkDistinctSecrets(),
 		)
 		if c.FirebaseCredentialsFile == "" {
 			errs = append(errs, errors.New("FIREBASE_CREDENTIALS_FILE is required in prod (revocation checks, account deletion)"))
@@ -256,12 +297,35 @@ func (c Config) MigrationURL() string {
 	return c.MigrateDatabaseURL
 }
 
+func (c *Config) secrets() map[string]*[]byte {
+	return map[string]*[]byte{"LOG_PEPPER": &c.LogPepper, "IP_HASH_KEY": &c.IPHashKey,
+		"PIN_PEPPER": &c.PinPepper, "BILLING_ACCOUNT_KEY": &c.BillingAccountKey}
+}
+
 func checkSecret(name string, v []byte) error {
 	if len(v) < minSecretLen {
 		return fmt.Errorf("%s must be at least %d characters in prod", name, minSecretLen)
 	}
-	if string(v) == devSecret {
+	if strings.HasPrefix(string(v), devSecret) {
 		return fmt.Errorf("%s must not use the dev default in prod", name)
+	}
+	return nil
+}
+
+// checkDistinctSecrets refuses reusing one secret for two purposes.
+func (c *Config) checkDistinctSecrets() error {
+	seen := map[string]string{}
+	names := []string{"LOG_PEPPER", "IP_HASH_KEY", "PIN_PEPPER", "BILLING_ACCOUNT_KEY"}
+	secrets := c.secrets()
+	for _, name := range names {
+		v := string(*secrets[name])
+		if v == "" {
+			continue
+		}
+		if other, ok := seen[v]; ok {
+			return fmt.Errorf("%s and %s must be different secrets", other, name)
+		}
+		seen[v] = name
 	}
 	return nil
 }
