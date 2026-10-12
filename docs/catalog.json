@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-12.1",
-  "_comment": "Katalog item & konten yang menentukan aturan ekonomi. Harga TIDAK ditulis di sini: priceTier merujuk ke kunci di economy-props.json bagian spend. Mirror app: features/toko/logic/toko_data.dart, features/kepribadian/logic/{character_accessory,card_style}.dart, features/meditasi/logic/meditation_catalog.dart, features/jurnal/logic/journal_prompts.dart, features/betterme/data/betterme_content.dart, features/monster/logic/habit_monsters.dart. Salinan server: backend/internal/catalog/catalog.json (wajib identik, dijaga tes). Id inventori: kosmetik monster = id-nya, aksesori = 'acc_' + id, gaya kartu = 'cardstyle_' + id.",
+  "version": "2026-10-12.2",
+  "_comment": "Katalog item & konten yang menentukan aturan ekonomi. Harga TIDAK ditulis di sini: priceTier merujuk ke kunci di economy-props.json bagian spend. Mirror app: features/toko/logic/toko_data.dart, features/kepribadian/logic/{character_accessory,card_style}.dart, features/meditasi/logic/meditation_catalog.dart, features/jurnal/logic/journal_prompts.dart, features/betterme/data/betterme_content.dart, features/monster/logic/habit_monsters.dart, core/config/appbeku_catalog.dart (id aplikasi Aplikasi Beku = package name). Salinan server: backend/internal/catalog/catalog.json (wajib identik, dijaga tes). Id inventori: kosmetik monster = id-nya, aksesori = 'acc_' + id, gaya kartu = 'cardstyle_' + id.",
   "monsters": [
     {
       "id": "meronta",
@@ -425,6 +425,70 @@
       "priceTier": "focusBundle5"
     }
   ],
+  "appbeku": {
+    "apps": [
+      {
+        "id": "com.instagram.android",
+        "group": "sosmed"
+      },
+      {
+        "id": "com.zhiliaoapp.musically",
+        "group": "sosmed"
+      },
+      {
+        "id": "com.google.android.youtube",
+        "group": "sosmed"
+      },
+      {
+        "id": "com.twitter.android",
+        "group": "sosmed"
+      },
+      {
+        "id": "com.mobile.legends",
+        "group": "game"
+      }
+    ],
+    "units": [
+      {
+        "minutes": 10,
+        "priceTier": "unlock10"
+      },
+      {
+        "minutes": 20,
+        "priceTier": "unlock20"
+      },
+      {
+        "minutes": 30,
+        "priceTier": "unlock30"
+      },
+      {
+        "minutes": 60,
+        "priceTier": "unlock60"
+      }
+    ],
+    "bundles": [
+      {
+        "id": "santai",
+        "priceTier": "bundleSantai",
+        "apps": [
+          {
+            "appId": "com.instagram.android",
+            "minutes": 15
+          },
+          {
+            "appId": "com.zhiliaoapp.musically",
+            "minutes": 15
+          }
+        ]
+      },
+      {
+        "id": "sosmed",
+        "priceTier": "bundleSosmed",
+        "group": "sosmed",
+        "minutesPerApp": 30
+      }
+    ]
+  },
   "journalPrompts": [
     {
       "id": "p_hakim",

@@ -6,10 +6,13 @@
 package config
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log/slog"
 	"net/netip"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -75,6 +78,10 @@ type Config struct {
 	PinPepper []byte
 	// BillingAccountKey derives the obfuscated Play account id per user.
 	BillingAccountKey []byte
+	// FocusTicketKey is the Ed25519 seed (32 bytes) that signs Focus tickets;
+	// FocusTicketKid names it so keys can be rotated.
+	FocusTicketKey []byte
+	FocusTicketKid string
 
 	// CORSLandingOrigin is the only origin allowed to call POST /v1/waitlist
 	// from a browser (empty = no CORS at all).
@@ -146,6 +153,20 @@ func Load(getenv func(string) string) (Config, error) {
 	c.IPHashKey = []byte(getenv("IP_HASH_KEY"))
 	c.PinPepper = []byte(getenv("PIN_PEPPER"))
 	c.BillingAccountKey = []byte(getenv("BILLING_ACCOUNT_KEY"))
+	if v := strings.TrimSpace(getenv("FOCUS_TICKET_KEY")); v != "" {
+		seed, err := decodeKey(v)
+		if err != nil || len(seed) != 32 {
+			errs = append(errs, errors.New("FOCUS_TICKET_KEY must be 32 random bytes in base64 (openssl rand -base64 32)"))
+		}
+		c.FocusTicketKey = seed
+	} else if c.Env == EnvDev {
+		sum := sha256.Sum256([]byte(devSecret + "/FOCUS_TICKET_KEY"))
+		c.FocusTicketKey = sum[:]
+	}
+	c.FocusTicketKid = orDefault(getenv("FOCUS_TICKET_KID"), "k1")
+	if !kidPattern.MatchString(c.FocusTicketKid) {
+		errs = append(errs, errors.New("FOCUS_TICKET_KID must be 1–32 letters, digits, '-' or '_'"))
+	}
 	if c.Env == EnvDev {
 		// Distinct per purpose even in dev: one shared key would make the log
 		// user hash a prefix of the billingAccountId sent to Google.
@@ -245,6 +266,7 @@ func (c Config) ValidateAPI() error {
 			checkSecret("IP_HASH_KEY", c.IPHashKey),
 			checkSecret("PIN_PEPPER", c.PinPepper),
 			checkSecret("BILLING_ACCOUNT_KEY", c.BillingAccountKey),
+			c.checkFocusTicketKey(),
 			c.checkDistinctSecrets(),
 		)
 		if c.FirebaseCredentialsFile == "" {
@@ -308,6 +330,29 @@ func checkSecret(name string, v []byte) error {
 	}
 	if strings.HasPrefix(string(v), devSecret) {
 		return fmt.Errorf("%s must not use the dev default in prod", name)
+	}
+	return nil
+}
+
+var kidPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,32}$`)
+
+// decodeKey accepts standard or URL-safe base64, padded or not.
+func decodeKey(v string) ([]byte, error) {
+	for _, enc := range []*base64.Encoding{base64.StdEncoding, base64.RawStdEncoding, base64.URLEncoding, base64.RawURLEncoding} {
+		if b, err := enc.DecodeString(v); err == nil {
+			return b, nil
+		}
+	}
+	return nil, errors.New("not base64")
+}
+
+func (c *Config) checkFocusTicketKey() error {
+	dev := sha256.Sum256([]byte(devSecret + "/FOCUS_TICKET_KEY"))
+	switch {
+	case len(c.FocusTicketKey) != 32:
+		return errors.New("FOCUS_TICKET_KEY is required in prod (openssl rand -base64 32)")
+	case string(c.FocusTicketKey) == string(dev[:]):
+		return errors.New("FOCUS_TICKET_KEY must not use the dev default in prod")
 	}
 	return nil
 }

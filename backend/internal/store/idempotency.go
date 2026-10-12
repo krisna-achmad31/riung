@@ -95,6 +95,7 @@ type PurgeResult struct {
 	DailyCounters   int64 `json:"dailyCounters"`
 	PinAttempts     int64 `json:"pinAttempts"`
 	RTDNMessages    int64 `json:"rtdnMessages"`
+	FocusTickets    int64 `json:"focusTickets"`
 }
 
 // Purge deletes housekeeping rows nobody can need any more: idempotency keys
@@ -114,6 +115,8 @@ func (s *Store) Purge(ctx context.Context) (PurgeResult, error) {
 		{&r.PinAttempts, `DELETE FROM pin_attempts WHERE day < current_date - 2`},
 		// Pub/Sub keeps undelivered messages at most 7 days.
 		{&r.RTDNMessages, `DELETE FROM rtdn_messages WHERE received_at < now() - interval '30 days'`},
+		// Used or expired Focus tickets are only needed for a while after.
+		{&r.FocusTickets, `DELETE FROM focus_tickets WHERE expires_at < now() - interval '90 days'`},
 	}
 	for _, st := range steps {
 		tag, err := s.pool.Exec(ctx, st.sql)

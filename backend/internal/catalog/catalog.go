@@ -87,6 +87,44 @@ type FocusPack struct {
 	Price     int    `json:"-"`
 }
 
+// AppBekuApp is an app that can be frozen. The id is the Android package
+// name from the app's catalog; nothing else about the app is known here.
+type AppBekuApp struct {
+	ID    string `json:"id"`
+	Group string `json:"group"`
+}
+
+// AppBekuUnit is a single-app unlock of fixed length.
+type AppBekuUnit struct {
+	Minutes   int    `json:"minutes"`
+	PriceTier string `json:"priceTier"`
+	Price     int    `json:"-"`
+}
+
+// AppBekuGrant is minutes unlocked for one app.
+type AppBekuGrant struct {
+	AppID   string `json:"appId"`
+	Minutes int    `json:"minutes"`
+}
+
+// AppBekuBundle unlocks several apps at once: either a fixed list (Apps) or
+// MinutesPerApp for each app of Group the user chooses.
+type AppBekuBundle struct {
+	ID            string         `json:"id"`
+	PriceTier     string         `json:"priceTier"`
+	Apps          []AppBekuGrant `json:"apps,omitempty"`
+	Group         string         `json:"group,omitempty"`
+	MinutesPerApp int            `json:"minutesPerApp,omitempty"`
+	Price         int            `json:"-"`
+}
+
+// AppBeku is the Aplikasi Beku catalog.
+type AppBeku struct {
+	Apps    []AppBekuApp    `json:"apps"`
+	Units   []AppBekuUnit   `json:"units"`
+	Bundles []AppBekuBundle `json:"bundles"`
+}
+
 // JournalPrompt is a guided CBT journal prompt.
 type JournalPrompt struct {
 	ID        string `json:"id"`
@@ -124,6 +162,7 @@ type Catalog struct {
 	AccessoryBundles []AccessoryBundle `json:"accessoryBundles"`
 	CardStyles       []CardStyle       `json:"cardStyles"`
 	FocusPacks       []FocusPack       `json:"focusPacks"`
+	AppBeku          AppBeku           `json:"appbeku"`
 	JournalPrompts   []JournalPrompt   `json:"journalPrompts"`
 	Meditations      []Meditation      `json:"meditations"`
 	Betterme         Betterme          `json:"betterme"`
@@ -137,6 +176,9 @@ type Catalog struct {
 	bundles      map[string]AccessoryBundle
 	cardStyles   map[string]CardStyle
 	focusPacks   map[string]FocusPack
+	appbekuApps  map[string]AppBekuApp
+	appbekuUnits map[int]AppBekuUnit
+	appbekuBunds map[string]AppBekuBundle
 	prompts      map[string]JournalPrompt
 	meditations  map[string]Meditation
 	lessons      map[string]BettermeLesson
@@ -278,6 +320,7 @@ func (c *Catalog) index(e economy.Props) error {
 		}
 		c.focusPacks[f.ID] = *f
 	}
+	c.indexAppBeku(e.AppBeku, fail)
 	c.prompts = map[string]JournalPrompt{}
 	for _, p := range c.JournalPrompts {
 		if _, ok := c.monsters[p.MonsterID]; !ok {
@@ -307,6 +350,57 @@ func (c *Catalog) index(e economy.Props) error {
 	return errors.Join(errs...)
 }
 
+func (c *Catalog) indexAppBeku(e economy.AppBeku, fail func(string, ...any)) {
+	prices := map[string]int{"unlock10": e.Unlock10, "unlock20": e.Unlock20, "unlock30": e.Unlock30,
+		"unlock60": e.Unlock60, "bundleSantai": e.BundleSantai, "bundleSosmed": e.BundleSosmed}
+	price := func(tier, what string) int {
+		p, ok := prices[tier]
+		if !ok {
+			fail("appbeku %s: unknown priceTier %q", what, tier)
+		}
+		return p
+	}
+	a := &c.AppBeku
+	c.appbekuApps = map[string]AppBekuApp{}
+	groups := map[string]int{}
+	for _, app := range a.Apps {
+		if app.ID == "" || app.Group == "" {
+			fail("appbeku app %q: id and group are required", app.ID)
+		}
+		if _, dup := c.appbekuApps[app.ID]; dup {
+			fail("appbeku app %q: duplicate", app.ID)
+		}
+		c.appbekuApps[app.ID] = app
+		groups[app.Group]++
+	}
+	c.appbekuUnits = map[int]AppBekuUnit{}
+	for i := range a.Units {
+		u := &a.Units[i]
+		u.Price = price(u.PriceTier, fmt.Sprintf("unit %d", u.Minutes))
+		if u.Minutes < 1 {
+			fail("appbeku unit: minutes must be >= 1")
+		}
+		c.appbekuUnits[u.Minutes] = *u
+	}
+	c.appbekuBunds = map[string]AppBekuBundle{}
+	for i := range a.Bundles {
+		b := &a.Bundles[i]
+		b.Price = price(b.PriceTier, "bundle "+b.ID)
+		switch {
+		case len(b.Apps) > 0 && b.Group == "":
+			for _, g := range b.Apps {
+				if _, ok := c.appbekuApps[g.AppID]; !ok || g.Minutes < 1 {
+					fail("appbeku bundle %s: bad app %q", b.ID, g.AppID)
+				}
+			}
+		case len(b.Apps) == 0 && groups[b.Group] > 0 && b.MinutesPerApp > 0:
+		default:
+			fail("appbeku bundle %s: needs either apps or a known group with minutesPerApp", b.ID)
+		}
+		c.appbekuBunds[b.ID] = *b
+	}
+}
+
 // Lookups.
 
 func (c *Catalog) Monster(id string) (Monster, bool) { m, ok := c.monsters[id]; return m, ok }
@@ -319,6 +413,15 @@ func (c *Catalog) Accessory(id string) (Accessory, bool)    { a, ok := c.accesso
 func (c *Catalog) Bundle(id string) (AccessoryBundle, bool) { b, ok := c.bundles[id]; return b, ok }
 func (c *Catalog) CardStyle(id string) (CardStyle, bool)    { s, ok := c.cardStyles[id]; return s, ok }
 func (c *Catalog) FocusPack(id string) (FocusPack, bool)    { f, ok := c.focusPacks[id]; return f, ok }
+func (c *Catalog) AppBekuApp(id string) (AppBekuApp, bool)  { a, ok := c.appbekuApps[id]; return a, ok }
+func (c *Catalog) AppBekuUnit(minutes int) (AppBekuUnit, bool) {
+	u, ok := c.appbekuUnits[minutes]
+	return u, ok
+}
+func (c *Catalog) AppBekuBundle(id string) (AppBekuBundle, bool) {
+	b, ok := c.appbekuBunds[id]
+	return b, ok
+}
 func (c *Catalog) JournalPrompt(id string) (JournalPrompt, bool) {
 	p, ok := c.prompts[id]
 	return p, ok

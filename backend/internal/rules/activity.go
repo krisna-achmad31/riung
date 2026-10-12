@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/krisna-achmad31/riung/backend/internal/settings"
@@ -164,7 +165,14 @@ func (s *Service) prepare(user store.User, in ActivityInput) (prepared, error) {
 		}
 		p.key = "minigame:" + in.Ref
 	case TypeFocusComplete:
-		return p, invalid("type", "focus_completed needs focus tickets, which this server version does not issue yet")
+		if !uuidPattern.MatchString(in.TicketID) {
+			return p, invalid("ticketId", "ticketId must be a UUID")
+		}
+		if _, ok := s.Catalog.Monster(in.SaboteurID); !ok {
+			return p, invalid("saboteurId", "unknown saboteurId")
+		}
+		p.in.TicketID = strings.ToLower(in.TicketID)
+		p.key = "focus:" + p.in.TicketID
 	default:
 		return p, invalid("type", "unknown activity type")
 	}
@@ -313,6 +321,9 @@ func (s *Service) apply(ctx context.Context, tx *store.UserTx, p prepared, res *
 			}
 		}
 		return s.progress(tx, res, in.SaboteurID, delta)
+
+	case TypeFocusComplete:
+		return s.redeemFocus(tx, p, res)
 	}
 	return fmt.Errorf("unhandled activity type %q", in.Type)
 }

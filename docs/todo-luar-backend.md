@@ -81,7 +81,18 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `GET /v1/billing/subscription` / `GET /v1/me`; berhenti mengkredit koin/Premium dari perangkat.
 - [ ] Hapus akun saat langganan aktif: tampilkan peringatan "batalkan langganan di Play Store dulu" —
       langganan terikat ke `billingAccountId` akun lama dan tidak bisa dipindah ke akun baru.
-- [ ] Tiket Fokus bertanda tangan disimpan terenkripsi di perangkat; ambil tiket `free_daily` saat online.
+- [ ] **Mode Fokus lewat tiket**: saat online ambil tiket `free_daily` di muka (`POST /v1/focus/tickets`),
+      simpan terenkripsi, cek tanda tangan dengan `focusTicketKeys` dari `/v1/config` (payload §3.7); tiket
+      `prepaid`/`coins` diminta **saat user memulai sesi** (sesinya langsung terpakai, tidak dikembalikan bila
+      kedaluwarsa); sesi selesai → `focus_completed` `{ticketId, saboteurId}` lewat outbox; tangani
+      `limit_reached` (`free_daily`, `no_prepaid_sessions`) dan `ticket_invalid`. Hapus pemotongan
+      sesi/koin Fokus di perangkat.
+- [ ] **Aplikasi Beku lewat server**: `POST /v1/appbeku/unlocks` dengan `appId` = package name (satuan:
+      `minutes` 10/20/30/60) atau `bundleId` (`santai`; `sosmed` + `appIds` aplikasi sosmed yang dibekukan),
+      `expectedPrice` = harga dasar dari `/v1/config` + 10 × `today.paidUnlocksUsed`; buka menit sesuai
+      `result.grants`; tangani `cooldown` (`retryAfterSeconds` — jeda juga berlaku di Toko, bukan hanya
+      interstisial), `limit_reached`, `insufficient_coins` dengan `earnedOnly`, `price_changed`. Hitungan
+      buka-berbayar dari `GET /v1/me` (`today.paidUnlocksUsed`), bukan prefs lokal; jalur napas tetap lokal.
 - [ ] Harga & batas dari `GET /v1/config` (cache + fallback `economy.dart`); hapus key ekonomi dari
       Remote Config.
 - [ ] `JurnalHomeScreen` / `JurnalPromptScreen`: cek boleh menulis & prompt premium lewat
@@ -137,4 +148,6 @@ Backend memakai default di kolom kanan sampai diputuskan lain.
 | Nilai awal `journalRewardsPerDay` / `meditationRewardsPerDay` | 3 / 3 (bisa diubah admin) |
 | Jendela laporan offline: 7 hari (sekarang) atau 72 jam (lebih ketat terhadap client yang dimodifikasi)? | 7 hari |
 | Refund satu periode langganan tanpa pencabutan akses oleh Google: Premium tetap jalan atau langsung dicabut? | mengikuti Google (tetap jalan bila Google tidak mencabut) |
+| Tiket Fokus `prepaid`/`coins` yang tidak dipakai sampai kedaluwarsa (30 hari): hangus atau sesi/koin dikembalikan? | hangus (app hanya meminta tiket saat sesi dimulai) |
+| Jeda 60 detik antar buka-berbayar Aplikasi Beku juga berlaku untuk pembelian dari Toko (sekarang app hanya menunggu di interstisial)? | ya, server menerapkan jeda untuk semua buka-berbayar |
 | Utang koin hasil refund (`debtCoins`) ditampilkan ke user? Teks apa? | tidak ada copy; API mengembalikan `debtCoins` |

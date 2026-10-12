@@ -78,6 +78,7 @@ func TestValidateAPIProdNeedsSecrets(t *testing.T) {
 	valid := map[string]string{
 		"RIUNG_ENV": "prod", "DATABASE_URL": "postgres://x",
 		"LOG_PEPPER": long + "1", "IP_HASH_KEY": long + "2", "PIN_PEPPER": long + "3", "BILLING_ACCOUNT_KEY": long + "4",
+		"FOCUS_TICKET_KEY":    "q83vEjRWeJq83vEjRWeJq83vEjRWeJq83vEjRWeJq80=",
 		"FIREBASE_PROJECT_ID": "riung-5e979", "FIREBASE_CREDENTIALS_FILE": "/run/secrets/firebase.json",
 		"TRUSTED_PROXIES": "172.19.0.2/32",
 	}
@@ -192,5 +193,26 @@ func TestBillingConfig(t *testing.T) {
 	c, _ = Load(env(map[string]string{"DEV_BILLING": "true"}))
 	if !c.BillingEnabled() || c.PlayPackageName != "com.riung.riung" {
 		t.Fatalf("dev billing: %+v", c)
+	}
+}
+
+func TestFocusTicketKey(t *testing.T) {
+	c, err := Load(env(nil))
+	if err != nil || len(c.FocusTicketKey) != 32 || c.FocusTicketKid != "k1" {
+		t.Fatalf("dev default key: %v %d %q", err, len(c.FocusTicketKey), c.FocusTicketKid)
+	}
+	if _, err := Load(env(map[string]string{"FOCUS_TICKET_KEY": "dG9vIHNob3J0"})); err == nil {
+		t.Fatal("a short key must be refused")
+	}
+	if _, err := Load(env(map[string]string{"FOCUS_TICKET_KID": "bad kid"})); err == nil {
+		t.Fatal("a bad kid must be refused")
+	}
+	c, err = Load(env(map[string]string{"FOCUS_TICKET_KEY": "q83vEjRWeJq83vEjRWeJq83vEjRWeJq83vEjRWeJq80", "FOCUS_TICKET_KID": "2026-10"}))
+	if err != nil || len(c.FocusTicketKey) != 32 || c.FocusTicketKid != "2026-10" {
+		t.Fatalf("unpadded key: %v", err)
+	}
+	c, _ = Load(env(map[string]string{"RIUNG_ENV": "prod"}))
+	if err := c.ValidateAPI(); err == nil || !strings.Contains(err.Error(), "FOCUS_TICKET_KEY") {
+		t.Fatalf("prod requires the key: %v", err)
 	}
 }

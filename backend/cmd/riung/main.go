@@ -36,6 +36,7 @@ import (
 	"github.com/krisna-achmad31/riung/backend/internal/ratelimit"
 	"github.com/krisna-achmad31/riung/backend/internal/settings"
 	"github.com/krisna-achmad31/riung/backend/internal/store"
+	"github.com/krisna-achmad31/riung/backend/internal/ticket"
 )
 
 // version is set at build time with -ldflags "-X main.version=...".
@@ -182,6 +183,10 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 	if err != nil {
 		return err
 	}
+	tickets, err := ticket.NewSigner(cfg.FocusTicketKid, cfg.FocusTicketKey)
+	if err != nil {
+		return fmt.Errorf("focus tickets: %w", err)
+	}
 	deps := api.Deps{
 		Config:   cfg,
 		Logger:   logger,
@@ -195,6 +200,7 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 		Settings: settings.NewCache(st, econ.Caps, 30*time.Second, time.Now),
 		Billing:  bill,
 		Push:     push,
+		Tickets:  tickets,
 	}
 	servers := []*http.Server{httpx.NewServer(cfg.ListenAddr, api.NewHandler(deps))}
 	if cfg.AdminListenAddr != "" {
@@ -253,7 +259,7 @@ func runCleanup(ctx context.Context, cfg config.Config, logger *slog.Logger) err
 	}
 	logger.Info("cleanup done", logx.KeyEvent, "job_run", "job", "cleanup", "ok", true,
 		"idempotencyKeys", res.IdempotencyKeys, "appCheckJtis", res.AppCheckJTIs, "signupCounters", res.SignupCounters,
-		"dailyCounters", res.DailyCounters, "pinAttempts", res.PinAttempts, "rtdnMessages", res.RTDNMessages)
+		"dailyCounters", res.DailyCounters, "pinAttempts", res.PinAttempts, "rtdnMessages", res.RTDNMessages, "focusTickets", res.FocusTickets)
 	return nil
 }
 

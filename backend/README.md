@@ -52,7 +52,14 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
   | `POST /v1/webhooks/google-play` | RTDN Pub/Sub (OIDC), dedupe, status selalu dibaca ulang dari Play |
   | `riung billing-sync` (cron tiap jam) | refund → tarik koin (sisa jadi utang) / cabut Premium; acknowledge pembelian yang terlewat app |
   | `riung reconcile` (cron harian) | saldo dompet vs jumlah ledger; selisih → `ledger_mismatch` + exit 1 |
-- Berikutnya: B4 (tiket Fokus & Aplikasi Beku). Lihat plan §10.
+- **B4 — Fokus & Aplikasi Beku** ✅:
+
+  | Endpoint | Isi |
+  |---|---|
+  | `POST /v1/focus/tickets`, `GET /v1/focus/tickets` | tiket Ed25519 untuk sesi offline: `free_daily` (1/hari, Premium 3), `prepaid` (sesi dari paket), `coins` (25/40/50) |
+  | `focus_completed` di `/v1/activities` | menukar tiket sekali (tidak bisa "selesai" sebelum durasinya), +4 progres monster |
+  | `POST /v1/appbeku/unlocks` | buka-waktu berbayar hanya dengan koin latihan, maks 3/hari, +10 tiap kali, jeda 60 detik; bundel `santai`/`sosmed` atomik; aplikasi yang dibuka tidak disimpan/dicatat |
+- Berikutnya: B5 (deploy) & B6 (produksi). Lihat plan §10.
 
 ## Menjalankan lokal
 
@@ -112,6 +119,8 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `FIREBASE_CREDENTIALS_FILE` | — | service account (Firebase Auth Admin); wajib di prod (cek pencabutan, hapus akun) |
 | `APP_CHECK_MODE` | dev `off`, prod `monitor` | `off` / `monitor` (catat saja) / `enforce` (tolak); `off` ditolak di prod |
 | `DEV_AUTH` | `false` | token `dev:<uid>:<provider>`; hanya di `RIUNG_ENV=dev` |
+| `FOCUS_TICKET_KEY` | dev: turunan dev secret | seed Ed25519 32 byte (base64, `openssl rand -base64 32`) untuk tiket Fokus; wajib di prod |
+| `FOCUS_TICKET_KID` | `k1` | nama kunci tiket (ganti bersama key saat rotasi) |
 | `PLAY_PACKAGE_NAME` | kosong (billing mati, 503) | `com.riung.riung`; mengaktifkan billing |
 | `PLAY_CREDENTIALS_FILE` | `FIREBASE_CREDENTIALS_FILE` | service account yang diundang di Play Console |
 | `RTDN_AUDIENCE`, `RTDN_SERVICE_ACCOUNT` | — | wajib bila billing aktif: audience & service account push subscription Pub/Sub |

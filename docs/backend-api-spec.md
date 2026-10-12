@@ -55,8 +55,9 @@ dari `code`.
 | 409 | `not_owned` | memasang item yang belum dimiliki |
 | 409 | `idempotency_key_reuse` | key sama dipakai untuk body berbeda |
 | 409 | `request_in_progress` | request dengan key yang sama masih diproses |
-| 409 | `limit_reached` | batas harian/etis tercapai (`details.limit`, `details.resetsAt`) |
+| 409 | `limit_reached` | batas harian/etis tercapai (`details.reason`, `details.limit`, `details.resetsAt`) |
 | 409 | `cooldown` | jeda belum lewat (`details.retryAfterSeconds`) |
+| 409 | `ticket_invalid` | tiket Fokus tidak bisa dipakai (`details.reason`: `not_found`, `used`, `too_early`, `expired`) |
 | 409 | `purchase_invalid` | token pembelian ditolak Google / milik akun lain |
 | 409 | `pin_locked` | verifikasi PIN dikunci sementara (`details.retryAfterSeconds`) |
 | 413 | `payload_too_large` | body melebihi batas |
@@ -202,7 +203,7 @@ Body: `{ "type": "...", "ref": "...", "occurredAt": "...", ...field per tipe }`.
 | `betterme_lesson_completed` | `lessonId` | +10 | — | sekali seumur akun per lesson · `betterme:<lessonId>`; level terkunci untuk non-Premium → tanpa koin, `capReason: "premium_required"` · **refleksi TIDAK dikirim** |
 | `mission_completed` | `date`, `index` (0–2) | +3 | — | 3/hari · `mission:<date>:<index>` |
 | `minigame_finished` | `saboteurId`, `won`, `ref` | +8 bila menang | +5 menang / +2 kalah | maks 4 pertarungan/hari · `minigame:<ref>` |
-| `focus_completed` (B4) | `ticketId`, `saboteurId` | — | +4 | wajib tiket fokus valid milik user & belum dipakai (§3.7); `occurredAt` ≥ `issuedAt` + durasi − 1 menit (sesi tidak bisa "selesai" instan) |
+| `focus_completed` | `ticketId`, `saboteurId` | — | +4 | wajib tiket Fokus milik user & belum dipakai (§3.7) · `focus:<ticketId>`; `occurredAt` ≥ `issuedAt` + durasi − 1 menit (sesi tidak bisa "selesai" instan) dan sesi harus dimulai (`occurredAt` − durasi) sebelum `expiresAt`; gagal → `409 ticket_invalid` (di batch: error per event) |
 
 Monster yang mencapai 100 → `state=tamed`, +50 koin **sekali** (`tamed:<saboteurId>`). Tidak ada tipe
 event yang berasal dari pembelian — progres monster tidak bisa dibeli (CLAUDE.md aturan #4).
@@ -218,7 +219,6 @@ Detail implementasi (B2):
   tetapi tidak bisa "menambal" hari yang terlewat (kalau bisa, pelindung streak jadi tidak berguna).
 - Setiap event diproses sekali per kunci bisnis (`activity_events`, append-only); replay mengembalikan hasil
   tersimpan dengan `replayed: true`.
-- `focus_completed` ditolak (400) sampai tiket Fokus tersedia di B4.
 
 Respons:
 
@@ -311,29 +311,51 @@ memasangnya di karakter lain. Gaya kartu berbayar boleh dipasang tanpa dibeli bi
 
 | # | Method & path | Akses | RL | Idem | Fungsi |
 |---|---|---|---|---|---|
-| 24 | `POST /v1/focus/tickets` | user | 20/mnt | ✓ | terbitkan tiket: `{ source: "free_daily" \| "prepaid" \| "coins", durationMin: 25\|45\|60 }` |
+| 24 | `POST /v1/focus/tickets` | user | 20/mnt | ✓ | terbitkan tiket: `{ source: "free_daily" \| "prepaid" \| "coins", durationMin: 25\|45\|60, expectedPrice? }` |
 | 25 | `GET /v1/focus/tickets` | user | 30/mnt | — | tiket aktif yang belum dipakai |
 
-- `free_daily`: 1/hari (Premium 3/hari), tiket berlaku sampai akhir hari itu (zona waktu user).
-- `prepaid`: memotong `consumables.prepaid_focus`, berlaku 30 hari. Gratis & prabayar berlaku untuk durasi
-  apa pun (default — lihat `docs/todo-luar-backend.md` §D).
-- `coins`: memotong 25/40/50 koin, berlaku 30 hari.
-- Tiket = `{ id, userId, durationMin, source, issuedAt, expiresAt, kid, sig }`, `sig` = Ed25519 atas field
-  lain. HP menyimpan tiket dan bisa memulai sesi **tanpa internet**; saat online, sesi selesai dilaporkan
-  lewat `focus_completed` (§3.3) → tiket ditandai terpakai, sekali saja.
+- `free_daily`: 1/hari (Premium 3/hari, hari = zona waktu user), tiket berlaku sampai tengah malam lokal.
+  Habis → `409 limit_reached` (`reason: "free_daily"`, `resetsAt`).
+- `prepaid`: memotong satu `consumables.prepaid_focus`, berlaku 30 hari. Tidak ada sesi →
+  `409 limit_reached` (`reason: "no_prepaid_sessions"`). Gratis & prabayar berlaku untuk durasi apa pun
+  (default — lihat `docs/todo-luar-backend.md` §D).
+- `coins`: memotong 25/40/50 koin (durasi 25/45/60, purchased dulu lalu earned), berlaku 30 hari.
+  `expectedPrice` wajib → `409 price_changed` / `409 insufficient_coins` seperti toko.
+- Sesi prabayar/koin sudah terpakai saat tiket terbit: app meminta tiket jenis ini **saat user memulai sesi**,
+  bukan di muka. Tiket yang kedaluwarsa tidak dikembalikan.
+- Respons `POST`: `{ ticket, price, freeFocusLeft, prepaidFocus, wallet }`. `GET`: `{ tickets: [...], keys }`
+  (tiket aktif yang belum dipakai, ditandatangani ulang dengan kunci saat ini).
+- Tiket = `{ id, userId, source, durationMin, issuedAt, expiresAt, kid, sig }` (waktu RFC 3339 UTC, detik
+  bulat). `sig` = Ed25519, base64url tanpa padding, atas byte string
+  `riung-focus-ticket.v1|<kid>|<id>|<userId>|<source>|<durationMin>|<issuedAt>|<expiresAt>`. Kunci publik
+  (`{kid, alg: "Ed25519", publicKey}` base64url) ada di `GET /v1/config` → `focusTicketKeys` dan di
+  `GET /v1/focus/tickets` → `keys`. HP menyimpan tiket dan bisa memulai sesi **tanpa internet**; saat
+  online, sesi selesai dilaporkan lewat `focus_completed` (§3.3) → tiket ditandai terpakai, sekali saja.
+  Server tidak mempercayai tanda tangan saat penukaran — baris DB yang menentukan.
 - App membuka layar Fokus → bila online, minta tiket `free_daily` di muka supaya tetap jalan saat offline.
 
 ### 3.8 Aplikasi Beku (buka-waktu berbayar)
 
 | # | Method & path | Akses | RL | Idem | Fungsi |
 |---|---|---|---|---|---|
-| 26 | `POST /v1/appbeku/unlocks` | user | 10/mnt | ✓ | satuan `{ appId, minutes, expectedPrice }` atau bundel `{ bundleId, appIds, expectedPrice }` |
+| 26 | `POST /v1/appbeku/unlocks` | user | 10/mnt | ✓ | satuan `{ appId, minutes, expectedPrice }` atau bundel `{ bundleId, appIds?, expectedPrice }` |
 
-- `appId` = id dari katalog Aplikasi Beku (bukan package name bebas) — server menolak aplikasi di luar
-  katalog dan **tidak menyimpan riwayat pemakaian aplikasi**, hanya hitungan buka-berbayar per hari.
-- Pengaman etis ditegakkan server: maks **3** buka-berbayar/hari → `409 limit_reached`; harga naik
-  **+10** tiap buka ke-n hari itu; jeda **60 detik** antar buka → `409 cooldown`; **hanya bucket
-  earned** (koin beli & koin harian tahunan tidak bisa) → `409 insufficient_coins` (`earnedOnly: true`).
+- Katalog di `docs/catalog.json` → `appbeku` dan `GET /v1/config` → `catalog.appbeku`: `apps` (`id` = package
+  name dari `core/config/appbeku_catalog.dart`, `group` `sosmed`/`game`; WhatsApp tidak bisa dibekukan),
+  `units` (10/20/30/60 menit = 15/25/35/60 koin), `bundles` (`santai` = Instagram 15 + TikTok 15 menit,
+  35 koin, `appIds` boleh dikosongkan; `sosmed` = 30 menit tiap aplikasi sosmed yang dibekukan — `appIds`
+  wajib, 1–4 aplikasi grup `sosmed` berbeda — 75 koin).
+- `appId` di luar katalog ditolak. Server **tidak menyimpan dan tidak mencatat aplikasi mana yang dibuka**:
+  baris `appbeku_unlocks`, ledger (`ref` = `unit` atau id bundel), dan log hanya berisi jenis, menit, harga.
+- Harga = harga dasar + `escalationPerUnlock` × jumlah buka-berbayar hari ini (ke-1: dasar, ke-2: +10,
+  ke-3: +20). `expectedPrice` harus sama → selain itu `409 price_changed` dengan `details.price`.
+- Respons: `{ result: { target, grants: [{appId, minutes}], price, paidUnlocksUsed, paidUnlocksLeft,
+  cooldownUntil }, wallet }` — app membuka menit di `grants` secara lokal.
+- Pengaman etis ditegakkan server (urutan cek: batas → jeda → harga → saldo): maks **3**
+  buka-berbayar/hari → `409 limit_reached` (`reason: "daily_paid_unlocks"`, `resetsAt`); harga naik **+10**
+  tiap buka ke-n hari itu; jeda **60 detik** antar buka berbayar (juga lintas hari) → `409 cooldown`;
+  **hanya bucket earned** (koin beli & koin harian tahunan tidak bisa) → `409 insufficient_coins`
+  (`earnedOnly: true`). Request yang ditolak tidak dihitung dan tidak memulai jeda.
 - Bundel (`santai` = Instagram 15 mnt + TikTok 15 mnt; `sosmed` = 30 mnt tiap aplikasi sosmed yang
   dibekukan) diproses **atomik**: satu potongan koin, dihitung **satu** buka-berbayar, semua menit dibuka
   bersamaan — atau tidak sama sekali.
@@ -515,8 +537,10 @@ Operasi yang jarang dan berisiko tinggi tetap lewat CLI di container, bukan HTTP
 - Rekonsiliasi harian: `wallets` harus = jumlah `coin_ledger` per user; selisih → log `error` + alert.
 
 ### 4.6 Tiket Fokus
-- Ditandatangani Ed25519 (private key hanya di server, `kid` untuk rotasi); terikat ke `userId`,
-  durasi, dan `expiresAt`; dipakai sekali (`consumed_at`).
+- Ditandatangani Ed25519 (seed 32 byte di env `FOCUS_TICKET_KEY`, hanya di server; `FOCUS_TICKET_KID` untuk
+  rotasi); terikat ke `userId`, durasi, dan `expiresAt`; dipakai sekali (`consumed_at`, dikunci per baris).
+- Rotasi: ganti `FOCUS_TICKET_KEY` + `FOCUS_TICKET_KID`, deploy. Tiket lama tetap sah di server (DB yang
+  menentukan); app mengambil ulang tiket (`GET /v1/focus/tickets`) dan kunci baru dari `/v1/config` saat online.
 
 ### 4.7 PIN jurnal
 - Server menyimpan `HMAC-SHA256(pepper_server, hashDariHP)` — bukan hash mentah — sehingga dump DB
@@ -607,6 +631,7 @@ location /                   { return 404; }       # termasuk /readyz dan path l
 | `POST /shop/purchase`, `POST /appbeku/unlocks` | 10/mnt | user |
 | `PUT /loadouts/*` | 30/mnt | user |
 | `POST /focus/tickets` | 20/mnt | user |
+| `GET /focus/tickets` | 30/mnt | user |
 | `POST /billing/verify` | 10/mnt dan 30/jam | user |
 | `POST /billing/restore` | 5/jam | user |
 | `POST /me/link`, `PUT/DELETE /me/journal-pin-backup` | 5/jam | user |
@@ -680,8 +705,8 @@ tidak mungkin tercatat. Layar krisis tidak menghasilkan request apa pun.
 | `wallet_mutation` | INFO | `type`, `bucket`, `amount`, `kind` (mis. `journal`, `cosmetic`), `balanceAfter` |
 | `activity_capped` | INFO | `type`, `cap` |
 | `shop_purchase` | INFO | `itemType`, `itemId`, `price` |
-| `appbeku_unlock` / `appbeku_blocked` | INFO / WARN | `n`, `price` / `reason` (`limit`, `cooldown`, `earned_only`) |
-| `focus_ticket_issued` / `focus_ticket_redeemed` / `focus_ticket_invalid` | INFO / INFO / WARN | `source`, `durationMin` / — / `reason` |
+| `appbeku_unlock` / `appbeku_blocked` | INFO / WARN | `target` (`unit`/id bundel — bukan aplikasi), `n`, `price` / `reason` (`limit`, `cooldown`, `earned_only`) |
+| `focus_ticket_issued` / `focus_ticket_redeemed` / `focus_ticket_invalid` | INFO / INFO / WARN | `source`, `durationMin` / — / `reason` (`not_found`, `used`, `too_early`, `expired`) |
 | `purchase_verified` / `purchase_rejected` | INFO / WARN | `productId`, `tokenTail` (6 karakter terakhir), `status`, `coins`, `test` / `reason` (`not_valid_for_account`, `unknown_product`) |
 | `rtdn_received` / `rtdn_rejected` | INFO / WARN | `kind`, `notificationType`, `productId`, `action` / `reason` (`auth`, `envelope`, `notification`) |
 | `refund_applied` | WARN | `productId`, `coinsClawedBack`, `debt`, `premiumRevoked`, `orphan` |

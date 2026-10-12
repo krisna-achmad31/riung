@@ -20,6 +20,7 @@ import (
 	"github.com/krisna-achmad31/riung/backend/internal/rules"
 	"github.com/krisna-achmad31/riung/backend/internal/settings"
 	"github.com/krisna-achmad31/riung/backend/internal/store"
+	"github.com/krisna-achmad31/riung/backend/internal/ticket"
 )
 
 // Deps are the API's collaborators.
@@ -40,6 +41,8 @@ type Deps struct {
 	Billing *billing.Service
 	// Push authenticates RTDN Pub/Sub pushes.
 	Push billing.PushVerifier
+	// Tickets signs Focus tickets; nil = built from Config (503 if that fails).
+	Tickets *ticket.Signer
 	// Now is the clock (tests inject a fixed one). Defaults to time.Now.
 	Now func() time.Time
 }
@@ -50,6 +53,7 @@ type Server struct {
 	settings     *settings.Cache
 	rules        *rules.Service
 	billingSvc   *billing.Service
+	tickets      *ticket.Signer
 	publicConfig configResponse
 }
 
@@ -65,11 +69,18 @@ func newServer(d Deps) *Server {
 	}
 	s := &Server{Deps: d, settings: d.Settings}
 	s.rules = &rules.Service{Store: d.Store, Economy: d.Economy, Catalog: d.Catalog, Settings: d.Settings, Now: d.Now}
+	s.tickets = d.Tickets
+	if s.tickets == nil {
+		if sg, err := ticket.NewSigner(d.Config.FocusTicketKid, d.Config.FocusTicketKey); err == nil {
+			s.tickets = sg
+		}
+	}
 	s.billingSvc = d.Billing
 	if s.billingSvc == nil {
 		s.billingSvc = &billing.Service{Store: d.Store, Economy: d.Economy, Hasher: d.Hasher, AccountKey: d.Config.BillingAccountKey, Now: d.Now}
 	}
 	s.publicConfig = buildPublicConfig(d)
+	s.publicConfig.FocusTicketKeys = s.ticketKeys()
 	return s
 }
 
@@ -127,6 +138,11 @@ func (s *Server) routes(mux *http.ServeMux) {
 	s.handle(mux, "POST /v1/shop/purchase", s.postPurchase, route{access: accessUser, limits: []ratelimit.Policy{rlShop}, idempotent: true})
 	s.handle(mux, "PUT /v1/loadouts/monsters/{saboteurId}", s.putMonsterLoadout, route{access: accessUser, limits: []ratelimit.Policy{rlLoadout}, idempotent: true})
 	s.handle(mux, "PUT /v1/loadouts/characters/{testId}", s.putCharacterLoadout, route{access: accessUser, limits: []ratelimit.Policy{rlLoadout}, idempotent: true})
+
+	// §3.7 Focus tickets, §3.8 Aplikasi Beku
+	s.handle(mux, "POST /v1/focus/tickets", s.postFocusTicket, route{access: accessUser, limits: []ratelimit.Policy{rlFocusIssue}, idempotent: true})
+	s.handle(mux, "GET /v1/focus/tickets", s.getFocusTickets, route{access: accessUser, limits: []ratelimit.Policy{rlFocusList}})
+	s.handle(mux, "POST /v1/appbeku/unlocks", s.postAppBekuUnlock, route{access: accessUser, limits: []ratelimit.Policy{rlAppBeku}, idempotent: true})
 
 	// §3.9 Google Play billing
 	s.handle(mux, "POST /v1/billing/verify", s.postBillingVerify, route{access: accessPermanent, checkRevoked: true, limitedUseAppCheck: true, limits: []ratelimit.Policy{rlVerifyMin, rlVerifyHour}, idempotent: true})

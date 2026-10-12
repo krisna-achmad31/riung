@@ -36,6 +36,9 @@ var (
 	rlShop          = ratelimit.Policy{Name: "shop", Limit: 10, Window: time.Minute}
 	rlPremiumDaily  = ratelimit.Policy{Name: "premium_daily", Limit: 10, Window: time.Minute}
 	rlLoadout       = ratelimit.Policy{Name: "loadout", Limit: 30, Window: time.Minute}
+	rlFocusIssue    = ratelimit.Policy{Name: "focus_ticket", Limit: 20, Window: time.Minute}
+	rlFocusList     = ratelimit.Policy{Name: "focus_tickets_list", Limit: 30, Window: time.Minute}
+	rlAppBeku       = ratelimit.Policy{Name: "appbeku_unlock", Limit: 10, Window: time.Minute}
 	rlVerifyMin     = ratelimit.Policy{Name: "billing_verify", Limit: 10, Window: time.Minute}
 	rlVerifyHour    = ratelimit.Policy{Name: "billing_verify_hour", Limit: 30, Window: time.Hour}
 	rlRestore       = ratelimit.Policy{Name: "billing_restore", Limit: 5, Window: time.Hour}

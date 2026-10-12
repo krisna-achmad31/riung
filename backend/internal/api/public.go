@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"regexp"
@@ -25,6 +26,8 @@ type configResponse struct {
 	ServerTime    time.Time     `json:"serverTime"`
 	Economy       economyPublic `json:"economy"`
 	Catalog       catalogPublic `json:"catalog"`
+	// FocusTicketKeys verify Focus tickets offline (§3.7).
+	FocusTicketKeys []ticketKey `json:"focusTicketKeys"`
 }
 
 // economyPublic is economy-props.json minus internal notes, with caps after
@@ -57,6 +60,7 @@ type catalogPublic struct {
 	AccessoryBundles []catalog.AccessoryBundle `json:"accessoryBundles"`
 	CardStyles       []cardStylePublic         `json:"cardStyles"`
 	FocusPacks       []focusPackPublic         `json:"focusPacks"`
+	AppBeku          appBekuPublic             `json:"appbeku"`
 	StreakShield     pricePublic               `json:"streakShield"`
 	JournalPrompts   []catalog.JournalPrompt   `json:"journalPrompts"`
 	Meditations      []catalog.Meditation      `json:"meditations"`
@@ -92,6 +96,25 @@ type focusPackPublic struct {
 	Price    int    `json:"price"`
 }
 
+type appBekuPublic struct {
+	Apps    []catalog.AppBekuApp  `json:"apps"`
+	Units   []appBekuUnitPublic   `json:"units"`
+	Bundles []appBekuBundlePublic `json:"bundles"`
+}
+
+type appBekuUnitPublic struct {
+	Minutes int `json:"minutes"`
+	Price   int `json:"price"`
+}
+
+type appBekuBundlePublic struct {
+	ID            string                 `json:"id"`
+	Price         int                    `json:"price"`
+	Apps          []catalog.AppBekuGrant `json:"apps,omitempty"`
+	Group         string                 `json:"group,omitempty"`
+	MinutesPerApp int                    `json:"minutesPerApp,omitempty"`
+}
+
 type pricePublic struct {
 	ItemID string `json:"itemId"`
 	Price  int    `json:"price"`
@@ -121,6 +144,15 @@ func buildPublicConfig(d Deps) configResponse {
 	for _, f := range c.FocusPacks {
 		pc.FocusPacks = append(pc.FocusPacks, focusPackPublic{ID: f.ID, Sessions: f.Sessions, Price: f.Price})
 	}
+	// Base prices: the n-th paid unlock of a day costs escalationPerUnlock × (n−1) more.
+	pc.AppBeku.Apps = c.AppBeku.Apps
+	for _, u := range c.AppBeku.Units {
+		pc.AppBeku.Units = append(pc.AppBeku.Units, appBekuUnitPublic{Minutes: u.Minutes, Price: u.Price})
+	}
+	for _, b := range c.AppBeku.Bundles {
+		pc.AppBeku.Bundles = append(pc.AppBeku.Bundles, appBekuBundlePublic{ID: b.ID, Price: b.Price, Apps: b.Apps,
+			Group: b.Group, MinutesPerApp: b.MinutesPerApp})
+	}
 	return configResponse{
 		Version:       e.Version,
 		MinAppVersion: d.Config.MinAppVersion,
@@ -141,7 +173,8 @@ func (s *Server) getConfig(w http.ResponseWriter, r *http.Request) {
 		MeditationRewardsPerDay: s.settings.Int(ctx, settings.MeditationRewardsPerDay),
 	}
 	tag := etag(s.Economy.Version, s.Catalog.Version, s.Config.MinAppVersion, s.settings.UpdatedAt(ctx).UTC().Format(time.RFC3339Nano),
-		strconv.Itoa(resp.Economy.Caps.JournalRewardsPerDay), strconv.Itoa(resp.Economy.Caps.MeditationRewardsPerDay))
+		strconv.Itoa(resp.Economy.Caps.JournalRewardsPerDay), strconv.Itoa(resp.Economy.Caps.MeditationRewardsPerDay),
+		fmt.Sprint(resp.FocusTicketKeys))
 	if notModified(w, r, tag) {
 		return
 	}

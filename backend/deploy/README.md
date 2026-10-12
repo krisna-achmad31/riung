@@ -73,7 +73,8 @@ Script berhenti (exit 3) bila password kosong/< 16 karakter. Simpan kedua passwo
 
 - `.env` dari `env.example` — `DATABASE_URL` (riung_app + `$APP_PW`), `TRUSTED_PROXIES=172.19.0.2/32`,
   `LOG_PEPPER`, `IP_HASH_KEY`, `PIN_PEPPER`, `BILLING_ACCOUNT_KEY` (masing-masing `openssl rand -hex 32`,
-  semuanya berbeda), `FIREBASE_PROJECT_ID`, `FIREBASE_CREDENTIALS_FILE`, `APP_CHECK_MODE=monitor`,
+  semuanya berbeda), `FOCUS_TICKET_KEY` (`openssl rand -base64 32`), `FIREBASE_PROJECT_ID`,
+  `FIREBASE_CREDENTIALS_FILE`, `APP_CHECK_MODE=monitor`,
   `CORS_LANDING_ORIGIN`, `MIN_APP_VERSION`. API menolak start bila ada yang kurang.
 - `.env.migrate` dari `env.migrate.example` — `MIGRATE_DATABASE_URL` (riung_migrator + `$MIG_PW`).
 

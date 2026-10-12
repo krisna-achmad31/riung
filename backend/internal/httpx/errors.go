@@ -22,6 +22,7 @@ const (
 	CodeRequestInProgress        = "request_in_progress"
 	CodeLimitReached             = "limit_reached"
 	CodeCooldown                 = "cooldown"
+	CodeTicketInvalid            = "ticket_invalid"
 	CodePurchaseInvalid          = "purchase_invalid"
 	CodePinLocked                = "pin_locked"
 	CodePayloadTooLarge          = "payload_too_large"

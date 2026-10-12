@@ -55,6 +55,10 @@ func (s *Server) ruleError(w http.ResponseWriter, r *http.Request, op string, er
 				"shortfall": coins.Required - coins.Balance, "earnedOnly": coins.EarnedOnly,
 			}))
 	default:
+		if apiErr, ok := blockingError(err); ok {
+			httpx.WriteError(w, r, apiErr)
+			return
+		}
 		s.internalError(w, r, op, err)
 	}
 }
@@ -74,6 +78,7 @@ func (s *Server) postActivity(w http.ResponseWriter, r *http.Request) {
 	}
 	c := callerFrom(r.Context())
 	res, wallet, err := s.rules.ApplyActivity(r.Context(), *c.User, in)
+	s.logFocusEvent(r, c.User.ID, &res, err)
 	if err != nil {
 		s.ruleError(w, r, "activity", err)
 		return
@@ -140,13 +145,17 @@ func (s *Server) postActivityBatch(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		res, _, err := s.rules.ApplyActivity(r.Context(), *c.User, in)
+		s.logFocusEvent(r, c.User.ID, &res, err)
 		var v *rules.ValidationError
+		var tk *rules.TicketError
 		switch {
 		case err == nil:
 			s.logActivity(r, c, res)
 			items = append(items, batchItem{OK: true, Result: &res})
 		case errors.As(err, &v):
 			items = append(items, batchItem{Error: &batchError{Code: httpx.CodeInvalidRequest, Message: v.Message, Field: v.Field}})
+		case errors.As(err, &tk):
+			items = append(items, batchItem{Error: &batchError{Code: httpx.CodeTicketInvalid, Message: tk.Reason, Field: "ticketId"}})
 		default:
 			// Infrastructure failure: stop so the client retries the rest later.
 			s.internalError(w, r, "activity_batch", err)
