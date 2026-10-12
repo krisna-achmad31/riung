@@ -1,5 +1,5 @@
 import json
-with open("campaign.pen") as f:
+with open("design/campaign.pen") as f:
     data = json.load(f)
 
 def extract_names(node, depth=0):
