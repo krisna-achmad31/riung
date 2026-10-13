@@ -6,7 +6,7 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
 - Rencana & keputusan: [`docs/backend-go-plan.md`](../docs/backend-go-plan.md)
 - Spesifikasi API, keamanan, rate limit, logging: [`docs/backend-api-spec.md`](../docs/backend-api-spec.md)
 - Pekerjaan di luar backend (app, infra): [`docs/todo-luar-backend.md`](../docs/todo-luar-backend.md)
-- **Untuk tim app**: [`docs/panduan-integrasi-app.md`](../docs/panduan-integrasi-app.md)
+- **Untuk tim app**: [`docs/panduan-integrasi-app.md`](../docs/panduan-integrasi-app.md) · Postman: [`postman/`](postman/README.md)
 
 ## Status
 
@@ -88,7 +88,8 @@ curl -X PATCH localhost:8080/v1/me/profile -H 'Authorization: Bearer dev:rani:an
   -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" -d '{"displayName":"Rani"}'
 ```
 
-`DEV_AUTH` ditolak saat `RIUNG_ENV=prod`.
+`DEV_AUTH` ditolak saat `RIUNG_ENV=prod`. Admin lokal: panggil `/v1/me` sekali dengan `dev:<uid>:google.com`, lalu
+`riung admin grant dev:<uid> "alasan"` dan pakai token `dev:<uid>:google.com:admin` ke port 8081.
 
 Stack dev juga memakai `DEV_BILLING=true` (Google Play palsu). Ambil `billingAccountId` dari `/v1/me`, lalu:
 

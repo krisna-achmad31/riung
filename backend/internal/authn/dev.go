@@ -96,3 +96,20 @@ func (DevAppChecker) Verify(_ context.Context, token string) (AppCheckToken, err
 	}
 	return AppCheckToken{AppID: "dev", ExpiresAt: time.Now().Add(time.Hour)}, nil
 }
+
+// DevAdminManager lets `riung admin grant dev:<uid> <reason>` work on a
+// DEV_AUTH server: the "email" names the dev subject directly and the admin
+// claim comes from the token suffix ":admin", so SetAdmin does nothing.
+type DevAdminManager struct{}
+
+// LookupEmail implements AdminManager.
+func (DevAdminManager) LookupEmail(_ context.Context, email string) (string, bool, error) {
+	uid, ok := strings.CutPrefix(email, "dev:")
+	if !ok || uid == "" || len(uid) > 128 || strings.Contains(uid, ":") {
+		return "", false, ErrInvalidToken
+	}
+	return uid, true, nil
+}
+
+// SetAdmin implements AdminManager.
+func (DevAdminManager) SetAdmin(context.Context, string, bool) error { return nil }

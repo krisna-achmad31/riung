@@ -254,6 +254,9 @@ dan setelah aksi penting sudah cukup.
 
 ## 11. Mencoba lokal
 
+Cara tercepat: **Postman collection** di `backend/postman/` (52 request, environment lokal & produksi,
+header dan Idempotency-Key otomatis) — lihat `backend/postman/README.md`. Atau dengan curl:
+
 ```sh
 cd backend && make dev-up
 docker compose -f deploy/docker-compose.yml exec -T api /riung seed-content - < ../docs/dummy-data-seed.json

@@ -496,7 +496,7 @@ bukan HTTP:
 | `migrate up\|status\|down` | migrasi (container `riung-migrate`, kredensial DDL; `down` ditolak di prod) |
 | `seed-content <file\|->` | ganti konten publik dari seed JSON |
 | `settings list` · `settings set <key> <value> <alasan>` · `settings reset <key> <alasan>` | jalur darurat tanpa VPN, tercatat dengan aktor `cli` |
-| `admin grant\|revoke <email> <alasan>` | akses Admin API |
+| `admin grant\|revoke <email> <alasan>` | akses Admin API (lokal `DEV_AUTH`: `dev:<uid>` menggantikan email) |
 | `cleanup` (cron harian) | idempotensi > 7 hari, jti, penghitung lama, id RTDN > 30 hari, tiket Fokus & buka-berbayar > 90 hari |
 | `billing-sync` (cron tiap jam) · `reconcile` (cron harian) | §3.9, §4.5 |
 | `cleanup-anon [--dry-run]` (cron harian) | hapus akun anonim yang tidak dibuka > `ANON_RETENTION_DAYS` (default 90): data server lalu user Firebase; maks 1000 per jalan |

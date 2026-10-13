@@ -99,6 +99,10 @@ func runAdmin(ctx context.Context, cfg config.Config, args []string, logger *slo
 	if err != nil {
 		return err
 	}
+	if cfg.DevAuth {
+		// Local only (DEV_AUTH is refused in prod): "dev:<uid>" instead of an email.
+		return changeAdmin(ctx, cfg, authn.DevAdminManager{}, email, grant, reason, logger)
+	}
 	if cfg.FirebaseProjectID == "" || cfg.FirebaseCredentialsFile == "" {
 		return errors.New("FIREBASE_PROJECT_ID and FIREBASE_CREDENTIALS_FILE are required")
 	}
