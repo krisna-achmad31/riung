@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net"
@@ -277,6 +276,5 @@ func (s *Server) adminAudit(w http.ResponseWriter, r *http.Request) {
 	if items == nil {
 		items = []store.AuditEntry{}
 	}
-	raw, _ := json.Marshal(items)
-	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": json.RawMessage(raw), "nextCursor": nextCursor})
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": items, "nextCursor": nextCursor})
 }

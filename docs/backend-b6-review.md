@@ -100,3 +100,13 @@ Pindah ke `enforce` bila **semua** terpenuhi:
    lonjakan `appCheck="unavailable"`.
 3. Ubah `APP_CHECK_MODE=enforce` di `/var/www/riung/.env`, jalankan `./deploy.sh <image yang sama>`, pantau
    `appcheck_failed` & 401 selama 1 jam. Kembali ke `monitor` = langkah yang sama.
+
+## 5. Audit ulang pasca-deploy (2026-10-13)
+
+| Area | Hasil |
+|---|---|
+| Produksi | `riung-api` `e5f0110` sehat, 0 restart, 0 log ERROR; job malam pertama (`cleanup`, `cleanup_anon`, `reconcile`) sukses dan tercatat di Loki; `billing-sync` tiap jam; backup 02:30 ada |
+| Uji negatif produksi | token dev → 401; bearer `dev-pubsub` → 503 (billing mati, tidak diproses); CORS dari origin asing tanpa `Access-Control-Allow-Origin`; body > 2 KB waitlist → 413; metode salah → 405; `/admin`, `/readyz` dari luar → 404 |
+| Analisis statis tambahan | 27 linter (contextcheck, nilerr, gocritic, unparam, forcetypeassert, …): tidak ada bug; sisa temuan disengaja (`context.WithoutCancel` untuk cleanup setelah request, `nil, nil` = "tidak ada") |
+| Diperbaiki | `GET /admin/v1/audit` tidak lagi meng-*encode* dua kali dengan error diabaikan; panduan app: pengecualian header untuk `/v1/waitlist`, beda `idempotency_key_reuse` vs `request_in_progress`, `DELETE /v1/me` yang diulang setelah sukses dijawab 401 |
+| Tetap terbuka | risiko P0 di §2.3 (key Firebase, SSH root, secret & backup off-site) |

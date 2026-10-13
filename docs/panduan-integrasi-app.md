@@ -29,8 +29,8 @@ sampai Play Console & Pub/Sub disiapkan.
 
 | Header | Isi | Kapan |
 |---|---|---|
-| `Authorization` | `Bearer <Firebase ID token>` (`getIdToken()`; perbarui saat 401) | semua kecuali `/v1/config`, `/v1/content/*` |
-| `X-Firebase-AppCheck` | token App Check (`FirebaseAppCheck.getToken()`) | semua `/v1/*`; **limited-use** (`getLimitedUseToken()`) untuk `POST /v1/billing/verify`, `DELETE /v1/me`, `POST /v1/me/journal-pin-backup/verify` |
+| `Authorization` | `Bearer <Firebase ID token>` (`getIdToken()`; perbarui saat 401) | semua kecuali `/v1/config`, `/v1/content/*`, `/v1/waitlist` |
+| `X-Firebase-AppCheck` | token App Check (`FirebaseAppCheck.getToken()`) | semua `/v1/*` kecuali `/v1/waitlist`; **limited-use** (`getLimitedUseToken()`) untuk `POST /v1/billing/verify`, `DELETE /v1/me`, `POST /v1/me/journal-pin-backup/verify` |
 | `Idempotency-Key` | UUID v4 | semua `POST/PUT/PATCH/DELETE` yang mengubah data (kecuali `DELETE /v1/me` dan verifikasi PIN) |
 | `X-App-Version` | versi app, mis. `1.4.0+27` | semua — app di bawah `minAppVersion` dijawab `426` |
 | `X-Platform` | `android` | semua |
@@ -73,7 +73,8 @@ custom key — dengan itu satu kejadian bisa dilacak sampai log server.
 | 409 | `ticket_invalid` | tiket Fokus tidak bisa dipakai (`details.reason`) |
 | 409 | `purchase_invalid` | Google tidak mengonfirmasi pembelian untuk akun ini |
 | 409 | `pin_locked` | verifikasi PIN dikunci (`details.retryAfterSeconds`) |
-| 409 | `idempotency_key_reuse` / `request_in_progress` | bug key / request sama masih jalan — tunggu lalu ulangi dengan key yang sama |
+| 409 | `idempotency_key_reuse` | key yang sama dipakai untuk body lain — bug di app; aksi baru selalu key baru |
+| 409 | `request_in_progress` | request dengan key yang sama masih diproses — tunggu sebentar, ulangi dengan key yang sama |
 | 413 / 415 | `payload_too_large` / `unsupported_media_type` | bug di app |
 | 426 | `upgrade_required` | layar wajib update (`details.minAppVersion`) |
 | 429 | `rate_limited` | tunggu header `Retry-After` |
@@ -106,7 +107,7 @@ koin membawa `wallet` terbaru — perbarui `WalletNotifier` dari situ, jangan me
 | Profil | `PATCH /v1/me/profile` | `displayName` (≤ 40), `avatarId` (`av1`–`av6`), `locale` (`id`/`en`), `persona` (`pelajar`/`mahasiswa`/`pekerja`/`lainnya`), `onboardingDone`, `tz` (IANA, mis. `Asia/Makassar`); kirim hanya field yang berubah |
 | Hasil asesmen ringkas | `PUT /v1/me/assessment` | `dominantSaboteurs`, `scores` (0–100 per saboteur), `completedAt`. Jawaban & hasil detail **tetap di HP** |
 | Anonim → email/Google | `POST /v1/me/link` | setelah `linkWithCredential` di Firebase (uid sama, tanpa body); semua data anonim ikut |
-| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Peringatkan bila langganan masih aktif — batalkan di Play Store dulu |
+| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Peringatkan bila langganan masih aktif — batalkan di Play Store dulu |
 | Unduh data server | `GET /v1/me/export` | melengkapi `DataExportBuilder` lokal |
 | Backup PIN jurnal | `PUT/GET/DELETE /v1/me/journal-pin-backup`, `POST …/verify` | akun permanen; hash PIN dihitung di HP. `GET` hanya mengembalikan `salt`; verifikasi → `{match, attemptsLeft}`, terkunci 1 jam setelah 10 gagal/hari |
 
