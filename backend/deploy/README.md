@@ -281,3 +281,6 @@ Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:8250
   Admin terhubung ke Google, restore backup ke DB sementara lolos (31 tabel, migrasi v3), log `riung-api`
   (termasuk `job_run` cron) masuk Loki.
 - Belum diuji dengan ID token Firebase sungguhan dari app (butuh build app yang memakai backend Go).
+- Redeploy B6 (2026-10-13): image `e5f0110` + config nginx (suite TLS AEAD, header tidak ganda). Config
+  sebelumnya disimpan di `/root/riung.nginx.before-b6.conf`; image `825085e` tetap ada untuk rollback.
+  Dicek: header & CSP, suite CBC ditolak, situs lain tetap 200/302, field `appCheck` di log.
