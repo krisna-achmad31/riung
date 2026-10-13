@@ -87,13 +87,15 @@ Aplikasi Beku, pembelian).
 - [ ] `WalletNotifier`: inventori, sesi prabayar, pelindung streak, cadangan koin-beli, klaim harian
       tahunan, misi hari ini → dari `GET /v1/me`, bukan `LocalPrefsStore`.
 - [ ] `AuthNotifier._linkAndMigrate` → `POST /v1/me/link` (hapus `migrateAnonymousSnapshot`).
-- [ ] Outbox offline untuk `POST /v1/activities/batch` (idempotency key per event).
+- [ ] Outbox offline (`sqflite`, DB versi 2) untuk `POST /v1/activities/batch`: `entryId`/`ref`/`ticketId` dibuat
+      sekali saat kejadian; `Idempotency-Key` baru per kiriman batch (panduan app §8).
 - [ ] `BillingService`: `applicationUserName` (= `obfuscatedAccountId`) = `billingAccountId` dari `/v1/me`;
       tombol beli hanya untuk akun permanen (anonim → ajak tautkan akun dulu, server menjawab 403);
-      panggil `/v1/billing/verify` (Idempotency-Key + App Check limited-use) untuk setiap update pembelian;
-      `completePurchase` hanya bila `result.status` ∈ `credited|already_credited|active|inactive` — **tidak**
-      untuk `pending` dan tidak untuk error; `503` → coba lagi nanti (pembelian tetap ada di Play);
-      `/v1/billing/restore` saat app dibuka/login dengan hasil `queryPastPurchases`; status Premium dari
+      paket koin `buyConsumable(autoConsume: false)`; panggil `/v1/billing/verify` (Idempotency-Key + App Check
+      limited-use) untuk setiap update pembelian; setelah `credited|already_credited` → `consumePurchase`,
+      setelah `active|inactive` → `completePurchase` — **tidak** untuk `pending` dan tidak untuk error; `503` →
+      coba lagi nanti (pembelian tetap ada di Play); `/v1/billing/restore` saat app dibuka/login dengan hasil
+      `restorePurchases()` (status `restored`); status Premium dari
       `GET /v1/billing/subscription` / `GET /v1/me`; berhenti mengkredit koin/Premium dari perangkat.
 - [ ] Hapus akun saat langganan aktif: tampilkan peringatan "batalkan langganan di Play Store dulu" —
       langganan terikat ke `billingAccountId` akun lama dan tidak bisa dipindah ke akun baru.

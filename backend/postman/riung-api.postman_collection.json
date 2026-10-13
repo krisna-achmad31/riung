@@ -746,7 +746,7 @@
                 "batch"
               ]
             },
-            "description": "≤ 50 event, hasil per event; event yang sudah pernah dikirim → `replayed: true`.",
+            "description": "≤ 50 event, hasil per event. Kirim ulang request ini (Idempotency-Key baru otomatis): event yang sama dikenali dari `entryId`/`ref`/tanggal → `replayed: true`, tanpa koin dobel. Di app, `entryId`/`ref` dibuat sekali saat kejadian.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"events\": [\n    {\n      \"type\": \"journal_saved\",\n      \"occurredAt\": \"{{now}}\",\n      \"entryId\": \"{{$guid}}\"\n    },\n    {\n      \"type\": \"minigame_finished\",\n      \"occurredAt\": \"{{now}}\",\n      \"ref\": \"{{$guid}}\",\n      \"saboteurId\": \"kabut\",\n      \"won\": false\n    },\n    {\n      \"type\": \"mission_completed\",\n      \"occurredAt\": \"{{now}}\",\n      \"date\": \"{{today}}\",\n      \"index\": 1\n    }\n  ]\n}",
@@ -871,7 +871,7 @@
                 "verify"
               ]
             },
-            "description": "Jalankan **Me** dulu (`billingAccountId`). Status `credited` → app memanggil `completePurchase`.",
+            "description": "Jalankan **Me** dulu (`billingAccountId`). Status `credited`/`already_credited` → app meng-*consume* paket koin (`consumePurchase`; beli dengan `autoConsume: false`).",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": \"coin_pack_large\",\n  \"purchaseToken\": \"dev-coin:{{billingAccountId}}:coin_pack_large:{{$timestamp}}\"\n}",
@@ -906,7 +906,7 @@
                 "verify"
               ]
             },
-            "description": "",
+            "description": "Status `active`/`inactive` → app memanggil `completePurchase` (acknowledge langganan).",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": \"premium_yearly\",\n  \"purchaseToken\": \"dev-sub:{{billingAccountId}}:premium_yearly:365:{{$timestamp}}\"\n}",

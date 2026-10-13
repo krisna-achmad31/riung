@@ -139,7 +139,7 @@ items = [
         req("Batch (outbox offline)", "POST", "/v1/activities/batch",
             body={"events": [ev("journal_saved", entryId="{{$guid}}"), ev("minigame_finished", ref="{{$guid}}", saboteurId="kabut", won=False),
                              ev("mission_completed", date="{{today}}", index=1)]},
-            desc="≤ 50 event, hasil per event; event yang sudah pernah dikirim → `replayed: true`."),
+            desc="≤ 50 event, hasil per event. Kirim ulang request ini (Idempotency-Key baru otomatis): event yang sama dikenali dari `entryId`/`ref`/tanggal → `replayed: true`, tanpa koin dobel. Di app, `entryId`/`ref` dibuat sekali saat kejadian."),
     ]),
     folder("5. Wallet & jurnal", "", [
         req("Wallet", "GET", "/v1/wallet", desc="Termasuk `debtCoins` (utang dari refund)."),
@@ -150,9 +150,10 @@ items = [
     folder("6. Google Play billing", "Akun permanen. **Produksi**: belum aktif (503) dan butuh `purchaseToken` asli dari Play. **Lokal** (`DEV_BILLING`): token palsu di bawah.", [
         req("Verifikasi paket koin (dev)", "POST", "/v1/billing/verify",
             body={"productId": "coin_pack_large", "purchaseToken": "dev-coin:{{billingAccountId}}:coin_pack_large:{{$timestamp}}"},
-            desc="Jalankan **Me** dulu (`billingAccountId`). Status `credited` → app memanggil `completePurchase`."),
+            desc="Jalankan **Me** dulu (`billingAccountId`). Status `credited`/`already_credited` → app meng-*consume* paket koin (`consumePurchase`; beli dengan `autoConsume: false`)."),
         req("Verifikasi langganan (dev)", "POST", "/v1/billing/verify",
-            body={"productId": "premium_yearly", "purchaseToken": "dev-sub:{{billingAccountId}}:premium_yearly:365:{{$timestamp}}"}),
+            body={"productId": "premium_yearly", "purchaseToken": "dev-sub:{{billingAccountId}}:premium_yearly:365:{{$timestamp}}"},
+            desc="Status `active`/`inactive` → app memanggil `completePurchase` (acknowledge langganan)."),
         req("Restore", "POST", "/v1/billing/restore",
             body={"purchases": [{"productId": "coin_pack_small", "purchaseToken": "dev-coin:{{billingAccountId}}:coin_pack_small:restore1"}]}),
         req("Status Premium", "GET", "/v1/billing/subscription"),

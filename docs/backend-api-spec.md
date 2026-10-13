@@ -78,9 +78,10 @@ dari `code`.
 - Untuk koin ada lapis kedua: `coin_ledger UNIQUE (user_id, idempotency_key)` dengan key bisnis
   (`checkin:2026-10-11`, `journal:<entryId>`, …) — jadi walau client membuat `Idempotency-Key` baru,
   reward yang sama tidak bisa diklaim dua kali.
-- Respons **4xx juga disimpan** (mis. `insufficient_coins`, `price_changed`): setelah memperbaiki keadaan,
-  client mengirim ulang dengan `Idempotency-Key` **baru**. Respons 5xx tidak disimpan (aman di-retry dengan
-  key yang sama).
+- Respons **4xx dari endpoint juga disimpan** (mis. `insufficient_coins`, `price_changed`): setelah memperbaiki
+  keadaan, client mengirim ulang dengan `Idempotency-Key` **baru**. Respons 5xx tidak disimpan (aman di-retry
+  dengan key yang sama), begitu juga jawaban yang terjadi sebelum langkah idempotensi — `401`, `403`
+  (akun/App Check), `426`, `429`, `409 request_in_progress`/`idempotency_key_reuse`.
 - Klaim yang belum selesai (proses mati/crash di tengah request) dianggap terbengkalai setelah 60 detik dan
   boleh diambil alih oleh retry dengan key yang sama; sebelum itu dijawab `409 request_in_progress`.
 
@@ -226,7 +227,9 @@ Detail implementasi (B2):
   kemarin** (waktu diproses) yang bisa menggerakkan streak; laporan yang lebih lama tetap dibayar koinnya
   tetapi tidak bisa "menambal" hari yang terlewat (kalau bisa, pelindung streak jadi tidak berguna).
 - Setiap event diproses sekali per kunci bisnis (`activity_events`, append-only); replay mengembalikan hasil
-  tersimpan dengan `replayed: true`.
+  tersimpan dengan `replayed: true`. Karena itu outbox app memakai `Idempotency-Key` **baru** untuk setiap
+  kiriman `/batch` (isinya bisa berubah antar percobaan), sedangkan `entryId`/`ref`/`ticketId` dibuat sekali
+  saat kejadian dan ikut disimpan.
 
 Respons:
 
@@ -384,8 +387,10 @@ Alur `verify`:
 3. Wajib: `purchaseState = PURCHASED`, `obfuscatedExternalAccountId` = `billingAccountId` user ini (§3.2),
    token belum pernah dikreditkan ke akun **mana pun** (`purchases.purchase_token` PRIMARY KEY).
 4. Koin paket → bucket **purchased** (80 / 330 / 820). Premium → `subscriptions.expires_at` dari Google.
-5. Server **tidak** meng-consume. Setelah server menjawab sukses, app memanggil `completePurchase`
-   (acknowledge/consume di sisi Play). Kalau app gagal menyelesaikan, job `riung billing-sync` (cron tiap jam)
+5. Server **tidak** meng-consume. Setelah server menjawab sukses, app meng-*consume* paket koin
+   (`consumePurchase`, sekaligus acknowledge) atau `completePurchase` untuk langganan. Di Flutter paket koin
+   wajib `buyConsumable(autoConsume: false)` — default plugin langsung consume sebelum app sempat
+   memverifikasi (panduan app §11). Kalau app gagal menyelesaikan, job `riung billing-sync` (cron tiap jam)
    meng-**acknowledge** (bukan consume) pembelian yang sudah dikreditkan/diaktifkan tapi masih belum di-ack
    setelah 1 jam — koin paket maupun langganan — supaya Google tidak me-refund otomatis di hari ke-3.
    App tetap wajib meng-consume paket koin agar paket yang sama bisa dibeli lagi.

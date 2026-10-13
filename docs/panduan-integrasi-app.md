@@ -1,5 +1,5 @@
 # Panduan integrasi app ↔ backend Riung
-*Untuk tim Flutter (`riung/`) · backend Go di `backend/` · berlaku untuk API `/v1` · 2026-10-13*
+*Untuk tim Flutter (`riung/`) · backend Go di `backend/` · API `/v1` · diperbarui 2026-10-13*
 
 Backend Go menggantikan peran "Cloud Functions" di `CLAUDE.md`: semua koin, progres monster, pembelian,
 tiket Fokus, dan buka-waktu Aplikasi Beku sekarang diputuskan server. App mengirim **apa yang terjadi**,
@@ -7,7 +7,8 @@ server yang menentukan **berapa nilainya**. Firebase tetap dipakai untuk login (
 Analytics, Crashlytics, dan Remote Config (hanya saklar fitur/A-B, bukan harga).
 
 Dokumen ini panduan praktis. Kontrak lengkap (semua field, batas, keamanan): `docs/backend-api-spec.md`.
-Daftar pekerjaan app yang sudah dipetakan: `docs/todo-luar-backend.md` §B–C.
+Untuk mencoba setiap endpoint: Postman collection di `backend/postman/`. Daftar pekerjaan app yang sudah
+dipetakan: `docs/todo-luar-backend.md` §B–C.
 
 ---
 
@@ -19,8 +20,9 @@ Daftar pekerjaan app yang sudah dipetakan: `docs/todo-luar-backend.md` §B–C.
 | Lokal | `http://localhost:8080/v1` (`cd backend && make dev-up`) | token dev `dev:<uid>:<provider>` | mati |
 
 Lokal memakai `DEV_AUTH`: token `Bearer dev:rani:anonymous` (atau `:password`, `:google.com`) menggantikan ID
-token Firebase, App Check cukup `dev`, dan Google Play dipalsukan (§9.4). Di Android emulator, host laptop =
-`http://10.0.2.2:8080`.
+token Firebase, App Check cukup `dev`, dan Google Play dipalsukan (§10.5). Di Android emulator, host laptop =
+`http://10.0.2.2:8080`. Untuk build debug yang menembak stack lokal, ID token Firebase sungguhan tidak
+dikenali — pakai token dev lewat konfigurasi build (`--dart-define`).
 
 Status produksi: API live, database kosong, **billing Google Play belum aktif** (`/v1/billing/*` → 503)
 sampai Play Console & Pub/Sub disiapkan.
@@ -29,22 +31,91 @@ sampai Play Console & Pub/Sub disiapkan.
 
 | Header | Isi | Kapan |
 |---|---|---|
-| `Authorization` | `Bearer <Firebase ID token>` (`getIdToken()`; perbarui saat 401) | semua kecuali `/v1/config`, `/v1/content/*`, `/v1/waitlist` |
-| `X-Firebase-AppCheck` | token App Check (`FirebaseAppCheck.getToken()`) | semua `/v1/*` kecuali `/v1/waitlist`; **limited-use** (`getLimitedUseToken()`) untuk `POST /v1/billing/verify`, `DELETE /v1/me`, `POST /v1/me/journal-pin-backup/verify` |
-| `Idempotency-Key` | UUID v4 | semua `POST/PUT/PATCH/DELETE` yang mengubah data (kecuali `DELETE /v1/me` dan verifikasi PIN) |
-| `X-App-Version` | versi app, mis. `1.4.0+27` | semua — app di bawah `minAppVersion` dijawab `426` |
+| `Authorization` | `Bearer <ID token>` dari `FirebaseAuth.instance.currentUser!.getIdToken()` | semua kecuali `/v1/config`, `/v1/content/*`, `/v1/waitlist` |
+| `X-Firebase-AppCheck` | `FirebaseAppCheck.instance.getToken()` | semua `/v1/*` kecuali `/v1/waitlist`; **limited-use** (`getLimitedUseToken()`, satu token per request) untuk `POST /v1/billing/verify`, `DELETE /v1/me`, `POST /v1/me/journal-pin-backup/verify` |
+| `Idempotency-Key` | UUID v4 (`const Uuid().v4()`, paket `uuid` sudah ada) | semua `POST/PUT/PATCH/DELETE` yang mengubah data, kecuali `DELETE /v1/me` dan verifikasi PIN; tanpa key → `400` |
+| `X-App-Version` | versi app (`1.0.0+1` dari `pubspec.yaml`) | semua — app di bawah `minAppVersion` dijawab `426` |
 | `X-Platform` | `android` | semua |
 | `Content-Type` | `application/json` | request ber-body |
 
-**Idempotency-Key**: satu UUID baru per **aksi pengguna**. Pakai ulang key yang sama **hanya** saat
-mengulang request yang gagal di jaringan atau dijawab 5xx — server mengembalikan respons yang sama persis
-dan tidak memotong/menambah koin dua kali. Setelah jawaban 4xx (mis. koin kurang), aksi berikutnya memakai
-key baru. Body berbeda dengan key yang sama → `409 idempotency_key_reuse`.
+**Idempotency-Key** — satu UUID baru per **aksi pengguna**, dibuat sekali lalu dipakai ulang untuk setiap
+percobaan ulang aksi itu:
+- Gagal jaringan, `5xx`, `401` (setelah token diperbarui), `426`, `429`, atau `409 request_in_progress`
+  → ulangi dengan **key yang sama**. Jawaban ini tidak disimpan server, dan aksi yang sudah sukses tidak
+  akan dijalankan dua kali.
+- `4xx` lain dari endpoint (mis. `insufficient_coins`, `price_changed`, `limit_reached`) **disimpan**: kirim
+  ulang dengan key sama → jawaban yang sama persis. Aksi berikutnya (setelah user latihan/ganti pilihan)
+  memakai key baru.
+- Body berbeda dengan key yang sama → `409 idempotency_key_reuse` (bug di app).
 
-Format waktu RFC 3339 UTC (`2026-10-13T03:04:05Z`); tanggal kalender `YYYY-MM-DD` menurut zona waktu user
-(`users.tz`, default `Asia/Jakarta`; kirim zona waktu HP lewat `PATCH /v1/me/profile`).
+Waktu dikirim RFC 3339 UTC: `DateTime.now().toUtc().toIso8601String()`. Tanggal kalender (`date`) =
+tanggal lokal user dalam zona waktu `users.tz` (default `Asia/Jakarta`). App sekarang memakai WIB
+(`tz.getLocation('Asia/Jakarta')` di notifikasi); bila user di WITA/WIT, ambil nama zona IANA HP (mis. paket
+`flutter_timezone`) dan kirim sekali lewat `PATCH /v1/me/profile` `{ "tz": "Asia/Makassar" }`.
 
-## 3. Error
+## 3. Klien HTTP di Flutter
+
+App belum punya paket HTTP dan App Check. Tambahkan `http` dan `firebase_app_check` (aktifkan provider
+Play Integrity; debug provider untuk emulator). Satu `ApiClient` membungkus semua aturan §2; UI tidak
+pernah menyentuh JSON mentah — service typed mengubahnya jadi model (`CLAUDE.md` aturan model).
+
+```dart
+class ApiException implements Exception {
+  ApiException(this.status, this.code, this.message, this.requestId, this.details);
+  final int status;
+  final String code;          // dipetakan ke file strings app (aturan #2)
+  final String message;       // hanya untuk log
+  final String? requestId;    // tampilkan "Kode: …" + kirim ke Crashlytics
+  final Map<String, dynamic> details;
+}
+
+class ApiClient {
+  ApiClient({required this.baseUrl, required this.appVersion, http.Client? client})
+      : _http = client ?? http.Client();
+  final Uri baseUrl;
+  final String appVersion;
+  final http.Client _http;
+
+  /// [idempotencyKey]: buat sekali per aksi (Uuid().v4()) dan pakai lagi saat mengulang aksi yang sama.
+  Future<Map<String, dynamic>> send(String method, String path,
+      {Object? body, String? idempotencyKey, bool limitedUseAppCheck = false, bool auth = true}) async {
+    for (var attempt = 0; ; attempt++) {
+      final headers = <String, String>{
+        'X-App-Version': appVersion,
+        'X-Platform': 'android',
+        if (body != null) 'Content-Type': 'application/json',
+        if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
+      };
+      final appCheck = limitedUseAppCheck
+          ? await FirebaseAppCheck.instance.getLimitedUseToken()
+          : await FirebaseAppCheck.instance.getToken(attempt > 0);
+      if (appCheck != null) headers['X-Firebase-AppCheck'] = appCheck;
+      if (auth) {
+        final token = await FirebaseAuth.instance.currentUser?.getIdToken(attempt > 0);
+        if (token == null) throw StateError('belum login Firebase');
+        headers['Authorization'] = 'Bearer $token';
+      }
+      final request = http.Request(method, baseUrl.resolve(path))..headers.addAll(headers);
+      if (body != null) request.body = jsonEncode(body);
+      final response = await http.Response.fromStream(await _http.send(request));
+
+      final json = response.body.isEmpty ? <String, dynamic>{} : jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode < 400) return json;
+      final error = (json['error'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final code = error['code'] as String? ?? 'unknown';
+      // Token login / App Check kedaluwarsa: ambil yang baru, ulangi sekali dengan key yang sama.
+      if (response.statusCode == 401 && attempt == 0 && code != 'recent_login_required') continue;
+      throw ApiException(response.statusCode, code, error['message'] as String? ?? '',
+          error['requestId'] as String?, (error['details'] as Map?)?.cast<String, dynamic>() ?? const {});
+    }
+  }
+}
+```
+
+Gagal jaringan (`SocketException`, `TimeoutException`) dan `5xx`/`503`: ulangi dengan backoff dan key yang
+sama (§2). Pasang timeout (mis. 15 detik) di pemanggil.
+
+## 4. Error
 
 ```json
 { "error": { "code": "insufficient_coins", "message": "not enough coins",
@@ -53,8 +124,8 @@ Format waktu RFC 3339 UTC (`2026-10-13T03:04:05Z`); tanggal kalender `YYYY-MM-DD
 ```
 
 `message` hanya untuk debugging. Teks di layar selalu dari file strings app, dipetakan dari `code`
-(CLAUDE.md aturan #2). Tampilkan `requestId` di pesan error ("Kode: …") dan kirim ke Crashlytics sebagai
-custom key — dengan itu satu kejadian bisa dilacak sampai log server.
+(CLAUDE.md aturan #2), Bahasa Indonesia & Inggris. Tampilkan `requestId` di pesan error ("Kode: …") dan
+kirim ke Crashlytics sebagai custom key — dengan itu satu kejadian bisa dilacak sampai log server.
 
 | HTTP | `code` | Yang dilakukan app |
 |---|---|---|
@@ -68,28 +139,29 @@ custom key — dengan itu satu kejadian bisa dilacak sampai log server.
 | 409 | `insufficient_coins` | **tawarkan latihan dulu**, baru tombol beli koin (aturan #4); `details.earnedOnly` = hanya koin latihan yang dihitung |
 | 409 | `price_changed` | harga berubah: muat ulang `/v1/config`, tampilkan harga baru (`details.price`) |
 | 409 | `already_owned` / `not_owned` | sinkronkan inventori dari `GET /v1/me` |
-| 409 | `limit_reached` | batas harian/etis (`details.reason`, `details.resetsAt`) |
+| 409 | `limit_reached` | batas harian/etis (`details.reason`, `details.limit`, `details.resetsAt`) |
 | 409 | `cooldown` | tunggu `details.retryAfterSeconds` |
 | 409 | `ticket_invalid` | tiket Fokus tidak bisa dipakai (`details.reason`) |
-| 409 | `purchase_invalid` | Google tidak mengonfirmasi pembelian untuk akun ini |
+| 409 | `purchase_invalid` | Google tidak mengonfirmasi pembelian untuk akun ini (§10) |
 | 409 | `pin_locked` | verifikasi PIN dikunci (`details.retryAfterSeconds`) |
-| 409 | `idempotency_key_reuse` | key yang sama dipakai untuk body lain — bug di app; aksi baru selalu key baru |
+| 409 | `idempotency_key_reuse` | key yang sama dipakai untuk body lain — bug di app |
 | 409 | `request_in_progress` | request dengan key yang sama masih diproses — tunggu sebentar, ulangi dengan key yang sama |
 | 413 / 415 | `payload_too_large` / `unsupported_media_type` | bug di app |
 | 426 | `upgrade_required` | layar wajib update (`details.minAppVersion`) |
-| 429 | `rate_limited` | tunggu header `Retry-After` |
+| 429 | `rate_limited` | tunggu header `Retry-After` (detik) |
 | 429 | `signup_limited` | terlalu banyak akun baru dari jaringan ini hari ini; coba lagi besok |
 | 500 | `internal` | ulangi nanti dengan key yang sama |
 | 503 | `unavailable` | server/Google sedang gangguan; ulangi dengan backoff, key yang sama |
 
-## 4. Alur buka app
+## 5. Alur buka app
 
 ```
 Firebase sign-in (anonim kalau belum login)
   → GET /v1/config         harga, katalog, batas, kunci tiket Fokus (cache + If-None-Match → 304)
   → GET /v1/me             akun dibuat otomatis di panggilan pertama (termasuk anonim)
   → kirim outbox           POST /v1/activities/batch (event yang tertunda saat offline)
-  → GET /v1/focus/tickets  + ambil tiket free_daily bila online (§7)
+  → billing                InAppPurchase.instance.restorePurchases() → POST /v1/billing/restore (§10)
+  → GET /v1/focus/tickets  + ambil tiket free_daily bila online (§8)
 ```
 
 `GET /v1/me` adalah sumber tunggal state user: profil, `billingAccountId`, Premium, streak + jumlah
@@ -100,37 +172,60 @@ sekarang disimpan di `LocalPrefsStore` dan bernilai uang pindah ke sini.
 Saldo yang ditampilkan = `wallet.coins` (= `earnedCoins` + `purchasedCoins`). Setiap respons yang mengubah
 koin membawa `wallet` terbaru — perbarui `WalletNotifier` dari situ, jangan menghitung sendiri.
 
-## 5. Akun
+## 6. Bagian app yang berubah
+
+| Sekarang (`riung/lib/`) | Nanti |
+|---|---|
+| `WalletFunctionsService` + `HybridWalletFunctionsService` / `LocalWalletFunctionsService` / `FirestoreWalletFunctionsService` (`earnCoins`, `spendCoins`, `dailyCheckin`, `tameProgress`) | service API typed: `postActivity`, `purchase(itemType, itemId, expectedPrice)`, `unlockApp`, `issueFocusTicket` — app tidak pernah mengirim nominal |
+| `WalletNotifier`, `StreakNotifier`, `MonsterProgressNotifier` | diisi dari `GET /v1/me` dan dari `wallet` / `result` di setiap respons |
+| `LocalPrefsStore` (kosmetik, sesi prabayar, pelindung streak, cadangan koin-beli, klaim harian tahunan, misi) | `GET /v1/me`; prefs hanya untuk hal tampilan |
+| `UserRepository` (`LocalUserRepository` / `FirestoreUserRepository`) | `GET /v1/me`, `PATCH /v1/me/profile`, `PUT /v1/me/assessment` |
+| `AuthNotifier._linkAndMigrate` | `linkWithCredential` lalu `POST /v1/me/link` — tidak ada lagi salin snapshot |
+| `ContentRepository` (`FirestoreContentRepository`) | `GET /v1/content/{kind}` (konten bawaan tetap jadi cadangan) |
+| `RemoteConfigService` (harga & batas) | `GET /v1/config`; Remote Config hanya saklar fitur |
+| `BillingService._deliver` (mengkredit di HP) | dihapus; verifikasi server (§10) |
+| `AppBekuNotifier.unlockMinutes` / `_paidUnlocksToday` | `POST /v1/appbeku/unlocks`; hitungan dari `today.paidUnlocksUsed` |
+| `SessionNotifier` (Mode Fokus) | tiket Fokus (§8) |
+| `JurnalPinService` (cocokkan hash di HP) | `POST /v1/me/journal-pin-backup/verify` |
+| `DataExportBuilder` | ditambah `GET /v1/me/export` |
+| `features/home/screens/sesi_selesai_screen.dart` (progres selalu `waswas`) | kirim monster yang sedang dijinakkan sebagai `saboteurId` |
+
+## 7. Akun
 
 | Aksi | Endpoint | Catatan |
 |---|---|---|
-| Profil | `PATCH /v1/me/profile` | `displayName` (≤ 40), `avatarId` (`av1`–`av6`), `locale` (`id`/`en`), `persona` (`pelajar`/`mahasiswa`/`pekerja`/`lainnya`), `onboardingDone`, `tz` (IANA, mis. `Asia/Makassar`); kirim hanya field yang berubah |
-| Hasil asesmen ringkas | `PUT /v1/me/assessment` | `dominantSaboteurs`, `scores` (0–100 per saboteur), `completedAt`. Jawaban & hasil detail **tetap di HP** |
+| Profil | `PATCH /v1/me/profile` | `displayName` (≤ 40 karakter), `avatarId` (`av1`–`av6`), `locale` (`id`/`en`), `persona` (`pelajar`/`mahasiswa`/`pekerja`/`lainnya`), `onboardingDone`, `tz` (IANA); kirim hanya field yang berubah |
+| Hasil asesmen ringkas | `PUT /v1/me/assessment` | `dominantSaboteurs` (1–7 id saboteur), `scores` (id saboteur → 0–100), `completedAt`. Jawaban & hasil detail **tetap di HP** |
 | Anonim → email/Google | `POST /v1/me/link` | setelah `linkWithCredential` di Firebase (uid sama, tanpa body); semua data anonim ikut |
 | Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Peringatkan bila langganan masih aktif — batalkan di Play Store dulu |
 | Unduh data server | `GET /v1/me/export` | melengkapi `DataExportBuilder` lokal |
-| Backup PIN jurnal | `PUT/GET/DELETE /v1/me/journal-pin-backup`, `POST …/verify` | akun permanen; hash PIN dihitung di HP. `GET` hanya mengembalikan `salt`; verifikasi → `{match, attemptsLeft}`, terkunci 1 jam setelah 10 gagal/hari |
+| Backup PIN jurnal | `PUT/GET/DELETE /v1/me/journal-pin-backup`, `POST …/verify` | akun permanen; hash PIN dihitung di HP (`hash` 16–256, `salt` 8–256 karakter base64/hex). `GET` hanya mengembalikan `salt`; verifikasi → `{match, attemptsLeft}`, terkunci 1 jam setelah 10 gagal/hari |
 
 Pembelian dengan uang hanya untuk akun permanen (supaya tidak hilang kalau app dihapus). Akun anonim yang
 tidak dibuka 90 hari dihapus otomatis.
 
-## 6. Latihan, koin & outbox
+## 8. Latihan, koin & outbox
 
 Satu endpoint untuk semua kejadian: `POST /v1/activities` (satu) atau `POST /v1/activities/batch`
 (`{"events": [...]}`, ≤ 50, hasil per event). App **tidak pernah mengirim nominal koin**.
 
-| `type` | Field | Server memberi |
-|---|---|---|
-| `checkin` | `date` | +5; streak; bonus 7 hari +20 / 30 hari +100; pelindung streak dipakai otomatis bila tepat 1 hari bolong |
-| `journal_saved` | `entryId` (UUID entri), `promptId?` | +4, +2 progres ke monster prompt; gratis 1 entri/hari |
-| `meditation_completed` | `sessionId` | +3, +3 progres ke monster target (dari katalog); sesi Premium perlu Premium |
-| `betterme_lesson_completed` | `lessonId` | +10 sekali per lesson; level ≥ 2 perlu Premium, berurutan |
-| `mission_completed` | `date`, `index` (0–2) | +3, maks 3 misi/hari |
-| `minigame_finished` | `ref` (UUID pertarungan), `saboteurId`, `won` | +8 bila menang; +5/+2 progres; maks 4 pertarungan/hari |
-| `focus_completed` | `ticketId`, `saboteurId` | +4 progres; tiket dipakai sekali (§7) |
+| `type` | Field | Server memberi | Kunci (dihitung sekali) |
+|---|---|---|---|
+| `checkin` | `date` | +5; streak; bonus 7 hari +20 / 30 hari +100; pelindung streak dipakai otomatis bila tepat 1 hari bolong | `date` |
+| `journal_saved` | `entryId`, `promptId?` (atau `promptMonsterId?`) | +4, +2 progres ke monster prompt; gratis 1 entri/hari | `entryId` |
+| `meditation_completed` | `sessionId` (id katalog, mis. `napas_4_7_8`) | +3, +3 progres ke monster target (dari katalog); sesi Premium perlu Premium | `sessionId` + tanggal |
+| `betterme_lesson_completed` | `lessonId` (mis. `l1_s1`) | +10 sekali per lesson; level ≥ 2 perlu Premium, berurutan | `lessonId` |
+| `mission_completed` | `date`, `index` (0–2) | +3, maks 3 misi/hari | `date` + `index` |
+| `minigame_finished` | `ref` (UUID), `saboteurId`, `won` | +8 bila menang; +5/+2 progres; maks 4 pertarungan/hari | `ref` |
+| `focus_completed` | `ticketId`, `saboteurId` | +4 progres; tiket dipakai sekali (§9) | `ticketId` |
 
 Semua event wajib `occurredAt` (kapan terjadi di HP, maks 7 hari ke belakang, maks 5 menit ke depan).
 `date` = tanggal lokal `occurredAt`. Monster yang mencapai 100 jinak dan memberi +50 sekali.
+
+**Kunci di kolom kanan menentukan "event yang sama".** Event dengan kunci yang sudah pernah diproses
+dijawab dengan hasil lamanya (`replayed: true`) dan tidak memberi koin lagi. Karena itu `entryId` (id entri
+jurnal), `ref` (UUID per pertarungan minigame), dan `ticketId` dibuat **sekali saat kejadian** dan ikut
+disimpan bersama event — jangan dibuat ulang saat mengirim.
 
 **Isi tidak pernah dikirim**: teks jurnal, mood/faktor/catatan check-in, refleksi Better Me, hasil Kenali
 Dirimu, data tidur, daftar & pemakaian aplikasi yang dibekukan, afirmasi buatan, apa pun dari layar krisis.
@@ -140,15 +235,16 @@ Dirimu, data tidur, daftar & pemakaian aplikasi yang dibekukan, afirmasi buatan,
 keterangan ramah, bukan pesan gagal.
 
 **Outbox offline** — wajib karena latihan sering dilakukan tanpa internet:
-- Simpan event di DB lokal saat terjadi, dengan `occurredAt` dan `Idempotency-Key` sendiri yang **tetap**
-  sampai terkirim.
-- Kirim lewat `/batch` saat online (urut sesuai waktu). Per hasil: `ok` → hapus dari outbox; error 4xx
-  (`invalid_request`, `ticket_invalid`) → hapus dan catat (mengulang tidak akan berhasil); 5xx/jaringan →
-  simpan dan coba lagi nanti dengan key yang sama.
-- Mengirim event yang sama dua kali aman: server mengembalikan hasil lama dengan `replayed: true`.
+- Tabel baru di database `sqflite` app (naikkan versi DB dari 1 ke 2): `outbox(id, body_json, created_at,
+  attempts)`, `body_json` = event lengkap dengan `occurredAt` dan kuncinya.
+- Kirim saat online (app dibuka, `connectivity_plus` tersambung) lewat `/batch`, urut waktu, ≤ 50 per
+  kiriman. **Setiap kiriman batch memakai `Idempotency-Key` baru** — isi outbox bisa berubah di antara
+  percobaan, dan pengulangan event sudah dicegah oleh kunci per event di atas.
+- Per hasil: `ok` → hapus dari outbox; `error` (`invalid_request`, `ticket_invalid`) → hapus dan catat
+  (mengulang tidak akan berhasil). Seluruh batch dijawab `5xx` atau gagal jaringan → simpan, coba lagi nanti.
 - Saldo di layar = angka terakhir dari server + penanda "menunggu sinkron" bila outbox belum kosong.
 
-## 7. Mode Fokus — tiket offline
+## 9. Mode Fokus — tiket offline
 
 Sesi Fokus boleh dimulai tanpa internet memakai **tiket** yang diambil saat online.
 
@@ -166,18 +262,16 @@ POST /v1/focus/tickets  {"source":"free_daily","durationMin":25}
 
 1. Saat layar Fokus dibuka dan online: ambil tiket `free_daily` di muka. Tiket `prepaid`/`coins` diminta
    **saat user benar-benar memulai sesi** — sesinya langsung terpakai dan tidak dikembalikan bila kedaluwarsa.
-2. Simpan tiket terenkripsi di HP. Boleh dicek keasliannya: `sig` = Ed25519 (base64url) atas
-   `riung-focus-ticket.v1|<kid>|<id>|<userId>|<source>|<durationMin>|<issuedAt>|<expiresAt>` dengan kunci
-   publik `focusTicketKeys` dari `/v1/config` (cocokkan `kid`).
-3. Sesi selesai → event `focus_completed` `{ticketId, saboteurId}` lewat outbox. Server menolak
+2. Simpan tiket di `flutter_secure_storage` (sudah ada). Boleh dicek keasliannya: `sig` = Ed25519
+   (base64url) atas `riung-focus-ticket.v1|<kid>|<id>|<userId>|<source>|<durationMin>|<issuedAt>|<expiresAt>`
+   dengan kunci publik `focusTicketKeys` dari `/v1/config` (cocokkan `kid`).
+3. Sesi selesai → event `focus_completed` `{ticketId, saboteurId, occurredAt}` lewat outbox. Server menolak
    (`ticket_invalid`) bila: tiket bukan milik user (`not_found`), sudah dipakai (`used`), "selesai" sebelum
    durasinya lewat (`too_early`), dimulai setelah tiket kedaluwarsa (`expired`), atau waktunya bertumpuk
    dengan sesi lain yang sudah dilaporkan (`overlap`).
 4. `GET /v1/focus/tickets` → tiket yang belum dipakai (untuk HP baru / setelah reinstall).
 
-Kirim `saboteurId` monster yang sedang dijinakkan (sekarang `sesi_selesai_screen.dart` selalu `waswas`).
-
-## 8. Toko, loadout, Aplikasi Beku
+## 10. Toko, loadout, Aplikasi Beku
 
 **Belanja koin** — `POST /v1/shop/purchase` `{itemType, itemId, expectedPrice}`:
 
@@ -191,9 +285,9 @@ Kirim `saboteurId` monster yang sedang dijinakkan (sekarang `sesi_selesai_screen
 Harga **selalu** dari `/v1/config` → `catalog` (sudah dihitung server); `expectedPrice` hanya deteksi
 perubahan. Koin beli dipakai lebih dulu, lalu koin latihan. Kepemilikan kosmetik global.
 
-**Loadout** — `PUT /v1/loadouts/monsters/{saboteurId}` `{items: [...]}`, `PUT /v1/loadouts/characters/{testId}`
-`{accessories: [...], cardStyle}`. Item harus dimiliki, satu per slot, item eksklusif hanya untuk karakternya.
-Gaya kartu berbayar boleh dipakai tanpa dibeli selama Premium aktif.
+**Loadout** — `PUT /v1/loadouts/monsters/{saboteurId}` `{items: [...]}` (≤ 5), `PUT /v1/loadouts/characters/{testId}`
+`{accessories: [...], cardStyle}` (≤ 4 aksesori). Item harus dimiliki, satu per slot, item eksklusif hanya untuk
+karakternya. Gaya kartu berbayar boleh dipakai tanpa dibeli selama Premium aktif.
 
 **Aplikasi Beku** — `POST /v1/appbeku/unlocks`:
 
@@ -205,12 +299,14 @@ bundel : {"bundleId":"santai","expectedPrice":35}
              "paidUnlocksUsed":1,"paidUnlocksLeft":2,"cooldownUntil":"…"},"wallet":{…}}
 ```
 
-- `appId` = package name dari `core/config/appbeku_catalog.dart` (WhatsApp tidak bisa). Menit dan bundel
-  dari `/v1/config` → `catalog.appbeku`.
-- `expectedPrice` = harga dasar + 10 × `today.paidUnlocksUsed` (ke-1: dasar, ke-2: +10, ke-3: +20).
+- `appId` = `packageName` dari `AppBekuCatalog` (`core/config/appbeku_catalog.dart`; WhatsApp tidak bisa).
+  Menit dan bundel dari `/v1/config` → `catalog.appbeku`.
+- `expectedPrice` = harga dasar + 10 × `today.paidUnlocksUsed` (ke-1: dasar, ke-2: +10, ke-3: +20) — sama dengan
+  `effectiveUnlockPrice` yang ada sekarang.
 - Pengaman etis ditegakkan server: maks 3 buka-berbayar/hari (`limit_reached`), jeda 60 detik antar buka
   berbayar — juga dari Toko, bukan hanya interstisial (`cooldown`), **hanya koin latihan**
-  (`insufficient_coins` dengan `earnedOnly: true`). Bundel dipotong sekali dan dihitung satu buka.
+  (`insufficient_coins` dengan `earnedOnly: true`). Bundel dipotong sekali dan dihitung satu buka (ganti
+  dua langkah `unlockMinutes` di `appbeku_toko_section.dart` dengan satu request bundel).
 - Buka menit secara lokal sesuai `grants`. Jalur napas gratis tetap lokal dan tidak pernah dibatasi.
 
 **Koin harian Premium tahunan** — `POST /v1/premium/daily-coins` (akun permanen, 1×/hari, +2 ke koin beli).
@@ -218,42 +314,82 @@ bundel : {"bundleId":"santai","expectedPrice":35}
 **Akses jurnal** — `GET /v1/journal/access?promptId=` → `canWrite`, `reason` (`daily_limit`,
 `premium_required`), status tiap prompt. Saat offline pakai hitungan lokal sebagai cadangan.
 
-## 9. Pembelian Google Play
+## 11. Pembelian Google Play (`in_app_purchase`)
 
-### 9.1 Membeli
-1. Hanya akun permanen. Ambil `billingAccountId` dari `GET /v1/me`.
-2. `BillingClient`: isi `obfuscatedAccountId` (`applicationUserName` di `in_app_purchase`) =
-   `billingAccountId`. Tanpa ini server menolak pembelian (`purchase_invalid`).
-3. Produk: koin `coin_pack_small|medium|large` (80 / 330 / 820 koin), langganan `premium_monthly|premium_yearly`.
-4. Setiap update pembelian → `POST /v1/billing/verify` `{productId, purchaseToken}` (Idempotency-Key +
-   App Check limited-use).
-5. `completePurchase` **hanya** bila `result.status` ∈ `credited`, `already_credited`, `active`, `inactive`.
-   Bukan untuk `pending` (pembayaran tertunda — tunggu update berikutnya) dan bukan untuk error.
-   `503` → coba lagi nanti; pembelian tetap tersimpan di Play.
-6. App **berhenti** mengkredit koin/Premium sendiri. Koin & status Premium dari respons (`wallet`, `premium`).
+### 11.1 Membeli
+- Hanya akun permanen (anonim → `403 permanent_account_required`). Ambil `billingAccountId` dari `GET /v1/me`.
+- Produk (sama dengan `BillingService` sekarang): koin `coin_pack_small|medium|large` (80 / 330 / 820 koin),
+  langganan `premium_monthly|premium_yearly`.
+- **Paket koin wajib `autoConsume: false`.** Default `in_app_purchase` di Android langsung meng-*consume*
+  pembelian sebelum app sempat memverifikasinya ke server; kalau app mati sebelum `verify`, pembelian itu
+  tidak muncul lagi di `restorePurchases()` dan koinnya hilang.
 
-### 9.2 Restore & status
-- `POST /v1/billing/restore` `{purchases: [{productId, purchaseToken}]}` (≤ 20) dari `queryPastPurchases`
-  saat app dibuka/login. Hasil per item; token yang sudah dikreditkan tidak dikreditkan ulang.
+```dart
+final param = PurchaseParam(productDetails: product, applicationUserName: me.billingAccountId);
+await InAppPurchase.instance.buyConsumable(purchaseParam: param, autoConsume: false); // paket koin
+await InAppPurchase.instance.buyNonConsumable(purchaseParam: param);                  // Premium
+```
+
+`applicationUserName` dikirim ke Play sebagai `obfuscatedAccountId`; server menolak pembelian yang tidak
+membawanya (`purchase_invalid`).
+
+### 11.2 Memproses `purchaseStream`
+
+```dart
+Future<void> _onPurchase(PurchaseDetails p) async {
+  if (p.status == PurchaseStatus.pending) return;                  // bayar tunai dsb. — tunggu update berikutnya
+  if (p.status != PurchaseStatus.purchased && p.status != PurchaseStatus.restored) return;
+  final r = await billingApi.verify(                               // POST /v1/billing/verify, App Check limited-use
+    productId: p.productID,
+    purchaseToken: p.verificationData.serverVerificationData,
+    idempotencyKey: const Uuid().v4(),                             // aman baru tiap panggilan (lihat di bawah)
+  );
+  switch (r.status) {
+    case 'credited' || 'already_credited':                         // paket koin: consume = acknowledge
+      await InAppPurchase.instance
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>()
+          .consumePurchase(p);
+    case 'active' || 'inactive':                                   // langganan
+      if (p.pendingCompletePurchase) await InAppPurchase.instance.completePurchase(p);
+    case 'pending':
+      break;                                                       // jangan consume/complete
+  }
+  wallet.update(r.wallet); premium.update(r.premium);              // jangan mengkredit sendiri
+}
+```
+
+- `verify`/`restore` boleh memakai `Idempotency-Key` baru setiap panggilan: satu `purchaseToken` hanya pernah
+  dikreditkan sekali oleh server (jawaban berikutnya `already_credited`), berapa kali pun dikirim.
+- `409 purchase_invalid` → jangan consume/complete; tampilkan pesan. Google me-refund otomatis setelah 3 hari.
+- `503`/gagal jaringan → jangan apa-apa; pembelian tetap ada di Play dan muncul lagi lewat `restorePurchases()`.
+- Impor `package:in_app_purchase_android/in_app_purchase_android.dart` (tambahkan ke `pubspec.yaml`) untuk
+  `InAppPurchaseAndroidPlatformAddition`. Upgrade bulanan → tahunan: `GooglePlayPurchaseParam` dengan
+  `changeSubscriptionParam`; server memindahkan Premium ke token baru.
+
+### 11.3 Restore & status
+- Saat app dibuka/login: `InAppPurchase.instance.restorePurchases()` → pembelian yang belum di-*consume*
+  dan langganan aktif datang lewat `purchaseStream` dengan status `restored`. Kirim sekaligus ke
+  `POST /v1/billing/restore` `{purchases: [{productId, purchaseToken}]}` (≤ 20, hasil per item), lalu
+  consume/complete per item dengan aturan §11.2. Token yang sudah dikreditkan tidak dikreditkan ulang.
 - `GET /v1/billing/subscription` / `GET /v1/me` → `premium.status`: aktif bila `active` atau `in_grace`.
   Membatalkan perpanjangan (auto-renew mati) tetap Premium sampai `expiresAt`.
 
-### 9.3 Refund
+### 11.4 Refund
 Refund dari Google menarik kembali koinnya. Kalau koinnya sudah terpakai, sisanya jadi `debtCoins`
 (`GET /v1/wallet`) yang dilunasi dari koin berikutnya — saldo tidak pernah minus.
 
-### 9.4 Uji lokal tanpa Play
+### 11.5 Uji lokal tanpa Play
 Stack dev memakai Google Play palsu: token `dev-coin:<billingAccountId>:<productId>:<n>` dan
-`dev-sub:<billingAccountId>:<productId>:<hari>:<n>`.
+`dev-sub:<billingAccountId>:<productId>:<hari>:<n>` (Postman folder *6. Google Play billing*).
 
-## 10. Rate limit yang perlu diperhatikan
+## 12. Rate limit yang perlu diperhatikan
 
 Batas per user (sisanya di spec §5): `GET /v1/me` & `/v1/wallet` 60/menit, `POST /v1/activities` 60/menit,
 `/batch` 10/menit, belanja & Aplikasi Beku 10/menit, tiket Fokus 20/menit, `billing/verify` 10/menit & 30/jam,
 `billing/restore` 5/jam, `/me/link` 5/jam, hapus/ekspor akun 3/jam. Jangan polling — `/v1/me` saat app dibuka
 dan setelah aksi penting sudah cukup.
 
-## 11. Mencoba lokal
+## 13. Mencoba lokal
 
 Cara tercepat: **Postman collection** di `backend/postman/` (52 request, environment lokal & produksi,
 header dan Idempotency-Key otomatis) — lihat `backend/postman/README.md`. Atau dengan curl:
@@ -267,16 +403,17 @@ curl -X POST localhost:8080/v1/activities -H 'Authorization: Bearer dev:rani:ano
   -d "{\"type\":\"checkin\",\"occurredAt\":\"$(date -u +%FT%TZ)\",\"date\":\"$(TZ=Asia/Jakarta date +%F)\"}"
 ```
 
-## 12. Daftar kerja app (ringkas)
+## 14. Daftar kerja app (ringkas)
 
 Detail & prioritas: `docs/todo-luar-backend.md` §B–C.
 
-- [ ] `ApiClient` (header §2, refresh token, retry dengan key yang sama, pemetaan `code` → strings, `requestId`)
+- [ ] Paket baru: `http`, `firebase_app_check`, `in_app_purchase_android` (impor langsung); opsional `flutter_timezone`
+- [ ] `ApiClient` (§3): header §2, refresh token, retry dengan key yang sama, pemetaan `code` → strings, `requestId`
 - [ ] Model Dart typed untuk request/response (aturan model di `CLAUDE.md`), tanpa `Map` mentah di UI
 - [ ] Bootstrap dari `GET /v1/me`; harga & katalog dari `/v1/config` (cache + fallback `economy.dart`)
-- [ ] Outbox offline + `/v1/activities/batch`; hapus mutasi koin di HP (`HybridWalletFunctionsService`, `firestore.rules`)
-- [ ] Toko, loadout, Aplikasi Beku, tiket Fokus lewat server (§7–8)
-- [ ] `BillingService` lewat `/v1/billing/*` (§9)
+- [ ] Outbox `sqflite` + `/v1/activities/batch` (§8); hapus mutasi koin di HP (§6, `firestore.rules`)
+- [ ] Toko, loadout, Aplikasi Beku, tiket Fokus lewat server (§9–10)
+- [ ] `BillingService`: `autoConsume: false`, verifikasi server, consume/complete setelah sukses, restore (§11)
 - [ ] App Check (Play Integrity) + `getLimitedUseToken` untuk 3 endpoint sensitif
-- [ ] Teks untuk semua `code` di §3 (Bahasa Indonesia & Inggris)
+- [ ] Teks untuk semua `code` di §4 (Bahasa Indonesia & Inggris)
 - [ ] Tes parity: `economy.dart` == `docs/economy-props.json`, katalog app == `docs/catalog.json`
