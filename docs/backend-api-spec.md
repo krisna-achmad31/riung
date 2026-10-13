@@ -1,5 +1,5 @@
 # Riung Backend — Spesifikasi API, Keamanan, Rate Limit & Logging
-*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-13 (B0–B4 selesai, API live di `riung.e55techlab.com`)*
+*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-13 (B0–B6 selesai, API live di `riung.e55techlab.com`; kesiapan produksi: `docs/backend-b6-review.md`)*
 
 Dokumen ini menjawab tiga hal: **endpoint apa saja yang dibutuhkan app**, **bagaimana setiap endpoint
 diamankan (sampai rate limit)**, dan **bagaimana log disiapkan**. Semua angka ekonomi yang disebut di sini
@@ -519,6 +519,8 @@ Belum dibuat (menyusul bila dibutuhkan): `wallet-adjust` (koreksi saldo manual, 
 ### 4.2 Autentikasi
 - ID token Firebase diverifikasi lokal (tanda tangan, `aud` = project id, `iss`, `exp`, `iat`) via Admin
   SDK dengan cache kunci publik Google. Aksi `user+fresh` juga cek pencabutan token + `auth_time` ≤ 5 menit.
+  Cek pencabutan (panggilan ke Firebase) baru dijalankan **setelah** rate limit, jadi request di atas batas
+  tidak pernah sampai ke Firebase.
 - Provider dibaca dari klaim `firebase.sign_in_provider` (`anonymous` / `password` / `google.com`).
 - Identitas dipetakan lewat `auth_identities (provider, subject) → users.id` — siap untuk auth sendiri.
 - Akun baru (anonim maupun permanen): maks **10 akun baru/IP/hari** (cegah farming koin dengan ratusan
@@ -531,8 +533,10 @@ Belum dibuat (menyusul bila dibutuhkan): `wallet-adjust` (koreksi saldo manual, 
 ### 4.3 App Check
 - Semua endpoint `app`/`user` mewajibkan `X-Firebase-AppCheck` (Play Integrity di Android).
 - Rollout dua tahap lewat env `APP_CHECK_MODE`: `monitor` (hanya dicatat di log) → `enforce` (tolak).
+  Hasil per request tercatat di access log (`appCheck`: `valid`, `missing`, `invalid`, `replayed`,
+  `unavailable`); kriteria pindah ke `enforce` di `docs/backend-b6-review.md` §4.
 - Endpoint sensitif (`billing/verify`, `DELETE /me`, `pin/verify`) memakai token **limited-use** dan
-  mencatat `jti` supaya token yang sama tidak bisa diputar ulang.
+  mencatat `jti` supaya token yang sama tidak bisa diputar ulang (di `monitor` replay hanya dicatat).
 
 ### 4.4 Validasi input
 - Decoder JSON ketat: field tak dikenal ditolak, body ganda ditolak, angka di luar rentang ditolak.
@@ -572,7 +576,10 @@ Belum dibuat (menyusul bila dibutuhkan): `wallet-adjust` (koreksi saldo manual, 
   [no-new-privileges:true]`, `mem_limit: 256m`, `cpus: 1`, `pids_limit: 200`. Container `riung-api` hanya
   memegang kredensial `riung_app`; kredensial `riung_migrator` hanya ada di `riung-migrate`.
 - CORS: tidak ada sama sekali, **kecuali** `POST /v1/waitlist` untuk origin landing.
-- Header respons API: `Cache-Control: no-store` (kecuali config/content), `X-Content-Type-Options: nosniff`.
+- Header respons API: `Cache-Control: no-store` (kecuali config/content), `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: no-referrer`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`.
+  Nginx menambah HSTS & `X-Frame-Options`, menyembunyikan salinan ganda dari Go, dan memakai suite TLS 1.2
+  AEAD saja (Mozilla intermediate).
 
 ### 4.9 Data pribadi & penghapusan
 - Data yang disimpan minimal (§3.10). Logs tanpa PII (§6.3).
@@ -696,7 +703,7 @@ Pipeline Promtail untuk `container="riung-api"`: stage `json` → label **hanya*
 {"time":"2026-10-11T03:04:05.123Z","level":"INFO","event":"http_request","msg":"request",
  "requestId":"01J9Z6…","method":"POST","route":"/v1/activities","status":200,"durationMs":23,
  "bytesOut":412,"user":"u_5f2c9a1e0b7d4c3a","anon":true,"ip":"ip_9e1d…","appVersion":"1.4.0+27",
- "platform":"android"}
+ "platform":"android","appCheck":"valid"}
 ```
 
 - `route` = pola route (`/v1/loadouts/monsters/{saboteurId}`), bukan path mentah.
@@ -786,7 +793,9 @@ Jejak keuangan resmi tetap di DB (`coin_ledger`, `purchases`) — log hanya untu
 | Pendaftaran | `signup_limited` > 20 dalam 1 jam (tanda CGNAT atau serangan) |
 | Container | `riung-api` restart / healthcheck gagal |
 
-Kanal notifikasi: email tim (kontak Grafana); bisa diteruskan ke n8n yang sudah ada.
+Implementasi: `backend/deploy/monitoring/grafana-alerting-riung.yml` (12 aturan, contact point Telegram
+`riung-telegram`, divalidasi di Grafana 11.6.1). Kanal: Telegram (konvensi `core-shared`), bukan email —
+SMTP Grafana tidak dikonfigurasi. Status pemasangan & query bantu: `docs/backend-b6-review.md` §3.
 
 ---
 
@@ -831,4 +840,4 @@ admin_audit_log (id uuid PK, admin_user_id uuid NULL, actor text NOT NULL,      
 | B3 ✅ | #27–30, `billing-sync` (refund & acknowledge), `reconcile` |
 | B4 ✅ | #24–26, `focus_completed` |
 | B5 | deploy ke VPS, `cleanup-anon`, `reapply-deletions`, Dependabot, rate limit nginx (§5.1) |
-| B6 | App Check `enforce`, alert Grafana (§6.6), uji beban & review keamanan |
+| B6 ✅ | uji beban (gate lolos), review keamanan + perbaikan, aturan alert Grafana, kriteria App Check `enforce` — `docs/backend-b6-review.md` |

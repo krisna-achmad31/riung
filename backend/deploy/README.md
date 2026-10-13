@@ -128,6 +128,15 @@ Perpanjangan sertifikat sudah ditangani cron certbot core-shared (03:00).
 `core-shared/monitoring/loki/config.yml` dan `monitoring/promtail-riung.snippet.yml` ke config Promtail,
 lalu `docker compose up -d --force-recreate loki promtail` di core-shared.
 
+**8b. Alert Telegram** (opsional sampai ada bot; lihat `docs/backend-b6-review.md` §3)
+
+1. Tulis chat id di `monitoring/grafana-alerting-riung.yml` (`chatid: "-100…"`, pakai tanda kutip).
+2. **Uji lokal dulu** — file yang salah menghentikan seluruh provisioning Grafana bersama: jalankan
+   `grafana/grafana:11.6.1` dengan folder provisioning berisi datasource Loki + file ini, pastikan tidak ada
+   `Failed to provision alerting` di log dan `GET /api/v1/provisioning/alert-rules` berisi 12 aturan.
+3. Salin ke `core-shared/monitoring/grafana/provisioning/alerting/riung.yml`, tambahkan
+   `RIUNG_TELEGRAM_BOT_TOKEN` ke environment service `grafana` (container `shared-grafana`), lalu `docker compose up -d grafana`.
+
 **9. Cron** (root, `crontab -e`). Job dijalankan di dalam `riung-api`; `LOG_TEE=/proc/1/fd/1` membuat
 baris `job_run` ikut masuk log container → Loki (output `docker exec` sendiri tidak ditangkap Promtail).
 

@@ -63,7 +63,12 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
 - [x] **P1 — Isi konten**: seed `dummy-data-seed.json` 2026-10-13 (ulangi bila konten berubah).
 - [ ] **P1 — Admin**: tentukan email admin; pastikan admin punya akses VPN OpenVPN; jalankan
       `riung admin grant <email> <alasan>` setelah deploy.
-- [ ] **P2 — Grafana**: kontak notifikasi (email tim) untuk alert di spec §6.6.
+- [ ] **P1 — Alert Telegram**: buat bot + grup Telegram tim (atau pakai bot yang sudah dipakai app lain),
+      lalu pasang `backend/deploy/monitoring/grafana-alerting-riung.yml` (runbook langkah 8b). Konvensi
+      `core-shared`: Grafana alerting sengaja kosong — sepakati dulu dengan pengelola `core-shared`.
+- [ ] **P1 — App Check `enforce`** setelah app mengirim token: kriteria di `docs/backend-b6-review.md` §4.
+- [ ] **P2 — Uji beban di VPS** saat beta (token Firebase sungguhan), pantau p95 dari Loki.
+- [ ] **P2 — `server_tokens off;`** di `shared-nginx` (versi nginx terlihat di header `Server`; berlaku semua situs).
 - [ ] **P2 — CI Flutter**: tambahkan `paths-ignore: ['backend/**']` di
       `.github/workflows/firebase_app_distribution.yml` supaya perubahan backend tidak memicu build APK.
 

@@ -64,12 +64,16 @@ func callerFrom(ctx context.Context) *caller {
 }
 
 // handle registers pattern with the protections in rt, outermost first:
-// CORS → body limit → min app version → App Check → auth → rate limit →
-// idempotency → handler.
+// CORS → body limit → min app version → App Check → auth (local token check)
+// → rate limit → revocation check → idempotency → handler. The revocation
+// check calls Firebase, so it runs only for requests within the rate limit.
 func (s *Server) handle(mux *http.ServeMux, pattern string, h http.HandlerFunc, rt route) {
 	var next http.Handler = h
 	if rt.idempotent {
 		next = s.idempotency(pattern, next)
+	}
+	if rt.access >= accessUser && (rt.checkRevoked || rt.fresh) {
+		next = s.revocation(next)
 	}
 	if len(rt.limits) > 0 {
 		next = s.rateLimit(rt.limits, next)
@@ -157,8 +161,15 @@ func (s *Server) appCheck(rt route, next http.Handler) http.Handler {
 		}
 		tok, err := s.AppCheck.Verify(r.Context(), r.Header.Get("X-Firebase-AppCheck"))
 		reason := ""
+		li := httpx.LogInfoFrom(r.Context())
+		outcome := func(v string) {
+			if li != nil {
+				li.AppCheck = v
+			}
+		}
 		switch {
 		case errors.Is(err, authn.ErrUnavailable):
+			outcome("unavailable")
 			// Cannot judge the token right now: never block in monitor mode,
 			// ask the client to retry in enforce mode.
 			s.Logger.LogAttrs(r.Context(), slog.LevelError, "app check unavailable",
@@ -176,7 +187,9 @@ func (s *Server) appCheck(rt route, next http.Handler) http.Handler {
 			if r.Header.Get("X-Firebase-AppCheck") == "" {
 				reason = "missing"
 			}
-		case rt.limitedUseAppCheck && mode == config.AppCheckEnforce && tok.JTI != "":
+		case rt.limitedUseAppCheck && tok.JTI != "":
+			// Checked in monitor mode too, so replays show up in the logs
+			// before enforce is switched on.
 			fresh, err := s.Store.ConsumeAppCheckJTI(r.Context(), tok.JTI, tok.ExpiresAt)
 			if err != nil {
 				s.internalError(w, r, "appcheck_jti", err)
@@ -186,7 +199,10 @@ func (s *Server) appCheck(rt route, next http.Handler) http.Handler {
 				reason = "replayed"
 			}
 		}
-		if reason != "" {
+		if reason == "" {
+			outcome("valid")
+		} else {
+			outcome(reason)
 			s.logWarn(r, logx.EventAppCheckFailed, "app check failed",
 				slog.String("reason", reason), slog.String("mode", mode))
 			if mode == config.AppCheckEnforce {
@@ -215,10 +231,36 @@ func bearerToken(r *http.Request) string {
 	return ""
 }
 
+// revocation re-verifies the token with a revocation check (a Firebase call)
+// for sensitive routes, after the rate limit.
+func (s *Server) revocation(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		if _, err := s.Verifier.Verify(ctx, bearerToken(r), true); err != nil {
+			if errors.Is(err, authn.ErrUnavailable) {
+				s.Logger.LogAttrs(ctx, slog.LevelError, "auth provider unavailable",
+					slog.String(logx.KeyEvent, logx.EventDependencyError),
+					slog.String(logx.KeyRequestID, httpx.RequestIDFrom(ctx)),
+					slog.String("dependency", "firebase"), slog.String("error", err.Error()))
+				httpx.WriteError(w, r, httpx.ErrUnavailable)
+				return
+			}
+			reason := "invalid"
+			if errors.Is(err, authn.ErrRevoked) {
+				reason = "revoked"
+			}
+			s.logWarn(r, logx.EventAuthFailed, "authentication failed", slog.String("reason", reason))
+			httpx.WriteError(w, r, errUnauthenticated)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (s *Server) authenticate(rt route, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		id, err := s.Verifier.Verify(ctx, bearerToken(r), rt.checkRevoked || rt.fresh)
+		id, err := s.Verifier.Verify(ctx, bearerToken(r), false)
 		if err != nil {
 			if errors.Is(err, authn.ErrUnavailable) {
 				s.Logger.LogAttrs(ctx, slog.LevelError, "auth provider unavailable",

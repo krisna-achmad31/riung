@@ -188,6 +188,9 @@ func AccessLog(logger *slog.Logger, hasher logx.Hasher) Middleware {
 			if info.Anon != nil {
 				attrs = append(attrs, slog.Bool(logx.KeyAnon, *info.Anon))
 			}
+			if info.AppCheck != "" {
+				attrs = append(attrs, slog.String("appCheck", info.AppCheck))
+			}
 			if v := safeHeader(r, "X-App-Version"); v != "" {
 				attrs = append(attrs, slog.String("appVersion", v))
 			}
@@ -240,6 +243,8 @@ func SecurityHeaders(next http.Handler) http.Handler {
 		h.Set("X-Content-Type-Options", "nosniff")
 		h.Set("Cache-Control", "no-store")
 		h.Set("Referrer-Policy", "no-referrer")
+		// JSON only: nothing may be rendered, framed, or loaded from a response.
+		h.Set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
 		next.ServeHTTP(w, r)
 	})
 }

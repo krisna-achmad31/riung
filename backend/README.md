@@ -59,10 +59,13 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
   | `POST /v1/focus/tickets`, `GET /v1/focus/tickets` | tiket Ed25519 untuk sesi offline: `free_daily` (1/hari, Premium 3), `prepaid` (sesi dari paket), `coins` (25/40/50) |
   | `focus_completed` di `/v1/activities` | menukar tiket sekali (tidak bisa "selesai" sebelum durasinya), +4 progres monster |
   | `POST /v1/appbeku/unlocks` | buka-waktu berbayar hanya dengan koin latihan, maks 3/hari, +10 tiap kali, jeda 60 detik; bundel `santai`/`sosmed` atomik; aplikasi yang dibuka tidak disimpan/dicatat |
-- **B5 — deploy** (berjalan): `riung cleanup-anon` (akun anonim tak dibuka > 90 hari, data server + user
+- **B5 — deploy** ✅ (live sejak 2026-10-13): `riung cleanup-anon` (akun anonim tak dibuka > 90 hari, data server + user
   Firebase), `riung reapply-deletions` (setelah restore backup), Dependabot untuk modul Go & image. Deploy ke
   VPS mengikuti [`deploy/README.md`](deploy/README.md).
-- Berikutnya: B6 (App Check `enforce`, alert Grafana, uji beban). Lihat plan §10.
+- **B6 — kesiapan produksi** ✅ ([`docs/backend-b6-review.md`](../docs/backend-b6-review.md)): uji beban
+  k6 ([`loadtest/`](loadtest/README.md), p95 11,9 ms di 200 pengguna aktif), review keamanan (cek pencabutan
+  token setelah rate limit, CSP, TLS AEAD, field `appCheck` di access log), 12 aturan alert Grafana (Telegram),
+  kriteria App Check `enforce`.
 
 ## Menjalankan lokal
 

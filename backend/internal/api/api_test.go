@@ -504,6 +504,11 @@ func TestAppCheckModes(t *testing.T) {
 	if !strings.Contains(monitor.logs.String(), `"event":"appcheck_failed"`) || !strings.Contains(monitor.logs.String(), `"mode":"monitor"`) {
 		t.Fatal("monitor mode must log failures")
 	}
+	// The access log carries the outcome, so the enforce switch can be judged from Loki.
+	monitor.do(req{method: "GET", path: "/v1/config", headers: map[string]string{"X-Firebase-AppCheck": "dev"}})
+	if logs := monitor.logs.String(); !strings.Contains(logs, `"appCheck":"missing"`) || !strings.Contains(logs, `"appCheck":"valid"`) {
+		t.Fatalf("access log must record the App Check outcome:\n%s", logs)
+	}
 	// The waitlist is public: never behind App Check.
 	if r := enforce.do(req{method: "POST", path: "/v1/waitlist", body: map[string]string{"email": "a@b.co"}}); r.status != 202 {
 		t.Fatalf("waitlist must stay public: %d %s", r.status, r.raw)
@@ -661,5 +666,28 @@ func TestExportDoesNotBlockDeletion(t *testing.T) {
 	}
 	if r := e.do(req{method: "DELETE", path: "/v1/me", token: googleToken}); r.status != 204 {
 		t.Fatalf("deletion must still work after exports: %d %s", r.status, r.raw)
+	}
+}
+
+func TestRevocationCheckedAfterRateLimit(t *testing.T) {
+	e := newEnv(t)
+	tok := "dev:revoke-me:google.com"
+	e.do(req{method: "GET", path: "/v1/me", token: tok})
+	before := e.verifier.RevocationChecks()
+	// POST /v1/me/link allows 5 per hour: requests over the limit must not
+	// reach Firebase's revocation check.
+	for range 8 {
+		e.do(req{method: "POST", path: "/v1/me/link", token: tok, idemKey: newKey(), body: map[string]any{}})
+	}
+	if got := e.verifier.RevocationChecks() - before; got != 5 {
+		t.Fatalf("revocation checks = %d, want 5 (rate limit first)", got)
+	}
+	e.verifier.Revoke("revoked-user")
+	e.do(req{method: "GET", path: "/v1/me", token: "dev:revoked-user:google.com"})
+	if r := e.do(req{method: "POST", path: "/v1/me/link", token: "dev:revoked-user:google.com", idemKey: newKey(), body: map[string]any{}}); r.status != 401 {
+		t.Fatalf("revoked token: %d %s", r.status, r.raw)
+	}
+	if r := e.do(req{method: "GET", path: "/v1/me", token: tok}); r.header.Get("Content-Security-Policy") != "default-src 'none'; frame-ancestors 'none'" {
+		t.Fatalf("CSP header: %q", r.header.Get("Content-Security-Policy"))
 	}
 }

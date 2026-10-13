@@ -1,0 +1,393 @@
+# Grafana alert rules for riung-api (docs/backend-api-spec.md §6.6), evaluated
+# from the riung-api log stream in Loki (datasource uid "loki").
+#
+# Install: copy to core-shared/monitoring/grafana/provisioning/alerting/riung.yml
+# set the Telegram chat id below and RIUNG_TELEGRAM_BOT_TOKEN in the Grafana
+# container environment, validate locally first (see README step 8b), then
+# restart Grafana (or POST
+# /api/admin/provisioning/alerting/reload). Rules route straight to the
+# "riung-telegram" contact point (notification_settings), so the shared
+# notification policy tree is not touched.
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: riung-telegram
+    receivers:
+      - uid: riung-telegram
+        type: telegram
+        settings:
+          bottoken: $__env{RIUNG_TELEGRAM_BOT_TOKEN}
+          # Not secret: write the chat id here at install time, quoted. Grafana
+          # turns an env-expanded "-100…" into a number and then refuses the
+          # whole file — which stops the Grafana provisioning service.
+          chatid: "REPLACE_WITH_CHAT_ID"
+          parse_mode: HTML
+          disable_notification: false
+        disableResolveMessage: false
+
+groups:
+  - orgId: 1
+    name: riung-api
+    folder: Riung
+    interval: 1m
+    rules:
+      - uid: riung-server-errors
+        title: "riung: error server"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | level="ERROR" [5m])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [5] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: critical }
+        annotations:
+          summary: "riung-api: lebih dari 5 log ERROR dalam 5 menit"
+          description: 'Grafana Explore: {container="riung-api"} | json | level="ERROR"'
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-5xx-ratio
+        title: "riung: 5xx > 1% request"
+        condition: E
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event="http_request" | status >= 500 [5m])) or vector(0)
+          - refId: B
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: B
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event="http_request" [5m])) or vector(0)
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: reduce, expression: A, reducer: last }
+          - refId: D
+            datasourceUid: __expr__
+            model: { refId: D, type: reduce, expression: B, reducer: last }
+          - refId: E
+            datasourceUid: __expr__
+            model:
+              refId: E
+              type: math
+              # Ratio only once there is real traffic (≥ 50 requests in 5 min).
+              expression: "($C / ($D + 1)) > 0.01 && $D >= 50"
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        labels: { app: riung, severity: critical }
+        annotations:
+          summary: "riung-api: lebih dari 1% request berakhir 5xx"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-latency-p95
+        title: "riung: p95 > 500 ms"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: max(quantile_over_time(0.95, {container="riung-api"} | json | event="http_request" | route!="/healthz" | unwrap durationMs [10m]) by (container)) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [500] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels: { app: riung, severity: warning }
+        annotations:
+          summary: "riung-api: p95 durasi request di atas 500 ms selama 10 menit"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-api-down
+        title: "riung: API tidak menjawab healthcheck"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              # Docker probes /healthz every 30 s; no probe line for 5 min = down.
+              expr: sum(count_over_time({container="riung-api"} | json | event="http_request" | route="/healthz" [5m])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: lt, params: [1] } }]
+        noDataState: Alerting
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: critical }
+        annotations:
+          summary: "riung-api: tidak ada healthcheck selama 5 menit (container mati/restart terus)"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-ledger-mismatch
+        title: "riung: ledger mismatch"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event="ledger_mismatch" [1h])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [0] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: critical }
+        annotations:
+          summary: "riung: saldo dompet tidak sama dengan ledger (job reconcile)"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-job-failed
+        title: "riung: job cron gagal"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event="job_run" | ok="false" [1h])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [0] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: warning }
+        annotations:
+          summary: "riung: job_run ok=false (cleanup / cleanup-anon / billing-sync / reconcile)"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-job-missing
+        title: "riung: reconcile tidak jalan > 26 jam"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 93600, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event="job_run" | job="reconcile" [26h])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: lt, params: [1] } }]
+        noDataState: Alerting
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: warning }
+        annotations:
+          summary: "riung: cron harian tidak jalan (tidak ada job_run reconcile 26 jam)"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-purchases
+        title: "riung: pembelian ditolak / refund"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event=~"purchase_rejected|refund_applied|rtdn_rejected" [5m])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [0] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: info }
+        annotations:
+          summary: "riung: ada purchase_rejected, refund_applied, atau rtdn_rejected"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-auth-attack
+        title: "riung: lonjakan auth/App Check gagal"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event=~"auth_failed|appcheck_failed" [5m])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [100] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: warning }
+        annotations:
+          summary: "riung: lebih dari 100 auth_failed/appcheck_failed dalam 5 menit"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-rate-limited
+        title: "riung: rate limit melonjak"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event="rate_limited" [5m])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [200] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: warning }
+        annotations:
+          summary: "riung: lebih dari 200 rate_limited dalam 5 menit"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-signup-limited
+        title: "riung: batas akun baru per IP sering tercapai"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event="signup_limited" [1h])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [20] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: warning }
+        annotations:
+          summary: "riung: signup_limited > 20 dalam 1 jam (CGNAT atau serangan) — cek maxNewAccountsPerIpPerDay"
+        notification_settings: { receiver: riung-telegram }
+
+      - uid: riung-admin
+        title: "riung: perubahan / akses ditolak Admin API"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: sum(count_over_time({container="riung-api"} | json | event=~"admin_setting_changed|admin_access_denied" [5m])) or vector(0)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [0] } }]
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels: { app: riung, severity: info }
+        annotations:
+          summary: "riung: admin_setting_changed atau admin_access_denied"
+        notification_settings: { receiver: riung-telegram }

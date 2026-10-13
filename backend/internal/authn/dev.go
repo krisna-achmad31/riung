@@ -13,12 +13,32 @@ import (
 // refuses DEV_AUTH outside RIUNG_ENV=dev, so it can never be enabled in
 // production.
 type DevVerifier struct {
-	mu      sync.Mutex
-	deleted []string
+	mu               sync.Mutex
+	deleted          []string
+	revoked          map[string]bool
+	revocationChecks int
+}
+
+// Revoke makes revocation checks for subject fail (tests).
+func (d *DevVerifier) Revoke(subject string) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.revoked == nil {
+		d.revoked = map[string]bool{}
+	}
+	d.revoked[subject] = true
+}
+
+// RevocationChecks counts Verify calls that asked for a revocation check —
+// each one is a call to Firebase in production (tests).
+func (d *DevVerifier) RevocationChecks() int {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return d.revocationChecks
 }
 
 // Verify implements Verifier.
-func (d *DevVerifier) Verify(_ context.Context, token string, _ bool) (Identity, error) {
+func (d *DevVerifier) Verify(_ context.Context, token string, checkRevoked bool) (Identity, error) {
 	parts := strings.Split(token, ":")
 	admin := false
 	if len(parts) == 4 && parts[3] == "admin" {
@@ -31,6 +51,15 @@ func (d *DevVerifier) Verify(_ context.Context, token string, _ bool) (Identity,
 	case ProviderAnonymous, ProviderPassword, ProviderGoogle:
 	default:
 		return Identity{}, ErrInvalidToken
+	}
+	if checkRevoked {
+		d.mu.Lock()
+		d.revocationChecks++
+		revoked := d.revoked[parts[1]]
+		d.mu.Unlock()
+		if revoked {
+			return Identity{}, ErrRevoked
+		}
 	}
 	return Identity{
 		Provider:       IdentityProviderFirebase,

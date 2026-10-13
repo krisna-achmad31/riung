@@ -45,6 +45,9 @@ type LogInfo struct {
 	Route    string
 	UserHash string
 	Anon     *bool
+	// AppCheck is the App Check outcome: valid, missing, invalid, replayed
+	// or unavailable (empty when the route does not check it or mode is off).
+	AppCheck string
 }
 
 // LogInfoFrom returns the mutable per-request log info, or nil outside the
