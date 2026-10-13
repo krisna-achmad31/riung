@@ -284,3 +284,5 @@ Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:8250
 - Redeploy B6 (2026-10-13): image `e5f0110` + config nginx (suite TLS AEAD, header tidak ganda). Config
   sebelumnya disimpan di `/root/riung.nginx.before-b6.conf`; image `825085e` tetap ada untuk rollback.
   Dicek: header & CSP, suite CBC ditolak, situs lain tetap 200/302, field `appCheck` di log.
+- Redeploy 2026-10-13: image `81f763f` (webhook billing → 404 selama billing mati, bukan 503/ERROR). Image
+  `e5f0110` dan `825085e` tetap di VPS untuk rollback.
