@@ -74,6 +74,9 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
 
 ## B. App Flutter (`riung/`) — integrasi backend (P1)
 
+Panduan lengkap untuk tim app: **`docs/panduan-integrasi-app.md`** (header, error, alur, outbox, Fokus, Toko,
+Aplikasi Beku, pembelian).
+
 - [ ] `ApiClient` (`lib/core/services/api/`): base URL, ID token, App Check token, `Idempotency-Key`,
       retry, pemetaan error `code` → strings (CLAUDE.md aturan #2). Paket baru: `http`, `firebase_app_check`
       (termasuk `getLimitedUseToken` untuk `billing/verify`, `DELETE /me`, verifikasi PIN).
@@ -129,9 +132,10 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `already_owned`, `price_changed`, `insufficient_coins` (`details.shortfall` → tawarkan latihan dulu).
 - [ ] Laporan latihan lewat `POST /v1/activities` / `/batch`: kirim `promptId` untuk jurnal ber-prompt;
       tampilkan `capReason` dengan nada ramah (batas harian bukan kegagalan).
-- [ ] `CLAUDE.md`: tambahkan rujukan `docs/catalog.json` sebagai sumber katalog item (selain economy-props.json).
+- [x] `CLAUDE.md`: rujukan backend Go, `docs/catalog.json`, dan panduan integrasi (2026-10-13).
 - [ ] Setelah cutover: `firestore.rules` → deny-all (kecuali yang masih dipakai), hapus kode Firestore
-      user/wallet, update `CLAUDE.md` aturan #5/#6, `docs/firebase-architecture.md`, `docs/setup-firebase.md`.
+      user/wallet, hapus catatan "Firestore masih dipakai" di `CLAUDE.md`, rapikan `docs/firebase-architecture.md`
+      & `docs/setup-firebase.md` (sudah diberi catatan status 2026-10-13).
 
 ## C. App Flutter — celah & bug yang ditemukan (P2, sebagian jadi P1 saat integrasi)
 

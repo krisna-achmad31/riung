@@ -1,5 +1,10 @@
 # Setup Firebase & Play Billing (M5 — Spark plan)
 
+> **Status 2026-10-13:** solusi sementara tanpa Cloud Functions di dokumen ini (`coinRequests`, verifikasi di HP)
+> digantikan backend Go (`backend/`, `https://riung.e55techlab.com/v1`) — koin & pembelian diputuskan server.
+> Panduan app: `docs/panduan-integrasi-app.md`. Setup Play Console untuk backend: `backend/deploy/README.md`
+> langkah 4c. Bagian Auth/Google Sign-In di bawah tetap berlaku.
+
 Panduan operasional buat nyalain backend Riung sungguhan di Firebase Console
 & Google Play Console. Ini BUKAN dokumen arsitektur (itu di
 `firebase-architecture.md`, yang menggambarkan versi ideal Blaze-plan

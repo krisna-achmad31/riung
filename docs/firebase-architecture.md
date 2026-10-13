@@ -1,6 +1,12 @@
 # Firebase Architecture — Psychology App (Freemium, ID Market)
 *CTO technical spec — v1.0*
 
+> **Status 2026-10-13:** peran Cloud Functions di dokumen ini (mutasi koin, verifikasi pembelian, tiket Fokus,
+> §5 dan §8.1) **tidak dibangun di Firebase** — diambil alih backend Go + PostgreSQL (`backend/`, live di
+> `https://riung.e55techlab.com`). Rancangan: `docs/backend-go-plan.md`; kontrak: `docs/backend-api-spec.md`;
+> cara app memakainya: `docs/panduan-integrasi-app.md`. Firebase tetap untuk Auth, App Check, Analytics,
+> Crashlytics, Remote Config (saklar fitur saja), dan Firestore sampai app pindah ke backend Go.
+
 ## 1. Stack
 - **Firebase Auth** — Email/Password, Google Sign-In (dominant in ID), anonymous auth for pre-signup onboarding funnel (convert later via `linkWithCredential`).
 - **Cloud Firestore** — primary DB (schema below).

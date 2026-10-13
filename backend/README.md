@@ -6,6 +6,7 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
 - Rencana & keputusan: [`docs/backend-go-plan.md`](../docs/backend-go-plan.md)
 - Spesifikasi API, keamanan, rate limit, logging: [`docs/backend-api-spec.md`](../docs/backend-api-spec.md)
 - Pekerjaan di luar backend (app, infra): [`docs/todo-luar-backend.md`](../docs/todo-luar-backend.md)
+- **Untuk tim app**: [`docs/panduan-integrasi-app.md`](../docs/panduan-integrasi-app.md)
 
 ## Status
 

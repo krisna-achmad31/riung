@@ -21,6 +21,7 @@ Vault + detail (Apa katanya/Faktanya, teknik penangkal) · mini-game breathing (
 
 ## M5 — Ekonomi live (2 sesi)
 Firestore + Cloud Functions (spendCoins/earnCoins/dailyCheckin/tameProgress) · Toko · Play Billing via in_app_purchase + validatePurchase · Premium gating.
+*Diperbarui 2026-10-13: bagian server M5 dibangun sebagai backend Go (`backend/`, fase B0–B6 di `docs/backend-go-plan.md` §10), bukan Cloud Functions; integrasi app: `docs/panduan-integrasi-app.md`.*
 **Gate**: uji beli sandbox (license tester), koin masuk hanya via server.
 
 ## M6 — AppBeku + Profil + Better me (2–3 sesi)
