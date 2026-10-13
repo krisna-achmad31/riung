@@ -20,12 +20,12 @@ dipetakan: `docs/todo-luar-backend.md` §B–C.
 | Lokal | `http://localhost:8080/v1` (`cd backend && make dev-up`) | token dev `dev:<uid>:<provider>` | mati |
 
 Lokal memakai `DEV_AUTH`: token `Bearer dev:rani:anonymous` (atau `:password`, `:google.com`) menggantikan ID
-token Firebase, App Check cukup `dev`, dan Google Play dipalsukan (§10.5). Di Android emulator, host laptop =
+token Firebase, App Check cukup `dev`, dan Google Play dipalsukan (§11.5). Di Android emulator, host laptop =
 `http://10.0.2.2:8080`. Untuk build debug yang menembak stack lokal, ID token Firebase sungguhan tidak
 dikenali — pakai token dev lewat konfigurasi build (`--dart-define`).
 
-Status produksi: API live, database kosong, **billing Google Play belum aktif** (`/v1/billing/*` → 503)
-sampai Play Console & Pub/Sub disiapkan.
+Status produksi: API live, database kosong, **billing Google Play belum aktif** (`/v1/billing/verify` &
+`/restore` → 503) sampai Play Console & Pub/Sub disiapkan.
 
 ## 2. Setiap request
 
@@ -56,7 +56,9 @@ tanggal lokal user dalam zona waktu `users.tz` (default `Asia/Jakarta`). App sek
 ## 3. Klien HTTP di Flutter
 
 App belum punya paket HTTP dan App Check. Tambahkan `http` dan `firebase_app_check` (aktifkan provider
-Play Integrity; debug provider untuk emulator). Satu `ApiClient` membungkus semua aturan §2; UI tidak
+Play Integrity; debug provider untuk emulator). Semua contoh Dart di panduan ini lolos `flutter analyze`
+(Flutter 3.44.0; `firebase_auth` 6.7.0, `firebase_app_check` 0.4.8, `http` 1.6.0, `uuid` 4.6.0,
+`in_app_purchase` 3.3.1, `in_app_purchase_android` 0.5.3 — versi yang sama dengan `pubspec.lock` app). Satu `ApiClient` membungkus semua aturan §2; UI tidak
 pernah menyentuh JSON mentah — service typed mengubahnya jadi model (`CLAUDE.md` aturan model).
 
 ```dart
@@ -142,7 +144,7 @@ kirim ke Crashlytics sebagai custom key — dengan itu satu kejadian bisa dilaca
 | 409 | `limit_reached` | batas harian/etis (`details.reason`, `details.limit`, `details.resetsAt`) |
 | 409 | `cooldown` | tunggu `details.retryAfterSeconds` |
 | 409 | `ticket_invalid` | tiket Fokus tidak bisa dipakai (`details.reason`) |
-| 409 | `purchase_invalid` | Google tidak mengonfirmasi pembelian untuk akun ini (§10) |
+| 409 | `purchase_invalid` | Google tidak mengonfirmasi pembelian untuk akun ini (§11) |
 | 409 | `pin_locked` | verifikasi PIN dikunci (`details.retryAfterSeconds`) |
 | 409 | `idempotency_key_reuse` | key yang sama dipakai untuk body lain — bug di app |
 | 409 | `request_in_progress` | request dengan key yang sama masih diproses — tunggu sebentar, ulangi dengan key yang sama |
@@ -160,8 +162,8 @@ Firebase sign-in (anonim kalau belum login)
   → GET /v1/config         harga, katalog, batas, kunci tiket Fokus (cache + If-None-Match → 304)
   → GET /v1/me             akun dibuat otomatis di panggilan pertama (termasuk anonim)
   → kirim outbox           POST /v1/activities/batch (event yang tertunda saat offline)
-  → billing                InAppPurchase.instance.restorePurchases() → POST /v1/billing/restore (§10)
-  → GET /v1/focus/tickets  + ambil tiket free_daily bila online (§8)
+  → billing                InAppPurchase.instance.restorePurchases() → POST /v1/billing/restore (§11)
+  → GET /v1/focus/tickets  + ambil tiket free_daily bila online (§9)
 ```
 
 `GET /v1/me` adalah sumber tunggal state user: profil, `billingAccountId`, Premium, streak + jumlah
@@ -183,9 +185,9 @@ koin membawa `wallet` terbaru — perbarui `WalletNotifier` dari situ, jangan me
 | `AuthNotifier._linkAndMigrate` | `linkWithCredential` lalu `POST /v1/me/link` — tidak ada lagi salin snapshot |
 | `ContentRepository` (`FirestoreContentRepository`) | `GET /v1/content/{kind}` (konten bawaan tetap jadi cadangan) |
 | `RemoteConfigService` (harga & batas) | `GET /v1/config`; Remote Config hanya saklar fitur |
-| `BillingService._deliver` (mengkredit di HP) | dihapus; verifikasi server (§10) |
+| `BillingService._deliver` (mengkredit di HP) | dihapus; verifikasi server (§11) |
 | `AppBekuNotifier.unlockMinutes` / `_paidUnlocksToday` | `POST /v1/appbeku/unlocks`; hitungan dari `today.paidUnlocksUsed` |
-| `SessionNotifier` (Mode Fokus) | tiket Fokus (§8) |
+| `SessionNotifier` (Mode Fokus) | tiket Fokus (§9) |
 | `JurnalPinService` (cocokkan hash di HP) | `POST /v1/me/journal-pin-backup/verify` |
 | `DataExportBuilder` | ditambah `GET /v1/me/export` |
 | `features/home/screens/sesi_selesai_screen.dart` (progres selalu `waswas`) | kirim monster yang sedang dijinakkan sebagai `saboteurId` |
@@ -407,7 +409,7 @@ curl -X POST localhost:8080/v1/activities -H 'Authorization: Bearer dev:rani:ano
 
 Detail & prioritas: `docs/todo-luar-backend.md` §B–C.
 
-- [ ] Paket baru: `http`, `firebase_app_check`, `in_app_purchase_android` (impor langsung); opsional `flutter_timezone`
+- [ ] Paket baru: `http` (^1.6.0), `firebase_app_check` (^0.4.8), `in_app_purchase_android` (0.5.3, impor langsung); opsional `flutter_timezone`
 - [ ] `ApiClient` (§3): header §2, refresh token, retry dengan key yang sama, pemetaan `code` → strings, `requestId`
 - [ ] Model Dart typed untuk request/response (aturan model di `CLAUDE.md`), tanpa `Map` mentah di UI
 - [ ] Bootstrap dari `GET /v1/me`; harga & katalog dari `/v1/config` (cache + fallback `economy.dart`)

@@ -355,6 +355,10 @@ func TestBillingUnavailableWithoutPublisher(t *testing.T) {
 	if r := verify(e, "dev:nopub:google.com", "coin_pack_small", "tok-nopub-00001"); r.status != 503 {
 		t.Fatalf("no publisher: %d %s", r.status, r.raw)
 	}
+	// The public webhook must not produce 5xx (ERROR logs) while billing is off.
+	if r := push(e, "dev-pubsub", "msg-off", subNotification("tok-off-000000", 4)); r.status != 404 {
+		t.Fatalf("webhook with billing off: %d %s", r.status, r.raw)
+	}
 }
 
 func TestBillingWebhookRetriesAfterFailure(t *testing.T) {

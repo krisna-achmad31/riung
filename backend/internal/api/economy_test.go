@@ -336,3 +336,29 @@ func adminOnly(cidr string) config.Config {
 func discardLogger() *slog.Logger { return logx.New(io.Discard, slog.LevelError) }
 
 func econForTest() economy.Props { return economy.MustLoad() }
+
+// The outbox sends every batch with a fresh Idempotency-Key; events are
+// recognised by their business keys, so a resend grants nothing twice.
+func TestBatchResentWithNewKeyIsReplayed(t *testing.T) {
+	e := newEnv(t)
+	tok := "dev:outbox:anonymous"
+	now := nowRFC(e)
+	events := []any{
+		map[string]any{"type": "journal_saved", "entryId": "11111111-2222-4333-8444-555555555555", "occurredAt": now},
+		map[string]any{"type": "minigame_finished", "ref": "66666666-7777-4888-8999-000000000000", "saboteurId": "waswas", "won": true, "occurredAt": now},
+	}
+	first := e.do(req{method: "POST", path: "/v1/activities/batch", token: tok, idemKey: newKey(), body: map[string]any{"events": events}})
+	coins := get(first.body, "wallet", "coins")
+	// Resend with one more event and a new key, as the outbox does.
+	events = append(events, map[string]any{"type": "mission_completed", "date": todayJakarta(e), "index": 2, "occurredAt": now})
+	second := e.do(req{method: "POST", path: "/v1/activities/batch", token: tok, idemKey: newKey(), body: map[string]any{"events": events}})
+	results, _ := second.body["results"].([]any)
+	if second.status != 200 || len(results) != 3 ||
+		get(results[0].(map[string]any), "result", "replayed") != true || get(results[1].(map[string]any), "result", "replayed") != true ||
+		get(results[2].(map[string]any), "result", "replayed") != false {
+		t.Fatalf("resend: %d %s", second.status, second.raw)
+	}
+	if get(second.body, "wallet", "coins").(float64) != coins.(float64)+3 {
+		t.Fatalf("only the new mission may pay: %v → %v", coins, get(second.body, "wallet", "coins"))
+	}
+}

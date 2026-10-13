@@ -691,3 +691,26 @@ func TestRevocationCheckedAfterRateLimit(t *testing.T) {
 		t.Fatalf("CSP header: %q", r.header.Get("Content-Security-Policy"))
 	}
 }
+
+// The app guide tells developers which errors they may retry with the same
+// Idempotency-Key: those produced before the idempotency step (429, 401, …)
+// are not stored, so a retry with the same key still runs the action once.
+func TestIdempotencyKeyReusableAfterRateLimit(t *testing.T) {
+	e := newEnv(t)
+	tok := "dev:retry-key:anonymous"
+	e.do(req{method: "GET", path: "/v1/me", token: tok})
+	// Use up the profile limit (20/min) with other keys.
+	for range 20 {
+		e.do(req{method: "PATCH", path: "/v1/me/profile", token: tok, idemKey: newKey(), body: map[string]any{"displayName": "A"}})
+	}
+	key := newKey()
+	body := map[string]any{"displayName": "Rani"}
+	if r := e.do(req{method: "PATCH", path: "/v1/me/profile", token: tok, idemKey: key, body: body}); r.status != 429 {
+		t.Fatalf("over the limit: %d", r.status)
+	}
+	e.clock.advance(time.Minute)
+	r := e.do(req{method: "PATCH", path: "/v1/me/profile", token: tok, idemKey: key, body: body})
+	if r.status != 200 || get(r.body, "user", "displayName") != "Rani" {
+		t.Fatalf("the same key must work after the 429: %d %s", r.status, r.raw)
+	}
+}

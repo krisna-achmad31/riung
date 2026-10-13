@@ -436,7 +436,8 @@ itu hanya diterima `verify`/`restore` setelah server mengikatnya ke user lewat `
 Webhook: autentikasi token OIDC Google dari push subscription — tanda tangan, `exp`, `aud` = `RTDN_AUDIENCE`,
 `iss` = `accounts.google.com`, `email` = `RTDN_SERVICE_ACCOUNT` dan `email_verified`. Jawaban: `204` (diproses,
 duplikat, atau isi tidak bisa dibaca — retry tidak akan pernah berhasil, jadi di-ack dan dicatat), `401` token
-salah, `429`/`5xx` gangguan sementara (Pub/Sub mengulang; id pesan dilepas lagi bila pemrosesan gagal, terputus,
+salah, `404` selama billing belum dikonfigurasi (tidak ada Pub/Sub; endpoint publik tidak boleh menghasilkan
+5xx/log ERROR bagi siapa pun), `429`/`5xx` gangguan sementara (Pub/Sub mengulang; id pesan dilepas lagi bila pemrosesan gagal, terputus,
 atau panic, sehingga ulangan tidak dianggap duplikat). `packageName` selain `PLAY_PACKAGE_NAME` diabaikan.
 
 Dev (`DEV_BILLING=true`, hanya `RIUNG_ENV=dev`): Google Play dipalsukan — token

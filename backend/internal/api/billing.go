@@ -217,8 +217,11 @@ func (s *Server) postPlayWebhook(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteError(w, r, errWebhookLimited)
 		return
 	}
-	if s.Push == nil || !s.Config.BillingEnabled() {
-		httpx.WriteError(w, r, errBillingOff)
+	if s.Push == nil || !s.Config.BillingEnabled() || s.billingSvc.Publisher == nil {
+		// No Pub/Sub subscription exists while billing is off: answer like a
+		// missing route, not 503 — a public 5xx would let anyone fill the logs
+		// with ERROR lines (and trip the server-error alert).
+		httpx.WriteError(w, r, httpx.ErrNotFound)
 		return
 	}
 	if err := s.Push.Verify(ctx, bearerToken(r)); err != nil {
