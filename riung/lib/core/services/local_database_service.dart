@@ -20,8 +20,12 @@ class LocalDatabaseService {
     final path = p.join(dbPath, 'riung.db');
     final db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) await _createOutbox(db);
+      },
       onCreate: (db, version) async {
+        await _createOutbox(db);
         await db.execute('''
           CREATE TABLE journal_entries (
             id TEXT PRIMARY KEY,
@@ -83,7 +87,26 @@ class LocalDatabaseService {
     final db = await _database;
     await db.delete('journal_entries');
     await db.delete('checkin_history');
+    await db.delete('outbox');
   }
+
+  static Future<void> _createOutbox(Database db) => db.execute('''
+    CREATE TABLE outbox (
+      id TEXT PRIMARY KEY, user_id TEXT NOT NULL, body_json TEXT NOT NULL,
+      created_at TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0
+    )
+  ''');
+
+  Future<void> enqueueActivity(String id, String uid, String body, String createdAt) async {
+    final db = await _database;
+    await db.insert('outbox', {'id': id, 'user_id': uid, 'body_json': body, 'created_at': createdAt}, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
+  Future<List<Map<String, Object?>>> pendingActivities(String uid) async =>
+      (await _database).query('outbox', where: 'user_id = ?', whereArgs: [uid], orderBy: 'created_at ASC, id ASC', limit: 50);
+
+  Future<void> removeActivity(String id) async => (await _database).delete('outbox', where: 'id = ?', whereArgs: [id]);
+  Future<void> attemptActivity(String id) async => (await _database).rawUpdate('UPDATE outbox SET attempts = attempts + 1 WHERE id = ?', [id]);
 
   Future<List<Map<String, Object?>>> allCheckIns() async {
     final db = await _database;

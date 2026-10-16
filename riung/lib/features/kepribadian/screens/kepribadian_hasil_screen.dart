@@ -71,6 +71,7 @@ class _KepribadianHasilScreenState extends State<KepribadianHasilScreen> {
       if (!bought || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.styleBought(t.styleName(style.id)))));
     }
+    await scope.wallet.apiState?.api.characterLoadout(widget.result.test.name, _accessories.map((a) => a.id).toList(), style.id);
     await scope.prefs.setPersonalityCardStyle(widget.result.test, style.id);
     if (mounted) setState(() => _style = style);
   }
@@ -79,7 +80,7 @@ class _KepribadianHasilScreenState extends State<KepribadianHasilScreen> {
     final scope = AppScope.of(context);
     final t = scope.language.strings.kepribadian;
     final wallet = scope.wallet;
-    final loadout = AccessoryLoadout(scope.prefs);
+    final loadout = AccessoryLoadout(scope.prefs, api: scope.wallet.apiState?.api);
     final test = widget.result.test;
     final worn = _accessories.contains(accessory);
     if (worn) {
@@ -128,7 +129,7 @@ class _KepribadianHasilScreenState extends State<KepribadianHasilScreen> {
     if (!ok || !mounted) return;
     final bought = await wallet.buyCosmeticBundle(bundleId: bundle.id, ids: [for (final a in bundle.items) a.cosmeticId], price: price);
     if (!bought || !mounted) return;
-    final loadout = AccessoryLoadout(scope.prefs);
+    final loadout = AccessoryLoadout(scope.prefs, api: scope.wallet.apiState?.api);
     for (final a in bundle.items) {
       await loadout.equip(widget.result.test, a);
     }

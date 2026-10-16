@@ -1,6 +1,7 @@
 import 'package:flutter/painting.dart';
 
 import '../../../core/config/economy.dart';
+import '../../../core/services/api/api_config_store.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 
@@ -8,12 +9,13 @@ import '../../../core/theme/theme.dart';
 /// sama persis dengan `assets/monsters/anchors.json` § cosmetics supaya
 /// [RiungMonster] bisa merender overlay-nya (CLAUDE.md aturan #7).
 class TokoCosmetic {
-  const TokoCosmetic({required this.id, required this.monsterId, required this.price, required this.slot, this.exclusive = false, this.khas = false});
+  const TokoCosmetic({required this.id, required this.monsterId, required int price, required this.slot, this.exclusive = false, this.khas = false}) : _price = price;
 
   /// Nama tampil per bahasa: `TokoStrings.cosmeticName(id)`.
   final String id;
   final String monsterId;
-  final int price;
+  final int _price;
+  int get price => ApiConfigStore.instance.itemPrice('monsterCosmetics', id, _price);
   final CosmeticSlot slot;
 
   /// Hanya bisa dipakai [monsterId] (mis. bingkai emas = khusus Si Cermin).
@@ -114,7 +116,7 @@ const tokoCosmetics = [
 /// 1 sesi vs paket 5 sesi Mode Fokus prabayar (Toko § "Beli sesi fokus") —
 /// harga paket sengaja < 5× harga satuan ("HEMAT 20%" di desain).
 abstract final class TokoFocusBundle {
-  static const int hargaSatuSesi = EconomySpend.fokus25Menit;
+  static int get hargaSatuSesi => ApiConfigStore.instance.itemPrice('focusPacks', 'focus_1', EconomySpend.fokus25Menit);
   static const int jumlahPaket = 5;
-  static const int hargaPaket = EconomySpend.fokusBundle5Sesi;
+  static int get hargaPaket => ApiConfigStore.instance.itemPrice('focusPacks', 'focus_5', EconomySpend.fokusBundle5Sesi);
 }

@@ -27,7 +27,9 @@ class _IzinNotifikasiScreenState extends State<IzinNotifikasiScreen> {
     final status = await Permission.notification.request();
     if (!mounted) return;
     setState(() => _requesting = false);
-    final pesan = status.isGranted ? context.s.launch.permissionGranted : context.s.launch.permissionDenied;
+    final pesan = status.isGranted
+        ? context.s.launch.permissionGranted
+        : context.s.launch.permissionDenied;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(pesan)));
     _lanjut();
   }
@@ -37,10 +39,17 @@ class _IzinNotifikasiScreenState extends State<IzinNotifikasiScreen> {
   /// yang profilnya sudah `onboardingDone`), jangan nyasar balik ke
   /// onboarding — langsung ke Beranda.
   void _lanjut() {
-    final onboardingDone = AppScope.of(context).auth.profile?.onboardingDone ?? false;
+    final scope = AppScope.of(context);
+    final profile = scope.auth.profile;
+    final onboardingDone =
+        profile != null &&
+        (profile.onboardingDone ||
+            scope.prefs.hasSeenIntroduction(profile.uid));
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (_) => onboardingDone ? const RootShellScreen() : const OnboardingFlowScreen(),
+        builder: (_) => onboardingDone
+            ? const RootShellScreen()
+            : const OnboardingFlowScreen(),
       ),
       (route) => false,
     );
@@ -53,7 +62,12 @@ class _IzinNotifikasiScreenState extends State<IzinNotifikasiScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, AppSpacing.md, 24, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            24,
+            AppSpacing.md,
+            24,
+            AppSpacing.lg,
+          ),
           child: Column(
             children: [
               Expanded(
@@ -70,29 +84,66 @@ class _IzinNotifikasiScreenState extends State<IzinNotifikasiScreen> {
                             child: Container(
                               width: 280,
                               height: 280,
-                              decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(
+                                  colors: [
+                                    AppColors.garis,
+                                    AppColors.garis.withValues(alpha: 0),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                          const Positioned(top: 96, child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 190, applyBossScale: false)),
+                          const Positioned(
+                            top: 96,
+                            child: RiungMonster(
+                              monsterId: 'kabut',
+                              state: MonsterVisualState.jinak,
+                              size: 190,
+                              applyBossScale: false,
+                            ),
+                          ),
                           Positioned(
                             top: 10,
                             left: 6,
                             right: 6,
-                            child: _ContohNotifikasi(title: n.checkinTitle, body: n.checkinBody(EconomyEarn.checkinHarian)),
+                            child: _ContohNotifikasi(
+                              title: n.checkinTitle,
+                              body: n.checkinBody(EconomyEarn.checkinHarian),
+                            ),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Align(alignment: Alignment.centerLeft, child: Text(t.permissionTitle, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.15))),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        t.permissionTitle,
+                        style: AppTextStyles.display.copyWith(
+                          fontSize: 28,
+                          height: 1.15,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              RiungButton(label: _requesting ? t.permissionAsking : t.permissionEnable, onPressed: _requesting ? null : _mintaIzin),
+              RiungButton(
+                label: _requesting ? t.permissionAsking : t.permissionEnable,
+                onPressed: _requesting ? null : _mintaIzin,
+              ),
               const SizedBox(height: AppSpacing.sm),
               TextButton(
                 onPressed: _requesting ? null : _lanjut,
-                child: Text(context.s.common.nantiSaja, style: AppTextStyles.chipLabel.copyWith(color: AppColors.teksSekunder, fontSize: 13)),
+                child: Text(
+                  context.s.common.nantiSaja,
+                  style: AppTextStyles.chipLabel.copyWith(
+                    color: AppColors.teksSekunder,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             ],
           ),
@@ -113,27 +164,54 @@ class _ContohNotifikasi extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: AppGlass.card(radius: 24, color: AppColors.permukaanPadat.withValues(alpha: 0.85)),
+      decoration: AppGlass.card(
+        radius: 24,
+        color: AppColors.permukaanPadat.withValues(alpha: 0.85),
+      ),
       child: Row(
         children: [
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primerTerang, AppColors.sekunderTerang]),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primerTerang, AppColors.sekunderTerang],
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
-            child: Text('R', style: AppTextStyles.display.copyWith(fontSize: 18, color: AppColors.diAtasTinta)),
+            child: Text(
+              'R',
+              style: AppTextStyles.display.copyWith(
+                fontSize: 18,
+                color: AppColors.diAtasTinta,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.teksUtama)),
+                Text(
+                  title,
+                  style: AppTextStyles.chipLabel.copyWith(
+                    fontSize: 13,
+                    color: AppColors.teksUtama,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(body, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.3, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                Text(
+                  body,
+                  style: AppTextStyles.caption.copyWith(
+                    fontSize: 12,
+                    height: 1.3,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.teksSekunder,
+                  ),
+                ),
               ],
             ),
           ),

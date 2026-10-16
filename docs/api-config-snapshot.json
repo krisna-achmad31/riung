@@ -1,0 +1,790 @@
+{
+  "version": "2026-10-11.1",
+  "minAppVersion": "0.0.0",
+  "serverTime": "2026-10-15T15:21:50.952069874Z",
+  "economy": {
+    "earn": {
+      "checkin": 5,
+      "journal": 4,
+      "meditation": 3,
+      "mission": 3,
+      "minigameWin": 8,
+      "monsterTamed": 50,
+      "bettermeLesson": 10,
+      "streak7": 20,
+      "streak30": 100,
+      "premiumYearlyDaily": 2
+    },
+    "monsterProgress": {
+      "focus": 4,
+      "minigameWin": 5,
+      "minigameLose": 2,
+      "journalPrompt": 2,
+      "meditation": 3
+    },
+    "spend": {
+      "focus25": 25,
+      "focus45": 40,
+      "focus60": 50,
+      "focusBundle5": 100,
+      "streakShield": 20,
+      "cosmeticCommon": 100,
+      "cosmeticEpic": 300,
+      "cosmeticLegendary": 500,
+      "accessorySmall": 60,
+      "accessoryRegular": 100,
+      "accessoryRare": 300,
+      "cardStyleRegular": 100,
+      "cardStyleRare": 300,
+      "bundleDiscountPercent": 20,
+      "bundleRounding": 5
+    },
+    "appbeku": {
+      "unlock10": 15,
+      "unlock20": 25,
+      "unlock30": 35,
+      "unlock60": 60,
+      "bundleSantai": 35,
+      "bundleSosmed": 75,
+      "maxPaidUnlocksPerDay": 3,
+      "escalationPerUnlock": 10,
+      "unlockCooldownSeconds": 60
+    },
+    "tickets": {
+      "freePerDay": 1,
+      "maxFromPracticePerDay": 3,
+      "maxFightsPerDay": 4
+    },
+    "freeTier": {
+      "meditations": 3,
+      "sleepStories": 2,
+      "journalPerDay": 1,
+      "minigamePerDay": 1,
+      "focusPerDay": 1
+    },
+    "premium": {
+      "monthlyPriceIdr": 59000,
+      "monthsPaidPerYear": 10,
+      "yearlyPriceIdr": 590000,
+      "trialDays": 7,
+      "focusFreePerDay": 3,
+      "yearlyDailyCoins": 2,
+      "graceDays": 3
+    },
+    "coinPacks": [
+      {
+        "productId": "coin_pack_small",
+        "coins": 80,
+        "bonus": 0,
+        "priceIdr": 15000
+      },
+      {
+        "productId": "coin_pack_medium",
+        "coins": 300,
+        "bonus": 30,
+        "priceIdr": 49000
+      },
+      {
+        "productId": "coin_pack_large",
+        "coins": 700,
+        "bonus": 120,
+        "priceIdr": 99000
+      }
+    ],
+    "caps": {
+      "missionsPerDay": 3,
+      "journalRewardsPerDay": 3,
+      "meditationRewardsPerDay": 3
+    }
+  },
+  "catalog": {
+    "version": "2026-10-12.2",
+    "monsters": [
+      {
+        "id": "meronta",
+        "family": "saboteur"
+      },
+      {
+        "id": "waswas",
+        "family": "saboteur"
+      },
+      {
+        "id": "kabut",
+        "family": "saboteur"
+      },
+      {
+        "id": "cermin",
+        "family": "saboteur"
+      },
+      {
+        "id": "sempurna",
+        "family": "saboteur"
+      },
+      {
+        "id": "mengelak",
+        "family": "saboteur"
+      },
+      {
+        "id": "hakim",
+        "family": "saboteur"
+      },
+      {
+        "id": "nanti",
+        "family": "habit"
+      },
+      {
+        "id": "gulir",
+        "family": "habit"
+      },
+      {
+        "id": "begadang",
+        "family": "habit"
+      },
+      {
+        "id": "bunglon",
+        "family": "habit"
+      },
+      {
+        "id": "bimbang",
+        "family": "habit"
+      },
+      {
+        "id": "bara",
+        "family": "habit"
+      }
+    ],
+    "monsterCosmetics": [
+      {
+        "id": "topi_rajut",
+        "monsterId": "kabut",
+        "slot": "head",
+        "exclusive": false,
+        "price": 100
+      },
+      {
+        "id": "syal_hangat",
+        "monsterId": "waswas",
+        "slot": "neck",
+        "exclusive": false,
+        "price": 100
+      },
+      {
+        "id": "bantal_mini",
+        "monsterId": "meronta",
+        "slot": "base",
+        "exclusive": false,
+        "price": 300
+      },
+      {
+        "id": "bingkai_emas",
+        "monsterId": "cermin",
+        "slot": "none",
+        "exclusive": true,
+        "price": 500
+      },
+      {
+        "id": "batu_tenang",
+        "monsterId": "waswas",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "lentera",
+        "monsterId": "kabut",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "bintang_kintsugi",
+        "monsterId": "sempurna",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "senter",
+        "monsterId": "mengelak",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "selimut_peluk",
+        "monsterId": "meronta",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "palu_busa",
+        "monsterId": "hakim",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "jam_pasir",
+        "monsterId": "nanti",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "kantong_hp",
+        "monsterId": "gulir",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "topi_tidur",
+        "monsterId": "begadang",
+        "slot": "head",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "pin_berani",
+        "monsterId": "bunglon",
+        "slot": "neck",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "kompas",
+        "monsterId": "bimbang",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      },
+      {
+        "id": "cangkir_teh",
+        "monsterId": "bara",
+        "slot": "side",
+        "exclusive": true,
+        "price": 300
+      }
+    ],
+    "personalityTests": [
+      "jung",
+      "temperament",
+      "attachment"
+    ],
+    "accessories": [
+      {
+        "id": "beanie",
+        "inventoryId": "acc_beanie",
+        "slot": "head",
+        "exclusiveTo": null,
+        "price": 60
+      },
+      {
+        "id": "ribbon",
+        "inventoryId": "acc_ribbon",
+        "slot": "head",
+        "exclusiveTo": null,
+        "price": 60
+      },
+      {
+        "id": "flower",
+        "inventoryId": "acc_flower",
+        "slot": "head",
+        "exclusiveTo": null,
+        "price": 60
+      },
+      {
+        "id": "witchHat",
+        "inventoryId": "acc_witchHat",
+        "slot": "head",
+        "exclusiveTo": null,
+        "price": 100
+      },
+      {
+        "id": "headphones",
+        "inventoryId": "acc_headphones",
+        "slot": "head",
+        "exclusiveTo": null,
+        "price": 100
+      },
+      {
+        "id": "halo",
+        "inventoryId": "acc_halo",
+        "slot": "head",
+        "exclusiveTo": null,
+        "price": 300
+      },
+      {
+        "id": "roundGlasses",
+        "inventoryId": "acc_roundGlasses",
+        "slot": "face",
+        "exclusiveTo": null,
+        "price": 60
+      },
+      {
+        "id": "starStickers",
+        "inventoryId": "acc_starStickers",
+        "slot": "face",
+        "exclusiveTo": null,
+        "price": 60
+      },
+      {
+        "id": "sunglasses",
+        "inventoryId": "acc_sunglasses",
+        "slot": "face",
+        "exclusiveTo": null,
+        "price": 100
+      },
+      {
+        "id": "scarf",
+        "inventoryId": "acc_scarf",
+        "slot": "neck",
+        "exclusiveTo": null,
+        "price": 60
+      },
+      {
+        "id": "necklace",
+        "inventoryId": "acc_necklace",
+        "slot": "neck",
+        "exclusiveTo": null,
+        "price": 100
+      },
+      {
+        "id": "backpack",
+        "inventoryId": "acc_backpack",
+        "slot": "back",
+        "exclusiveTo": null,
+        "price": 100
+      },
+      {
+        "id": "cape",
+        "inventoryId": "acc_cape",
+        "slot": "back",
+        "exclusiveTo": null,
+        "price": 300
+      },
+      {
+        "id": "wings",
+        "inventoryId": "acc_wings",
+        "slot": "back",
+        "exclusiveTo": null,
+        "price": 300
+      },
+      {
+        "id": "jungCrown",
+        "inventoryId": "acc_jungCrown",
+        "slot": "head",
+        "exclusiveTo": "jung",
+        "price": 300
+      },
+      {
+        "id": "jungMask",
+        "inventoryId": "acc_jungMask",
+        "slot": "face",
+        "exclusiveTo": "jung",
+        "price": 100
+      },
+      {
+        "id": "jungCompass",
+        "inventoryId": "acc_jungCompass",
+        "slot": "neck",
+        "exclusiveTo": "jung",
+        "price": 100
+      },
+      {
+        "id": "jungLantern",
+        "inventoryId": "acc_jungLantern",
+        "slot": "back",
+        "exclusiveTo": "jung",
+        "price": 300
+      },
+      {
+        "id": "tempFlame",
+        "inventoryId": "acc_tempFlame",
+        "slot": "head",
+        "exclusiveTo": "temperament",
+        "price": 100
+      },
+      {
+        "id": "tempMonocle",
+        "inventoryId": "acc_tempMonocle",
+        "slot": "face",
+        "exclusiveTo": "temperament",
+        "price": 60
+      },
+      {
+        "id": "tempLeaf",
+        "inventoryId": "acc_tempLeaf",
+        "slot": "neck",
+        "exclusiveTo": "temperament",
+        "price": 60
+      },
+      {
+        "id": "tempWave",
+        "inventoryId": "acc_tempWave",
+        "slot": "back",
+        "exclusiveTo": "temperament",
+        "price": 300
+      },
+      {
+        "id": "attNightCap",
+        "inventoryId": "acc_attNightCap",
+        "slot": "head",
+        "exclusiveTo": "attachment",
+        "price": 60
+      },
+      {
+        "id": "attHeartCharm",
+        "inventoryId": "acc_attHeartCharm",
+        "slot": "face",
+        "exclusiveTo": "attachment",
+        "price": 60
+      },
+      {
+        "id": "attBlanket",
+        "inventoryId": "acc_attBlanket",
+        "slot": "neck",
+        "exclusiveTo": "attachment",
+        "price": 100
+      },
+      {
+        "id": "attCompanion",
+        "inventoryId": "acc_attCompanion",
+        "slot": "back",
+        "exclusiveTo": "attachment",
+        "price": 300
+      }
+    ],
+    "accessoryBundles": [
+      {
+        "id": "cozy",
+        "items": [
+          "beanie",
+          "scarf",
+          "roundGlasses"
+        ],
+        "exclusiveTo": null
+      },
+      {
+        "id": "stylish",
+        "items": [
+          "headphones",
+          "sunglasses",
+          "necklace"
+        ],
+        "exclusiveTo": null
+      },
+      {
+        "id": "heavenly",
+        "items": [
+          "halo",
+          "wings",
+          "starStickers"
+        ],
+        "exclusiveTo": null
+      },
+      {
+        "id": "jungSet",
+        "items": [
+          "jungCrown",
+          "jungMask",
+          "jungCompass",
+          "jungLantern"
+        ],
+        "exclusiveTo": "jung"
+      },
+      {
+        "id": "temperamentSet",
+        "items": [
+          "tempFlame",
+          "tempMonocle",
+          "tempLeaf",
+          "tempWave"
+        ],
+        "exclusiveTo": "temperament"
+      },
+      {
+        "id": "attachmentSet",
+        "items": [
+          "attNightCap",
+          "attHeartCharm",
+          "attBlanket",
+          "attCompanion"
+        ],
+        "exclusiveTo": "attachment"
+      }
+    ],
+    "cardStyles": [
+      {
+        "id": "klasik",
+        "inventoryId": "cardstyle_klasik",
+        "free": true,
+        "price": null
+      },
+      {
+        "id": "taman",
+        "inventoryId": "cardstyle_taman",
+        "free": false,
+        "price": 100
+      },
+      {
+        "id": "arkade",
+        "inventoryId": "cardstyle_arkade",
+        "free": false,
+        "price": 100
+      },
+      {
+        "id": "galaksi",
+        "inventoryId": "cardstyle_galaksi",
+        "free": false,
+        "price": 300
+      },
+      {
+        "id": "aurora",
+        "inventoryId": "cardstyle_aurora",
+        "free": false,
+        "price": 300
+      }
+    ],
+    "focusPacks": [
+      {
+        "id": "focus_1",
+        "sessions": 1,
+        "price": 25
+      },
+      {
+        "id": "focus_5",
+        "sessions": 5,
+        "price": 100
+      }
+    ],
+    "appbeku": {
+      "apps": [
+        {
+          "id": "com.instagram.android",
+          "group": "sosmed"
+        },
+        {
+          "id": "com.zhiliaoapp.musically",
+          "group": "sosmed"
+        },
+        {
+          "id": "com.google.android.youtube",
+          "group": "sosmed"
+        },
+        {
+          "id": "com.twitter.android",
+          "group": "sosmed"
+        },
+        {
+          "id": "com.mobile.legends",
+          "group": "game"
+        }
+      ],
+      "units": [
+        {
+          "minutes": 10,
+          "price": 15
+        },
+        {
+          "minutes": 20,
+          "price": 25
+        },
+        {
+          "minutes": 30,
+          "price": 35
+        },
+        {
+          "minutes": 60,
+          "price": 60
+        }
+      ],
+      "bundles": [
+        {
+          "id": "santai",
+          "price": 35,
+          "apps": [
+            {
+              "appId": "com.instagram.android",
+              "minutes": 15
+            },
+            {
+              "appId": "com.zhiliaoapp.musically",
+              "minutes": 15
+            }
+          ]
+        },
+        {
+          "id": "sosmed",
+          "price": 75,
+          "group": "sosmed",
+          "minutesPerApp": 30
+        }
+      ]
+    },
+    "streakShield": {
+      "itemId": "streak_shield",
+      "price": 20
+    },
+    "journalPrompts": [
+      {
+        "id": "p_hakim",
+        "monsterId": "hakim",
+        "premium": false
+      },
+      {
+        "id": "p_kabut",
+        "monsterId": "kabut",
+        "premium": false
+      },
+      {
+        "id": "p_cermin",
+        "monsterId": "cermin",
+        "premium": false
+      },
+      {
+        "id": "p_waswas",
+        "monsterId": "waswas",
+        "premium": false
+      },
+      {
+        "id": "p_mengelak",
+        "monsterId": "mengelak",
+        "premium": false
+      }
+    ],
+    "meditations": [
+      {
+        "id": "jeda_kerja",
+        "targetMonsterId": "waswas",
+        "premium": false
+      },
+      {
+        "id": "napas_4_7_8",
+        "targetMonsterId": "waswas",
+        "premium": false
+      },
+      {
+        "id": "tenang_ujian",
+        "targetMonsterId": "waswas",
+        "premium": false
+      },
+      {
+        "id": "body_scan",
+        "targetMonsterId": "waswas",
+        "premium": true
+      },
+      {
+        "id": "menonton_pikiran",
+        "targetMonsterId": "kabut",
+        "premium": true
+      },
+      {
+        "id": "berhenti_membandingkan",
+        "targetMonsterId": "cermin",
+        "premium": true
+      }
+    ],
+    "betterme": {
+      "premiumFromLevel": 2,
+      "lessons": [
+        {
+          "id": "l1_s1",
+          "level": 1
+        },
+        {
+          "id": "l1_s2",
+          "level": 1
+        },
+        {
+          "id": "l1_s3",
+          "level": 1
+        },
+        {
+          "id": "l1_s4",
+          "level": 1
+        },
+        {
+          "id": "l1_s5",
+          "level": 1
+        },
+        {
+          "id": "l1_s6",
+          "level": 1
+        },
+        {
+          "id": "l1_s7",
+          "level": 1
+        },
+        {
+          "id": "l2_s1",
+          "level": 2
+        },
+        {
+          "id": "l2_s2",
+          "level": 2
+        },
+        {
+          "id": "l2_s3",
+          "level": 2
+        },
+        {
+          "id": "l2_s4",
+          "level": 2
+        },
+        {
+          "id": "l2_s5",
+          "level": 2
+        },
+        {
+          "id": "l2_s6",
+          "level": 2
+        },
+        {
+          "id": "l2_s7",
+          "level": 2
+        },
+        {
+          "id": "l3_s1",
+          "level": 3
+        },
+        {
+          "id": "l3_s2",
+          "level": 3
+        },
+        {
+          "id": "l3_s3",
+          "level": 3
+        },
+        {
+          "id": "l3_s4",
+          "level": 3
+        },
+        {
+          "id": "l3_s5",
+          "level": 3
+        },
+        {
+          "id": "l3_s6",
+          "level": 3
+        },
+        {
+          "id": "l3_s7",
+          "level": 3
+        },
+        {
+          "id": "l3_s8",
+          "level": 3
+        }
+      ]
+    }
+  },
+  "focusTicketKeys": [
+    {
+      "kid": "k1",
+      "alg": "Ed25519",
+      "publicKey": "Uu4C47PS5EnNtCAQ3qs1Q1WQexQAImkSatSN63-iALU"
+    }
+  ]
+}

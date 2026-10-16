@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,12 +12,17 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'core/config/firebase_config.dart';
 import 'core/l10n/l10n.dart';
 import 'core/services/afirmasi_reminder.dart';
+import 'core/services/api/api_client.dart';
+import 'core/services/api/api_state.dart';
+import 'core/services/api/api_repositories.dart';
+import 'core/services/api/riung_api.dart';
 import 'core/services/monster_anchor_registry.dart';
 import 'core/services/services.dart';
 import 'core/services/sleep_reminder.dart';
 import 'core/state/state.dart';
 import 'core/theme/theme.dart';
 import 'core/widgets/widgets.dart';
+import 'core/widgets/api_error_feedback.dart';
 import 'features/appbeku/screens/appbeku_interstitial_screen.dart';
 import 'features/launch/screens/splash_screen.dart';
 
@@ -51,6 +58,9 @@ Future<void> main() async {
   // non-scroll overflow begitu HP diputar landscape.
   await SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await Firebase.initializeApp();
+  await FirebaseAppCheck.instance.activate(
+    providerAndroid: kDebugMode ? const AndroidDebugProvider() : const AndroidPlayIntegrityProvider(),
+  );
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
   // Pre-warm supaya RiungMonster tidak pernah menampilkan frame kosong
   // sebelum anchors.json selesai dibaca.
@@ -125,7 +135,9 @@ class _RiungAppState extends State<RiungApp> {
   late final WalletFunctionsService _walletFunctions;
   late final JurnalPinService _pinService;
   late final BillingService _billing;
+  late final Future<bool> _billingReady;
   late final AnalyticsService _analytics;
+  ApiState? _apiState;
 
   late final AuthNotifier _auth;
   late final WalletNotifier _wallet;
@@ -141,13 +153,47 @@ class _RiungAppState extends State<RiungApp> {
   void initState() {
     super.initState();
     _authService = widget.authService ?? FirebaseAuthService(googleServerClientId: googleServerClientId);
+    if (widget.userRepository == null && widget.walletFunctions == null) {
+      const baseUrl = String.fromEnvironment('RIUNG_API_BASE_URL', defaultValue: 'https://riung.e55techlab.com');
+      const devToken = String.fromEnvironment('RIUNG_DEV_TOKEN');
+      final api = RiungApi(ApiClient(baseUrl: baseUrl, appVersion: const String.fromEnvironment('RIUNG_APP_VERSION', defaultValue: '1.0.0+1'),
+        accountId: () => _authService.currentUid,
+        onError: (error) {
+          _apiState?.reportError(error);
+          final context = AppNavigator.key.currentContext;
+          if (context != null && context.mounted && !error.retryable) showApiError(context, error);
+        },
+        token: (force) async {
+          if (kDebugMode && devToken.isNotEmpty) return devToken;
+          try {
+            return await FirebaseAuth.instance.currentUser?.getIdToken(force);
+          } on FirebaseAuthException catch (error) {
+            final offline = error.code == 'network-request-failed';
+            throw ApiException(offline ? 0 : 401, offline ? 'network' : 'unauthenticated', 'Firebase token unavailable');
+          }
+        },
+        appCheckToken: (limited, force) async {
+          if (kDebugMode && devToken.isNotEmpty) return 'dev';
+          try {
+            final token = limited ? FirebaseAppCheck.instance.getLimitedUseToken() : FirebaseAppCheck.instance.getToken(force);
+            return await token.timeout(const Duration(seconds: 3), onTimeout: () => null);
+          } on FirebaseException {
+            // App Check is currently in monitor mode. Enforcing backends
+            // reject a missing token with app_check_failed themselves.
+            return null;
+          }
+        },
+      ));
+      _apiState = ApiState(api: api, db: LocalDatabaseService(), presentationPrefs: widget.prefs, currentUid: () => _authService.currentUid)..start();
+    }
     // Poin 4 — lokal-dulu, cloud-setelah-login: SELAMA ANONIM,
     // wallet/profil/progres monster sepenuhnya lokal (tidak menyentuh
     // Firestore sama sekali), baru mulai sinkron ke cloud begitu
     // user login/link akun. `isAnonymous` di sini dibaca LIVE dari
     // `_authService` tiap dipanggil (bukan snapshot beku), jadi
     // langsung akurat begitu link sukses — lihat AuthNotifier._linkAndMigrate.
-    _userRepository = widget.userRepository ??
+    _userRepository = widget.userRepository ?? (_apiState != null ?
+        ApiUserRepository(state: _apiState!, prefs: widget.prefs, db: _apiState!.db, crypto: JournalCryptoService()) :
         FirestoreUserRepository(
           firestore: FirebaseFirestore.instance,
           localDelegate: LocalUserRepository(
@@ -156,29 +202,30 @@ class _RiungAppState extends State<RiungApp> {
             crypto: JournalCryptoService(),
           ),
           isAnonymous: () => _authService.isAnonymous,
-        );
-    _contentRepository = widget.contentRepository ?? FirestoreContentRepository(firestore: FirebaseFirestore.instance);
+        ));
+    _contentRepository = widget.contentRepository ?? (_apiState != null ? ApiContentRepository(_apiState!.api, locale: widget.prefs.languageCode ?? 'id') : FirestoreContentRepository(firestore: FirebaseFirestore.instance));
     // LocalWalletFunctionsService dikasih _userRepository yang SAMA
     // (bukan LocalUserRepository baru terpisah) — supaya progres monster
     // yang dibaca/ditulis tameProgress() saat anonim tetap satu sumber
     // kebenaran dengan yang dibaca layar lain lewat _userRepository.
-    _walletFunctions = widget.walletFunctions ??
+    _walletFunctions = widget.walletFunctions ?? (_apiState != null ? ApiWalletFunctionsService(_apiState!) :
         HybridWalletFunctionsService(
           local: LocalWalletFunctionsService(prefs: widget.prefs, userRepository: _userRepository),
           cloud: FirestoreWalletFunctionsService(firestore: FirebaseFirestore.instance),
           isAnonymous: () => _authService.isAnonymous,
-        );
+        ));
     _pinService = JurnalPinService();
 
-    _auth = AuthNotifier(_authService, userRepository: _userRepository);
-    _wallet = WalletNotifier(userRepository: _userRepository, walletFunctions: _walletFunctions, prefs: widget.prefs);
-    _streak = StreakNotifier(userRepository: _userRepository);
+    _auth = AuthNotifier(_authService, userRepository: _userRepository, apiState: _apiState);
+    _wallet = WalletNotifier(userRepository: _userRepository, walletFunctions: _walletFunctions, prefs: widget.prefs, apiState: _apiState);
+    _streak = StreakNotifier(userRepository: _userRepository, apiState: _apiState);
     _monsterProgress = MonsterProgressNotifier(
       userRepository: _userRepository,
       walletFunctions: _walletFunctions,
+      apiState: _apiState,
     );
     _session = SessionNotifier();
-    _appBeku = AppBekuNotifier(prefs: widget.prefs);
+    _appBeku = AppBekuNotifier(prefs: widget.prefs, apiState: _apiState);
     _language = LanguageNotifier(prefs: widget.prefs);
     _appBeku.lockNotifText = () {
       final t = _language.strings.appbeku;
@@ -194,8 +241,9 @@ class _RiungAppState extends State<RiungApp> {
       analytics: _analytics,
       isAnonymous: () => _authService.isAnonymous,
       onCoinsPurchased: _wallet.recordPurchasedCoins,
+      apiState: _apiState,
     );
-    _billing.init();
+    _billingReady = _billing.init();
 
     _auth.addListener(_onAuthUidChanged);
     _auth.addListener(_maybeRestorePremium);
@@ -275,11 +323,25 @@ class _RiungAppState extends State<RiungApp> {
   /// lalu memuat ulang kalau uid berganti (mis. daftar/masuk akun).
   void _onAuthUidChanged() {
     final uid = _auth.uid;
-    if (uid == null || uid == _loadedForUid) return;
+    if (uid == null) {
+      if (_loadedForUid != null) { _loadedForUid = null; _apiState?.clearSession(); }
+      return;
+    }
+    if (uid == _loadedForUid) return;
+    if (_loadedForUid != null) _apiState?.clearSession();
     _loadedForUid = uid;
     _wallet.load(uid);
     _streak.load(uid);
     _monsterProgress.load(uid);
+    _bootstrapBackend(uid);
+    if (_contentRepository case final ApiContentRepository repository) repository.warm();
+  }
+
+  Future<void> _bootstrapBackend(String uid) async {
+    await _apiState?.bootstrap();
+    if (_apiState?.currentSnapshot != null && _auth.uid == uid && await _billingReady) {
+      try { await _billing.restorePurchases(); } catch (_) { /* Play remains retryable from the shop. */ }
+    }
   }
 
   @override
@@ -297,6 +359,7 @@ class _RiungAppState extends State<RiungApp> {
     _appBeku.dispose();
     _language.dispose();
     _billing.dispose();
+    _apiState?.dispose();
     super.dispose();
   }
 
@@ -333,7 +396,7 @@ class _RiungAppState extends State<RiungApp> {
             supportedLocales: [for (final language in AppLanguage.values) Locale(language.code)],
             localizationsDelegates: GlobalMaterialLocalizations.delegates,
             home: const SplashScreen(),
-            builder: (context, child) => RiungOfflineBanner(child: child ?? const SizedBox.shrink()),
+            builder: (context, child) => RiungOfflineBanner(apiState: _apiState, child: child ?? const SizedBox.shrink()),
           ),
         ),
       ),

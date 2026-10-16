@@ -1,6 +1,8 @@
 import '../../../core/config/economy.dart';
 import '../../../core/models/personality_result.dart';
 import '../../../core/services/local_prefs_store.dart';
+import '../../../core/services/api/api_config_store.dart';
+import '../../../core/services/api/riung_api.dart';
 
 /// Tempat aksesori di karakter. Satu aksesori per slot.
 enum AccessorySlot { head, face, neck, back }
@@ -66,11 +68,11 @@ enum CharacterAccessory {
   int get price {
     switch (tier) {
       case AccessoryTier.kecil:
-        return EconomySpend.aksesorisKecil;
+        return ApiConfigStore.instance.itemPrice('accessories', id, EconomySpend.aksesorisKecil);
       case AccessoryTier.biasa:
-        return EconomySpend.skinCommon;
+        return ApiConfigStore.instance.itemPrice('accessories', id, EconomySpend.skinCommon);
       case AccessoryTier.langka:
-        return EconomySpend.skinEpic;
+        return ApiConfigStore.instance.itemPrice('accessories', id, EconomySpend.skinEpic);
     }
   }
 
@@ -143,7 +145,8 @@ enum AccessoryBundle {
 
 /// Baca/tulis aksesori yang dipakai per tes lewat [LocalPrefsStore].
 class AccessoryLoadout {
-  const AccessoryLoadout(this.prefs);
+  const AccessoryLoadout(this.prefs, {this.api});
+  final RiungApi? api;
 
   final LocalPrefsStore prefs;
 
@@ -162,12 +165,14 @@ class AccessoryLoadout {
     final all = {for (final e in prefs.personalityAccessories.entries) e.key: {...e.value}};
     final mine = all.putIfAbsent(test.name, () => {});
     mine[accessory.slot.name] = accessory.id;
+    await api?.characterLoadout(test.name, mine.values.toList(), prefs.personalityCardStyles[test.name] ?? 'klasik');
     await prefs.setPersonalityAccessories(all);
   }
 
   Future<void> unequip(PersonalityTest test, AccessorySlot slot) async {
     final all = {for (final e in prefs.personalityAccessories.entries) e.key: {...e.value}};
     all[test.name]?.remove(slot.name);
+    await api?.characterLoadout(test.name, all[test.name]?.values.toList() ?? [], prefs.personalityCardStyles[test.name] ?? 'klasik');
     await prefs.setPersonalityAccessories(all);
   }
 }

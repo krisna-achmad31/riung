@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/services/api/riung_api.dart';
+import '../../../core/services/api/api_client.dart';
+import '../../../core/widgets/api_error_feedback.dart';
 
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
@@ -29,6 +32,7 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
   bool _starting = true;
   bool _insufficientCoins = false;
   bool _navigatedToResult = false;
+  FocusTicket? _ticket;
 
   @override
   void initState() {
@@ -38,6 +42,19 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
 
   Future<void> _mulaiSesi() async {
     final wallet = AppScope.of(context).wallet;
+    if (wallet.apiState != null) {
+      try {
+        _ticket = await wallet.apiState!.reserveFocus(widget.duration.inMinutes, widget.priceCoins);
+        if (!mounted) return;
+        AppScope.of(context).session.start(widget.duration);
+        setState(() => _starting = false);
+      } on ApiException catch (e) {
+        if (!mounted) return;
+        showApiError(context, e);
+        setState(() { _starting = false; _insufficientCoins = true; });
+      }
+      return;
+    }
     // Sesi prabayar dari Toko dipakai duluan (jalan offline seperti tiket
     // serangan) — baru kalau habis, potong koin langsung per sesi.
     // Sesi gratis harian dulu: progres monster tidak boleh bergantung pada koin.
@@ -90,7 +107,7 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (!mounted) return;
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => SesiSelesaiScreen(duration: widget.duration)),
+                    MaterialPageRoute(builder: (_) => SesiSelesaiScreen(duration: widget.duration, ticketId: _ticket?.id, saboteurId: monsterId)),
                   );
                 });
               }

@@ -1,6 +1,11 @@
 import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'api/api_state.dart';
+import 'api/api_client.dart';
+import 'api/riung_api.dart';
 
 import '../config/economy.dart';
 import 'firebase/analytics_service.dart';
@@ -50,19 +55,8 @@ class BillingUpdate {
   final String? detail;
 }
 
-/// Integrasi Google Play Billing lewat `in_app_purchase`. Alur: tap beli →
-/// Play sheet (native) → status `purchased` masuk lewat [purchaseStream] →
-/// [completePurchase] (ini yang memicu `acknowledgePurchase` di sisi Play)
-/// → kredit koin/aktifkan Premium lewat service yang sama dipakai fitur
-/// lain, supaya tunduk pada validasi delta `firestore.rules` yang sama.
-///
-/// CATATAN KEAMANAN: di Spark plan (tanpa Cloud Functions) tidak ada
-/// verifikasi *server-side* atas token pembelian ke Google Play Developer
-/// API — status `purchased` di sini murni hasil laporan Play Billing
-/// Library on-device. Ini cukup untuk pengembangan/rilis awal, tapi
-/// idealnya diverifikasi ulang server-side (Cloud Functions, Blaze plan)
-/// sebelum benar-benar mengandalkan ini untuk transaksi bernilai besar.
-/// Detail di `docs/setup-firebase.md`.
+/// Google Play purchases are verified by the backend before consumption or
+/// acknowledgement. Failed delivery remains recoverable through Play restore.
 class BillingService {
   BillingService({
     required WalletFunctionsService walletFunctions,
@@ -72,19 +66,15 @@ class BillingService {
     required bool Function() isAnonymous,
     this.onCoinsPurchased,
     InAppPurchase? iap,
-  })  : _walletFunctions = walletFunctions,
-        _userRepository = userRepository,
-        _currentUid = currentUid,
-        _analytics = analytics,
+    this.apiState,
+  })  : _analytics = analytics,
         _isAnonymous = isAnonymous,
         _iap = iap ?? InAppPurchase.instance;
 
-  final WalletFunctionsService _walletFunctions;
-  final UserRepository _userRepository;
-  final String Function() _currentUid;
   final AnalyticsService _analytics;
   final bool Function() _isAnonymous;
   final InAppPurchase _iap;
+  final ApiState? apiState;
 
   /// Dipanggil setelah paket koin terverifikasi & dikreditkan — dipakai
   /// `WalletNotifier` untuk melacak koin beli vs koin hasil latihan.
@@ -99,6 +89,8 @@ class BillingService {
   };
 
   StreamSubscription<List<PurchaseDetails>>? _subscription;
+  Future<void> _processing = Future.value();
+  final Set<String> _consumed = {};
   final _updatesController = StreamController<BillingUpdate>.broadcast();
 
   /// Emit tiap kali status satu pembelian berubah — Toko screen dengarkan
@@ -109,10 +101,11 @@ class BillingService {
     try {
       final available = await _iap.isAvailable();
       if (!available) return false;
-      _subscription = _iap.purchaseStream.listen(_onPurchaseUpdate, onError: (_) {});
-      // Cek langganan yang mungkin sudah aktif dari sesi sebelumnya (mis.
-      // habis install ulang) — hasilnya juga lewat purchaseStream di atas.
-      unawaited(_iap.restorePurchases());
+      _subscription = _iap.purchaseStream.listen((purchases) {
+        _processing = _processing.then((_) => _onPurchaseUpdate(purchases)).catchError((Object _) {});
+      }, onError: (_) {});
+      // The app restores after /me bootstrap so receipts have an authenticated
+      // server billing account, including when signing in after launch.
       return true;
     } catch (_) {
       // Play services tidak tersedia (emulator tanpa Play Store, dsb) atau
@@ -128,23 +121,49 @@ class BillingService {
   /// `ensureAccountForPurchase`) sudah harus mencegah ini tercapai dalam
   /// keadaan anonim; kalau tetap tercapai berarti ada titik panggil baru
   /// yang lupa pasang guard-nya di layar.
-  Future<void> buyCoinPack(ProductDetails product) {
+  Future<void> buyCoinPack(ProductDetails product) async {
     if (_isAnonymous()) {
       throw StateError('buyCoinPack dipanggil selagi masih anonim — pasang ensureAccountForPurchase() di UI pemanggil.');
     }
-    return _iap.buyConsumable(purchaseParam: PurchaseParam(productDetails: product));
+    final account = (await apiState?.refresh())?.billingAccountId;
+    if (account == null || account.isEmpty) throw StateError('Server billing account required');
+    await _iap.buyConsumable(purchaseParam: PurchaseParam(productDetails: product, applicationUserName: account), autoConsume: false);
   }
 
-  Future<void> buyPremium(ProductDetails product) {
+  Future<void> buyPremium(ProductDetails product) async {
     if (_isAnonymous()) {
       throw StateError('buyPremium dipanggil selagi masih anonim — pasang ensureAccountForPurchase() di UI pemanggil.');
     }
-    return _iap.buyNonConsumable(purchaseParam: PurchaseParam(productDetails: product));
+    final account = (await apiState?.refresh())?.billingAccountId;
+    if (account == null || account.isEmpty) throw StateError('Server billing account required');
+    await _iap.buyNonConsumable(purchaseParam: PurchaseParam(productDetails: product, applicationUserName: account));
   }
 
   Future<void> restorePurchases() => _iap.restorePurchases();
 
   Future<void> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
+    final restored = purchases.where((p) => p.status == PurchaseStatus.restored).toList();
+    final restoredResults = <String, BillingResult>{};
+    if (restored.isNotEmpty && apiState != null) {
+      try {
+        for (var offset = 0; offset < restored.length; offset += 20) {
+          final chunk = restored.skip(offset).take(20).toList();
+          final response = await apiState!.api.restore(chunk.map((p) => (productId: p.productID, purchaseToken: p.verificationData.serverVerificationData)).toList());
+          final results = response['results'] as List? ?? [];
+          for (var i = 0; i < results.length && i < chunk.length; i++) {
+            final row = jsonObject(results[i]);
+            if (row['error'] != null) continue;
+            restoredResults[chunk[i].verificationData.serverVerificationData] = BillingResult(row['result'] is Map ? jsonObject(row['result']) : row);
+          }
+        }
+      } catch (_) {
+        for (final p in restored) {
+          _updatesController.add(BillingUpdate(productId: p.productID, status: BillingStatus.error, errorKind: BillingErrorKind.deliveryFailed));
+        }
+        // Never consume or acknowledge a restore that failed verification.
+        purchases = purchases.where((p) => p.status != PurchaseStatus.restored).toList();
+      }
+    }
     for (final purchase in purchases) {
       switch (purchase.status) {
         case PurchaseStatus.pending:
@@ -167,7 +186,9 @@ class BillingService {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
           try {
-            await _deliver(purchase);
+            if (purchase.status == PurchaseStatus.restored && !restoredResults.containsKey(purchase.verificationData.serverVerificationData)) continue;
+            final delivered = await _deliver(purchase, restoredResult: restoredResults[purchase.verificationData.serverVerificationData]);
+            if (!delivered) continue;
             _updatesController.add(BillingUpdate(productId: purchase.productID, status: BillingStatus.success));
           } catch (e) {
             _updatesController.add(BillingUpdate(
@@ -176,45 +197,37 @@ class BillingService {
               errorKind: BillingErrorKind.deliveryFailed,
             ));
           }
-          if (purchase.pendingCompletePurchase) {
-            await _iap.completePurchase(purchase);
-          }
       }
     }
   }
 
-  Future<void> _deliver(PurchaseDetails purchase) async {
-    final uid = _currentUid();
-
-    final coinPack = CoinPackSku.values.where((s) => s.productId == purchase.productID).firstOrNull;
-    if (coinPack != null) {
-      await _walletFunctions.earnCoins(
-        uid: uid,
-        amount: coinPack.totalCoins,
-        reason: 'purchase:${purchase.productID}',
-      );
-      onCoinsPurchased?.call(coinPack.totalCoins);
-      await _analytics.purchase(productId: coinPack.productId, valueIdr: coinPack.priceIdr);
-      return;
+  Future<bool> _deliver(PurchaseDetails purchase, {BillingResult? restoredResult}) async {
+    final state = apiState;
+    if (state == null) throw StateError('Server verification required');
+    final result = restoredResult ?? await state.api.verifyPurchase(purchase.productID, purchase.verificationData.serverVerificationData);
+    if (result.status == 'pending') return false;
+    if (result.consumableDelivered) {
+      final token = purchase.verificationData.serverVerificationData;
+      if (!_consumed.contains(token)) {
+        final consumed = await _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>().consumePurchase(purchase);
+        if (consumed.responseCode != BillingResponse.ok) throw StateError('Google Play consumption failed');
+        _consumed.add(token);
+      }
+    } else if (result.subscriptionVerified) {
+      if (purchase.pendingCompletePurchase) await _iap.completePurchase(purchase);
+    } else {
+      throw const ApiException(502, 'invalid_response', 'Unknown billing status');
     }
-
-    final premium = PremiumSku.values.where((s) => s.productId == purchase.productID).firstOrNull;
-    if (premium != null) {
-      final profile = await _userRepository.getUserProfile(uid);
-      final renewsAt = DateTime.now().add(Duration(days: premium.durationDays));
-      await _userRepository.saveUserProfile(
-        profile.copyWith(premiumActive: true, premiumPlan: purchase.productID, premiumRenewsAt: renewsAt),
-      );
-      await _analytics.purchase(productId: premium.productId, valueIdr: premium.priceIdr);
-    }
+    await state.refresh();
+    final coin = CoinPackSku.values.where((s) => s.productId == purchase.productID);
+    final premium = PremiumSku.values.where((s) => s.productId == purchase.productID);
+    if (purchase.status == PurchaseStatus.purchased) await _analytics.purchase(productId: purchase.productID,
+      valueIdr: coin.isNotEmpty ? coin.first.priceIdr : premium.isNotEmpty ? premium.first.priceIdr : 0);
+    return true;
   }
 
   void dispose() {
     _subscription?.cancel();
     _updatesController.close();
   }
-}
-
-extension<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
 }

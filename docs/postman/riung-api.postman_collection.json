@@ -1,0 +1,1869 @@
+{
+  "info": {
+    "_postman_id": "d8732967-fe72-5a63-a8e8-1dca7acae3a0",
+    "name": "Riung API v1",
+    "description": "Koleksi semua endpoint backend Riung (`/v1`). Panduan: `docs/panduan-integrasi-app.md`; kontrak lengkap: `docs/backend-api-spec.md`.\n\n**Pakai**\n1. Import koleksi ini + salah satu environment (`riung-local` atau `riung-prod`).\n2. Lokal: `cd backend && make dev-up` lalu seed konten. Token sudah terisi (`dev:postman:google.com`, App Check `dev`).\n3. Produksi: isi `idToken` dengan ID token Firebase (berlaku 1 jam) dan `appCheckToken` bila ada (App Check masih `monitor`).\n4. Jalankan **2. Akun → Me** dulu: menyimpan `userId` dan `billingAccountId`.\n\nScript koleksi menambah `X-App-Version`, `X-Platform`, `X-Firebase-AppCheck`, dan `Idempotency-Key` (baru tiap kirim) otomatis, serta mengisi `{{now}}` dan `{{today}}` (Asia/Jakarta). Error ditampilkan di Postman Console beserta `requestId`.\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{idToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Header yang sama untuk semua request (docs/panduan-integrasi-app.md §2).",
+          "pm.request.headers.upsert({ key: 'X-App-Version', value: pm.variables.get('appVersion') || '1.0.0' });",
+          "pm.request.headers.upsert({ key: 'X-Platform', value: 'android' });",
+          "const appCheck = pm.variables.get('appCheckToken');",
+          "if (appCheck) pm.request.headers.upsert({ key: 'X-Firebase-AppCheck', value: appCheck });",
+          "// Satu Idempotency-Key baru per kirim. Untuk menguji replay, isi header Idempotency-Key sendiri di request-nya.",
+          "if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(pm.request.method) && !pm.request.headers.has('Idempotency-Key')) {",
+          "  pm.request.headers.add({ key: 'Idempotency-Key', value: pm.variables.replaceIn('{{$guid}}') });",
+          "}",
+          "// now = occurredAt; today = tanggal lokal Asia/Jakarta (zona waktu default user).",
+          "const now = new Date();",
+          "pm.variables.set('now', now.toISOString());",
+          "pm.variables.set('today', new Date(now.getTime() + 7 * 3600 * 1000).toISOString().slice(0, 10));"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('bukan 5xx', () => pm.expect(pm.response.code).to.be.below(500));",
+          "if (pm.response.code >= 400) {",
+          "  try { const e = pm.response.json().error; console.log(`${pm.info.requestName}: ${pm.response.code} ${e.code} — ${e.message} (requestId ${e.requestId})`); } catch (_) {}",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "id": "6b88e538-ad3f-56ae-a38f-cbd805f71b7c",
+      "name": "0. Sistem",
+      "description": "Liveness & readiness. `/readyz` hanya bisa dari dalam network Docker di produksi (dari luar 404).",
+      "item": [
+        {
+          "id": "1a7b47c8-df16-51c3-91de-7fb2bbf1d468",
+          "name": "Healthz",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/healthz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "healthz"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "c3af36d4-4d2f-5b4a-9c70-60aa6ae89338",
+          "name": "Readyz (lokal)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/readyz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "readyz"
+              ]
+            },
+            "description": "Produksi: 404 dari luar (sengaja).",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "237db780-8ba9-59ee-94db-53d1f8125f9d",
+      "name": "1. Publik & konfigurasi",
+      "description": "Tanpa login; App Check wajib (mode `monitor` di produksi baru mencatat).",
+      "item": [
+        {
+          "id": "5bf9419b-6ddc-5616-92b0-d71f1a166fe9",
+          "name": "Config",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "config"
+              ]
+            },
+            "description": "Harga, katalog (`catalog`), batas setelah override admin, `minAppVersion`, `focusTicketKeys`. Cache di app; kirim ulang dengan `If-None-Match` (request berikut) → 304.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const tag = pm.response.headers.get('ETag');",
+                  "if (tag) pm.environment.set('configEtag', tag);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b799f2d6-0c91-57fc-ada7-4b532baebc3d",
+          "name": "Config (If-None-Match → 304)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "If-None-Match",
+                "value": "{{configEtag}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "config"
+              ]
+            },
+            "description": "Jalankan **Config** dulu supaya `configEtag` terisi.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "a1440002-490e-5769-89e6-71cff1fb2b1c",
+          "name": "Content",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/content/saboteurs?locale=id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "content",
+                "saboteurs"
+              ],
+              "query": [
+                {
+                  "key": "locale",
+                  "value": "id",
+                  "description": "id | en (fallback ke id)"
+                }
+              ]
+            },
+            "description": "`kind`: saboteurs, affirmations, research_facts, meditations, sleep_stories, betterme_lessons. Ganti segmen terakhir path.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "f681e30e-c571-51b5-8d5f-d3fd69c23572",
+          "name": "Waitlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/waitlist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "waitlist"
+              ]
+            },
+            "description": "Selalu 202 (email baru atau lama). `website` = honeypot, harus kosong. Tanpa App Check/Idempotency.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"contoh@example.com\",\n  \"lang\": \"id\",\n  \"source\": \"postman\",\n  \"website\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "a9aa8c3c-d61a-5fb4-8525-c5ff551ecfc7",
+      "name": "2. Akun",
+      "description": "Akun dibuat otomatis di panggilan pertama `GET /v1/me` (termasuk anonim).",
+      "item": [
+        {
+          "id": "248e770e-7ab0-5ece-ae30-228b5f50849c",
+          "name": "Me (bootstrap)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me"
+              ]
+            },
+            "description": "Profil, `billingAccountId`, Premium, streak, wallet, monster, inventori, loadout, `today`. Menyimpan `userId` & `billingAccountId` ke environment."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.environment.set('userId', j.user.id);",
+                  "  pm.environment.set('billingAccountId', j.user.billingAccountId);",
+                  "  pm.test('billingAccountId tersimpan', () => pm.expect(j.user.billingAccountId).to.match(/^ba_/));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b598ddbe-0a49-544f-a3c5-2f80129a7bbd",
+          "name": "Update profil",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "profile"
+              ]
+            },
+            "description": "Kirim hanya field yang berubah. `avatarId` av1–av6; `persona` pelajar|mahasiswa|pekerja|lainnya; `tz` IANA.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Rani\",\n  \"avatarId\": \"av2\",\n  \"locale\": \"id\",\n  \"persona\": \"mahasiswa\",\n  \"onboardingDone\": true,\n  \"tz\": \"Asia/Jakarta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "f8a40ee6-68d9-5b14-9d37-8342b7733cb3",
+          "name": "Simpan asesmen",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/assessment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "assessment"
+              ]
+            },
+            "description": "Ringkasan saja; jawaban & hasil detail tetap di HP.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dominantSaboteurs\": [\n    \"hakim\",\n    \"kabut\"\n  ],\n  \"scores\": {\n    \"hakim\": 72,\n    \"kabut\": 64,\n    \"waswas\": 40\n  },\n  \"completedAt\": \"{{now}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "9320dea1-a7ef-5eec-8f4c-ef51d281736a",
+          "name": "Tautkan akun (anonim → permanen)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/link",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "link"
+              ]
+            },
+            "description": "Setelah `linkWithCredential` di Firebase. Token harus sudah provider `password`/`google.com`. Tanpa body."
+          },
+          "response": []
+        },
+        {
+          "id": "dba45d35-1549-5170-879a-80cf5e625bed",
+          "name": "Ekspor data server",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "export"
+              ]
+            },
+            "description": "3/jam."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "b031070f-029b-5911-a6d6-f39b5cb81eea",
+      "name": "3. Backup PIN jurnal",
+      "description": "Hanya akun permanen. Hash PIN dihitung di HP.",
+      "item": [
+        {
+          "id": "aee5ce32-373f-55d7-b022-423e1660bc8e",
+          "name": "Simpan backup PIN",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/journal-pin-backup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "journal-pin-backup"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hash\": \"c2FsdGVkLXBpbi1oYXNoLWRhcmktaHA=\",\n  \"salt\": \"c2FsdC0xMjM0NTY=\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "d508cccc-18d7-5673-9db5-de0f687d72d6",
+          "name": "Ambil salt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/journal-pin-backup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "journal-pin-backup"
+              ]
+            },
+            "description": "Hanya `salt` + `updatedAt`; hash tidak pernah dikirim balik."
+          },
+          "response": []
+        },
+        {
+          "id": "2dd3e477-3dfd-57c3-b2fe-02d80f6572ee",
+          "name": "Verifikasi PIN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/journal-pin-backup/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "journal-pin-backup",
+                "verify"
+              ]
+            },
+            "description": "`{match, attemptsLeft}`; terkunci 1 jam setelah 10 gagal/hari (`pin_locked`). App Check limited-use.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hash\": \"c2FsdGVkLXBpbi1oYXNoLWRhcmktaHA=\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "d80f94ce-1bca-5d76-9bc6-d770dc6cc582",
+          "name": "Hapus backup PIN",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me/journal-pin-backup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "journal-pin-backup"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "3d5d14a0-51b1-50ca-acf2-c7a8ee2d7f52",
+      "name": "4. Aktivitas (koin & progres)",
+      "description": "App mengirim apa yang terjadi; server menentukan koin. `occurredAt` = `{{now}}`, `date` = `{{today}}` (diisi script koleksi). Event di atas batas harian → 200 `capped: true`.",
+      "item": [
+        {
+          "id": "408d752b-23a7-56fd-8c26-e1ba663ad140",
+          "name": "Check-in",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"checkin\",\n  \"occurredAt\": \"{{now}}\",\n  \"date\": \"{{today}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "c9b4bf19-cffd-54f0-b584-f41af16b87cc",
+          "name": "Jurnal disimpan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities"
+              ]
+            },
+            "description": "Teks jurnal TIDAK dikirim.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"journal_saved\",\n  \"occurredAt\": \"{{now}}\",\n  \"entryId\": \"{{$guid}}\",\n  \"promptId\": \"p_hakim\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "2476eff5-99b5-5828-875b-e195a873cad4",
+          "name": "Meditasi selesai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"meditation_completed\",\n  \"occurredAt\": \"{{now}}\",\n  \"sessionId\": \"napas_4_7_8\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "62f78c71-4098-55f8-9fef-c3d16cdfab2a",
+          "name": "Better Me selesai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"betterme_lesson_completed\",\n  \"occurredAt\": \"{{now}}\",\n  \"lessonId\": \"l1_s1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "408bba86-ee3e-5f0f-9cf8-368005adb66d",
+          "name": "Misi selesai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities"
+              ]
+            },
+            "description": "`index` 0–2.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"mission_completed\",\n  \"occurredAt\": \"{{now}}\",\n  \"date\": \"{{today}}\",\n  \"index\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "6a006a7d-0c7b-5be3-8c9b-8a10cb3a5861",
+          "name": "Minigame selesai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"minigame_finished\",\n  \"occurredAt\": \"{{now}}\",\n  \"ref\": \"{{$guid}}\",\n  \"saboteurId\": \"waswas\",\n  \"won\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "ba4a64fc-0ff0-50ed-8350-f3b4c9183c11",
+          "name": "Batch (outbox offline)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities/batch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities",
+                "batch"
+              ]
+            },
+            "description": "≤ 50 event, hasil per event; event yang sudah pernah dikirim → `replayed: true`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"type\": \"journal_saved\",\n      \"occurredAt\": \"{{now}}\",\n      \"entryId\": \"{{$guid}}\"\n    },\n    {\n      \"type\": \"minigame_finished\",\n      \"occurredAt\": \"{{now}}\",\n      \"ref\": \"{{$guid}}\",\n      \"saboteurId\": \"kabut\",\n      \"won\": false\n    },\n    {\n      \"type\": \"mission_completed\",\n      \"occurredAt\": \"{{now}}\",\n      \"date\": \"{{today}}\",\n      \"index\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "9e9f8da6-4b89-5049-a8b3-14667e743b38",
+      "name": "5. Wallet & jurnal",
+      "description": "",
+      "item": [
+        {
+          "id": "34d7cadb-4033-5f57-84e0-730574fd22f3",
+          "name": "Wallet",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/wallet",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "wallet"
+              ]
+            },
+            "description": "Termasuk `debtCoins` (utang dari refund)."
+          },
+          "response": []
+        },
+        {
+          "id": "31daaa86-15ae-512d-b62c-f849be051a43",
+          "name": "Riwayat transaksi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/wallet/transactions?limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "wallet",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "1–100"
+                }
+              ]
+            },
+            "description": "Halaman berikut: tambah `cursor` = `nextCursor`."
+          },
+          "response": []
+        },
+        {
+          "id": "b413e8ed-e898-53db-a4a9-4210bc15b8ae",
+          "name": "Akses jurnal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/journal/access?promptId=p_hakim",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "journal",
+                "access"
+              ],
+              "query": [
+                {
+                  "key": "promptId",
+                  "value": "p_hakim",
+                  "description": "opsional"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "cd61376c-1e27-54e5-b8a2-f43a933ee05c",
+      "name": "6. Google Play billing",
+      "description": "Akun permanen. **Produksi**: belum aktif (503) dan butuh `purchaseToken` asli dari Play. **Lokal** (`DEV_BILLING`): token palsu di bawah.",
+      "item": [
+        {
+          "id": "0600f3f4-1220-5a39-9114-8b00da1f3fc4",
+          "name": "Verifikasi paket koin (dev)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/billing/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "billing",
+                "verify"
+              ]
+            },
+            "description": "Jalankan **Me** dulu (`billingAccountId`). Status `credited` → app memanggil `completePurchase`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"coin_pack_large\",\n  \"purchaseToken\": \"dev-coin:{{billingAccountId}}:coin_pack_large:{{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "ab0aa149-9bbc-5310-8cdd-08ab2ff11a4d",
+          "name": "Verifikasi langganan (dev)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/billing/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "billing",
+                "verify"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"premium_yearly\",\n  \"purchaseToken\": \"dev-sub:{{billingAccountId}}:premium_yearly:365:{{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "df591f97-805d-5824-aec5-53db0a91e83c",
+          "name": "Restore",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/billing/restore",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "billing",
+                "restore"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purchases\": [\n    {\n      \"productId\": \"coin_pack_small\",\n      \"purchaseToken\": \"dev-coin:{{billingAccountId}}:coin_pack_small:restore1\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "78c1a385-51bb-5611-b49e-447487a38c53",
+          "name": "Status Premium",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/billing/subscription",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "billing",
+                "subscription"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "id": "c1bfe8ba-20c1-5235-8b8e-37cd59036e49",
+          "name": "Koin harian Premium tahunan",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/premium/daily-coins",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "premium",
+                "daily-coins"
+              ]
+            },
+            "description": "Akun permanen + Premium **tahunan** aktif (lokal: setelah *Verifikasi langganan*); +2 koin 1×/hari."
+          },
+          "response": []
+        },
+        {
+          "id": "2712ae34-5b68-5ae1-9230-740b4270c07e",
+          "name": "Webhook RTDN (dev)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/webhooks/google-play",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "webhooks",
+                "google-play"
+              ]
+            },
+            "description": "Hanya lokal (bearer `dev-pubsub`). Di produksi dipanggil Pub/Sub dengan token OIDC Google. 204.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": {\n    \"data\": \"{{rtdnData}}\",\n    \"messageId\": \"{{rtdnMessageId}}\"\n  },\n  \"subscription\": \"projects/riung-5e979/subscriptions/play-rtdn\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pubsubToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Pub/Sub push body: base64 DeveloperNotification + messageId unik.",
+                  "const n = { version: '1.0', packageName: 'com.riung.riung', eventTimeMillis: String(Date.now()), testNotification: { version: '1.0' } };",
+                  "pm.variables.set('rtdnData', btoa(JSON.stringify(n)));",
+                  "pm.variables.set('rtdnMessageId', String(Date.now()));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8dace735-fea3-53fc-a264-bb046a8fdc85",
+      "name": "7. Toko & loadout",
+      "description": "Harga dari `Config` → `catalog`; `expectedPrice` harus sama.",
+      "item": [
+        {
+          "id": "87f96792-42d6-5476-9fdf-729b023499ae",
+          "name": "Beli kosmetik monster",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shop/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "shop",
+                "purchase"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"cosmetic\",\n  \"itemId\": \"topi_rajut\",\n  \"expectedPrice\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "386b1aad-e66a-5be1-b59b-75ea0ae8a0ea",
+          "name": "Beli aksesori karakter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shop/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "shop",
+                "purchase"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"cosmetic\",\n  \"itemId\": \"acc_beanie\",\n  \"expectedPrice\": 60\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "8d239303-ab75-552d-800c-805c71cee30b",
+          "name": "Beli gaya kartu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shop/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "shop",
+                "purchase"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"cosmetic\",\n  \"itemId\": \"cardstyle_taman\",\n  \"expectedPrice\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "95194697-cbc3-5168-a43f-0e6c7155752d",
+          "name": "Beli bundel aksesori",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shop/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "shop",
+                "purchase"
+              ]
+            },
+            "description": "Harga = 80% item yang belum dimiliki (dibulatkan ke 5). Kirim sekali dengan 0 → `409 price_changed` berisi `details.price`, lalu kirim ulang.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"cosmetic_bundle\",\n  \"itemId\": \"cozy\",\n  \"expectedPrice\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "fecbdca2-d5b5-5117-8a1c-7cedc5ee0558",
+          "name": "Beli pelindung streak",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shop/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "shop",
+                "purchase"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"streak_shield\",\n  \"itemId\": \"streak_shield\",\n  \"expectedPrice\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "909f3cd1-a2d5-535e-915c-371514c735f5",
+          "name": "Beli paket Fokus",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shop/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "shop",
+                "purchase"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"focus_pack\",\n  \"itemId\": \"focus_5\",\n  \"expectedPrice\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "d6f245d5-22e8-5a92-bfbe-b70aaac7bb47",
+          "name": "Pasang kosmetik monster",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/loadouts/monsters/kabut",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "loadouts",
+                "monsters",
+                "kabut"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    \"topi_rajut\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "4cc27292-fd12-5d41-9f82-04fc9cadc5c4",
+          "name": "Pasang aksesori karakter",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/loadouts/characters/jung",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "loadouts",
+                "characters",
+                "jung"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accessories\": [\n    \"beanie\"\n  ],\n  \"cardStyle\": \"taman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "58f49c3f-b381-5b1d-a49d-fae95529e1ff",
+      "name": "8. Fokus (tiket offline)",
+      "description": "Tiket Ed25519 untuk sesi tanpa internet (`focusTicketKeys` di Config).",
+      "item": [
+        {
+          "id": "b45ac922-1d3c-5d28-901e-2d444d0030c0",
+          "name": "Tiket gratis harian",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/focus/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "focus",
+                "tickets"
+              ]
+            },
+            "description": "1/hari (Premium 3), berlaku sampai tengah malam. Menyimpan `ticketId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"free_daily\",\n  \"durationMin\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.environment.set('ticketId', j.ticket.id);",
+                  "  pm.test('ticketId tersimpan', () => pm.expect(j.ticket.id).to.be.a('string'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "683bd06b-6160-583e-8d72-9d72ff70d7d5",
+          "name": "Tiket prabayar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/focus/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "focus",
+                "tickets"
+              ]
+            },
+            "description": "Memakai satu sesi dari paket `focus_1`/`focus_5` (beli di Toko).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"prepaid\",\n  \"durationMin\": 45\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.environment.set('ticketId', j.ticket.id);",
+                  "  pm.test('ticketId tersimpan', () => pm.expect(j.ticket.id).to.be.a('string'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "715a9390-dc7e-5ad1-8abd-f28c3c789206",
+          "name": "Tiket koin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/focus/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "focus",
+                "tickets"
+              ]
+            },
+            "description": "25/40/50 koin untuk 25/45/60 menit.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"coins\",\n  \"durationMin\": 25,\n  \"expectedPrice\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.environment.set('ticketId', j.ticket.id);",
+                  "  pm.test('ticketId tersimpan', () => pm.expect(j.ticket.id).to.be.a('string'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b0e8f616-9907-57b3-8848-603a2c4ee616",
+          "name": "Tiket aktif",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/focus/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "focus",
+                "tickets"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "id": "9dd1ca59-fe83-5ade-b40b-3e9650f48119",
+          "name": "Sesi Fokus selesai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "activities"
+              ]
+            },
+            "description": "Memakai `ticketId` dari request tiket terakhir. Langsung dikirim → `409 ticket_invalid` `too_early`: server menerima setelah durasi sesi berlalu (dikirim app lewat outbox).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"focus_completed\",\n  \"occurredAt\": \"{{now}}\",\n  \"ticketId\": \"{{ticketId}}\",\n  \"saboteurId\": \"nanti\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "f8a93ebc-182d-5918-aca0-463c5d9c7d7f",
+      "name": "9. Aplikasi Beku",
+      "description": "Hanya koin latihan; maks 3/hari; +10 tiap buka; jeda 60 detik. `expectedPrice` = harga dasar + 10 × `today.paidUnlocksUsed`. Dijalankan berurutan, request ke-2 dan ke-3 dijawab `409 cooldown` — tunggu 60 detik dan naikkan `expectedPrice` (+10 untuk buka ke-2, +20 untuk ke-3).",
+      "item": [
+        {
+          "id": "82ab9c94-685a-5387-83bc-5698a9af22d4",
+          "name": "Buka 10 menit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/appbeku/unlocks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "appbeku",
+                "unlocks"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appId\": \"com.instagram.android\",\n  \"minutes\": 10,\n  \"expectedPrice\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "56f7846d-20fd-588a-bc2e-34741422bb4a",
+          "name": "Bundel santai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/appbeku/unlocks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "appbeku",
+                "unlocks"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bundleId\": \"santai\",\n  \"expectedPrice\": 35\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "908afaa4-9587-5162-87e9-e28d49e17d05",
+          "name": "Bundel sosmed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/appbeku/unlocks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "appbeku",
+                "unlocks"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bundleId\": \"sosmed\",\n  \"appIds\": [\n    \"com.instagram.android\",\n    \"com.google.android.youtube\"\n  ],\n  \"expectedPrice\": 75\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "805eafb2-9c4b-5433-b2cf-42f80ebd744d",
+      "name": "10. Admin API (port 8081)",
+      "description": "Tidak lewat nginx. Produksi: dari laptop yang tersambung VPN (`{{adminBaseUrl}}` = http://172.19.0.16:8081), token akun admin (login ≤ 15 menit). Lokal: `docker compose -f deploy/docker-compose.yml exec api /riung admin grant dev:postman-admin \"postman lokal\"` setelah sekali memanggil `GET /v1/me` dengan `dev:postman-admin:google.com`.",
+      "item": [
+        {
+          "id": "a5a941fa-3b2e-5415-892d-0f0f707090c0",
+          "name": "Daftar pengaturan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{adminBaseUrl}}/admin/v1/settings",
+              "host": [
+                "{{adminBaseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "77ae46cc-ae38-5b6e-b3e9-d258f2a5e431",
+          "name": "Ubah pengaturan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{adminBaseUrl}}/admin/v1/settings/journalRewardsPerDay",
+              "host": [
+                "{{adminBaseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "v1",
+                "settings",
+                "journalRewardsPerDay"
+              ]
+            },
+            "description": "Key: journalRewardsPerDay (0–20), meditationRewardsPerDay (0–20), maxNewAccountsPerIpPerDay (1–1000).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 4,\n  \"reason\": \"uji batas baru dari Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "b691348a-c0f2-52e2-8ef2-9a1c927f21d4",
+          "name": "Kembalikan ke default",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{adminBaseUrl}}/admin/v1/settings/journalRewardsPerDay",
+              "host": [
+                "{{adminBaseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "v1",
+                "settings",
+                "journalRewardsPerDay"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"kembali ke default\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "f91cc071-396c-54ed-9de5-b47d939f3087",
+          "name": "Audit log",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{adminBaseUrl}}/admin/v1/audit?limit=50",
+              "host": [
+                "{{adminBaseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "v1",
+                "audit"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "1–200"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "2e461524-cee0-5c54-bb5b-38f9ee820fa7",
+      "name": "11. Hapus akun",
+      "description": "Jalankan terakhir: menghapus akun yang dipakai koleksi ini.",
+      "item": [
+        {
+          "id": "6641b46f-2a6e-5c0b-b6a5-f18423b2a599",
+          "name": "Hapus akun",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "me"
+              ]
+            },
+            "description": "⚠️ Menghapus semua data + user Firebase. Akun permanen: login ≤ 5 menit (`recent_login_required`). App Check limited-use. 204."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

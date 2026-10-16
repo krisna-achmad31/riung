@@ -210,7 +210,7 @@ void main() {
 
       await auth.masukEmailPassword(email: 'x@example.com', password: 'password1');
 
-      expect(userRepo.callLog, isEmpty);
+      expect(userRepo.callLog, ['getUserProfile']);
       expect(auth.migrationWarning, isFalse);
     });
   });

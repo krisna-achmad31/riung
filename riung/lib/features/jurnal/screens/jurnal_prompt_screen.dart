@@ -4,6 +4,9 @@ import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../../core/state/state.dart';
+import '../../../core/services/api/api_client.dart';
+import '../../../core/widgets/api_error_feedback.dart';
 import '../logic/journal_prompts.dart';
 import 'jurnal_editor_screen.dart';
 
@@ -13,6 +16,22 @@ class JurnalPromptScreen extends StatelessWidget {
   const JurnalPromptScreen({super.key});
 
   void _openEditor(BuildContext context, {JournalPrompt? prompt}) async {
+    final state = AppScope.of(context).wallet.apiState;
+    if (state != null) {
+      try {
+        final access = await state.api.journalAccess(prompt?.id ?? '');
+        if (!context.mounted) return;
+        if (!access.canWrite) {
+          final reason = access.reason ?? 'daily_limit';
+          showApiError(context, ApiException(403, reason == 'premium_required' ? reason : 'limit_reached', 'Journal access unavailable'));
+          return;
+        }
+      } on ApiException catch (e) {
+        if (!context.mounted) return;
+        if (!e.retryable) { showApiError(context, e); return; }
+      }
+    }
+    if (!context.mounted) return;
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => JurnalEditorScreen(prompt: prompt)),
     );
