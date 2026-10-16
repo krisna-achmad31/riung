@@ -47,6 +47,7 @@ class _LemariScreenState extends State<LemariScreen> {
 
   Future<void> _simpan() async {
     final scope = AppScope.of(context);
+    await scope.wallet.apiState?.api.monsterLoadout(widget.monsterId, _draft.values.map((c) => c.id).toList());
     await MonsterLoadout(scope.prefs).save(widget.monsterId, _draft.values);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.s.toko.styleSaved)));

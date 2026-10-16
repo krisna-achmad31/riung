@@ -8,7 +8,7 @@ import '../theme/theme.dart';
 /// padding horizontal list.
 ///
 /// Saat layar pertama kali tampil, beberapa anak teratas masuk berurutan
-/// (pudar + naik 16dp, jeda 45ms per anak). Hanya sekali per layar; anak
+/// (naik 8dp, jeda 20ms per anak). Hanya sekali per layar; anak
 /// yang dibangun belakangan (digulir) langsung tampil.
 class RiungBleedListView extends StatefulWidget {
   const RiungBleedListView({
@@ -26,25 +26,26 @@ class RiungBleedListView extends StatefulWidget {
   State<RiungBleedListView> createState() => _RiungBleedListViewState();
 }
 
-class _RiungBleedListViewState extends State<RiungBleedListView> with SingleTickerProviderStateMixin {
-  static const _animated = 8;
-  static const _stagger = 45;
-  static const _itemMs = 320;
+class _RiungBleedListViewState extends State<RiungBleedListView>
+    with SingleTickerProviderStateMixin {
+  static const _animated = 3;
+  static const _stagger = 20;
+  static const _itemMs = 180;
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: _itemMs + _stagger * (_animated - 1)),
+    duration: const Duration(
+      milliseconds: _itemMs + _stagger * (_animated - 1),
+    ),
   );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_controller.isDismissed) {
-      if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
-        _controller.value = 1;
-      } else {
-        _controller.forward();
-      }
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+      _controller.value = 1;
+    } else if (_controller.isDismissed) {
+      _controller.forward();
     }
   }
 
@@ -72,9 +73,14 @@ class _RiungBleedListViewState extends State<RiungBleedListView> with SingleTick
               for (var i = 0; i < widget.children.length; i++)
                 if (i < _animated)
                   _Entrance(
-                    animation: CurvedAnimation(
-                      parent: _controller,
-                      curve: Interval(i * _stagger / total, (i * _stagger + _itemMs) / total, curve: Curves.easeOutCubic),
+                    animation: _controller.drive(
+                      CurveTween(
+                        curve: Interval(
+                          i * _stagger / total,
+                          (i * _stagger + _itemMs) / total,
+                          curve: Curves.easeOutCubic,
+                        ),
+                      ),
                     ),
                     child: widget.children[i],
                   )
@@ -96,12 +102,12 @@ class _Entrance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: animation,
-      child: AnimatedBuilder(
-        animation: animation,
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) => Transform.translate(
+        offset: Offset(0, 8 * (1 - animation.value)),
         child: child,
-        builder: (context, child) => Transform.translate(offset: Offset(0, 16 * (1 - animation.value)), child: child),
       ),
     );
   }

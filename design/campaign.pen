@@ -549,7 +549,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_waswas_liar.png",
+                            "url": "aset3d_cut/si_waswas_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -562,7 +562,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_waswas.png",
+                            "url": "aset3d_cut/si_waswas.png",
                             "mode": "contain"
                           }
                         }
@@ -662,7 +662,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/batu_tenang.png",
+                            "url": "aset3d_cut/batu_tenang.png",
                             "mode": "contain"
                           }
                         },
@@ -761,7 +761,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_kabut_liar.png",
+                            "url": "aset3d_cut/si_kabut_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -774,7 +774,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_kabut.png",
+                            "url": "aset3d_cut/si_kabut.png",
                             "mode": "contain"
                           }
                         }
@@ -874,7 +874,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/lentera.png",
+                            "url": "aset3d_cut/lentera.png",
                             "mode": "contain"
                           }
                         },
@@ -973,7 +973,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_sempurna_liar.png",
+                            "url": "aset3d_cut/si_sempurna_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -986,7 +986,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_sempurna.png",
+                            "url": "aset3d_cut/si_sempurna.png",
                             "mode": "contain"
                           }
                         }
@@ -1086,7 +1086,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/bintang_kintsugi.png",
+                            "url": "aset3d_cut/bintang_kintsugi.png",
                             "mode": "contain"
                           }
                         },
@@ -1185,7 +1185,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_cermin_liar.png",
+                            "url": "aset3d_cut/si_cermin_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -1198,7 +1198,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_cermin.png",
+                            "url": "aset3d_cut/si_cermin.png",
                             "mode": "contain"
                           }
                         }
@@ -1298,7 +1298,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/bingkai_emas.png",
+                            "url": "aset3d_cut/bingkai_emas.png",
                             "mode": "contain"
                           },
                           "layout": "none"
@@ -1398,7 +1398,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_mengelak_liar.png",
+                            "url": "aset3d_cut/si_mengelak_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -1411,7 +1411,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_mengelak.png",
+                            "url": "aset3d_cut/si_mengelak.png",
                             "mode": "contain"
                           }
                         }
@@ -1511,7 +1511,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/senter.png",
+                            "url": "aset3d_cut/senter.png",
                             "mode": "contain"
                           }
                         },
@@ -1610,7 +1610,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_meronta_liar.png",
+                            "url": "aset3d_cut/si_meronta_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -1623,7 +1623,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_meronta.png",
+                            "url": "aset3d_cut/si_meronta.png",
                             "mode": "contain"
                           }
                         }
@@ -1723,7 +1723,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/selimut_peluk.png",
+                            "url": "aset3d_cut/selimut_peluk.png",
                             "mode": "contain"
                           }
                         },
@@ -1822,7 +1822,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_hakim_liar.png",
+                            "url": "aset3d_cut/si_hakim_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -1835,7 +1835,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_hakim.png",
+                            "url": "aset3d_cut/si_hakim.png",
                             "mode": "contain"
                           }
                         }
@@ -1935,7 +1935,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/palu_busa.png",
+                            "url": "aset3d_cut/palu_busa.png",
                             "mode": "contain"
                           }
                         },
@@ -2094,7 +2094,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_nanti_liar.png",
+                            "url": "aset3d_cut/si_nanti_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -2107,7 +2107,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_nanti.png",
+                            "url": "aset3d_cut/si_nanti.png",
                             "mode": "contain"
                           }
                         }
@@ -2207,7 +2207,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/jam_pasir.png",
+                            "url": "aset3d_cut/jam_pasir.png",
                             "mode": "contain"
                           }
                         },
@@ -2306,7 +2306,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_gulir_liar.png",
+                            "url": "aset3d_cut/si_gulir_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -2319,7 +2319,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_gulir.png",
+                            "url": "aset3d_cut/si_gulir.png",
                             "mode": "contain"
                           }
                         }
@@ -2419,7 +2419,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kantong_hp.png",
+                            "url": "aset3d_cut/kantong_hp.png",
                             "mode": "contain"
                           }
                         },
@@ -2518,7 +2518,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_begadang_liar.png",
+                            "url": "aset3d_cut/si_begadang_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -2531,7 +2531,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_begadang.png",
+                            "url": "aset3d_cut/si_begadang.png",
                             "mode": "contain"
                           }
                         }
@@ -2631,7 +2631,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/topi_tidur.png",
+                            "url": "aset3d_cut/topi_tidur.png",
                             "mode": "contain"
                           }
                         },
@@ -2730,7 +2730,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_bunglon_liar.png",
+                            "url": "aset3d_cut/si_bunglon_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -2743,7 +2743,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_bunglon.png",
+                            "url": "aset3d_cut/si_bunglon.png",
                             "mode": "contain"
                           }
                         }
@@ -2843,7 +2843,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/pin_berani.png",
+                            "url": "aset3d_cut/pin_berani.png",
                             "mode": "contain"
                           }
                         },
@@ -2942,7 +2942,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_bimbang_liar.png",
+                            "url": "aset3d_cut/si_bimbang_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -2955,7 +2955,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_bimbang.png",
+                            "url": "aset3d_cut/si_bimbang.png",
                             "mode": "contain"
                           }
                         }
@@ -3055,7 +3055,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kompas.png",
+                            "url": "aset3d_cut/kompas.png",
                             "mode": "contain"
                           }
                         },
@@ -3154,7 +3154,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_bara_liar.png",
+                            "url": "aset3d_cut/si_bara_liar.png",
                             "mode": "contain"
                           }
                         },
@@ -3167,7 +3167,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_bara.png",
+                            "url": "aset3d_cut/si_bara.png",
                             "mode": "contain"
                           }
                         }
@@ -3267,7 +3267,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/cangkir_teh.png",
+                            "url": "aset3d_cut/cangkir_teh.png",
                             "mode": "contain"
                           }
                         },
@@ -3621,7 +3621,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/si_kabut.png",
+                        "url": "aset3d_cut/si_kabut.png",
                         "mode": "contain"
                       },
                       "cornerRadius": 12
@@ -4290,7 +4290,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_streak.png",
+                                                "url": "aset3d_cut/ikon_streak.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -4349,7 +4349,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -4486,7 +4486,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_kabut.png",
+                                        "url": "aset3d_cut/si_kabut.png",
                                         "mode": "contain"
                                       }
                                     }
@@ -4544,7 +4544,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_meditasi.png",
+                                            "url": "aset3d_cut/ikon_meditasi.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -4615,7 +4615,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_tidur.png",
+                                            "url": "aset3d_cut/ikon_tidur.png",
                                             "mode": "contain"
                                           },
                                           "layout": "none"
@@ -4687,7 +4687,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_jurnal.png",
+                                            "url": "aset3d_cut/ikon_jurnal.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -4758,7 +4758,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_afirmasi.png",
+                                            "url": "aset3d_cut/ikon_afirmasi.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -4864,7 +4864,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_waswas.png",
+                                                "url": "aset3d_cut/si_waswas.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -5340,7 +5340,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_hakim_liar.png",
+                                        "url": "aset3d_cut/si_hakim_liar.png",
                                         "mode": "contain"
                                       }
                                     }
@@ -5385,7 +5385,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/ikon_fokus.png",
+                                        "url": "aset3d_cut/ikon_fokus.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -5725,7 +5725,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -5740,7 +5740,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -5755,7 +5755,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -5770,7 +5770,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_mengelak.png",
+                    "url": "aset3d_cut/si_mengelak.png",
                     "mode": "contain"
                   }
                 },
@@ -5785,7 +5785,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 },
@@ -5832,7 +5832,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_koin.png",
+                        "url": "aset3d_cut/ikon_koin.png",
                         "mode": "contain"
                       },
                       "layout": "none"
@@ -5911,7 +5911,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_streak.png",
+                        "url": "aset3d_cut/ikon_streak.png",
                         "mode": "contain"
                       }
                     },
@@ -6103,7 +6103,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/si_hakim.png",
+                        "url": "aset3d_cut/si_hakim.png",
                         "mode": "contain"
                       }
                     },
@@ -6224,7 +6224,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/si_waswas.png",
+                                    "url": "aset3d_cut/si_waswas.png",
                                     "mode": "contain"
                                   }
                                 }
@@ -6317,7 +6317,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/si_sempurna.png",
+                                    "url": "aset3d_cut/si_sempurna.png",
                                     "mode": "contain"
                                   }
                                 }
@@ -6410,7 +6410,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/si_cermin.png",
+                                    "url": "aset3d_cut/si_cermin.png",
                                     "mode": "contain"
                                   }
                                 }
@@ -6512,7 +6512,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/si_kabut.png",
+                                    "url": "aset3d_cut/si_kabut.png",
                                     "mode": "contain"
                                   }
                                 }
@@ -6605,7 +6605,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/si_mengelak.png",
+                                    "url": "aset3d_cut/si_mengelak.png",
                                     "mode": "contain"
                                   }
                                 }
@@ -6698,7 +6698,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/si_meronta.png",
+                                    "url": "aset3d_cut/si_meronta.png",
                                     "mode": "contain"
                                   }
                                 }
@@ -7119,7 +7119,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/siluet/misteri_1.png",
+                                "url": "aset3d_cut/siluet/misteri_1.png",
                                 "mode": "contain"
                               },
                               "width": 140,
@@ -7291,7 +7291,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/siluet/misteri_2.png",
+                                "url": "aset3d_cut/siluet/misteri_2.png",
                                 "mode": "contain"
                               },
                               "width": 140,
@@ -7463,7 +7463,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/siluet/misteri_3.png",
+                                "url": "aset3d_cut/siluet/misteri_3.png",
                                 "mode": "contain"
                               },
                               "width": 140,
@@ -7635,7 +7635,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/siluet/misteri_4.png",
+                                "url": "aset3d_cut/siluet/misteri_4.png",
                                 "mode": "contain"
                               },
                               "width": 140,
@@ -7807,7 +7807,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/siluet/misteri_5.png",
+                                "url": "aset3d_cut/siluet/misteri_5.png",
                                 "mode": "contain"
                               },
                               "width": 140,
@@ -7979,7 +7979,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/siluet/misteri_6.png",
+                                "url": "aset3d_cut/siluet/misteri_6.png",
                                 "mode": "contain"
                               },
                               "width": 140,
@@ -8689,7 +8689,7 @@
                                                   "fill": {
                                                     "type": "image",
                                                     "enabled": true,
-                                                    "url": "design/aset3d_cut/si_hakim_liar.png",
+                                                    "url": "aset3d_cut/si_hakim_liar.png",
                                                     "mode": "contain"
                                                   }
                                                 },
@@ -8814,7 +8814,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/si_waswas_liar.png",
+                                                        "url": "aset3d_cut/si_waswas_liar.png",
                                                         "mode": "contain"
                                                       }
                                                     }
@@ -8930,7 +8930,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/si_mengelak_liar.png",
+                                                        "url": "aset3d_cut/si_mengelak_liar.png",
                                                         "mode": "contain"
                                                       }
                                                     }
@@ -9046,7 +9046,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/si_sempurna_liar.png",
+                                                        "url": "aset3d_cut/si_sempurna_liar.png",
                                                         "mode": "contain"
                                                       }
                                                     }
@@ -9162,7 +9162,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/si_cermin_liar.png",
+                                                        "url": "aset3d_cut/si_cermin_liar.png",
                                                         "mode": "contain"
                                                       }
                                                     }
@@ -9278,7 +9278,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/si_kabut_liar.png",
+                                                        "url": "aset3d_cut/si_kabut_liar.png",
                                                         "mode": "contain"
                                                       }
                                                     }
@@ -9394,7 +9394,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/si_meronta_liar.png",
+                                                        "url": "aset3d_cut/si_meronta_liar.png",
                                                         "mode": "contain"
                                                       }
                                                     }
@@ -9989,7 +9989,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/ikon_streak.png",
+                                                        "url": "aset3d_cut/ikon_streak.png",
                                                         "mode": "contain"
                                                       }
                                                     },
@@ -10048,7 +10048,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/ikon_koin.png",
+                                                        "url": "aset3d_cut/ikon_koin.png",
                                                         "mode": "contain"
                                                       },
                                                       "layout": "none"
@@ -10185,7 +10185,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_kabut.png",
+                                                "url": "aset3d_cut/si_kabut.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -10243,7 +10243,7 @@
                                                   "fill": {
                                                     "type": "image",
                                                     "enabled": true,
-                                                    "url": "design/aset3d_cut/ikon_meditasi.png",
+                                                    "url": "aset3d_cut/ikon_meditasi.png",
                                                     "mode": "contain"
                                                   }
                                                 },
@@ -10314,7 +10314,7 @@
                                                   "fill": {
                                                     "type": "image",
                                                     "enabled": true,
-                                                    "url": "design/aset3d_cut/ikon_tidur.png",
+                                                    "url": "aset3d_cut/ikon_tidur.png",
                                                     "mode": "contain"
                                                   },
                                                   "layout": "none"
@@ -10386,7 +10386,7 @@
                                                   "fill": {
                                                     "type": "image",
                                                     "enabled": true,
-                                                    "url": "design/aset3d_cut/ikon_jurnal.png",
+                                                    "url": "aset3d_cut/ikon_jurnal.png",
                                                     "mode": "contain"
                                                   }
                                                 },
@@ -10457,7 +10457,7 @@
                                                   "fill": {
                                                     "type": "image",
                                                     "enabled": true,
-                                                    "url": "design/aset3d_cut/ikon_afirmasi.png",
+                                                    "url": "aset3d_cut/ikon_afirmasi.png",
                                                     "mode": "contain"
                                                   }
                                                 },
@@ -10563,7 +10563,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/si_waswas.png",
+                                                        "url": "aset3d_cut/si_waswas.png",
                                                         "mode": "contain"
                                                       }
                                                     },
@@ -10578,7 +10578,7 @@
                                                       "fill": {
                                                         "type": "image",
                                                         "enabled": true,
-                                                        "url": "design/aset3d_cut/topi_rajut.png",
+                                                        "url": "aset3d_cut/topi_rajut.png",
                                                         "mode": "contain"
                                                       }
                                                     }
@@ -11054,7 +11054,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_hakim_liar.png",
+                                                "url": "aset3d_cut/si_hakim_liar.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -11099,7 +11099,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_fokus.png",
+                                                "url": "aset3d_cut/ikon_fokus.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -11796,7 +11796,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_hakim_liar.png",
+                                                "url": "aset3d_cut/si_hakim_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -11974,7 +11974,7 @@
                                                   "fill": {
                                                     "type": "image",
                                                     "enabled": true,
-                                                    "url": "design/aset3d_cut/ikon_koin.png",
+                                                    "url": "aset3d_cut/ikon_koin.png",
                                                     "mode": "contain"
                                                   },
                                                   "layout": "none"
@@ -12245,7 +12245,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_fokus.png",
+                        "url": "aset3d_cut/ikon_fokus.png",
                         "mode": "contain"
                       }
                     },
@@ -12332,7 +12332,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_tidur.png",
+                        "url": "aset3d_cut/ikon_tidur.png",
                         "mode": "contain"
                       },
                       "layout": "none"
@@ -12402,7 +12402,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_meditasi.png",
+                        "url": "aset3d_cut/ikon_meditasi.png",
                         "mode": "contain"
                       }
                     },
@@ -12481,7 +12481,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_jurnal.png",
+                        "url": "aset3d_cut/ikon_jurnal.png",
                         "mode": "contain"
                       }
                     },
@@ -12550,7 +12550,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_aplikasi_beku.png",
+                        "url": "aset3d_cut/ikon_aplikasi_beku.png",
                         "mode": "contain"
                       }
                     },
@@ -12619,7 +12619,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_afirmasi.png",
+                        "url": "aset3d_cut/ikon_afirmasi.png",
                         "mode": "contain"
                       }
                     },
@@ -12698,7 +12698,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/ikon_laporan.png",
+                        "url": "aset3d_cut/ikon_laporan.png",
                         "mode": "contain"
                       }
                     },
@@ -12797,7 +12797,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/ikon_kepribadian.png",
+                            "url": "aset3d_cut/ikon_kepribadian.png",
                             "mode": "contain"
                           }
                         },
@@ -12845,7 +12845,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/karakter_ai/ENFP.png",
+                            "url": "aset3d_cut/karakter_ai/ENFP.png",
                             "mode": "contain"
                           },
                           "layout": "none"
@@ -12859,7 +12859,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/karakter_ai/INFP.png",
+                            "url": "aset3d_cut/karakter_ai/INFP.png",
                             "mode": "contain"
                           },
                           "layout": "none"
@@ -12873,7 +12873,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/karakter_ai/INTJ.png",
+                            "url": "aset3d_cut/karakter_ai/INTJ.png",
                             "mode": "contain"
                           },
                           "layout": "none"
@@ -13016,7 +13016,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/ikon_pelindung.png",
+                                "url": "aset3d_cut/ikon_pelindung.png",
                                 "mode": "contain"
                               }
                             },
@@ -13072,7 +13072,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/ikon_jurnal.png",
+                                "url": "aset3d_cut/ikon_jurnal.png",
                                 "mode": "contain"
                               }
                             },
@@ -13137,7 +13137,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/ikon_bantuan.png",
+                                "url": "aset3d_cut/ikon_bantuan.png",
                                 "mode": "contain"
                               }
                             },
@@ -13193,7 +13193,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/ikon_aplikasi_beku.png",
+                                "url": "aset3d_cut/ikon_aplikasi_beku.png",
                                 "mode": "contain"
                               }
                             },
@@ -13967,7 +13967,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/ikon_bantuan.png",
+                    "url": "aset3d_cut/ikon_bantuan.png",
                     "mode": "contain"
                   }
                 }
@@ -14594,7 +14594,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -14609,7 +14609,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -14624,7 +14624,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 },
@@ -14639,7 +14639,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 },
@@ -14654,7 +14654,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -14669,7 +14669,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -14684,7 +14684,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_mengelak.png",
+                    "url": "aset3d_cut/si_mengelak.png",
                     "mode": "contain"
                   }
                 }
@@ -14730,7 +14730,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/si_kabut.png",
+                        "url": "aset3d_cut/si_kabut.png",
                         "mode": "contain"
                       }
                     },
@@ -15063,7 +15063,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -15107,7 +15107,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -15151,7 +15151,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -15195,7 +15195,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -15239,7 +15239,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 },
@@ -15271,7 +15271,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 18,
@@ -15696,7 +15696,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_streak.png",
+                                                "url": "aset3d_cut/ikon_streak.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -15755,7 +15755,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -15892,7 +15892,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_kabut.png",
+                                        "url": "aset3d_cut/si_kabut.png",
                                         "mode": "contain"
                                       }
                                     }
@@ -15950,7 +15950,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_meditasi.png",
+                                            "url": "aset3d_cut/ikon_meditasi.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -16021,7 +16021,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_tidur.png",
+                                            "url": "aset3d_cut/ikon_tidur.png",
                                             "mode": "contain"
                                           },
                                           "layout": "none"
@@ -16093,7 +16093,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_jurnal.png",
+                                            "url": "aset3d_cut/ikon_jurnal.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -16164,7 +16164,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_afirmasi.png",
+                                            "url": "aset3d_cut/ikon_afirmasi.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -16270,7 +16270,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_waswas.png",
+                                                "url": "aset3d_cut/si_waswas.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -16285,7 +16285,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/topi_rajut.png",
+                                                "url": "aset3d_cut/topi_rajut.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -16761,7 +16761,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_hakim_liar.png",
+                                        "url": "aset3d_cut/si_hakim_liar.png",
                                         "mode": "contain"
                                       }
                                     }
@@ -16806,7 +16806,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/ikon_fokus.png",
+                                        "url": "aset3d_cut/ikon_fokus.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -17146,7 +17146,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 }
@@ -17522,7 +17522,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_tiket.png",
+                                                "url": "aset3d_cut/ikon_tiket.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -17582,7 +17582,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -17728,7 +17728,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/si_hakim_liar.png",
+                                            "url": "aset3d_cut/si_hakim_liar.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -18014,7 +18014,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_meronta_liar.png",
+                                                "url": "aset3d_cut/si_meronta_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -18147,7 +18147,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_waswas_liar.png",
+                                                "url": "aset3d_cut/si_waswas_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -18289,7 +18289,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_kabut.png",
+                                                "url": "aset3d_cut/si_kabut.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -18304,7 +18304,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/topi_rajut.png",
+                                                "url": "aset3d_cut/topi_rajut.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -18414,7 +18414,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_cermin.png",
+                                                "url": "aset3d_cut/si_cermin.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -18429,7 +18429,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/bingkai_emas.png",
+                                                "url": "aset3d_cut/bingkai_emas.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -18549,7 +18549,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_sempurna_liar.png",
+                                                "url": "aset3d_cut/si_sempurna_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -18682,7 +18682,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_mengelak_liar.png",
+                                                "url": "aset3d_cut/si_mengelak_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -19009,7 +19009,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 }
@@ -19382,7 +19382,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_koin.png",
+                                            "url": "aset3d_cut/ikon_koin.png",
                                             "mode": "contain"
                                           },
                                           "layout": "none"
@@ -19542,7 +19542,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_waswas.png",
+                                        "url": "aset3d_cut/si_waswas.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -19557,7 +19557,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/syal_hangat.png",
+                                        "url": "aset3d_cut/syal_hangat.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -19759,7 +19759,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -19854,7 +19854,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -20275,7 +20275,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 }
@@ -20750,7 +20750,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/bantal_mini.png",
+                                        "url": "aset3d_cut/bantal_mini.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -20765,7 +20765,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_kabut.png",
+                                        "url": "aset3d_cut/si_kabut.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -22145,7 +22145,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/ikon_jurnal.png",
+                                        "url": "aset3d_cut/ikon_jurnal.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -22304,7 +22304,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_hakim.png",
+                                                "url": "aset3d_cut/si_hakim.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -22387,7 +22387,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_waswas.png",
+                                                "url": "aset3d_cut/si_waswas.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -22872,7 +22872,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 }
@@ -23250,7 +23250,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_waswas.png",
+                                        "url": "aset3d_cut/si_waswas.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -23265,7 +23265,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/topi_rajut.png",
+                                        "url": "aset3d_cut/topi_rajut.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -23396,7 +23396,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_koin.png",
+                                            "url": "aset3d_cut/ikon_koin.png",
                                             "mode": "contain"
                                           },
                                           "layout": "none"
@@ -23470,7 +23470,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/si_waswas.png",
+                                            "url": "aset3d_cut/si_waswas.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -23576,7 +23576,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 }
@@ -23971,7 +23971,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/karakter_ai/INFP.png",
+                                        "url": "aset3d_cut/karakter_ai/INFP.png",
                                         "mode": "contain"
                                       },
                                       "layout": "none"
@@ -24416,7 +24416,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/siluet/misteri_2.png",
+                        "url": "aset3d_cut/siluet/misteri_2.png",
                         "mode": "contain"
                       },
                       "width": 130,
@@ -24831,7 +24831,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_streak.png",
+                                                "url": "aset3d_cut/ikon_streak.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -24890,7 +24890,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -25027,7 +25027,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_kabut.png",
+                                        "url": "aset3d_cut/si_kabut.png",
                                         "mode": "contain"
                                       }
                                     }
@@ -25085,7 +25085,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_meditasi.png",
+                                            "url": "aset3d_cut/ikon_meditasi.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -25156,7 +25156,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_tidur.png",
+                                            "url": "aset3d_cut/ikon_tidur.png",
                                             "mode": "contain"
                                           },
                                           "layout": "none"
@@ -25228,7 +25228,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_jurnal.png",
+                                            "url": "aset3d_cut/ikon_jurnal.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -25299,7 +25299,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_afirmasi.png",
+                                            "url": "aset3d_cut/ikon_afirmasi.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -25405,7 +25405,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_waswas.png",
+                                                "url": "aset3d_cut/si_waswas.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -25420,7 +25420,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/topi_rajut.png",
+                                                "url": "aset3d_cut/topi_rajut.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -25896,7 +25896,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_hakim_liar.png",
+                                        "url": "aset3d_cut/si_hakim_liar.png",
                                         "mode": "contain"
                                       }
                                     }
@@ -25941,7 +25941,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/ikon_fokus.png",
+                                        "url": "aset3d_cut/ikon_fokus.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -26281,7 +26281,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 }
@@ -26657,7 +26657,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_tiket.png",
+                                                "url": "aset3d_cut/ikon_tiket.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -26717,7 +26717,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -26863,7 +26863,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/si_hakim_liar.png",
+                                            "url": "aset3d_cut/si_hakim_liar.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -27149,7 +27149,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_meronta_liar.png",
+                                                "url": "aset3d_cut/si_meronta_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -27282,7 +27282,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_waswas_liar.png",
+                                                "url": "aset3d_cut/si_waswas_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -27424,7 +27424,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_kabut.png",
+                                                "url": "aset3d_cut/si_kabut.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -27439,7 +27439,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/topi_rajut.png",
+                                                "url": "aset3d_cut/topi_rajut.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -27549,7 +27549,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_cermin.png",
+                                                "url": "aset3d_cut/si_cermin.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -27564,7 +27564,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/bingkai_emas.png",
+                                                "url": "aset3d_cut/bingkai_emas.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -27684,7 +27684,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_sempurna_liar.png",
+                                                "url": "aset3d_cut/si_sempurna_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -27817,7 +27817,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_mengelak_liar.png",
+                                                "url": "aset3d_cut/si_mengelak_liar.png",
                                                 "mode": "contain"
                                               }
                                             },
@@ -28144,7 +28144,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 }
@@ -28517,7 +28517,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_koin.png",
+                                            "url": "aset3d_cut/ikon_koin.png",
                                             "mode": "contain"
                                           },
                                           "layout": "none"
@@ -28677,7 +28677,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_waswas.png",
+                                        "url": "aset3d_cut/si_waswas.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -28692,7 +28692,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/syal_hangat.png",
+                                        "url": "aset3d_cut/syal_hangat.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -28894,7 +28894,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -28989,7 +28989,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/ikon_koin.png",
+                                                "url": "aset3d_cut/ikon_koin.png",
                                                 "mode": "contain"
                                               },
                                               "layout": "none"
@@ -29410,7 +29410,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 }
@@ -29885,7 +29885,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/bantal_mini.png",
+                                        "url": "aset3d_cut/bantal_mini.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -29900,7 +29900,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_kabut.png",
+                                        "url": "aset3d_cut/si_kabut.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -31280,7 +31280,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/ikon_jurnal.png",
+                                        "url": "aset3d_cut/ikon_jurnal.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -31439,7 +31439,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_hakim.png",
+                                                "url": "aset3d_cut/si_hakim.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -31522,7 +31522,7 @@
                                               "fill": {
                                                 "type": "image",
                                                 "enabled": true,
-                                                "url": "design/aset3d_cut/si_waswas.png",
+                                                "url": "aset3d_cut/si_waswas.png",
                                                 "mode": "contain"
                                               }
                                             }
@@ -32007,7 +32007,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 }
@@ -32385,7 +32385,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/si_waswas.png",
+                                        "url": "aset3d_cut/si_waswas.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -32400,7 +32400,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/topi_rajut.png",
+                                        "url": "aset3d_cut/topi_rajut.png",
                                         "mode": "contain"
                                       }
                                     },
@@ -32531,7 +32531,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/ikon_koin.png",
+                                            "url": "aset3d_cut/ikon_koin.png",
                                             "mode": "contain"
                                           },
                                           "layout": "none"
@@ -32605,7 +32605,7 @@
                                           "fill": {
                                             "type": "image",
                                             "enabled": true,
-                                            "url": "design/aset3d_cut/si_waswas.png",
+                                            "url": "aset3d_cut/si_waswas.png",
                                             "mode": "contain"
                                           }
                                         },
@@ -32711,7 +32711,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 }
@@ -33106,7 +33106,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "design/aset3d_cut/karakter_ai/INFP.png",
+                                        "url": "aset3d_cut/karakter_ai/INFP.png",
                                         "mode": "contain"
                                       },
                                       "layout": "none"
@@ -33551,7 +33551,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/siluet/misteri_2.png",
+                        "url": "aset3d_cut/siluet/misteri_2.png",
                         "mode": "contain"
                       },
                       "width": 166,
@@ -33772,7 +33772,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 }
@@ -33910,7 +33910,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -33925,7 +33925,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -33940,7 +33940,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 }
@@ -34171,7 +34171,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -34186,7 +34186,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -34201,7 +34201,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 }
@@ -34394,7 +34394,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/si_waswas.png",
+                        "url": "aset3d_cut/si_waswas.png",
                         "mode": "contain"
                       }
                     },
@@ -34409,7 +34409,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/si_cermin.png",
+                        "url": "aset3d_cut/si_cermin.png",
                         "mode": "contain"
                       }
                     },
@@ -34424,7 +34424,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/aset3d_cut/si_kabut.png",
+                        "url": "aset3d_cut/si_kabut.png",
                         "mode": "contain"
                       }
                     }
@@ -34549,7 +34549,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/marketing/ikon/riung_icon_1024.png",
+                    "url": "marketing/ikon/riung_icon_1024.png",
                     "mode": "cover"
                   },
                   "cornerRadius": 40,
@@ -34593,7 +34593,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/marketing/ikon/riung_icon_1024.png",
+                    "url": "marketing/ikon/riung_icon_1024.png",
                     "mode": "cover"
                   },
                   "cornerRadius": 90,
@@ -34637,7 +34637,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/marketing/ikon/riung_icon_1024.png",
+                    "url": "marketing/ikon/riung_icon_1024.png",
                     "mode": "cover"
                   },
                   "cornerRadius": 36,
@@ -34681,7 +34681,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/marketing/ikon/riung_icon_1024.png",
+                    "url": "marketing/ikon/riung_icon_1024.png",
                     "mode": "cover"
                   },
                   "cornerRadius": 22,
@@ -34725,7 +34725,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/marketing/ikon/riung_icon_1024.png",
+                    "url": "marketing/ikon/riung_icon_1024.png",
                     "mode": "cover"
                   },
                   "cornerRadius": 11,
@@ -34851,7 +34851,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 999
@@ -35278,7 +35278,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -35393,7 +35393,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_mengelak.png",
+                    "url": "aset3d_cut/si_mengelak.png",
                     "mode": "contain"
                   }
                 },
@@ -35437,7 +35437,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 },
@@ -35481,7 +35481,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 }
@@ -35577,7 +35577,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -35692,7 +35692,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -35736,7 +35736,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -35780,7 +35780,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 },
@@ -35824,7 +35824,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -35868,7 +35868,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 }
@@ -35964,7 +35964,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -36076,7 +36076,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/ikon_kepribadian.png",
+                            "url": "aset3d_cut/ikon_kepribadian.png",
                             "mode": "contain"
                           }
                         },
@@ -36157,7 +36157,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/ikon_checkin.png",
+                            "url": "aset3d_cut/ikon_checkin.png",
                             "mode": "contain"
                           },
                           "layout": "none"
@@ -36239,7 +36239,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/ikon_streak.png",
+                            "url": "aset3d_cut/ikon_streak.png",
                             "mode": "contain"
                           }
                         },
@@ -36372,7 +36372,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -36512,7 +36512,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -36556,7 +36556,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -36600,7 +36600,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 },
@@ -36736,7 +36736,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -36871,7 +36871,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -36915,7 +36915,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -36959,7 +36959,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -37003,7 +37003,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -37047,7 +37047,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 },
@@ -37164,7 +37164,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -37308,7 +37308,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -37471,7 +37471,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -37637,7 +37637,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/siluet/misteri_1.png",
+                                    "url": "aset3d_cut/siluet/misteri_1.png",
                                     "mode": "contain"
                                   },
                                   "width": 96,
@@ -37786,7 +37786,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/siluet/misteri_2.png",
+                                    "url": "aset3d_cut/siluet/misteri_2.png",
                                     "mode": "contain"
                                   },
                                   "width": 96,
@@ -37935,7 +37935,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/siluet/misteri_3.png",
+                                    "url": "aset3d_cut/siluet/misteri_3.png",
                                     "mode": "contain"
                                   },
                                   "width": 96,
@@ -38093,7 +38093,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/siluet/misteri_4.png",
+                                    "url": "aset3d_cut/siluet/misteri_4.png",
                                     "mode": "contain"
                                   },
                                   "width": 96,
@@ -38242,7 +38242,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/siluet/misteri_5.png",
+                                    "url": "aset3d_cut/siluet/misteri_5.png",
                                     "mode": "contain"
                                   },
                                   "width": 96,
@@ -38391,7 +38391,7 @@
                                   "fill": {
                                     "type": "image",
                                     "enabled": true,
-                                    "url": "design/aset3d_cut/siluet/misteri_6.png",
+                                    "url": "aset3d_cut/siluet/misteri_6.png",
                                     "mode": "contain"
                                   },
                                   "width": 96,
@@ -38622,7 +38622,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -38757,7 +38757,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -38801,7 +38801,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -38845,7 +38845,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -38889,7 +38889,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -38933,7 +38933,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 }
@@ -39021,7 +39021,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -39117,7 +39117,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 },
@@ -39224,7 +39224,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -39435,7 +39435,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_2.png",
+                    "url": "aset3d_cut/siluet/misteri_2.png",
                     "mode": "contain"
                   },
                   "width": 230,
@@ -39647,7 +39647,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -39769,7 +39769,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -39813,7 +39813,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_mengelak.png",
+                    "url": "aset3d_cut/si_mengelak.png",
                     "mode": "contain"
                   }
                 },
@@ -39857,7 +39857,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -39901,7 +39901,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -39945,7 +39945,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 },
@@ -39989,7 +39989,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -40033,7 +40033,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 }
@@ -40129,7 +40129,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -40257,7 +40257,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 },
@@ -40502,7 +40502,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -40630,7 +40630,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_waswas.png",
+                    "url": "aset3d_cut/si_waswas.png",
                     "mode": "contain"
                   }
                 },
@@ -40875,7 +40875,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -41003,7 +41003,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_sempurna.png",
+                    "url": "aset3d_cut/si_sempurna.png",
                     "mode": "contain"
                   }
                 },
@@ -41248,7 +41248,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -41376,7 +41376,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -41621,7 +41621,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -41749,7 +41749,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 },
@@ -41994,7 +41994,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -42122,7 +42122,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_mengelak.png",
+                    "url": "aset3d_cut/si_mengelak.png",
                     "mode": "contain"
                   }
                 },
@@ -42367,7 +42367,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -42495,7 +42495,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_meronta.png",
+                    "url": "aset3d_cut/si_meronta.png",
                     "mode": "contain"
                   }
                 },
@@ -42740,7 +42740,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -42839,7 +42839,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/si_hakim.png",
+                                "url": "aset3d_cut/si_hakim.png",
                                 "mode": "contain"
                               }
                             },
@@ -42900,7 +42900,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/si_waswas.png",
+                                "url": "aset3d_cut/si_waswas.png",
                                 "mode": "contain"
                               }
                             },
@@ -42961,7 +42961,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/si_sempurna.png",
+                                "url": "aset3d_cut/si_sempurna.png",
                                 "mode": "contain"
                               }
                             },
@@ -43031,7 +43031,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/si_cermin.png",
+                                "url": "aset3d_cut/si_cermin.png",
                                 "mode": "contain"
                               }
                             },
@@ -43092,7 +43092,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/si_kabut.png",
+                                "url": "aset3d_cut/si_kabut.png",
                                 "mode": "contain"
                               }
                             },
@@ -43153,7 +43153,7 @@
                               "fill": {
                                 "type": "image",
                                 "enabled": true,
-                                "url": "design/aset3d_cut/si_mengelak.png",
+                                "url": "aset3d_cut/si_mengelak.png",
                                 "mode": "contain"
                               }
                             },
@@ -43213,7 +43213,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/si_meronta.png",
+                            "url": "aset3d_cut/si_meronta.png",
                             "mode": "contain"
                           }
                         },
@@ -43334,7 +43334,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -43494,7 +43494,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_kabut.png",
+                    "url": "aset3d_cut/si_kabut.png",
                     "mode": "contain"
                   }
                 }
@@ -43608,7 +43608,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -43742,7 +43742,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_3.png",
+                    "url": "aset3d_cut/siluet/misteri_3.png",
                     "mode": "contain"
                   },
                   "width": 250,
@@ -43883,7 +43883,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -44043,7 +44043,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_hakim.png",
+                    "url": "aset3d_cut/si_hakim.png",
                     "mode": "contain"
                   }
                 }
@@ -44131,7 +44131,7 @@
                       "fill": {
                         "type": "image",
                         "enabled": true,
-                        "url": "design/marketing/ikon/riung_icon_1024.png",
+                        "url": "marketing/ikon/riung_icon_1024.png",
                         "mode": "cover"
                       },
                       "cornerRadius": 8
@@ -44188,7 +44188,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/si_cermin.png",
+                    "url": "aset3d_cut/si_cermin.png",
                     "mode": "contain"
                   }
                 },
@@ -44445,7 +44445,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -44622,7 +44622,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_1.png",
+                    "url": "aset3d_cut/siluet/misteri_1.png",
                     "mode": "contain"
                   },
                   "width": 150,
@@ -44666,7 +44666,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_2.png",
+                    "url": "aset3d_cut/siluet/misteri_2.png",
                     "mode": "contain"
                   },
                   "width": 150,
@@ -44710,7 +44710,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_3.png",
+                    "url": "aset3d_cut/siluet/misteri_3.png",
                     "mode": "contain"
                   },
                   "width": 140,
@@ -44754,7 +44754,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_4.png",
+                    "url": "aset3d_cut/siluet/misteri_4.png",
                     "mode": "contain"
                   },
                   "width": 140,
@@ -44798,7 +44798,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_5.png",
+                    "url": "aset3d_cut/siluet/misteri_5.png",
                     "mode": "contain"
                   },
                   "width": 130,
@@ -44842,7 +44842,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_6.png",
+                    "url": "aset3d_cut/siluet/misteri_6.png",
                     "mode": "contain"
                   },
                   "width": 130,
@@ -44940,7 +44940,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -45099,7 +45099,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_1.png",
+                    "url": "aset3d_cut/siluet/misteri_1.png",
                     "mode": "contain"
                   },
                   "width": 230,
@@ -45329,7 +45329,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -45488,7 +45488,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_2.png",
+                    "url": "aset3d_cut/siluet/misteri_2.png",
                     "mode": "contain"
                   },
                   "width": 230,
@@ -45718,7 +45718,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -45877,7 +45877,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_3.png",
+                    "url": "aset3d_cut/siluet/misteri_3.png",
                     "mode": "contain"
                   },
                   "width": 230,
@@ -46107,7 +46107,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -46266,7 +46266,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_4.png",
+                    "url": "aset3d_cut/siluet/misteri_4.png",
                     "mode": "contain"
                   },
                   "width": 230,
@@ -46496,7 +46496,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -46655,7 +46655,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_5.png",
+                    "url": "aset3d_cut/siluet/misteri_5.png",
                     "mode": "contain"
                   },
                   "width": 230,
@@ -46885,7 +46885,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/marketing/ikon/riung_icon_1024.png",
+                            "url": "marketing/ikon/riung_icon_1024.png",
                             "mode": "cover"
                           },
                           "cornerRadius": 8
@@ -47044,7 +47044,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "design/aset3d_cut/siluet/misteri_6.png",
+                    "url": "aset3d_cut/siluet/misteri_6.png",
                     "mode": "contain"
                   },
                   "width": 230,
@@ -54310,7 +54310,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_01_polos.png",
+                            "url": "aset3d_cut/waswas_jinak_01_polos.png",
                             "mode": "contain"
                           }
                         }
@@ -54591,7 +54591,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_02_topi.png",
+                            "url": "aset3d_cut/waswas_jinak_02_topi.png",
                             "mode": "contain"
                           }
                         }
@@ -54872,7 +54872,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_03_syal.png",
+                            "url": "aset3d_cut/waswas_jinak_03_syal.png",
                             "mode": "contain"
                           }
                         }
@@ -55153,7 +55153,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_04_batu.png",
+                            "url": "aset3d_cut/waswas_jinak_04_batu.png",
                             "mode": "contain"
                           }
                         }
@@ -55443,7 +55443,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_05_bantal.png",
+                            "url": "aset3d_cut/waswas_jinak_05_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -55724,7 +55724,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_06_topi_syal.png",
+                            "url": "aset3d_cut/waswas_jinak_06_topi_syal.png",
                             "mode": "contain"
                           }
                         }
@@ -56005,7 +56005,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_07_topi_batu.png",
+                            "url": "aset3d_cut/waswas_jinak_07_topi_batu.png",
                             "mode": "contain"
                           }
                         }
@@ -56286,7 +56286,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_08_topi_bantal.png",
+                            "url": "aset3d_cut/waswas_jinak_08_topi_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -56576,7 +56576,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_09_syal_batu.png",
+                            "url": "aset3d_cut/waswas_jinak_09_syal_batu.png",
                             "mode": "contain"
                           }
                         }
@@ -56857,7 +56857,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_10_syal_bantal.png",
+                            "url": "aset3d_cut/waswas_jinak_10_syal_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -57138,7 +57138,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_11_batu_bantal.png",
+                            "url": "aset3d_cut/waswas_jinak_11_batu_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -57419,7 +57419,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_12_topi_syal_batu.png",
+                            "url": "aset3d_cut/waswas_jinak_12_topi_syal_batu.png",
                             "mode": "contain"
                           }
                         }
@@ -57709,7 +57709,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_13_topi_syal_bantal.png",
+                            "url": "aset3d_cut/waswas_jinak_13_topi_syal_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -57990,7 +57990,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_14_topi_batu_bantal.png",
+                            "url": "aset3d_cut/waswas_jinak_14_topi_batu_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -58271,7 +58271,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_15_syal_batu_bantal.png",
+                            "url": "aset3d_cut/waswas_jinak_15_syal_batu_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -58552,7 +58552,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/waswas_jinak_16_lengkap.png",
+                            "url": "aset3d_cut/waswas_jinak_16_lengkap.png",
                             "mode": "contain"
                           }
                         }
@@ -62377,7 +62377,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_01_polos.png",
+                            "url": "aset3d_cut/kabut_jinak_01_polos.png",
                             "mode": "contain"
                           }
                         }
@@ -62658,7 +62658,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_02_topi.png",
+                            "url": "aset3d_cut/kabut_jinak_02_topi.png",
                             "mode": "contain"
                           }
                         }
@@ -62939,7 +62939,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_03_syal.png",
+                            "url": "aset3d_cut/kabut_jinak_03_syal.png",
                             "mode": "contain"
                           }
                         }
@@ -63220,7 +63220,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_04_lentera.png",
+                            "url": "aset3d_cut/kabut_jinak_04_lentera.png",
                             "mode": "contain"
                           }
                         }
@@ -63510,7 +63510,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_05_bantal.png",
+                            "url": "aset3d_cut/kabut_jinak_05_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -63791,7 +63791,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_06_topi_syal.png",
+                            "url": "aset3d_cut/kabut_jinak_06_topi_syal.png",
                             "mode": "contain"
                           }
                         }
@@ -64072,7 +64072,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_07_topi_lentera.png",
+                            "url": "aset3d_cut/kabut_jinak_07_topi_lentera.png",
                             "mode": "contain"
                           }
                         }
@@ -64353,7 +64353,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_08_topi_bantal.png",
+                            "url": "aset3d_cut/kabut_jinak_08_topi_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -64643,7 +64643,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_09_syal_lentera.png",
+                            "url": "aset3d_cut/kabut_jinak_09_syal_lentera.png",
                             "mode": "contain"
                           }
                         }
@@ -64924,7 +64924,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_10_syal_bantal.png",
+                            "url": "aset3d_cut/kabut_jinak_10_syal_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -65205,7 +65205,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_11_lentera_bantal.png",
+                            "url": "aset3d_cut/kabut_jinak_11_lentera_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -65486,7 +65486,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_12_topi_syal_lentera.png",
+                            "url": "aset3d_cut/kabut_jinak_12_topi_syal_lentera.png",
                             "mode": "contain"
                           }
                         }
@@ -65776,7 +65776,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_13_topi_syal_bantal.png",
+                            "url": "aset3d_cut/kabut_jinak_13_topi_syal_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -66057,7 +66057,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_14_topi_lentera_bantal.png",
+                            "url": "aset3d_cut/kabut_jinak_14_topi_lentera_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -66338,7 +66338,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_15_syal_lentera_bantal.png",
+                            "url": "aset3d_cut/kabut_jinak_15_syal_lentera_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -66619,7 +66619,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/kabut_jinak_16_lengkap.png",
+                            "url": "aset3d_cut/kabut_jinak_16_lengkap.png",
                             "mode": "contain"
                           }
                         }
@@ -70425,7 +70425,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_01_polos.png",
+                            "url": "aset3d_cut/sempurna_jinak_01_polos.png",
                             "mode": "contain"
                           }
                         }
@@ -70706,7 +70706,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_02_topi.png",
+                            "url": "aset3d_cut/sempurna_jinak_02_topi.png",
                             "mode": "contain"
                           }
                         }
@@ -70987,7 +70987,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_03_syal.png",
+                            "url": "aset3d_cut/sempurna_jinak_03_syal.png",
                             "mode": "contain"
                           }
                         }
@@ -71268,7 +71268,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_04_bintang.png",
+                            "url": "aset3d_cut/sempurna_jinak_04_bintang.png",
                             "mode": "contain"
                           }
                         }
@@ -71558,7 +71558,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_05_bantal.png",
+                            "url": "aset3d_cut/sempurna_jinak_05_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -71839,7 +71839,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_06_topi_syal.png",
+                            "url": "aset3d_cut/sempurna_jinak_06_topi_syal.png",
                             "mode": "contain"
                           }
                         }
@@ -72120,7 +72120,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_07_topi_bintang.png",
+                            "url": "aset3d_cut/sempurna_jinak_07_topi_bintang.png",
                             "mode": "contain"
                           }
                         }
@@ -72401,7 +72401,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_08_topi_bantal.png",
+                            "url": "aset3d_cut/sempurna_jinak_08_topi_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -72691,7 +72691,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_09_syal_bintang.png",
+                            "url": "aset3d_cut/sempurna_jinak_09_syal_bintang.png",
                             "mode": "contain"
                           }
                         }
@@ -72972,7 +72972,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_10_syal_bantal.png",
+                            "url": "aset3d_cut/sempurna_jinak_10_syal_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -73253,7 +73253,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_11_bintang_bantal.png",
+                            "url": "aset3d_cut/sempurna_jinak_11_bintang_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -73534,7 +73534,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_12_topi_syal_bintang.png",
+                            "url": "aset3d_cut/sempurna_jinak_12_topi_syal_bintang.png",
                             "mode": "contain"
                           }
                         }
@@ -73824,7 +73824,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_13_topi_syal_bantal.png",
+                            "url": "aset3d_cut/sempurna_jinak_13_topi_syal_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -74105,7 +74105,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_14_topi_bintang_bantal.png",
+                            "url": "aset3d_cut/sempurna_jinak_14_topi_bintang_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -74386,7 +74386,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_15_syal_bintang_bantal.png",
+                            "url": "aset3d_cut/sempurna_jinak_15_syal_bintang_bantal.png",
                             "mode": "contain"
                           }
                         }
@@ -74665,7 +74665,7 @@
                           "fill": {
                             "type": "image",
                             "enabled": true,
-                            "url": "design/aset3d_cut/sempurna_jinak_16_lengkap.png",
+                            "url": "aset3d_cut/sempurna_jinak_16_lengkap.png",
                             "mode": "contain"
                           }
                         }
@@ -74838,6 +74838,275 @@
               ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "WNcOU",
+      "x": 4369,
+      "y": -11564,
+      "name": "AI WORK - Si Kabut 16",
+      "clip": true,
+      "width": 4400,
+      "height": 4400,
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "i3qVPS",
+          "x": 0,
+          "y": 0,
+          "name": "KT 01_polos",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-145.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "vXDHE",
+          "x": 1100,
+          "y": 0,
+          "name": "KT 02_topi",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-146.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "eyYaK",
+          "x": 2200,
+          "y": 0,
+          "name": "KT 03_syal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-143.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "S1MR8C",
+          "x": 3300,
+          "y": 0,
+          "name": "KT 04_lentera",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-151.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "vZGeq",
+          "x": 0,
+          "y": 1100,
+          "name": "KT 05_bantal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-152.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "pCJAs",
+          "x": 1100,
+          "y": 1100,
+          "name": "KT 06_topi_syal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-144.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "jR3S0",
+          "x": 2200,
+          "y": 1100,
+          "name": "KT 07_topi_lentera",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-148.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "l2lFM2",
+          "x": 3300,
+          "y": 1100,
+          "name": "KT 08_topi_bantal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-147.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "WdhWN",
+          "x": 0,
+          "y": 2200,
+          "name": "KT 09_syal_lentera",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-153.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "m0q1Me",
+          "x": 1100,
+          "y": 2200,
+          "name": "KT 10_syal_bantal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-142.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "bA2Zo",
+          "x": 2200,
+          "y": 2200,
+          "name": "KT 11_lentera_bantal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-154.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "u8Ey9",
+          "x": 3300,
+          "y": 2200,
+          "name": "KT 12_topi_syal_lentera",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-150.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "i0sm2",
+          "x": 0,
+          "y": 3300,
+          "name": "KT 13_topi_syal_bantal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-155.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "d5Qx2",
+          "x": 1100,
+          "y": 3300,
+          "name": "KT 14_topi_lentera_bantal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-149.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "GQH4t",
+          "x": 2200,
+          "y": 3300,
+          "name": "KT 15_syal_lentera_bantal",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-157.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "fOJlh",
+          "x": 3300,
+          "y": 3300,
+          "name": "KT 16_lengkap",
+          "clip": true,
+          "width": 1024,
+          "height": 1024,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-156.png",
+            "mode": "cover"
+          }
         }
       ]
     }

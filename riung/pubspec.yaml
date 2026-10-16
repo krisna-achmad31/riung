@@ -65,6 +65,9 @@ dependencies:
   gal: ^2.3.3
   path_provider: ^2.1.6
   health: ^13.3.2
+  http: ^1.6.0
+  firebase_app_check: ^0.4.8
+  in_app_purchase_android: ^0.5.3
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +89,10 @@ dev_dependencies:
 # Pin to 2.2.23, the last release before the JNIgen rewrite (no jni dependency).
 dependency_overrides:
   path_provider_android: 2.2.23
+  # 7.2.12+ assumes AGP 9 built-in Kotlin, while this Flutter project uses
+  # android.builtInKotlin=false. Without classic KGP, ResultUtils.kt is not
+  # compiled and GoogleSignInPlugin.java cannot resolve ResultUtilsKt.
+  google_sign_in_android: 7.2.11
 
 # M7: app icon generation (Task 1) — satu file 1024x1024 (7 monster jinak)
 # dipakai untuk semua varian, termasuk adaptive icon foreground. Latar

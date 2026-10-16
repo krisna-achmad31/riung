@@ -188,7 +188,7 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get statTamed => 'jinak';
   @override
-  String get betterMeTitle => 'Better Me';
+  String get betterMeTitle => 'Memperbaiki Diri';
   @override
   String get betterMeSub => 'Program latihan 22 sesi';
   @override

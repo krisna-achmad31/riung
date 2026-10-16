@@ -89,9 +89,13 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.tinta,
-        contentTextStyle: AppTextStyles.body.copyWith(color: AppColors.diAtasTinta),
+        contentTextStyle: AppTextStyles.body.copyWith(
+          color: AppColors.diAtasTinta,
+        ),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -113,7 +117,9 @@ abstract final class AppTheme {
       switchTheme: SwitchThemeData(
         thumbColor: const WidgetStatePropertyAll(AppColors.diAtasTinta),
         trackColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? AppColors.primer : AppColors.teksRedup.withValues(alpha: 0.35),
+          (s) => s.contains(WidgetState.selected)
+              ? AppColors.primer
+              : AppColors.teksRedup.withValues(alpha: 0.35),
         ),
         trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       ),
@@ -134,18 +140,15 @@ abstract final class AppTheme {
   }
 }
 
-/// Transisi halaman Riung: halaman baru masuk dengan pudar + naik sedikit
-/// (24dp), halaman lama mundur pelan. Ringan — hanya Fade/Slide (tanpa blur
-/// atau saveLayer besar). Latar kabut dipasang di belakang tiap halaman,
-/// jadi Scaffold transparan tidak pernah tembus ke halaman di bawahnya.
+/// Short slide with an opaque backdrop; no full-screen opacity layer.
 class _GlassPageTransitionsBuilder extends PageTransitionsBuilder {
   const _GlassPageTransitionsBuilder();
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 340);
+  Duration get transitionDuration => const Duration(milliseconds: 220);
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 260);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 180);
 
   @override
   Widget buildTransitions<T>(
@@ -157,17 +160,11 @@ class _GlassPageTransitionsBuilder extends PageTransitionsBuilder {
   ) {
     final page = RiungGlassBackdrop(child: child);
     if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return page;
-    final masuk = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
-    final mundur = CurvedAnimation(parent: secondaryAnimation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
     return SlideTransition(
-      position: Tween(begin: Offset.zero, end: const Offset(-0.06, 0)).animate(mundur),
-      child: FadeTransition(
-        opacity: CurvedAnimation(parent: animation, curve: const Interval(0, 0.7, curve: Curves.easeOut)),
-        child: SlideTransition(
-          position: Tween(begin: const Offset(0, 0.035), end: Offset.zero).animate(masuk),
-          child: page,
-        ),
-      ),
+      position: animation
+          .drive(CurveTween(curve: Curves.easeOutCubic))
+          .drive(Tween(begin: const Offset(0, 0.02), end: Offset.zero)),
+      child: page,
     );
   }
 }

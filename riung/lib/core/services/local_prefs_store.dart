@@ -73,28 +73,38 @@ class LocalPrefsStore {
   /// Kode bahasa pilihan user (`id`/`en`); null = belum pernah memilih
   /// (pakai bahasa bawaan, lihat `AppLanguage.defaultLanguage`).
   String? get languageCode => _prefs.getString(_kLanguageCode);
-  Future<void> setLanguageCode(String value) => _prefs.setString(_kLanguageCode, value);
+  Future<void> setLanguageCode(String value) =>
+      _prefs.setString(_kLanguageCode, value);
 
   String? get userId => _prefs.getString(_kUserId);
   Future<void> setUserId(String value) => _prefs.setString(_kUserId, value);
 
   bool get onboardingDone => _prefs.getBool(_kOnboardingDone) ?? false;
-  Future<void> setOnboardingDone(bool value) => _prefs.setBool(_kOnboardingDone, value);
+  bool hasSeenIntroduction(String uid) =>
+      _prefs.getBool('intro_seen_v1_$uid') ?? false;
+  Future<void> setIntroductionSeen(String uid) =>
+      _prefs.setBool('intro_seen_v1_$uid', true);
+  Future<void> setOnboardingDone(bool value) =>
+      _prefs.setBool(_kOnboardingDone, value);
 
   int? get coins => _prefs.getInt(_kCoins);
   Future<void> setCoins(int value) => _prefs.setInt(_kCoins, value);
 
   int get lifetimeEarned => _prefs.getInt(_kLifetimeEarned) ?? 0;
-  Future<void> setLifetimeEarned(int value) => _prefs.setInt(_kLifetimeEarned, value);
+  Future<void> setLifetimeEarned(int value) =>
+      _prefs.setInt(_kLifetimeEarned, value);
 
   int get lifetimeSpent => _prefs.getInt(_kLifetimeSpent) ?? 0;
-  Future<void> setLifetimeSpent(int value) => _prefs.setInt(_kLifetimeSpent, value);
+  Future<void> setLifetimeSpent(int value) =>
+      _prefs.setInt(_kLifetimeSpent, value);
 
   int get streakCurrent => _prefs.getInt(_kStreakCurrent) ?? 0;
-  Future<void> setStreakCurrent(int value) => _prefs.setInt(_kStreakCurrent, value);
+  Future<void> setStreakCurrent(int value) =>
+      _prefs.setInt(_kStreakCurrent, value);
 
   int get streakLongest => _prefs.getInt(_kStreakLongest) ?? 0;
-  Future<void> setStreakLongest(int value) => _prefs.setInt(_kStreakLongest, value);
+  Future<void> setStreakLongest(int value) =>
+      _prefs.setInt(_kStreakLongest, value);
 
   DateTime? get lastCheckInDate {
     final raw = _prefs.getString(_kLastCheckInDate);
@@ -122,7 +132,8 @@ class LocalPrefsStore {
   Future<void> setUserProfileJson(Map<String, dynamic> value) =>
       _prefs.setString(_kUserProfileJson, jsonEncode(value));
 
-  List<String> get favoriteAffirmationIds => _prefs.getStringList(_kFavoriteAffirmationIds) ?? const [];
+  List<String> get favoriteAffirmationIds =>
+      _prefs.getStringList(_kFavoriteAffirmationIds) ?? const [];
   Future<void> setFavoriteAffirmationIds(List<String> value) =>
       _prefs.setStringList(_kFavoriteAffirmationIds, value);
 
@@ -136,10 +147,12 @@ class LocalPrefsStore {
       _prefs.setString(_kCustomAffirmationsJson, jsonEncode(value));
 
   int get ticketBalance => _prefs.getInt(_kTicketBalance) ?? 0;
-  Future<void> setTicketBalance(int value) => _prefs.setInt(_kTicketBalance, value);
+  Future<void> setTicketBalance(int value) =>
+      _prefs.setInt(_kTicketBalance, value);
 
   int get ticketsEarnedToday => _prefs.getInt(_kTicketsEarnedToday) ?? 0;
-  Future<void> setTicketsEarnedToday(int value) => _prefs.setInt(_kTicketsEarnedToday, value);
+  Future<void> setTicketsEarnedToday(int value) =>
+      _prefs.setInt(_kTicketsEarnedToday, value);
 
   int get fightsToday => _prefs.getInt(_kFightsToday) ?? 0;
   Future<void> setFightsToday(int value) => _prefs.setInt(_kFightsToday, value);
@@ -148,25 +161,30 @@ class LocalPrefsStore {
   /// reset earned/fights) dijalankan — dipakai [WalletNotifier] mendeteksi
   /// hari baru.
   String? get ticketResetDate => _prefs.getString(_kTicketResetDate);
-  Future<void> setTicketResetDate(String value) => _prefs.setString(_kTicketResetDate, value);
+  Future<void> setTicketResetDate(String value) =>
+      _prefs.setString(_kTicketResetDate, value);
 
   /// Id kosmetik yang sudah dibeli (Toko § "Buat monstermu") — dibeli
   /// dengan koin, jadi lokal-murni seperti tiket (bukan lewat wallet
   /// Firestore), lihat [WalletNotifier.buyCosmetic].
-  Set<String> get ownedCosmetics => (_prefs.getStringList(_kOwnedCosmetics) ?? const []).toSet();
-  Future<void> setOwnedCosmetics(Set<String> value) => _prefs.setStringList(_kOwnedCosmetics, value.toList());
+  Set<String> get ownedCosmetics =>
+      (_prefs.getStringList(_kOwnedCosmetics) ?? const []).toSet();
+  Future<void> setOwnedCosmetics(Set<String> value) =>
+      _prefs.setStringList(_kOwnedCosmetics, value.toList());
 
   /// Sesi Mode Fokus prabayar (Toko § "Beli sesi fokus") — dikonsumsi
   /// duluan sebelum potong koin langsung per sesi, jalan offline seperti
   /// tiket serangan (CLAUDE.md aturan #5).
   int get prepaidFocusSessions => _prefs.getInt(_kPrepaidFocusSessions) ?? 0;
-  Future<void> setPrepaidFocusSessions(int value) => _prefs.setInt(_kPrepaidFocusSessions, value);
+  Future<void> setPrepaidFocusSessions(int value) =>
+      _prefs.setInt(_kPrepaidFocusSessions, value);
 
   /// Pelindung streak tersimpan (Toko § "Buat rutinitasmu") — belum ada
   /// gerbang deteksi streak putus di app ini, jadi nilainya baru
   /// tersimpan/ditampilkan, belum otomatis terpakai.
   int get streakShieldBalance => _prefs.getInt(_kStreakShieldBalance) ?? 0;
-  Future<void> setStreakShieldBalance(int value) => _prefs.setInt(_kStreakShieldBalance, value);
+  Future<void> setStreakShieldBalance(int value) =>
+      _prefs.setInt(_kStreakShieldBalance, value);
 
   /// Pengaturan Aplikasi Beku per package (`{pkg: {limit, enabled}}`) —
   /// tetap tersimpan lintas hari (bukan direset harian).
@@ -195,25 +213,31 @@ class LocalPrefsStore {
   /// dilacak supaya buka-waktu Aplikasi Beku bisa dibatasi ke koin hasil
   /// latihan saja (lihat `WalletNotifier.spend(earnedOnly: true)`).
   int get purchasedCoinsReserve => _prefs.getInt(_kPurchasedCoinsReserve) ?? 0;
-  Future<void> setPurchasedCoinsReserve(int value) => _prefs.setInt(_kPurchasedCoinsReserve, value);
+  Future<void> setPurchasedCoinsReserve(int value) =>
+      _prefs.setInt(_kPurchasedCoinsReserve, value);
 
   /// Tanggal (yyyy-MM-dd) koin harian Premium tahunan terakhir diambil.
-  String? get premiumDailyClaimDate => _prefs.getString(_kPremiumDailyClaimDate);
-  Future<void> setPremiumDailyClaimDate(String value) => _prefs.setString(_kPremiumDailyClaimDate, value);
+  String? get premiumDailyClaimDate =>
+      _prefs.getString(_kPremiumDailyClaimDate);
+  Future<void> setPremiumDailyClaimDate(String value) =>
+      _prefs.setString(_kPremiumDailyClaimDate, value);
 
   /// Tanggal (yyyy-MM-dd) sesi Fokus gratis terakhir dipakai.
   String? get freeFocusDate => _prefs.getString(_kFreeFocusDate);
-  Future<void> setFreeFocusDate(String value) => _prefs.setString(_kFreeFocusDate, value);
+  Future<void> setFreeFocusDate(String value) =>
+      _prefs.setString(_kFreeFocusDate, value);
 
   /// Jumlah sesi Fokus gratis yang sudah dipakai pada [freeFocusDate].
   int get freeFocusUsed => _prefs.getInt(_kFreeFocusUsed) ?? 0;
-  Future<void> setFreeFocusUsed(int value) => _prefs.setInt(_kFreeFocusUsed, value);
+  Future<void> setFreeFocusUsed(int value) =>
+      _prefs.setInt(_kFreeFocusUsed, value);
 
   /// Mode kunci Aplikasi Beku: aplikasi yang melewati batas benar-benar
   /// ditutup oleh Riung (bukan sekadar diingatkan). Default nyala — user
   /// bisa mematikannya di Pengaturan Aplikasi Beku kapan saja.
   bool get appBekuLockEnabled => _prefs.getBool(_kAppBekuLockEnabled) ?? true;
-  Future<void> setAppBekuLockEnabled(bool value) => _prefs.setBool(_kAppBekuLockEnabled, value);
+  Future<void> setAppBekuLockEnabled(bool value) =>
+      _prefs.setBool(_kAppBekuLockEnabled, value);
 
   Future<void> setAppBekuDailyJson(Map<String, dynamic> value) =>
       _prefs.setString(_kAppBekuDailyJson, jsonEncode(value));
@@ -237,7 +261,9 @@ class LocalPrefsStore {
     final raw = _prefs.getString(_kSleepReminderJson);
     if (raw == null) return SleepReminderSettings.defaults;
     try {
-      return SleepReminderSettings.fromMap(jsonDecode(raw) as Map<String, dynamic>);
+      return SleepReminderSettings.fromMap(
+        jsonDecode(raw) as Map<String, dynamic>,
+      );
     } catch (_) {
       return SleepReminderSettings.defaults;
     }
@@ -251,7 +277,11 @@ class LocalPrefsStore {
       final map = jsonDecode(raw) as Map<String, dynamic>;
       return {
         for (final test in PersonalityTest.values)
-          if (map[test.name] is Map) test: PersonalityResult.fromMap(test, (map[test.name] as Map).cast<String, dynamic>()),
+          if (map[test.name] is Map)
+            test: PersonalityResult.fromMap(
+              test,
+              (map[test.name] as Map).cast<String, dynamic>(),
+            ),
       };
     } catch (_) {
       return const {};
@@ -264,7 +294,10 @@ class LocalPrefsStore {
   final ValueNotifier<int> personalityRevision = ValueNotifier<int>(0);
 
   Future<void> setPersonalityResult(PersonalityResult result) async {
-    final all = {for (final e in personalityResults.entries) e.key.name: e.value.toMap(), result.test.name: result.toMap()};
+    final all = {
+      for (final e in personalityResults.entries) e.key.name: e.value.toMap(),
+      result.test.name: result.toMap(),
+    };
     await _prefs.setString(_kPersonalityJson, jsonEncode(all));
     personalityRevision.value++;
   }
@@ -275,13 +308,20 @@ class LocalPrefsStore {
     if (raw == null) return const {};
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
-      return {for (final e in map.entries) e.key: (e.value as Map).map((k, v) => MapEntry(k.toString(), v.toString()))};
+      return {
+        for (final e in map.entries)
+          e.key: (e.value as Map).map(
+            (k, v) => MapEntry(k.toString(), v.toString()),
+          ),
+      };
     } catch (_) {
       return const {};
     }
   }
 
-  Future<void> setPersonalityAccessories(Map<String, Map<String, String>> value) async {
+  Future<void> setPersonalityAccessories(
+    Map<String, Map<String, String>> value,
+  ) async {
     await _prefs.setString(_kAccessoriesJson, jsonEncode(value));
     personalityRevision.value++;
   }
@@ -293,7 +333,12 @@ class LocalPrefsStore {
     if (raw == null) return const {};
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
-      return {for (final e in map.entries) e.key: (e.value as Map).map((k, v) => MapEntry(k.toString(), v.toString()))};
+      return {
+        for (final e in map.entries)
+          e.key: (e.value as Map).map(
+            (k, v) => MapEntry(k.toString(), v.toString()),
+          ),
+      };
     } catch (_) {
       return const {};
     }
@@ -302,7 +347,9 @@ class LocalPrefsStore {
   /// Naik tiap isi Lemari berubah, supaya layar yang merender monster ikut segar.
   final ValueNotifier<int> monsterCosmeticsRevision = ValueNotifier<int>(0);
 
-  Future<void> setMonsterCosmetics(Map<String, Map<String, String>> value) async {
+  Future<void> setMonsterCosmetics(
+    Map<String, Map<String, String>> value,
+  ) async {
     await _prefs.setString(_kMonsterCosmeticsJson, jsonEncode(value));
     monsterCosmeticsRevision.value++;
   }
@@ -314,17 +361,22 @@ class LocalPrefsStore {
     if (raw == null) return const {};
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is Map) return decoded.map((k, v) => MapEntry(k.toString(), v.toString()));
+      if (decoded is Map)
+        return decoded.map((k, v) => MapEntry(k.toString(), v.toString()));
     } catch (_) {
       // format lama (satu string id) dianggap tidak ada — jatuh ke klasik.
     }
     return const {};
   }
 
-  String personalityCardStyle(PersonalityTest test) => personalityCardStyles[test.name] ?? 'klasik';
+  String personalityCardStyle(PersonalityTest test) =>
+      personalityCardStyles[test.name] ?? 'klasik';
 
   Future<void> setPersonalityCardStyle(PersonalityTest test, String id) async {
-    await _prefs.setString(_kCardStyle, jsonEncode({...personalityCardStyles, test.name: id}));
+    await _prefs.setString(
+      _kCardStyle,
+      jsonEncode({...personalityCardStyles, test.name: id}),
+    );
     personalityRevision.value++;
   }
 
@@ -335,8 +387,10 @@ class LocalPrefsStore {
       _prefs.setString(_kSleepReminderJson, jsonEncode(value.toMap()));
 
   /// Jam kirim notifikasi afirmasi harian ("HH:mm"), default 07:00.
-  String get afirmasiReminderTime => _prefs.getString(_kAfirmasiTime) ?? '07:00';
-  Future<void> setAfirmasiReminderTime(String value) => _prefs.setString(_kAfirmasiTime, value);
+  String get afirmasiReminderTime =>
+      _prefs.getString(_kAfirmasiTime) ?? '07:00';
+  Future<void> setAfirmasiReminderTime(String value) =>
+      _prefs.setString(_kAfirmasiTime, value);
 
   /// Misi harian yang sudah dicentang hari ini: `{'date': 'yyyy-MM-dd',
   /// 'done': [indeks...]}`. Tanggalnya dipakai untuk reset otomatis tiap
@@ -354,13 +408,17 @@ class LocalPrefsStore {
   /// PIN) — `JurnalPinUnlockScreen` cek ini SEKALIGUS ketersediaan
   /// perangkat (`JurnalPinService.isBiometricAvailable`) sebelum
   /// menawarkan tombol sidik jari/wajah.
-  bool get biometricUnlockEnabled => _prefs.getBool(_kBiometricUnlockEnabled) ?? true;
-  Future<void> setBiometricUnlockEnabled(bool value) => _prefs.setBool(_kBiometricUnlockEnabled, value);
+  bool get biometricUnlockEnabled =>
+      _prefs.getBool(_kBiometricUnlockEnabled) ?? true;
+  Future<void> setBiometricUnlockEnabled(bool value) =>
+      _prefs.setBool(_kBiometricUnlockEnabled, value);
 
   /// Id sesi Better Me yang sudah diselesaikan — lintas hari (tidak
   /// direset), lihat `betterme_content.dart`.
-  Set<String> get betterMeCompleted => (_prefs.getStringList(_kBetterMeCompleted) ?? const []).toSet();
-  Future<void> setBetterMeCompleted(Set<String> value) => _prefs.setStringList(_kBetterMeCompleted, value.toList());
+  Set<String> get betterMeCompleted =>
+      (_prefs.getStringList(_kBetterMeCompleted) ?? const []).toSet();
+  Future<void> setBetterMeCompleted(Set<String> value) =>
+      _prefs.setStringList(_kBetterMeCompleted, value.toList());
 
   /// Jawaban refleksi tiap sesi (`{sessionId: teks}`) — beda dari Jurnal:
   /// bukan catatan pribadi harian, jadi sengaja TIDAK dienkripsi seperti
@@ -376,7 +434,8 @@ class LocalPrefsStore {
 
   /// Pengguna memilih menghubungkan data tidur (Health Connect) ke laporan.
   bool get sleepSyncEnabled => _prefs.getBool(_kSleepSyncEnabled) ?? false;
-  Future<void> setSleepSyncEnabled(bool value) => _prefs.setBool(_kSleepSyncEnabled, value);
+  Future<void> setSleepSyncEnabled(bool value) =>
+      _prefs.setBool(_kSleepSyncEnabled, value);
 
   /// Node peta latihan Si Waswas yang sudah diselesaikan HARI INI
   /// (`{'date': 'yyyy-MM-dd', 'done': [id node...]}`) — pola sama dengan
@@ -394,7 +453,8 @@ class LocalPrefsStore {
   /// Hasil tes & kuis Kenali Dirimu, TERENKRIPSI (AES, kunci di secure
   /// storage) — dibaca/ditulis hanya lewat `KenaliResultRepository`.
   String? get kenaliResultsCipher => _prefs.getString(_kKenaliResultsCipher);
-  Future<void> setKenaliResultsCipher(String value) => _prefs.setString(_kKenaliResultsCipher, value);
+  Future<void> setKenaliResultsCipher(String value) =>
+      _prefs.setString(_kKenaliResultsCipher, value);
 
   /// Latihan peta Monster Kebiasaan yang sudah selesai, berurutan & lintas
   /// hari: `{nanti: 2, gulir: 0}` = jumlah node latihan yang sudah dilewati.
@@ -403,7 +463,8 @@ class LocalPrefsStore {
     if (raw == null) return const {};
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is Map) return decoded.map((k, v) => MapEntry(k.toString(), v is int ? v : 0));
+      if (decoded is Map)
+        return decoded.map((k, v) => MapEntry(k.toString(), v is int ? v : 0));
     } catch (_) {
       // data rusak dianggap belum ada latihan.
     }
@@ -414,7 +475,10 @@ class LocalPrefsStore {
   final ValueNotifier<int> habitStageRevision = ValueNotifier<int>(0);
 
   Future<void> setHabitStageDone(String monsterId, int done) async {
-    await _prefs.setString(_kHabitStageJson, jsonEncode({...habitStageDone, monsterId: done}));
+    await _prefs.setString(
+      _kHabitStageJson,
+      jsonEncode({...habitStageDone, monsterId: done}),
+    );
     habitStageRevision.value++;
   }
 

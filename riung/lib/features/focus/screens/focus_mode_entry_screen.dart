@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/config/economy.dart';
+import '../../../core/services/api/api_config_store.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
@@ -9,9 +10,10 @@ import '../widgets/focus_ring.dart';
 import '../../home/screens/focus_timer_screen.dart';
 
 class _DurationOption {
-  const _DurationOption(this.minutes, this.priceCoins);
+  const _DurationOption(this.minutes, this._priceCoins);
   final int minutes;
-  final int priceCoins;
+  final int _priceCoins;
+  int get priceCoins => ApiConfigStore.instance.value('spend', 'focus$minutes', _priceCoins);
 }
 
 const _durations = [
@@ -50,7 +52,10 @@ class _FocusModeEntryScreenState extends State<FocusModeEntryScreen> {
           builder: (context, _) {
             final adaGratis = scope.wallet.freeFocusAvailable(premium: profile?.premiumNow ?? false);
             final adaSesiPrabayar = scope.wallet.prepaidFocusSessions > 0;
-            final cukupKoin = adaGratis || adaSesiPrabayar || scope.wallet.coins >= option.priceCoins;
+            final state = scope.wallet.apiState;
+            final cachedForDuration = state?.cachedFocusDurations.contains(option.minutes) ?? false;
+            final serverFree = scope.wallet.serverFreeFocusLeft > 0;
+            final cukupKoin = cachedForDuration || (adaGratis && (state == null || serverFree)) || adaSesiPrabayar || scope.wallet.coins >= option.priceCoins;
             return ListView(
               padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
               children: [

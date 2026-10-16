@@ -13,6 +13,8 @@ Widget `RiungMonster(id, state, cosmetics, size)` — SVG layered + anchors, bos
 Launch (5) → Onboarding funnel + skoring (39) → Home (5) → Focus timer + tiket lokal. Firebase Auth anonim + local DB. Paywall UI (belum live billing).
 **Gate**: jalan penuh dari splash → hasil asesmen (skor benar per spec) → home → sesi fokus selesai, offline.
 
+**Keputusan alur terbaru (16 Oktober 2026):** tiga halaman sambutan terpisah dari asesmen. Setelah sambutan, asesmen boleh ditunda lewat **Isi nanti**. Kembali dari pertanyaan kedua dan seterusnya mundur satu pertanyaan; kembali dari pertanyaan pertama menuju Beranda. Beranda menampilkan **Kenali monstermu / Lanjutkan asesmen** sampai asesmen selesai, dengan latihan umum tanpa hasil personal atau skor buatan. Buka ulang aplikasi menuju Beranda bila sambutan sudah dilalui. Draf jawaban, nama dan teks bebas disimpan terenkripsi di perangkat, dipisahkan per Firebase uid; login akun lain tidak memindahkan draf. Draf dibersihkan setelah hasil tersimpan atau akun dihapus. Status sambutan lokal tidak menandai asesmen selesai di backend.
+
 ## M3 — Fitur inti (3 sesi)
 Meditasi · Tidur · Jurnal (PIN + enkripsi + offline save) · Afirmasi · Check-in pagi + streak + misi harian.
 

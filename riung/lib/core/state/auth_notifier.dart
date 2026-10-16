@@ -7,6 +7,8 @@ import '../models/user_profile.dart';
 import '../models/wallet.dart';
 import '../services/auth_service.dart';
 import '../services/user_repository.dart';
+import '../services/api/api_repositories.dart';
+import '../services/api/api_state.dart';
 
 /// Notifier global status autentikasi + profil user saat ini — satu-satunya
 /// sumber uid & [UserProfile] untuk seluruh app (lihat CLAUDE.md §State
@@ -14,17 +16,40 @@ import '../services/user_repository.dart';
 /// "siapa yang login" dan "profilnya" adalah satu domain identitas yang
 /// sama, bukan domain lintas layar baru.
 class AuthNotifier extends ChangeNotifier {
-  AuthNotifier(this._authService, {required UserRepository userRepository})
-      : _userRepository = userRepository {
+  AuthNotifier(
+    this._authService, {
+    required UserRepository userRepository,
+    this.apiState,
+  }) : _userRepository = userRepository {
     _uid = _authService.currentUid;
+    apiState?.addListener(_serverChanged);
     _subscription = _authService.uidChanges.listen((uid) {
+      if (_uid == uid) return;
       _uid = uid;
       _profile = null;
+      _profileLoading = null;
       notifyListeners();
     });
   }
 
   final AuthService _authService;
+  final ApiState? apiState;
+  bool _disposed = false;
+  void _serverChanged() {
+    final uid = _uid;
+    final snapshot = apiState?.currentSnapshot;
+    if (uid == null || snapshot == null) return;
+    _userRepository.getUserProfile(uid).then((profile) {
+      if (_disposed ||
+          _uid != uid ||
+          !identical(snapshot, apiState?.currentSnapshot)) {
+        return;
+      }
+      _profile = profile;
+      notifyListeners();
+    });
+  }
+
   final UserRepository _userRepository;
   late final StreamSubscription<String?> _subscription;
   String? _uid;
@@ -80,6 +105,7 @@ class AuthNotifier extends ChangeNotifier {
       _uid = uid;
     }
     final p = await _userRepository.getUserProfile(uid);
+    if (_uid != uid) return ensureProfileLoaded();
     _profile = p;
     _profileLoading = null;
     notifyListeners();
@@ -98,7 +124,9 @@ class AuthNotifier extends ChangeNotifier {
     return p;
   }
 
-  Future<void> updateProfile(UserProfile Function(UserProfile current) update) async {
+  Future<void> updateProfile(
+    UserProfile Function(UserProfile current) update,
+  ) async {
     final current = _profile ?? await ensureProfileLoaded();
     final updated = update(current);
     await _userRepository.saveUserProfile(updated);
@@ -119,24 +147,55 @@ class AuthNotifier extends ChangeNotifier {
   /// progres onboarding tetap sama) jadi akun permanen, lalu salin
   /// progres yang terkumpul selama anonim ke Firestore (lihat
   /// [_linkAndMigrate]).
-  Future<String> daftarEmailPassword({required String email, required String password}) {
-    return _linkAndMigrate(() => _authService.linkEmailPassword(email: email, password: password));
+  Future<String> daftarEmailPassword({
+    required String email,
+    required String password,
+  }) {
+    return _linkAndMigrate(
+      () => _authService.linkEmailPassword(email: email, password: password),
+    );
   }
 
   /// Masuk ke akun email+password yang SUDAH ADA — uid berganti ke akun
   /// itu (bukan mempertahankan uid anonim), jadi TIDAK ada migrasi di
   /// sini: data lokal perangkat ini milik sesi anonim yang ditinggalkan,
   /// bukan milik akun yang baru saja di-masuki.
-  Future<String> masukEmailPassword({required String email, required String password}) {
-    return _authService.signInWithEmailPassword(email: email, password: password);
+  Future<String> masukEmailPassword({
+    required String email,
+    required String password,
+  }) {
+    return _signInAndLoad(
+      () => _authService.signInWithEmailPassword(
+        email: email,
+        password: password,
+      ),
+    );
   }
 
   /// Daftar lewat Google — upgrade sesi anonim saat ini, lihat
   /// [_linkAndMigrate].
-  Future<String> daftarGoogle() => _linkAndMigrate(() => _authService.linkGoogle());
+  Future<String> daftarGoogle() =>
+      _linkAndMigrate(() => _authService.linkGoogle());
 
   /// Masuk ke akun Google yang sudah ada.
-  Future<String> masukGoogle() => _authService.signInWithGoogle();
+  Future<String> masukGoogle() => _signInAndLoad(_authService.signInWithGoogle);
+
+  Future<String> _signInAndLoad(Future<String> Function() signIn) async {
+    final uid = await signIn();
+    _uid = uid;
+    _profile = null;
+    _profileLoading = null;
+    notifyListeners();
+    if (_userRepository case final ApiUserRepository repository) {
+      await repository.state.refresh();
+    }
+    final profile = await _userRepository.getUserProfile(uid);
+    if (_uid == uid) {
+      _profile = profile;
+      notifyListeners();
+    }
+    return uid;
+  }
 
   /// Poin 4d — urutan ini KRITIS, jangan diubah tanpa alasan kuat:
   /// 1. Baca wallet/profile/monsterProgress SAAT INI lewat
@@ -155,6 +214,16 @@ class AuthNotifier extends ChangeNotifier {
   ///    Set [_migrationWarning] alih-alih melempar exception —
   ///    user harus tetap bisa lanjut pakai app, bukan macet di sini.
   Future<String> _linkAndMigrate(Future<String> Function() link) async {
+    if (_userRepository is ApiUserRepository) {
+      final newUid = await link();
+      _uid = newUid;
+      final repository = _userRepository;
+      await repository.state.api.link();
+      await repository.state.refresh();
+      _profile = await repository.getUserProfile(newUid);
+      notifyListeners();
+      return newUid;
+    }
     final uid = _uid;
     Wallet? snapshotWallet;
     UserProfile? snapshotProfile;
@@ -169,7 +238,9 @@ class AuthNotifier extends ChangeNotifier {
     _uid = newUid;
 
     _migrationWarning = false;
-    if (snapshotWallet != null && snapshotProfile != null && snapshotMonsters != null) {
+    if (snapshotWallet != null &&
+        snapshotProfile != null &&
+        snapshotMonsters != null) {
       try {
         await _userRepository.migrateAnonymousSnapshot(
           uid: newUid,
@@ -185,12 +256,15 @@ class AuthNotifier extends ChangeNotifier {
     return newUid;
   }
 
-  Future<void> kirimResetKataSandi(String email) => _authService.sendPasswordResetEmail(email);
+  Future<void> kirimResetKataSandi(String email) =>
+      _authService.sendPasswordResetEmail(email);
 
   Future<void> deleteAccount() => _authService.deleteAccount();
 
   @override
   void dispose() {
+    _disposed = true;
+    apiState?.removeListener(_serverChanged);
     _subscription.cancel();
     super.dispose();
   }

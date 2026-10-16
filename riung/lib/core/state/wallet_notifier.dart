@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
+import '../services/api/api_state.dart';
+import '../services/api/riung_api.dart';
 
 import '../config/economy.dart';
 import '../models/coin_transaction.dart';
@@ -18,9 +21,48 @@ class WalletNotifier extends ChangeNotifier {
     required UserRepository userRepository,
     required WalletFunctionsService walletFunctions,
     required LocalPrefsStore prefs,
+    this.apiState,
   })  : _userRepository = userRepository,
         _walletFunctions = walletFunctions,
-        _prefs = prefs;
+        _prefs = prefs {
+    apiState?.addListener(_applyServer);
+  }
+  final ApiState? apiState;
+  bool get pendingSync => apiState?.pendingSync ?? false;
+  int get serverFreeFocusLeft => (apiState?.currentSnapshot?.today['freeFocusLeft'] as num? ?? 0).toInt();
+  Set<int>? get serverMissionsDone => apiState?.currentSnapshot == null ? null : (apiState!.currentSnapshot!.today['missionsDone'] as List? ?? []).whereType<int>().toSet();
+  void _applyServer() {
+    final snapshot = apiState?.snapshot;
+    if (snapshot == null) {
+      _wallet = Wallet.zero(); _tickets = 0; _ownedCosmetics = {};
+      _prepaidFocusSessions = 0; _streakShieldBalance = 0; _purchasedReserve = 0;
+      notifyListeners();
+      return;
+    }
+    _wallet = snapshot.wallet;
+    final raw = snapshot.raw;
+    final inv = snapshot.inventory;
+    _ownedCosmetics = (inv['cosmetics'] as List? ?? inv['ownedCosmetics'] as List? ?? []).cast<String>().toSet();
+    _prepaidFocusSessions = (inv['prepaidFocus'] as num? ?? 0).toInt();
+    _streakShieldBalance = (jsonObject(raw['streak'])['shields'] as num? ?? 0).toInt();
+    _purchasedReserve = (jsonObject(raw['wallet'])['purchasedCoins'] as num? ?? 0).toInt();
+    _fightsToday = (snapshot.today['fightsToday'] as num? ?? 0).toInt();
+    _tickets = (inv['tickets'] as num?)?.toInt() ?? fightsRemainingToday;
+    _premiumClaimDate = snapshot.today['premiumDailyClaimed'] == true ? _todayIso() : null;
+    notifyListeners();
+  }
+
+  Future<void> finishMinigame(String saboteurId, bool won) async {
+    final state = apiState;
+    if (state == null) {
+      if (won) await earn(amount: EconomyEarn.menangGame, reason: 'minigame_win:$saboteurId');
+      return;
+    }
+    await state.record(ActivityEvent(ActivityType.minigameFinished, occurredAt: DateTime.now(), ref: const Uuid().v4(), saboteurId: saboteurId, won: won));
+  }
+
+  @override
+  void dispose() { apiState?.removeListener(_applyServer); super.dispose(); }
 
   final UserRepository _userRepository;
   final WalletFunctionsService _walletFunctions;
@@ -60,6 +102,11 @@ class WalletNotifier extends ChangeNotifier {
   /// login harian). Koin ini dicatat sebagai koin-beli: tidak bisa dipakai
   /// buka-waktu Aplikasi Beku.
   Future<bool> claimPremiumDaily() async {
+    if (apiState != null) {
+      await apiState!.api.dailyCoins();
+      await apiState!.refresh();
+      return true;
+    }
     if (!premiumDailyClaimable) return false;
     await earn(amount: EconomyPremium.koinHarianTahunan, reason: 'premium_daily');
     await recordPurchasedCoins(EconomyPremium.koinHarianTahunan);
@@ -74,6 +121,7 @@ class WalletNotifier extends ChangeNotifier {
 
   /// Sesi Fokus gratis yang masih tersisa hari ini.
   int freeFocusRemaining({bool premium = false}) {
+    if (apiState?.snapshot != null) return (apiState!.snapshot!.today['freeFocusLeft'] as num? ?? 0).toInt() + apiState!.cachedFreeFocus;
     final used = _freeFocusDate == _todayIso() ? _freeFocusUsed : 0;
     return (freeFocusLimit(premium: premium) - used).clamp(0, freeFocusLimit(premium: premium));
   }
@@ -92,6 +140,7 @@ class WalletNotifier extends ChangeNotifier {
     _loading = true;
     notifyListeners();
     _wallet = await _userRepository.getWallet(uid);
+    if (apiState != null) { _applyServer(); _loading = false; notifyListeners(); return; }
     await _loadTickets();
     _ownedCosmetics = _prefs.ownedCosmetics;
     _prepaidFocusSessions = _prefs.prepaidFocusSessions;
@@ -141,6 +190,7 @@ class WalletNotifier extends ChangeNotifier {
   /// Catat koin yang berasal dari pembelian paket koin (dipanggil setelah
   /// pembelian terverifikasi). Lihat [earnedCoins].
   Future<void> recordPurchasedCoins(int amount) async {
+    if (apiState != null) { await apiState!.refresh(); return; }
     _purchasedReserve += amount;
     await _prefs.setPurchasedCoinsReserve(_purchasedReserve);
     notifyListeners();
@@ -148,6 +198,7 @@ class WalletNotifier extends ChangeNotifier {
 
   /// Pakai sesi Fokus gratis hari ini kalau masih ada.
   Future<bool> consumeFreeFocusSession({bool premium = false}) async {
+    if (apiState != null) throw StateError('Use reserveFocus for server tickets');
     if (!freeFocusAvailable(premium: premium)) return false;
     final today = _todayIso();
     _freeFocusUsed = (_freeFocusDate == today ? _freeFocusUsed : 0) + 1;
@@ -184,6 +235,7 @@ class WalletNotifier extends ChangeNotifier {
   /// supaya pemanggil (layar selesai check-in/meditasi/jurnal) tidak perlu
   /// tahu soal cap ini.
   Future<void> addTickets(int count) async {
+    if (apiState != null) return;
     final grant = count.clamp(0, EconomyTiket.maxDariLatihanPerHari - _ticketsEarnedToday);
     if (grant <= 0) return;
     _ticketsEarnedToday += grant;
@@ -196,6 +248,7 @@ class WalletNotifier extends ChangeNotifier {
   /// true kalau berhasil dipakai — false kalau tiket habis ATAU sudah kena
   /// limit [EconomyTiket.maxFightPerHari] serangan hari ini.
   Future<bool> useTicket() async {
+    if (apiState != null) return !dailyFightCapReached;
     if (_tickets <= 0 || dailyFightCapReached) return false;
     _tickets -= 1;
     _fightsToday += 1;
@@ -223,6 +276,7 @@ class WalletNotifier extends ChangeNotifier {
     if (_ownedCosmetics.contains(id)) return true;
     final berhasil = await spend(amount: price, reason: 'cosmetic:$id');
     if (!berhasil) return false;
+    if (apiState != null) return true;
     _ownedCosmetics = {..._ownedCosmetics, id};
     await _prefs.setOwnedCosmetics(_ownedCosmetics);
     notifyListeners();
@@ -236,6 +290,7 @@ class WalletNotifier extends ChangeNotifier {
     if (baru.isEmpty) return true;
     final berhasil = await spend(amount: price, reason: 'cosmetic_bundle:$bundleId');
     if (!berhasil) return false;
+    if (apiState != null) return true;
     _ownedCosmetics = {..._ownedCosmetics, ...baru};
     await _prefs.setOwnedCosmetics(_ownedCosmetics);
     notifyListeners();
@@ -248,6 +303,7 @@ class WalletNotifier extends ChangeNotifier {
   Future<bool> buyPrepaidFocusSessions({required int count, required int price}) async {
     final berhasil = await spend(amount: price, reason: 'prepaid_focus_sessions:$count');
     if (!berhasil) return false;
+    if (apiState != null) return true;
     _prepaidFocusSessions += count;
     await _prefs.setPrepaidFocusSessions(_prepaidFocusSessions);
     notifyListeners();
@@ -257,6 +313,7 @@ class WalletNotifier extends ChangeNotifier {
   /// true kalau ada sesi prabayar yang terpakai (dan saldo dikurangi) —
   /// false kalau kosong, pemanggil lalu jatuh balik ke potong koin langsung.
   Future<bool> consumePrepaidFocusSession() async {
+    if (apiState != null) throw StateError('Use reserveFocus for server tickets');
     if (_prepaidFocusSessions <= 0) return false;
     _prepaidFocusSessions -= 1;
     await _prefs.setPrepaidFocusSessions(_prepaidFocusSessions);
@@ -267,6 +324,7 @@ class WalletNotifier extends ChangeNotifier {
   Future<bool> buyStreakShield({required int price}) async {
     final berhasil = await spend(amount: price, reason: 'streak_shield');
     if (!berhasil) return false;
+    if (apiState != null) return true;
     _streakShieldBalance += 1;
     await _prefs.setStreakShieldBalance(_streakShieldBalance);
     notifyListeners();

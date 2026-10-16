@@ -1,11 +1,22 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../core/state/app_scope.dart';
+import '../../../core/models/assessment_draft.dart';
+import '../../../core/services/assessment_draft_store.dart';
 import 'onboarding_info_screens.dart';
 import 'onboarding_questions.dart';
 import 'scoring_engine.dart';
 
-enum OnboardingStepType { welcome, question, freeText, nama, analyzing, info, hasil, paywall }
+enum OnboardingStepType {
+  welcome,
+  question,
+  freeText,
+  nama,
+  analyzing,
+  info,
+  hasil,
+  paywall,
+}
 
 class OnboardingStep {
   const OnboardingStep(this.type, [this.dataIndex = 0]);
@@ -22,11 +33,13 @@ class OnboardingStep {
 /// `widgets/rate_us_step.dart` untuk dipakai nanti).
 final List<OnboardingStep> onboardingSteps = [
   const OnboardingStep(OnboardingStepType.welcome),
-  for (var i = 0; i < onboardingQuestions.length; i++) OnboardingStep(OnboardingStepType.question, i),
+  for (var i = 0; i < onboardingQuestions.length; i++)
+    OnboardingStep(OnboardingStepType.question, i),
   const OnboardingStep(OnboardingStepType.freeText),
   const OnboardingStep(OnboardingStepType.nama),
   const OnboardingStep(OnboardingStepType.analyzing),
-  for (var i = 0; i < onboardingInfoScreens.length; i++) OnboardingStep(OnboardingStepType.info, i),
+  for (var i = 0; i < onboardingInfoScreens.length; i++)
+    OnboardingStep(OnboardingStepType.info, i),
   const OnboardingStep(OnboardingStepType.hasil),
   const OnboardingStep(OnboardingStepType.paywall),
 ];
@@ -36,6 +49,48 @@ final List<OnboardingStep> onboardingSteps = [
 /// menghitung skor lewat [ScoringEngine], dan mempersist hasilnya ke
 /// [AuthNotifier] + [MonsterProgressNotifier] saat asesmen selesai.
 class OnboardingController extends ChangeNotifier {
+  OnboardingController({
+    AssessmentDraft? draft,
+    bool resumeAssessment = false,
+  }) {
+    if (resumeAssessment) _stepIndex = 1;
+    if (draft == null) return;
+    for (final question in onboardingQuestions) {
+      final valid = (draft.answers[question.number] ?? <int>{})
+          .where((i) => i >= 0 && i < question.options.length)
+          .toSet();
+      if (valid.isNotEmpty) {
+        _answers[question.number] = question.isMulti ? valid : {valid.first};
+      }
+    }
+    _freeText = draft.freeText;
+    _nama = draft.name;
+    final lastEditable = onboardingSteps.indexWhere(
+      (s) => s.type == OnboardingStepType.nama,
+    );
+    _stepIndex = draft.step.clamp(1, lastEditable);
+    // Never jump past unanswered questions, including drafts from older versions.
+    for (var i = 1; i < _stepIndex; i++) {
+      final step = onboardingSteps[i];
+      if (step.type == OnboardingStepType.question &&
+          answersFor(onboardingQuestions[step.dataIndex].number).isEmpty) {
+        _stepIndex = i;
+        break;
+      }
+      if (step.type == OnboardingStepType.freeText &&
+          _freeText.trim().isEmpty) {
+        _stepIndex = i;
+        break;
+      }
+    }
+  }
+
+  AssessmentDraft get draft => AssessmentDraft(
+    step: _stepIndex,
+    answers: _answers.map((key, value) => MapEntry(key, Set<int>.from(value))),
+    freeText: _freeText,
+    name: _nama,
+  );
   int _stepIndex = 0;
   final Map<int, Set<int>> _answers = {};
   String _freeText = '';
@@ -49,7 +104,8 @@ class OnboardingController extends ChangeNotifier {
   String get nama => _nama;
   AssessmentResult? get result => _result;
 
-  Set<int> answersFor(int questionNumber) => _answers[questionNumber] ?? const <int>{};
+  Set<int> answersFor(int questionNumber) =>
+      _answers[questionNumber] ?? const <int>{};
 
   bool isSelected(int questionNumber, int optionIndex) =>
       answersFor(questionNumber).contains(optionIndex);
@@ -110,7 +166,9 @@ class OnboardingController extends ChangeNotifier {
 
   /// Lompat langsung dari layar info manapun ke Hasil asesmen ("Lewati").
   void skipToHasil() {
-    final index = onboardingSteps.indexWhere((s) => s.type == OnboardingStepType.hasil);
+    final index = onboardingSteps.indexWhere(
+      (s) => s.type == OnboardingStepType.hasil,
+    );
     if (index != -1) {
       _stepIndex = index;
       notifyListeners();
@@ -128,7 +186,9 @@ class OnboardingController extends ChangeNotifier {
     final selected = _answers[1];
     if (selected == null || selected.isEmpty) return null;
     final index = selected.first;
-    return index >= 0 && index < _personaByQ1.length ? _personaByQ1[index] : null;
+    return index >= 0 && index < _personaByQ1.length
+        ? _personaByQ1[index]
+        : null;
   }
 
   /// Mempersist hasil asesmen: profil (nama, persona, skor, anak buah
@@ -138,14 +198,21 @@ class OnboardingController extends ChangeNotifier {
     final result = _result ?? const ScoringEngine().score(_answers);
     _result = result;
 
-    await scope.auth.updateProfile((current) => current.copyWith(
-          displayName: _nama.trim().isEmpty ? current.displayName : _nama.trim(),
-          persona: _persona ?? current.persona,
-          onboardingDone: true,
-          dominantSaboteurs: result.dominantSaboteurs,
-          assessmentScores: result.scores,
-          assessmentCompletedAt: DateTime.now(),
-        ));
+    await scope.auth.updateProfile(
+      (current) => current.copyWith(
+        displayName: _nama.trim().isEmpty ? current.displayName : _nama.trim(),
+        persona: _persona ?? current.persona,
+        onboardingDone: true,
+        dominantSaboteurs: result.dominantSaboteurs,
+        assessmentScores: result.scores,
+        assessmentCompletedAt: DateTime.now(),
+      ),
+    );
     scope.monsterProgress.ensureAllSaboteurs(ScoringEngine.allSaboteurs);
+    final uid = scope.auth.uid;
+    if (uid != null) {
+      await scope.prefs.setIntroductionSeen(uid);
+      await AssessmentDraftStore().clear(uid);
+    }
   }
 }
