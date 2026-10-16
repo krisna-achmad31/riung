@@ -10,6 +10,25 @@ Kategori: **Ditambahkan** (fitur baru) · **Diubah** · **Diperbaiki** · **Keam
 
 ---
 
+## [1.0.2+3] — 2026-10-17
+
+**Committer:** Achmad Yukrisna · **Branch:** `fix/audit-hardening` · **Commit:** commit rilis ini (tindak lanjut re-audit)
+
+### Ditambahkan
+- Standar state layar: `RiungStateView` (loading/error/empty/ready), `RiungAsyncView` (pengganti `FutureBuilder`), `RiungEmptyState`, `RiungSkeletonList` di `core/widgets/`. Loading = skeleton, error = `RiungErrorWidget` + "Coba lagi", offline = `RiungOfflineBanner` global.
+- `test/screen_state_contract_test.dart` memaksa standar ini: tidak ada `FutureBuilder`/`StreamBuilder` di layar fitur, tidak ada spinner polos sebagai loading layar, dan setiap layar yang memuat data wajib lewat `RiungStateView`/`RiungAsyncView` (pengecualian tercatat beserta alasannya).
+
+### Diperbaiki
+- Diterapkan ke Beranda, Tiket serangan, Riwayat koin, Riwayat check-in, Laporan, Brankas monster, Detail Si Hakim, Kategori afirmasi, Jurnal, Onboarding, Sesi Fokus, Profil, Langganan, Unduh data, Kalender latihan.
+- Layar yang dulu berputar selamanya bila belum ada akun atau pemuatan gagal (Riwayat check-in, Laporan, Unduh data, Kalender, Jurnal, Kategori afirmasi) kini menampilkan error + "Coba lagi".
+- Sesi Fokus: gangguan jaringan tidak lagi ditampilkan sebagai "koin kurang".
+
+### Keamanan
+- `firestore.rules`: wallet sepenuhnya server-only (client tidak bisa mengubah `wallet`, dokumen baru wajib wallet nol) dan `premium.active` tidak bisa dinyalakan dari client. `isValidWalletDelta` (bisa di-replay) dihapus.
+- Build rilis menolak jalur wallet Firestore/lokal (`main.dart`), sehingga semua mutasi koin lewat server.
+
+---
+
 ## [1.0.1+2] — 2026-10-17
 
 **Committer:** Achmad Yukrisna · **Branch:** `fix/audit-hardening` · **Commit:** `26a7a0f`, `f27871d`, + commit rilis ini

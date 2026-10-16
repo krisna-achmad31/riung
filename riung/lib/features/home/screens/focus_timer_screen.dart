@@ -30,6 +30,7 @@ class FocusTimerScreen extends StatefulWidget {
 
 class _FocusTimerScreenState extends State<FocusTimerScreen> {
   bool _starting = true;
+  Object? _startError;
   bool _insufficientCoins = false;
   bool _navigatedToResult = false;
   FocusTicket? _ticket;
@@ -50,8 +51,14 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
         setState(() => _starting = false);
       } on ApiException catch (e) {
         if (!mounted) return;
+        if (e.code != 'insufficient_coins') {
+          setState(() { _starting = false; _startError = e; });
+          return;
+        }
         showApiError(context, e);
         setState(() { _starting = false; _insufficientCoins = true; });
+      } catch (e) {
+        if (mounted) setState(() { _starting = false; _startError = e; });
       }
       return;
     }
@@ -82,9 +89,19 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_starting) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: AppColors.primer)),
+    if (_starting || _startError != null) {
+      return Scaffold(
+        body: SafeArea(
+          child: RiungStateView(
+            status: RiungStateView.statusOf(loading: _starting, error: _startError),
+            onRetry: () {
+              setState(() { _starting = true; _startError = null; });
+              _mulaiSesi();
+            },
+            loading: const Center(child: RiungSkeleton(width: 240, height: 240, borderRadius: 120)),
+            builder: (_) => const SizedBox.shrink(),
+          ),
+        ),
       );
     }
     if (_insufficientCoins) {

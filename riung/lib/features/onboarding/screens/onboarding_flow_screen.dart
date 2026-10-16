@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/state/state.dart';
 import '../../../core/services/assessment_draft_store.dart';
 import '../../../core/l10n/l10n.dart';
-import '../../../core/theme/theme.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../home/screens/root_shell_screen.dart';
 import '../../launch/screens/masuk_screen.dart';
 import '../logic/onboarding_controller.dart';
@@ -54,6 +54,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   }
 
   Future<void> _load() async {
+    if (_loadFailed) setState(() => _loadFailed = false);
     final scope = AppScope.of(context);
     _uid = scope.auth.uid;
     try {
@@ -194,13 +195,12 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   Widget build(BuildContext context) {
     if (_loadedController == null) {
       return Scaffold(
-        body: Center(
-          child: _loadFailed
-              ? TextButton(
-                  onPressed: _load,
-                  child: Text(context.s.common.cobaLagi),
-                )
-              : const CircularProgressIndicator(color: AppColors.primer),
+        body: SafeArea(
+          child: RiungStateView(
+            status: _loadFailed ? RiungViewStatus.error : RiungViewStatus.loading,
+            onRetry: _load,
+            builder: (_) => const SizedBox.shrink(),
+          ),
         ),
       );
     }

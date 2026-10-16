@@ -31,7 +31,12 @@ class _AfirmasiBuatScreenState extends State<AfirmasiBuatScreen> {
   }
 
   Future<void> _loadSaboteurs() async {
-    final saboteurs = await AppScope.of(context).contentRepository.getSaboteurs();
+    final List<Saboteur> saboteurs;
+    try {
+      saboteurs = await AppScope.of(context).contentRepository.getSaboteurs();
+    } catch (_) {
+      return; // Tag monster opsional — form tetap bisa dipakai tanpa tag.
+    }
     if (!mounted) return;
     // Si Hakim (bos) sengaja tidak bisa ditag di sini — afirmasi custom
     // cuma boleh menargetkan 6 anak buah, bukan bos.

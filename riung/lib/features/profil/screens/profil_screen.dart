@@ -39,7 +39,7 @@ class ProfilScreen extends StatelessWidget {
           builder: (context, _) {
             final profile = scope.auth.profile;
             if (profile == null) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primer));
+              return const RiungSkeletonList();
             }
             final tamedCount = scope.monsterProgress.all.values.where((m) => m.state == MonsterState.tamed).length;
             final avatar = AvatarCatalog.byId(profile.avatarId);

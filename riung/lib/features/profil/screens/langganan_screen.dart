@@ -43,7 +43,7 @@ class LanggananScreen extends StatelessWidget {
                   builder: (context, _) {
                     final profile = scope.auth.profile;
                     if (profile == null) {
-                      return const Center(child: CircularProgressIndicator(color: AppColors.primer));
+                      return const RiungSkeletonList();
                     }
                     final status = profile.premiumStatus(DateTime.now());
                     if (status == PremiumStatus.expired) {

@@ -12,32 +12,11 @@ import '../../../core/widgets/widgets.dart';
 /// Tidak ada file `design/*.dc.html` khusus buat layar ini — dibangun
 /// mengikuti pola kartu & tipografi layar riwayat lain (mis. Riwayat mood
 /// di Checkin.dc.html) supaya tetap konsisten dengan sistem desain.
-class KoinHistoriScreen extends StatefulWidget {
+class KoinHistoriScreen extends StatelessWidget {
   const KoinHistoriScreen({super.key});
 
   @override
-  State<KoinHistoriScreen> createState() => _KoinHistoriScreenState();
-}
-
-class _KoinHistoriScreenState extends State<KoinHistoriScreen> {
-  List<CoinTransaction>? _transactions;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final scope = AppScope.of(context);
-    final list = await scope.wallet.getTransactions();
-    if (!mounted) return;
-    setState(() => _transactions = list);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final transactions = _transactions;
     final scope = AppScope.of(context);
     final t = context.s.home;
     return Scaffold(
@@ -69,11 +48,12 @@ class _KoinHistoriScreenState extends State<KoinHistoriScreen> {
                 ),
               ),
               Expanded(
-                child: transactions == null
-                    ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
-                    : transactions.isEmpty
-                        ? const _EmptyHistori()
-                        : _HistoriList(transactions: transactions),
+                child: RiungAsyncView<List<CoinTransaction>>(
+                  load: scope.wallet.getTransactions,
+                  isEmpty: (transactions) => transactions.isEmpty,
+                  empty: const _EmptyHistori(),
+                  builder: (context, transactions) => _HistoriList(transactions: transactions),
+                ),
               ),
             ],
           ),

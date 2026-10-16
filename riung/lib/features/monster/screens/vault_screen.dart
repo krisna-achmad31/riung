@@ -37,8 +37,10 @@ class _VaultScreenState extends State<VaultScreen> {
   }
 
   Future<void> _load() async {
+    if (_loadError != null) setState(() => _loadError = null);
     try {
       final list = await AppScope.of(context).contentRepository.getSaboteurs();
+      if (list.isEmpty) throw StateError('saboteurs kosong');
       if (!mounted) return;
       setState(() => _saboteurs = list);
     } catch (e) {
@@ -55,52 +57,18 @@ class _VaultScreenState extends State<VaultScreen> {
         bottom: false,
         child: ListenableBuilder(
           listenable: Listenable.merge([scope.monsterProgress, scope.wallet]),
-          builder: (context, _) => _buildBody(context, scope),
+          builder: (context, _) => RiungStateView(
+            status: RiungStateView.statusOf(loading: _saboteurs == null, error: _loadError),
+            errorMessage: context.s.monster.loadError,
+            onRetry: _load,
+            builder: (context) => _buildBody(context, scope, _saboteurs!),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, AppScope scope) {
-    if (_loadError != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xxl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.wifi_off_rounded,
-                size: 32,
-                color: AppColors.teksRedup,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                context.s.monster.loadError,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.body,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              RiungButton(
-                label: context.s.common.cobaLagi,
-                onPressed: () {
-                  setState(() => _loadError = null);
-                  _load();
-                },
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final saboteurs = _saboteurs;
-    if (saboteurs == null) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primer),
-      );
-    }
-
+  Widget _buildBody(BuildContext context, AppScope scope, List<Saboteur> saboteurs) {
     final t = context.s.monster;
     final hakim = saboteurs.firstWhere(
       (s) => s.id == 'hakim',

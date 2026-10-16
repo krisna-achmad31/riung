@@ -43,7 +43,10 @@ class _LaporanScreenState extends State<LaporanScreen> {
     setState(() => _error = null);
     final scope = AppScope.of(context);
     final uid = scope.auth.uid;
-    if (uid == null) return;
+    if (uid == null) {
+      setState(() => _entries = const []);
+      return;
+    }
     try {
       final checkIns = await scope.userRepository.getCheckIns(uid);
       final journals = await scope.userRepository.getJournalEntries(uid);
@@ -122,29 +125,29 @@ class _LaporanScreenState extends State<LaporanScreen> {
     final premium = AppScope.of(context).auth.profile?.premiumNow ?? false;
     final entries = _entries;
 
-    Widget content;
-    if (_error != null) {
-      content = Center(child: TextButton(onPressed: _load, child: Text(context.s.common.cobaLagi)));
-    } else if (entries == null) {
-      content = const Center(child: CircularProgressIndicator(color: AppColors.primer));
-    } else if (_monthly && !premium) {
-      content = ReportNoticeCard(
-        icon: Icons.workspace_premium,
-        accent: AppColors.aksenHangat,
-        title: t.lockedTitle,
-        body: t.monthLockedBody,
-        cta: t.lockedCta,
-        onCta: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallPremiumScreen())),
-      );
-    } else {
-      final report = ReportEngine.build(
-        entries,
-        now: DateTime.now(),
-        windowDays: _monthly ? ReportConfig.monthDays : ReportConfig.weekDays,
-        sleepMinutes: _sleepMinutes,
-      );
-      content = ReportBody(report: report, premium: premium);
-    }
+    final content = RiungStateView(
+      status: RiungStateView.statusOf(loading: entries == null, error: _error),
+      onRetry: _load,
+      builder: (context) {
+        if (_monthly && !premium) {
+          return ReportNoticeCard(
+            icon: Icons.workspace_premium,
+            accent: AppColors.aksenHangat,
+            title: t.lockedTitle,
+            body: t.monthLockedBody,
+            cta: t.lockedCta,
+            onCta: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallPremiumScreen())),
+          );
+        }
+        final report = ReportEngine.build(
+          entries!,
+          now: DateTime.now(),
+          windowDays: _monthly ? ReportConfig.monthDays : ReportConfig.weekDays,
+          sleepMinutes: _sleepMinutes,
+        );
+        return ReportBody(report: report, premium: premium);
+      },
+    );
 
     return Scaffold(
       body: SafeArea(

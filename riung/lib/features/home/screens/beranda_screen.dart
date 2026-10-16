@@ -84,6 +84,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
   }
 
   Future<void> _loadSaboteurs() async {
+    if (_loadError != null) setState(() => _loadError = null);
     try {
       final content = AppScope.of(context).contentRepository;
       final list = await content.getSaboteurs();
@@ -143,26 +144,21 @@ class _BerandaScreenState extends State<BerandaScreen> {
             scope.auth,
             scope.monsterProgress,
           ]),
-          builder: (context, _) => _buildBody(context, scope),
+          builder: (context, _) => RiungStateView(
+            status: RiungStateView.statusOf(
+              loading: scope.auth.profile == null || _saboteurs == null || scope.wallet.loading,
+              error: _loadError,
+            ),
+            errorMessage: context.s.home.loadError,
+            onRetry: _loadSaboteurs,
+            builder: (context) => _buildBody(context, scope, scope.auth.profile!, _saboteurs!),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, AppScope scope) {
-    if (_loadError != null) {
-      return _BerandaError(
-        onRetry: () {
-          setState(() => _loadError = null);
-          _loadSaboteurs();
-        },
-      );
-    }
-    final profile = scope.auth.profile;
-    final saboteurs = _saboteurs;
-    if (profile == null || saboteurs == null || scope.wallet.loading) {
-      return const _BerandaLoading();
-    }
+  Widget _buildBody(BuildContext context, AppScope scope, UserProfile profile, List<Saboteur> saboteurs) {
 
     if (profile.assessmentCompletedAt == null) {
       return SingleChildScrollView(
@@ -290,50 +286,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
             source: _researchFact?.source ?? context.s.home.tipSource,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _BerandaLoading extends StatelessWidget {
-  const _BerandaLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(color: AppColors.primer),
-    );
-  }
-}
-
-class _BerandaError extends StatelessWidget {
-  const _BerandaError({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xxl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.wifi_off_rounded,
-              size: 32,
-              color: AppColors.teksRedup,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              context.s.home.loadError,
-              textAlign: TextAlign.center,
-              style: AppTextStyles.body,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            RiungButton(label: context.s.common.cobaLagi, onPressed: onRetry),
-          ],
-        ),
       ),
     );
   }

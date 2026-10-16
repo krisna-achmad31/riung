@@ -219,6 +219,11 @@ class _RiungAppState extends State<RiungApp> {
           cloud: FirestoreWalletFunctionsService(firestore: FirebaseFirestore.instance),
           isAnonymous: () => _authService.isAnonymous,
         ));
+    // Wallet client-side (Firestore) ditolak firestore.rules — build rilis
+    // wajib lewat server (REST API), CLAUDE.md aturan #5.
+    if (kReleaseMode && _walletFunctions is HybridWalletFunctionsService) {
+      throw StateError('Wallet Firestore/lokal tidak boleh dipakai di build rilis');
+    }
     _pinService = JurnalPinService();
 
     _auth = AuthNotifier(_authService, userRepository: _userRepository, apiState: _apiState);

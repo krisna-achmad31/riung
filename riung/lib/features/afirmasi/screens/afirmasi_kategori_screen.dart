@@ -23,6 +23,7 @@ class AfirmasiKategoriScreen extends StatefulWidget {
 
 class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
   List<AffirmationDeck>? _decks;
+  Object? _error;
 
   @override
   void initState() {
@@ -31,14 +32,19 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
   }
 
   Future<void> _load() async {
+    if (_error != null) setState(() => _error = null);
     final scope = AppScope.of(context);
     final uid = scope.auth.profile?.uid;
-    final seeded = await scope.contentRepository.getAffirmations();
-    final custom = uid == null ? <Affirmation>[] : await scope.userRepository.getCustomAffirmations(uid);
-    if (!mounted) return;
-    setState(() {
-      _decks = buildAffirmationDecks(seeded: seeded, custom: custom);
-    });
+    try {
+      final seeded = await scope.contentRepository.getAffirmations();
+      final custom = uid == null ? <Affirmation>[] : await scope.userRepository.getCustomAffirmations(uid);
+      if (!mounted) return;
+      setState(() {
+        _decks = buildAffirmationDecks(seeded: seeded, custom: custom);
+      });
+    } catch (error) {
+      if (mounted) setState(() => _error = error);
+    }
   }
 
   Future<void> _openBuat() async {
@@ -72,12 +78,14 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
     final t = context.s.afirmasi;
     final canPop = Navigator.canPop(context);
     final today = decks == null ? null : _today(decks);
+    final ready = decks ?? const <AffirmationDeck>[];
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: decks == null
-            ? const SizedBox.shrink()
-            : RiungBleedListView(
+        child: RiungStateView(
+          status: RiungStateView.statusOf(loading: decks == null, error: _error),
+          onRetry: _load,
+          builder: (context) => RiungBleedListView(
                 bleed: 0,
                 padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
                 children: [
@@ -117,28 +125,28 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
                     ),
                     const SizedBox(height: 14),
                   ],
-                  if (decks.isEmpty)
+                  if (ready.isEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
                       child: Text(t.noDecks, textAlign: TextAlign.center, style: AppTextStyles.body),
                     )
                   else
-                    for (var i = 0; i < decks.length; i += 2)
+                    for (var i = 0; i < ready.length; i += 2)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 14),
                         child: IntrinsicHeight(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Expanded(child: _tile(decks[i])),
+                              Expanded(child: _tile(ready[i])),
                               const SizedBox(width: 12),
-                              Expanded(child: i + 1 < decks.length ? _tile(decks[i + 1]) : const SizedBox.shrink()),
+                              Expanded(child: i + 1 < ready.length ? _tile(ready[i + 1]) : const SizedBox.shrink()),
                             ],
                           ),
                         ),
                       ),
                 ],
-              ),
+              )),
       ),
     );
   }
