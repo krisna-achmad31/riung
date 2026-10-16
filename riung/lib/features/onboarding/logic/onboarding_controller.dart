@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/state/app_scope.dart';
 import '../../../core/models/assessment_draft.dart';
 import '../../../core/services/assessment_draft_store.dart';
@@ -63,8 +64,9 @@ class OnboardingController extends ChangeNotifier {
         _answers[question.number] = question.isMulti ? valid : {valid.first};
       }
     }
-    _freeText = draft.freeText;
-    _nama = draft.name;
+    // Draft dari versi lama belum melewati formatter input — rapikan dulu.
+    _freeText = InputLimits.sanitize(draft.freeText, InputLimits.onboardingCerita);
+    _nama = InputLimits.sanitize(draft.name, InputLimits.nama, multiline: false);
     final lastEditable = onboardingSteps.indexWhere(
       (s) => s.type == OnboardingStepType.nama,
     );

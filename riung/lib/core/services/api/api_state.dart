@@ -7,7 +7,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../local_database_service.dart';
@@ -16,6 +15,7 @@ import '../../models/personality_result.dart';
 import 'api_client.dart';
 import 'riung_api.dart';
 import 'api_config_store.dart';
+import '../device_time_zone.dart';
 
 /// Shared server snapshot and durable event transport. Cache and outbox are
 /// scoped by Firebase uid so logging into another account cannot replay data.
@@ -75,15 +75,11 @@ class ApiState extends ChangeNotifier with WidgetsBindingObserver {
     clearSession();
   }
 
-  static bool _zonesReady = false;
   String dateFor(DateTime instant) {
-    if (!_zonesReady) {
-      tzdata.initializeTimeZones();
-      _zonesReady = true;
-    }
+    DeviceTimeZone.ensureInitialized();
     final zone =
         jsonObject(currentSnapshot?.raw['profile'])['tz'] as String? ??
-        'Asia/Jakarta';
+        DeviceTimeZone.detect(now: instant.toLocal());
     final local = tz.TZDateTime.from(instant, tz.getLocation(zone));
     return '${local.year.toString().padLeft(4, '0')}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
   }
@@ -218,11 +214,27 @@ class ApiState extends ChangeNotifier with WidgetsBindingObserver {
     try {
       await ApiConfigStore.instance.load(api);
       await refresh();
+      await _syncTimeZone();
       await sync();
       await prefetchTickets();
     } on ApiException catch (e) {
       lastError = e;
       notifyListeners();
+    }
+  }
+
+  /// Server memakai `profile.tz` untuk batas hari (streak, cap harian).
+  /// Kirim zona perangkat bila berbeda — user di WITA/WIT/luar negeri tidak
+  /// lagi dihitung memakai WIB.
+  Future<void> _syncTimeZone() async {
+    final device = DeviceTimeZone.detect();
+    final server = jsonObject(currentSnapshot?.raw['profile'])['tz'] as String?;
+    if (server == device) return;
+    try {
+      await api.profile({'tz': device});
+      await refresh();
+    } on ApiException {
+      // Best-effort: dicoba lagi saat bootstrap berikutnya.
     }
   }
 
@@ -247,11 +259,23 @@ class ApiState extends ChangeNotifier with WidgetsBindingObserver {
     await sync();
   }
 
+  /// Satu aktivitas yang ditolak/gagal sebanyak ini dianggap gagal permanen
+  /// dan dibuang dari outbox (lihat [LocalDatabaseService.dropExhaustedActivities]).
+  static const maxOutboxAttempts = 10;
+
   Future<void> sync() async {
     final uid = currentUid();
     if (_flushing || uid == null) return;
     _flushing = true;
     try {
+      final dropped = await db.dropExhaustedActivities(uid, maxOutboxAttempts);
+      if (dropped > 0) {
+        try {
+          FirebaseCrashlytics.instance.log('outbox_dropped:$dropped');
+        } catch (_) {
+          /* No Firebase app in isolated tests. */
+        }
+      }
       while (currentUid() == uid) {
         final rows = await db.pendingActivities(uid);
         pendingSync = rows.isNotEmpty;

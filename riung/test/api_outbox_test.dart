@@ -43,6 +43,13 @@ class MemoryOutbox extends LocalDatabaseService {
   Future<void> attemptActivity(String id) async {
     rows[id]!['attempts'] = (rows[id]!['attempts'] as int) + 1;
   }
+
+  @override
+  Future<int> dropExhaustedActivities(String uid, int maxAttempts) async {
+    final before = rows.length;
+    rows.removeWhere((_, r) => r['user_id'] == uid && (r['attempts'] as int) >= maxAttempts);
+    return before - rows.length;
+  }
 }
 
 void main() {
@@ -165,6 +172,49 @@ void main() {
       state.dispose();
     },
   );
+
+  test('events that exhaust maxOutboxAttempts are dropped, fresh ones still sent', () async {
+    final db = MemoryOutbox();
+    final sent = <String>[];
+    final api = RiungApi(
+      ApiClient(
+        baseUrl: 'https://example.test',
+        retryDelay: Duration.zero,
+        token: (_) async => 'token',
+        client: MockClient((request) async {
+          if (request.url.path == '/v1/me') return http.Response('{"wallet":{"coins":1}}', 200);
+          final events = (jsonDecode(request.body) as Map)['events'] as List;
+          sent.addAll(events.map((e) => (e as Map)['entryId'] as String));
+          return http.Response(jsonEncode({'results': [for (final _ in events) {'ok': true, 'result': {}}]}), 200);
+        }),
+      ),
+    );
+    final state = ApiState(api: api, db: db, currentUid: () => 'alice');
+    final at = DateTime.utc(2026, 10, 15);
+    for (final id in ['stuck', 'fresh']) {
+      await db.enqueueActivity(id, 'alice', jsonEncode(ActivityEvent(ActivityType.journalSaved, occurredAt: at, entryId: id).toMap()), at.toIso8601String());
+    }
+    db.rows['stuck']!['attempts'] = ApiState.maxOutboxAttempts;
+    await state.sync();
+    expect(sent, ['fresh']);
+    expect(db.rows, isEmpty);
+    state.dispose();
+  });
+
+  test('ApiClient never retries beyond maxRetryLimit', () async {
+    var calls = 0;
+    final client = ApiClient(
+      baseUrl: 'https://example.test',
+      retryDelay: Duration.zero,
+      token: (_) async => 'token',
+      client: MockClient((_) async {
+        calls++;
+        return http.Response('{"error":{"code":"unavailable"}}', 503);
+      }),
+    );
+    await expectLater(client.request('GET', '/v1/me', maxRetries: 1000), throwsA(isA<ApiException>()));
+    expect(calls, ApiClient.maxRetryLimit + 1);
+  });
 
   test('date follows server timezone across a UTC day boundary', () {
     final state = ApiState(

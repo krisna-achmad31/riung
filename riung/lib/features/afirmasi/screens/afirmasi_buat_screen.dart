@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
@@ -163,6 +164,7 @@ class _PreviewCard extends StatelessWidget {
           const SizedBox(height: 10),
           TextField(
             controller: controller,
+            inputFormatters: InputLimits.formatters(InputLimits.afirmasi),
             maxLines: null,
             autofocus: true,
             textAlign: TextAlign.center,

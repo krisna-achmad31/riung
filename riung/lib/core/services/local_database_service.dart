@@ -108,6 +108,12 @@ class LocalDatabaseService {
   Future<void> removeActivity(String id) async => (await _database).delete('outbox', where: 'id = ?', whereArgs: [id]);
   Future<void> attemptActivity(String id) async => (await _database).rawUpdate('UPDATE outbox SET attempts = attempts + 1 WHERE id = ?', [id]);
 
+  /// Buang aktivitas yang sudah dicoba [maxAttempts] kali tanpa diterima
+  /// server (gagal permanen) supaya tidak menyumbat antrean selamanya.
+  /// Mengembalikan jumlah baris yang dibuang.
+  Future<int> dropExhaustedActivities(String uid, int maxAttempts) async =>
+      (await _database).delete('outbox', where: 'user_id = ? AND attempts >= ?', whereArgs: [uid, maxAttempts]);
+
   Future<List<Map<String, Object?>>> allCheckIns() async {
     final db = await _database;
     return db.query('checkin_history', orderBy: 'created_at DESC');

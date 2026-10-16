@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
@@ -28,16 +30,23 @@ class TokoScreen extends StatefulWidget {
 class _TokoScreenState extends State<TokoScreen> {
   Map<String, ProductDetails> _products = {};
   bool _purchasingCoinPack = false;
+  StreamSubscription<BillingUpdate>? _sub;
 
   @override
   void initState() {
     super.initState();
     final billing = AppScope.of(context).billing;
-    billing.updates.listen(_onBillingUpdate);
+    _sub = billing.updates.listen(_onBillingUpdate);
     billing.queryProducts().then((res) {
       if (!mounted) return;
       setState(() => _products = {for (final p in res.productDetails) p.id: p});
     });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   void _onBillingUpdate(BillingUpdate update) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
@@ -75,6 +76,7 @@ class _NamaStepState extends State<NamaStep> {
                     ),
                     child: TextField(
                       controller: _textController,
+                      inputFormatters: InputLimits.formatters(InputLimits.nama, multiline: false),
                       autofocus: true,
                       textAlign: TextAlign.center,
                       cursorColor: AppColors.primer,

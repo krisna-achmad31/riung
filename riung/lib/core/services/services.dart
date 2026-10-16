@@ -9,6 +9,7 @@ export 'auth_service.dart';
 export 'billing_service.dart';
 export 'content_repository.dart';
 export 'data_export_builder.dart';
+export 'device_time_zone.dart';
 export 'dummy_data_loader.dart';
 export 'firebase/analytics_service.dart';
 export 'firebase/firebase_auth_service.dart';

@@ -152,6 +152,11 @@ class _RiungAppState extends State<RiungApp> {
   @override
   void initState() {
     super.initState();
+    // StubAuthService (uid dummy, tanpa validasi) hanya untuk test/dev —
+    // build rilis menolak keras supaya tidak pernah lolos ke pengguna.
+    if (kReleaseMode && widget.authService is StubAuthService) {
+      throw StateError('StubAuthService tidak boleh dipakai di build rilis');
+    }
     _authService = widget.authService ?? FirebaseAuthService(googleServerClientId: googleServerClientId);
     if (widget.userRepository == null && widget.walletFunctions == null) {
       const baseUrl = String.fromEnvironment('RIUNG_API_BASE_URL', defaultValue: 'https://riung.e55techlab.com');

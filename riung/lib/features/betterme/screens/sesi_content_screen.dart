@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
@@ -100,6 +101,7 @@ class _SesiContentScreenState extends State<SesiContentScreen> {
                           const SizedBox(height: AppSpacing.md),
                           TextField(
                             controller: _controller,
+                            inputFormatters: InputLimits.formatters(InputLimits.refleksiBetterMe),
                             minLines: 5,
                             maxLines: 10,
                             cursorColor: AppColors.primer,

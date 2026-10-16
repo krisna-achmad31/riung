@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
@@ -80,6 +81,9 @@ class BillingService {
   /// `WalletNotifier` untuk melacak koin beli vs koin hasil latihan.
   final void Function(int totalCoins)? onCoinsPurchased;
 
+  /// Batas token per panggilan `/v1/billing/restore`.
+  static const restoreChunkSize = 20;
+
   static const allProductIds = {
     'coin_pack_small',
     'coin_pack_medium',
@@ -97,25 +101,64 @@ class BillingService {
   /// ini untuk menampilkan loading/sukses/gagal.
   Stream<BillingUpdate> get updates => _updatesController.stream;
 
+  /// false bila Play Billing tidak siap (emulator tanpa Play Store, Play
+  /// Services mati, plugin belum siap). Toko tetap tampil; tombol beli
+  /// memberi tahu paket belum tersedia ([queryProducts] kosong).
+  bool get available => _available;
+  bool _available = false;
+
   Future<bool> init() async {
     try {
       final available = await _iap.isAvailable();
       if (!available) return false;
       _subscription = _iap.purchaseStream.listen((purchases) {
-        _processing = _processing.then((_) => _onPurchaseUpdate(purchases)).catchError((Object _) {});
-      }, onError: (_) {});
+        _processing = _processing.then((_) => _onPurchaseUpdate(purchases)).catchError((Object error, StackTrace stack) {
+          // Jangan menelan diam-diam: pembelian yang belum terproses tetap
+          // tertunda di Play & dipulihkan lewat restore berikutnya.
+          _report(error, stack, 'billing_update_failed');
+          for (final p in purchases) {
+            _updatesController.add(BillingUpdate(productId: p.productID, status: BillingStatus.error, errorKind: BillingErrorKind.deliveryFailed));
+          }
+        });
+      }, onError: (Object error, StackTrace stack) => _report(error, stack, 'billing_stream_error'));
+      _available = true;
       // The app restores after /me bootstrap so receipts have an authenticated
       // server billing account, including when signing in after launch.
       return true;
-    } catch (_) {
+    } catch (error, stack) {
       // Play services tidak tersedia (emulator tanpa Play Store, dsb) atau
       // plugin belum siap (mis. widget test) — toko cuma tidak aktif,
       // bukan crash.
+      _report(error, stack, 'billing_init_failed');
       return false;
     }
   }
 
-  Future<ProductDetailsResponse> queryProducts() => _iap.queryProductDetails(allProductIds);
+  void _report(Object error, StackTrace stack, String reason) {
+    try {
+      FirebaseCrashlytics.instance.recordError(error, stack, reason: reason);
+    } catch (_) {
+      // Tanpa Firebase (test) — cukup diabaikan.
+    }
+  }
+
+  /// Tidak pernah throw: tanpa Play Billing hasilnya daftar kosong, dan
+  /// layar Toko/Paywall menampilkan "paket belum tersedia" saat ditap.
+  Future<ProductDetailsResponse> queryProducts() async {
+    if (!_available) return _emptyProducts('unavailable');
+    try {
+      return await _iap.queryProductDetails(allProductIds);
+    } catch (error, stack) {
+      _report(error, stack, 'billing_query_failed');
+      return _emptyProducts('$error');
+    }
+  }
+
+  static ProductDetailsResponse _emptyProducts(String message) => ProductDetailsResponse(
+        productDetails: const [],
+        notFoundIDs: allProductIds.toList(),
+        error: IAPError(source: 'google_play', code: 'unavailable', message: message),
+      );
 
   /// Poin 2 — jaring pengaman lapis kedua. UI (lihat
   /// `ensureAccountForPurchase`) sudah harus mencegah ini tercapai dalam
@@ -145,24 +188,33 @@ class BillingService {
     final restored = purchases.where((p) => p.status == PurchaseStatus.restored).toList();
     final restoredResults = <String, BillingResult>{};
     if (restored.isNotEmpty && apiState != null) {
-      try {
-        for (var offset = 0; offset < restored.length; offset += 20) {
-          final chunk = restored.skip(offset).take(20).toList();
-          final response = await apiState!.api.restore(chunk.map((p) => (productId: p.productID, purchaseToken: p.verificationData.serverVerificationData)).toList());
-          final results = response['results'] as List? ?? [];
-          for (var i = 0; i < results.length && i < chunk.length; i++) {
-            final row = jsonObject(results[i]);
-            if (row['error'] != null) continue;
-            restoredResults[chunk[i].verificationData.serverVerificationData] = BillingResult(row['result'] is Map ? jsonObject(row['result']) : row);
+      // Per chunk: satu chunk gagal tidak membatalkan chunk lain yang
+      // sudah terverifikasi (pemulihan parsial). Chunk gagal dicoba ulang
+      // sekali; sisanya tetap tertunda di Play untuk restore berikutnya.
+      for (var offset = 0; offset < restored.length; offset += restoreChunkSize) {
+        final chunk = restored.skip(offset).take(restoreChunkSize).toList();
+        for (var attempt = 0; attempt < 2; attempt++) {
+          try {
+            final response = await apiState!.api.restore(chunk.map((p) => (productId: p.productID, purchaseToken: p.verificationData.serverVerificationData)).toList());
+            final results = response['results'] as List? ?? [];
+            for (var i = 0; i < results.length && i < chunk.length; i++) {
+              final row = jsonObject(results[i]);
+              if (row['error'] != null) continue;
+              restoredResults[chunk[i].verificationData.serverVerificationData] = BillingResult(row['result'] is Map ? jsonObject(row['result']) : row);
+            }
+            break;
+          } catch (error, stack) {
+            if (attempt == 0 && error is ApiException && error.retryable) continue;
+            _report(error, stack, 'billing_restore_failed');
+            for (final p in chunk) {
+              _updatesController.add(BillingUpdate(productId: p.productID, status: BillingStatus.error, errorKind: BillingErrorKind.deliveryFailed));
+            }
+            break;
           }
         }
-      } catch (_) {
-        for (final p in restored) {
-          _updatesController.add(BillingUpdate(productId: p.productID, status: BillingStatus.error, errorKind: BillingErrorKind.deliveryFailed));
-        }
-        // Never consume or acknowledge a restore that failed verification.
-        purchases = purchases.where((p) => p.status != PurchaseStatus.restored).toList();
       }
+      // Never consume or acknowledge a restore that failed verification:
+      // restored purchases without a verified result are skipped below.
     }
     for (final purchase in purchases) {
       switch (purchase.status) {

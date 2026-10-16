@@ -88,6 +88,10 @@ class ApiClient {
   final Duration retryDelay;
   final void Function(ApiException)? onError;
 
+  /// Batas atas keras untuk `maxRetries` — salah konfigurasi pemanggil
+  /// tidak bisa membuat retry (backoff 2^n) berjalan tanpa akhir.
+  static const maxRetryLimit = 5;
+
   Future<ApiResponse> request(
     String method,
     String path, {
@@ -125,7 +129,7 @@ class ApiClient {
           expectedAccount: initialAccount,
         );
       } on ApiException catch (e) {
-        if (!e.retryable || attempt >= maxRetries) {
+        if (!e.retryable || attempt >= maxRetries.clamp(0, maxRetryLimit)) {
           if (reportErrors) onError?.call(e);
           rethrow;
         }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/journal_entry.dart';
@@ -241,6 +242,7 @@ class _JurnalEditorScreenState extends State<JurnalEditorScreen> {
                       Expanded(
                         child: TextField(
                           controller: _controller,
+                          inputFormatters: InputLimits.formatters(InputLimits.jurnal),
                           maxLines: null,
                           expands: true,
                           autofocus: true,
