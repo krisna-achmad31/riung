@@ -4,9 +4,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
+import '../../../core/services/services.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../toko/logic/premium_offer.dart';
+import '../../toko/logic/restore_feedback.dart';
 import '../../toko/screens/paywall_premium_screen.dart';
 import '../widgets/premium_daily_coins_card.dart';
 
@@ -15,8 +18,25 @@ import '../widgets/premium_daily_coins_card.dart';
 /// premium, tampilkan upsell ke [PaywallPremiumScreen] (desain cuma
 /// menggambarkan state "sudah aktif" — layar ini butuh cabang kedua yang
 /// desainnya tidak mockup-kan).
-class LanggananScreen extends StatelessWidget {
+class LanggananScreen extends StatefulWidget {
   const LanggananScreen({super.key});
+
+  @override
+  State<LanggananScreen> createState() => _LanggananScreenState();
+}
+
+class _LanggananScreenState extends State<LanggananScreen> {
+  /// Harga plan aktif dari Play (mata uang user), bukan Rupiah dari config.
+  /// null = masih dimuat.
+  Map<String, PremiumOffer>? _offers;
+
+  @override
+  void initState() {
+    super.initState();
+    PremiumOffer.load(AppScope.of(context).billing).then((offers) {
+      if (mounted) setState(() => _offers = offers);
+    });
+  }
 
   Future<void> _kelolaLangganan(String? productId) async {
     final uri = Uri.parse(
@@ -36,7 +56,13 @@ class LanggananScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, 0),
           child: Column(
             children: [
-              RiungGlassHeader(title: t.subTitle),
+              RiungGlassHeader(
+                title: t.subTitle,
+                trailing: ListenableBuilder(
+                  listenable: scope.auth,
+                  builder: (context, _) => (scope.auth.profile?.premiumNow ?? false) ? const ProBadge() : const SizedBox.shrink(),
+                ),
+              ),
               Expanded(
                 child: ListenableBuilder(
                   listenable: scope.auth,
@@ -54,9 +80,6 @@ class LanggananScreen extends StatelessWidget {
                     }
                     final isMonthly = profile.premiumPlan == 'premium_monthly';
                     final planLabel = isMonthly ? t.planMonthly : t.planYearly;
-                    final rc = scope.remoteConfig;
-                    final rupiah = NumberFormat.decimalPattern('id_ID');
-                    final harga = isMonthly ? rc.premiumHargaBulananIdr : rc.premiumHargaTahunanIdr;
                     final tanggal = profile.premiumRenewsAt == null ? '-' : DateFormat('d MMM yyyy', context.s.dateLocale).format(profile.premiumRenewsAt!);
 
                     return RiungBleedListView(
@@ -65,7 +88,11 @@ class LanggananScreen extends StatelessWidget {
                         _PaketAktifCard(
                           title: t.planTitle(planLabel),
                           sub: '${t.activeUntil}$tanggal${t.autoRenew}',
-                          price: t.priceVia(rupiah.format(harga), isMonthly),
+                          price: switch (_offers?[profile.premiumPlan]) {
+                            _ when _offers == null => null,
+                            null => context.s.toko.priceOnPlay,
+                            final offer => t.priceVia(offer.recurringPrice, isMonthly),
+                          },
                           warning: status == PremiumStatus.renewsSoon ? t.statusRenewsSoon : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
@@ -118,7 +145,9 @@ class _PaketAktifCard extends StatelessWidget {
 
   final String title;
   final String sub;
-  final String price;
+
+  /// null = harga Play masih dimuat → skeleton.
+  final String? price;
   final String? warning;
 
   @override
@@ -150,7 +179,10 @@ class _PaketAktifCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(price, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.emasLembut)),
+          if (price case final text?)
+            Text(text, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.emasLembut))
+          else
+            const RiungSkeleton(width: 140, height: 12),
           if (warning != null) ...[
             const SizedBox(height: 8),
             Text(warning!, style: AppTextStyles.caption.copyWith(fontSize: 11, height: 1.4, color: AppColors.emasMuda)),
@@ -175,10 +207,11 @@ class _PulihkanLinkState extends State<_PulihkanLink> {
   Future<void> _pulihkan() async {
     final scope = AppScope.of(context);
     setState(() => _checking = true);
-    await scope.billing.restorePurchases();
-    await Future<void>.delayed(const Duration(seconds: 3));
-    await scope.auth.refreshProfile();
-    if (mounted) setState(() => _checking = false);
+    final outcome = await scope.billing.restorePurchases();
+    if (outcome == RestoreOutcome.restored) await scope.auth.refreshProfile();
+    if (!mounted) return;
+    setState(() => _checking = false);
+    showRestoreOutcome(context, outcome);
   }
 
   @override
@@ -241,11 +274,11 @@ class _KedaluwarsaState extends State<_Kedaluwarsa> {
   Future<void> _pulihkan() async {
     final scope = AppScope.of(context);
     setState(() => _checking = true);
-    await scope.billing.restorePurchases();
-    // Hasilnya masuk lewat stream pembelian; beri waktu sebentar lalu muat ulang profil.
-    await Future<void>.delayed(const Duration(seconds: 3));
-    await scope.auth.refreshProfile();
-    if (mounted) setState(() => _checking = false);
+    final outcome = await scope.billing.restorePurchases();
+    if (outcome == RestoreOutcome.restored) await scope.auth.refreshProfile();
+    if (!mounted) return;
+    setState(() => _checking = false);
+    showRestoreOutcome(context, outcome);
   }
 
   @override

@@ -10,6 +10,11 @@ import 'package:sqflite/sqflite.dart';
 /// (mis. kalau user tidak buka Jurnal/Check-in hari itu), dan supaya alur
 /// yang tidak menyentuh Jurnal (mis. tes boot Splash→Onboarding) tidak
 /// perlu platform channel sqflite sama sekali.
+///
+/// Sejak v3 setiap baris jurnal & check-in punya `user_id` dan semua query
+/// difilter per uid — akun lain di HP yang sama tidak pernah membaca jurnal
+/// atau mood akun sebelumnya (audit C-01). Baris lama (v2, `user_id` NULL)
+/// diserahkan sekali ke pemilik terakhir lewat [adoptOrphanRows].
 class LocalDatabaseService {
   Database? _db;
 
@@ -20,15 +25,20 @@ class LocalDatabaseService {
     final path = p.join(dbPath, 'riung.db');
     final db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) await _createOutbox(db);
+        if (oldVersion < 3) {
+          await db.execute('ALTER TABLE journal_entries ADD COLUMN user_id TEXT');
+          await db.execute('ALTER TABLE checkin_history ADD COLUMN user_id TEXT');
+        }
       },
       onCreate: (db, version) async {
         await _createOutbox(db);
         await db.execute('''
           CREATE TABLE journal_entries (
             id TEXT PRIMARY KEY,
+            user_id TEXT,
             date TEXT NOT NULL,
             prompt_id TEXT,
             text_encrypted TEXT NOT NULL,
@@ -40,6 +50,7 @@ class LocalDatabaseService {
         await db.execute('''
           CREATE TABLE checkin_history (
             id TEXT PRIMARY KEY,
+            user_id TEXT,
             date TEXT NOT NULL,
             mood TEXT,
             energy INTEGER,
@@ -55,31 +66,39 @@ class LocalDatabaseService {
     return db;
   }
 
-  Future<void> insertJournalEntry(Map<String, Object?> row) async {
+  Future<void> insertJournalEntry(String uid, Map<String, Object?> row) async {
     final db = await _database;
-    await db.insert('journal_entries', row, conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('journal_entries', {...row, 'user_id': uid}, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<List<Map<String, Object?>>> allJournalEntries() async {
+  Future<List<Map<String, Object?>>> allJournalEntries(String uid) async {
     final db = await _database;
-    return db.query('journal_entries', orderBy: 'created_at DESC');
+    return db.query('journal_entries', where: 'user_id = ?', whereArgs: [uid], orderBy: 'created_at DESC');
   }
 
-  Future<Map<String, Object?>?> journalEntryById(String id) async {
+  Future<Map<String, Object?>?> journalEntryById(String uid, String id) async {
     final db = await _database;
-    final rows = await db.query('journal_entries', where: 'id = ?', whereArgs: [id], limit: 1);
+    final rows = await db.query('journal_entries', where: 'user_id = ? AND id = ?', whereArgs: [uid, id], limit: 1);
     return rows.isEmpty ? null : rows.first;
   }
 
-  Future<int> journalEntryCountForDate(String isoDate) async {
+  Future<int> journalEntryCountForDate(String uid, String isoDate) async {
     final db = await _database;
-    final rows = await db.query('journal_entries', where: 'date = ?', whereArgs: [isoDate]);
+    final rows = await db.query('journal_entries', where: 'user_id = ? AND date = ?', whereArgs: [uid, isoDate]);
     return rows.length;
   }
 
-  Future<void> insertCheckIn(Map<String, Object?> row) async {
+  Future<void> insertCheckIn(String uid, Map<String, Object?> row) async {
     final db = await _database;
-    await db.insert('checkin_history', row, conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('checkin_history', {...row, 'user_id': uid}, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  /// Serahkan baris sebelum v3 (`user_id` NULL) ke [uid] — pemilik terakhir
+  /// di HP ini. Dipanggil sekali oleh [LegacyAccountMigration].
+  Future<void> adoptOrphanRows(String uid) async {
+    final db = await _database;
+    await db.update('journal_entries', {'user_id': uid}, where: 'user_id IS NULL');
+    await db.update('checkin_history', {'user_id': uid}, where: 'user_id IS NULL');
   }
 
   /// Hapus semua jurnal & check-in (hapus akun).
@@ -114,8 +133,8 @@ class LocalDatabaseService {
   Future<int> dropExhaustedActivities(String uid, int maxAttempts) async =>
       (await _database).delete('outbox', where: 'user_id = ? AND attempts >= ?', whereArgs: [uid, maxAttempts]);
 
-  Future<List<Map<String, Object?>>> allCheckIns() async {
+  Future<List<Map<String, Object?>>> allCheckIns(String uid) async {
     final db = await _database;
-    return db.query('checkin_history', orderBy: 'created_at DESC');
+    return db.query('checkin_history', where: 'user_id = ?', whereArgs: [uid], orderBy: 'created_at DESC');
   }
 }

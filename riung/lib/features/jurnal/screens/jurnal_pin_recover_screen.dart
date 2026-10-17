@@ -64,8 +64,9 @@ class _JurnalPinRecoverScreenState extends State<JurnalPinRecoverScreen> {
       setState(() { _checking = false; _current = ''; });
       return;
     }
-    if (matches) {
-      await scope.pinService.setPin(_current);
+    final uid = scope.auth.uid;
+    if (matches && uid != null) {
+      await scope.pinService.setPin(uid, _current);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } else {

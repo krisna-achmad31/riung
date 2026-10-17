@@ -7,6 +7,9 @@ abstract final class AppSpacing {
   static const double lg = 16;
   static const double xl = 20;
   static const double xxl = 24;
+
+  /// Jarak antar blok di frame `Konten` layar Riung Glass (gap 14).
+  static const double konten = 14;
 }
 
 /// Skala radius Riung — dipakai untuk kartu, tombol, chip, dsb.

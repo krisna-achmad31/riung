@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 
 /// Teks yang dipakai berulang di banyak layar (tombol umum, status umum).
 /// Teks khusus satu fitur ada di class strings fitur itu.
@@ -6,6 +5,7 @@ abstract class CommonStrings {
   const CommonStrings();
 
   String get batal;
+  String get proBadge;
   String get simpan;
   String get lanjut;
   String get kembali;
@@ -34,7 +34,7 @@ abstract class CommonStrings {
   String get offlineBanner;
   String get didYouKnow;
   String premiumLockedBody(String freeTierNote);
-  String premiumPriceLine(int monthlyPrice, int trialDays);
+  String premiumPriceLine(String monthlyPrice, int? trialDays);
   String get seePremium;
   String get skipForNow;
 
@@ -65,6 +65,8 @@ class CommonStringsId extends CommonStrings {
 
   @override
   String get batal => 'Batal';
+  @override
+  String get proBadge => 'PRO';
   @override
   String get simpan => 'Simpan';
   @override
@@ -119,7 +121,8 @@ class CommonStringsId extends CommonStrings {
   @override
   String premiumLockedBody(String freeTierNote) => 'Konten ini bagian dari Riung Premium. $freeTierNote';
   @override
-  String premiumPriceLine(int monthlyPrice, int trialDays) => 'Rp${_rupiah(monthlyPrice)}/bln · trial $trialDays hari gratis';
+  String premiumPriceLine(String monthlyPrice, int? trialDays) =>
+      trialDays == null ? '$monthlyPrice/bln' : '$monthlyPrice/bln · trial $trialDays hari gratis';
   @override
   String get seePremium => 'Lihat Riung Premium';
   @override
@@ -131,6 +134,8 @@ class CommonStringsEn extends CommonStrings {
 
   @override
   String get batal => 'Cancel';
+  @override
+  String get proBadge => 'PRO';
   @override
   String get simpan => 'Save';
   @override
@@ -185,12 +190,10 @@ class CommonStringsEn extends CommonStrings {
   @override
   String premiumLockedBody(String freeTierNote) => 'This content is part of Riung Premium. $freeTierNote';
   @override
-  String premiumPriceLine(int monthlyPrice, int trialDays) => 'Rp${_rupiah(monthlyPrice)}/mo · $trialDays-day free trial';
+  String premiumPriceLine(String monthlyPrice, int? trialDays) =>
+      trialDays == null ? '$monthlyPrice/mo' : '$monthlyPrice/mo · $trialDays-day free trial';
   @override
   String get seePremium => 'See Riung Premium';
   @override
   String get skipForNow => 'Skip for now';
 }
-
-/// Format rupiah dengan pemisah ribuan titik (59000 → 59.000).
-String _rupiah(int amount) => NumberFormat.decimalPattern('id_ID').format(amount);

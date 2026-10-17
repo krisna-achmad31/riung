@@ -21,6 +21,12 @@ abstract final class AppColors {
   /// Tepi kaca (g-glass-edge) — border kartu & pemisah.
   static const Color garis = Color(0xE6FFFFFF);
 
+  /// Opsi radio terpilih (frame `Tahunan`/`Paket 5 sesi`, putih 88%).
+  static const Color kartuTerpilih = Color(0xE0FFFFFF);
+
+  /// Opsi radio tak terpilih (frame `Bulanan`/`1 sesi`, putih 50%).
+  static const Color kartuOpsi = Color(0x80FFFFFF);
+
   /// Kaca tab bar mengambang (`Tab Bar Kaca`, putih 65%).
   static const Color kacaNav = Color(0xA6FFFFFF);
 

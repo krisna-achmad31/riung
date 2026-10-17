@@ -56,7 +56,7 @@ Fase dibagi 3 minggu sebelum launch store, 1 minggu launch, 2 minggu pasca-launc
 
 | Minggu | Akun | Ide Konten Viral | Format | Hook / CTA |
 |---|---|---|---|---|
-| **W-3** | `.id` | **"Si Sempurna Bukan Kamu — Ini Monster Kebiasaan"** | Carousel 6 slide | Hook: "Ketika 95 masih dianggap 'kurang usaha' — ini bukan kamu gagal. Ini Si Sempurna." CTA: "Kenali dulu. Download nanti." |
+| **W-3** | `.id` | **"Si Sempurna Bukan Kamu — Ini Monster Pikiran"** | Carousel 6 slide | Hook: "Ketika 95 masih dianggap 'kurang usaha' — ini bukan kamu gagal. Ini Si Sempurna." CTA: "Kenali dulu. Download nanti." |
 | **W-3** | `.global` | **"Perfectionism Is Fear in a Fancy Suit"** | Carousel 6 slide + Reels 25s | Hook: "95/100 feels like failure. That's not ambition — it's a cognitive distortion." CTA: "Know the pattern. Start gently." |
 | **W-3** | `@riung` | **Bilingual Launch — "Meet The Monsters"** | Carousel + Story series | Introduksi 7 monster dalam format split caption. CTA: "Follow @riung.id (ID) atau @riung.global (EN) untuk versi lengkap." |
 | **W-2** | `.id` | **"Si Kabut — Pikiran Berkabut"** | Chat-style post + Reels 20s | Hook chat: "[Chat] 'Udah mulai tugas belum?' 'Belum deh, nanti aja.' — Ini Si Kabut, bukan malas." CTA: "Satu langkah kecil hari ini. Coba di Riung." |
@@ -69,7 +69,7 @@ Fase dibagi 3 minggu sebelum launch store, 1 minggu launch, 2 minggu pasca-launc
 **Format Video Viral (Reels/TikTok/Shorts) — Template dari `riung_ad_generator.html`:**
 
 Gunakan struktur 20 detik ini untuk semua video master:
-- **0–4 detik — Hook:** Masalah user & monster liar muncul (contoh: jam 2 pagi, scroll medsos, Si Gulir / Si Waswas muncul).
+- **0–4 detik — Hook:** Masalah user & monster liar muncul (contoh: jam 2 pagi, scroll medsos, Si Kabut / Si Waswas muncul — pakai monster pikiran (gratis); monster kebiasaan = Premium, belum dikampanyekan).
 - **4–8 detik — Eksternalisasi:** "Bukan kamu yang lemah. Ini 'Si Waswas' yang lagi membajak perhatianmu."
 - **8–13 detik — Solusi Aplikasi:** Demo Mode Fokus / Aplikasi Beku / Jeda Napas 4-4-4 (gunakan scene dari ad generator).
 - **13–17 detik — Transformasi:** Monster jinak muncul, progres naik, tanpa guilt.
@@ -144,6 +144,13 @@ Dari perspektif `@automation-governance-architect`: sistem harus **pemerintahan 
 
 ### 3.3 Template Adaptasi 3 Versi (Copy-Paste Ready)
 
+**Aturan visual (i18n key, bukan split per slide):** setiap aset didesain **satu kali dalam EN** di `design/campaign.pen`. Setiap teks di desain punya *i18n key* (metadata node), dan versi `.id` dirender dari kamus yang sama. Jadi tidak ada slide yang memuat EN di atas + ID di bawah.
+- `.global` → render EN.
+- `.id` → render ID (teks dari kamus, nada gaul/hangat disesuaikan di kamus `.id`).
+- `@riung` → pakai salah satu render (EN atau ID, sesuai audiens post). Sifat bilingual akun hub ada di **caption**, bukan di gambar.
+
+Yang diadaptasi per akun = isi kamus (nada, istilah, CTA) + caption + jadwal. Layout, monster, dan warna tetap satu sumber.
+
 Gunakan template ini setiap ide:
 
 ```markdown
@@ -152,6 +159,7 @@ Monster: Si Waswas
 Distorsi: Catastrophizing
 Format: Carousel 4:5 + Reels 25s
 Visual: Monster jinak (versi lembut) + ilustrasi latar
+Desain: design/campaign.pen frame [ID frame] (EN) · i18n key prefix: [mis. camp3.waswas.*]
 
 ---
 
@@ -174,7 +182,8 @@ Posting: Senin 08:00 UTC (15:00 WIB / pagi US)
 ---
 
 ## VERSI @RIUNG (Hub / Bilingual)
-Caption split:
+Visual: render EN atau ID dari frame yang sama (bukan slide split)
+Caption split (hanya teks caption):
 [EN — atas] "Your brain wrote a horror movie. The script? One small worry — that's catastrophizing."
 [ID — bawah] "Kamu belum mulai tugas. Otak langsung: 'Gagal total.' Ini bukan kamu — ini Si Waswas."
 CTA: "Kenali monsternya di aplikasi. Follow @riung.id atau @riung.global untuk versi lengkap. 🌙 / 🌍"

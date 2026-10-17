@@ -72,6 +72,15 @@ Future<void> main() async {
   // sqflite (Jurnal/Check-in) sengaja TIDAK dibuka di sini — lazy saat
   // fitur itu benar-benar dipakai, lihat LocalDatabaseService.
   final prefs = await LocalPrefsStore.init();
+  // Data domain-user di prefs/sqflite/secure storage di-scope per uid
+  // (audit C-01). Data lama (sebelum per-uid) diserahkan sekali ke
+  // pemiliknya; gagal → dicoba lagi saat start berikutnya.
+  prefs.bindAccount(() => FirebaseAuth.instance.currentUser?.uid);
+  try {
+    await LegacyAccountMigration.run(prefs: prefs, currentUid: FirebaseAuth.instance.currentUser?.uid);
+  } catch (e) {
+    debugPrint('LegacyAccountMigration gagal: $e');
+  }
   // Hasil Kenali Dirimu terenkripsi — didekripsi sekali, lalu dibaca sinkron
   // oleh Beranda/Profil/Brankas (Monster Kebiasaan bangun dari hasil ini).
   await KenaliResultRepository.instance.load(prefs);
@@ -158,6 +167,7 @@ class _RiungAppState extends State<RiungApp> {
       throw StateError('StubAuthService tidak boleh dipakai di build rilis');
     }
     _authService = widget.authService ?? FirebaseAuthService(googleServerClientId: googleServerClientId);
+    widget.prefs.bindAccount(() => _authService.currentUid);
     if (widget.userRepository == null && widget.walletFunctions == null) {
       const baseUrl = String.fromEnvironment('RIUNG_API_BASE_URL', defaultValue: 'https://riung.e55techlab.com');
       const devToken = String.fromEnvironment('RIUNG_DEV_TOKEN');
@@ -334,17 +344,31 @@ class _RiungAppState extends State<RiungApp> {
   void _onAuthUidChanged() {
     final uid = _auth.uid;
     if (uid == null) {
-      if (_loadedForUid != null) { _loadedForUid = null; _apiState?.clearSession(); }
+      if (_loadedForUid != null) { _loadedForUid = null; _clearAccountState(); }
       return;
     }
     if (uid == _loadedForUid) return;
-    if (_loadedForUid != null) _apiState?.clearSession();
+    if (_loadedForUid != null) _clearAccountState();
     _loadedForUid = uid;
     _wallet.load(uid);
     _streak.load(uid);
     _monsterProgress.load(uid);
     _bootstrapBackend(uid);
     if (_contentRepository case final ApiContentRepository repository) repository.warm();
+  }
+
+  /// Keluar/pindah akun: tidak ada state akun lama yang boleh tertinggal di
+  /// memori (audit C-01). Data persisten sudah per uid, jadi cukup lupakan
+  /// cache notifier lalu biarkan akun berikutnya memuat miliknya sendiri.
+  void _clearAccountState() {
+    _apiState?.clearSession();
+    _wallet.clearSession();
+    _streak.clearSession();
+    _monsterProgress.clearSession();
+    _session.clearSession();
+    _premiumRestoreTried = false;
+    widget.prefs.notifyAccountChanged();
+    KenaliResultRepository.instance.reload(widget.prefs);
   }
 
   Future<void> _bootstrapBackend(String uid) async {

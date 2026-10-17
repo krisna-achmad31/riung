@@ -23,6 +23,19 @@ class SessionNotifier extends ChangeNotifier {
   Duration? get totalDuration => _totalDuration;
   SessionEndReason get endReason => _endReason;
 
+  /// Akun berganti/keluar: hentikan sesi Fokus yang masih berjalan tanpa
+  /// menghitungnya sebagai selesai (audit C-01).
+  void clearSession() {
+    _ticker?.cancel();
+    _ticker = null;
+    _totalDuration = null;
+    _remaining = Duration.zero;
+    _isActive = false;
+    _isPaused = false;
+    _endReason = SessionEndReason.none;
+    notifyListeners();
+  }
+
   void start(Duration duration) {
     _ticker?.cancel();
     _totalDuration = duration;

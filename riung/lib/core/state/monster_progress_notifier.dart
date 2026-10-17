@@ -38,6 +38,13 @@ class MonsterProgressNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Akun berganti/keluar: lupakan progres monster akun lama (audit C-01).
+  void clearSession() {
+    _uid = null;
+    _progress = {};
+    notifyListeners();
+  }
+
   /// Menjamin setiap id di [saboteurIds] punya entri progres (default liar
   /// 0%) tanpa menimpa yang sudah ada — dipakai sekali setelah asesmen
   /// onboarding selesai (semua 7 monster "ada" sejak awal, CBT: semua orang

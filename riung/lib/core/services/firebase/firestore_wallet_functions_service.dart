@@ -52,6 +52,7 @@ class FirestoreWalletFunctionsService implements WalletFunctionsService {
 
   @override
   Future<Wallet> earnCoins({required String uid, required int amount, required String reason}) async {
+    checkCoinAmount(amount);
     final ref = _userDoc(uid);
     return _firestore.runTransaction((tx) async {
       final snap = await tx.get(ref);
@@ -68,6 +69,7 @@ class FirestoreWalletFunctionsService implements WalletFunctionsService {
 
   @override
   Future<Wallet> spendCoins({required String uid, required int amount, required String reason}) async {
+    checkCoinAmount(amount);
     final ref = _userDoc(uid);
     return _firestore.runTransaction((tx) async {
       final snap = await tx.get(ref);

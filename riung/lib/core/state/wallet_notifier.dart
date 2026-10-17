@@ -153,6 +153,25 @@ class WalletNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Akun berganti/keluar: lupakan saldo & inventaris akun lama supaya UI
+  /// tidak pernah menampilkannya ke akun berikutnya (audit C-01).
+  void clearSession() {
+    _uid = null;
+    _wallet = Wallet.zero();
+    _tickets = 0;
+    _ticketsEarnedToday = 0;
+    _fightsToday = 0;
+    _loading = false;
+    _ownedCosmetics = {};
+    _prepaidFocusSessions = 0;
+    _streakShieldBalance = 0;
+    _purchasedReserve = 0;
+    _freeFocusDate = null;
+    _freeFocusUsed = 0;
+    _premiumClaimDate = null;
+    notifyListeners();
+  }
+
   String _todayIso() {
     final now = DateTime.now();
     return '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';

@@ -29,6 +29,7 @@ class LocalWalletFunctionsService implements WalletFunctionsService {
 
   @override
   Future<Wallet> earnCoins({required String uid, required int amount, required String reason}) async {
+    checkCoinAmount(amount);
     final wallet = await _currentWallet(uid);
     return _persist(wallet.copyWith(
       coins: wallet.coins + amount,
@@ -38,6 +39,7 @@ class LocalWalletFunctionsService implements WalletFunctionsService {
 
   @override
   Future<Wallet> spendCoins({required String uid, required int amount, required String reason}) async {
+    checkCoinAmount(amount);
     final wallet = await _currentWallet(uid);
     if (wallet.coins < amount) {
       throw InsufficientCoinsException(wallet.coins, amount);

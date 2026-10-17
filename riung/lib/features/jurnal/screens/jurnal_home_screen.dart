@@ -45,7 +45,8 @@ class _JurnalHomeScreenState extends State<JurnalHomeScreen> {
 
   Future<void> _gate() async {
     final scope = AppScope.of(context);
-    final hasPin = await scope.pinService.hasPin;
+    final pinUid = scope.auth.uid;
+    final hasPin = pinUid != null && await scope.pinService.hasPin(pinUid);
     if (!mounted) return;
 
     Widget gateScreen;

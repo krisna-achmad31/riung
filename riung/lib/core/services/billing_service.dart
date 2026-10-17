@@ -41,9 +41,16 @@ enum PremiumSku {
 
 enum BillingStatus { pending, success, error, canceled }
 
+/// Hasil "Pulihkan pembelian": [none] = akun Play ini tidak punya pembelian,
+/// [failed] = Play/server gagal atau tidak menjawab (boleh dicoba lagi),
+/// [otherAccount] = langganan di Play ini milik akun Riung lain.
+enum RestoreOutcome { restored, none, failed, otherAccount }
+
 /// Jenis kegagalan pembelian — UI menerjemahkannya sesuai bahasa aktif lewat
 /// `TokoStrings.billingError` (layer ini tidak membuat kalimat sendiri).
-enum BillingErrorKind { purchaseFailed, deliveryFailed }
+/// [otherAccount] = server menolak langganan yang dipulihkan karena terikat
+/// ke akun Riung lain (`purchase_invalid` pada baris restore).
+enum BillingErrorKind { purchaseFailed, deliveryFailed, otherAccount }
 
 class BillingUpdate {
   const BillingUpdate({required this.productId, required this.status, this.errorKind, this.detail});
@@ -92,8 +99,18 @@ class BillingService {
     'premium_yearly',
   };
 
+  /// Batas tunggu jawaban Play setelah `restorePurchases` — Play tidak
+  /// menjamin selalu memancarkan update, jadi UI tidak boleh menunggu
+  /// selamanya.
+  static const restoreTimeout = Duration(seconds: 20);
+
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   Future<void> _processing = Future.value();
+  Completer<RestoreOutcome>? _restoreWaiter;
+
+  /// Langganan Premium yang terakhir terverifikasi di HP ini (dari restore
+  /// atau pembelian) — dipakai sebagai `oldPurchaseDetails` saat pindah plan.
+  GooglePlayPurchaseDetails? _activeSubscription;
   final Set<String> _consumed = {};
   final _updatesController = StreamController<BillingUpdate>.broadcast();
 
@@ -112,13 +129,28 @@ class BillingService {
       final available = await _iap.isAvailable();
       if (!available) return false;
       _subscription = _iap.purchaseStream.listen((purchases) {
-        _processing = _processing.then((_) => _onPurchaseUpdate(purchases)).catchError((Object error, StackTrace stack) {
+        // Jawaban restore = daftar yang semuanya `restored` (boleh kosong).
+        final pendingRestore = _restoreWaiter;
+        final waiter = pendingRestore != null && purchases.every((p) => p.status == PurchaseStatus.restored) ? pendingRestore : null;
+        if (waiter != null) _restoreWaiter = null;
+        _processing = _processing.then((_) async {
+          final result = await _onPurchaseUpdate(purchases);
+          if (waiter != null && !waiter.isCompleted) {
+            waiter.complete(switch (result) {
+              _ when purchases.isEmpty => RestoreOutcome.none,
+              (delivered: > 0, otherAccount: _) => RestoreOutcome.restored,
+              (delivered: _, otherAccount: true) => RestoreOutcome.otherAccount,
+              _ => RestoreOutcome.failed,
+            });
+          }
+        }).catchError((Object error, StackTrace stack) {
           // Jangan menelan diam-diam: pembelian yang belum terproses tetap
           // tertunda di Play & dipulihkan lewat restore berikutnya.
           _report(error, stack, 'billing_update_failed');
           for (final p in purchases) {
             _updatesController.add(BillingUpdate(productId: p.productID, status: BillingStatus.error, errorKind: BillingErrorKind.deliveryFailed));
           }
+          if (waiter != null && !waiter.isCompleted) waiter.complete(RestoreOutcome.failed);
         });
       }, onError: (Object error, StackTrace stack) => _report(error, stack, 'billing_stream_error'));
       _available = true;
@@ -170,21 +202,66 @@ class BillingService {
     }
     final account = (await apiState?.refresh())?.billingAccountId;
     if (account == null || account.isEmpty) throw StateError('Server billing account required');
-    await _iap.buyConsumable(purchaseParam: PurchaseParam(productDetails: product, applicationUserName: account), autoConsume: false);
+    final launched = await _iap.buyConsumable(purchaseParam: PurchaseParam(productDetails: product, applicationUserName: account), autoConsume: false);
+    // Tanpa sheet Play tidak akan ada update di stream — UI harus tahu.
+    if (!launched) throw StateError('Google Play purchase flow not launched');
   }
 
+  /// Beli atau pindah plan Premium. Bila server menyatakan akun ini sudah
+  /// Premium di plan lain, pembelian dikirim sebagai penggantian langganan
+  /// (`ChangeSubscriptionParam`) supaya Play tidak membuat langganan kedua
+  /// yang tertagih ganda. Plan yang sama tidak bisa dibeli dua kali.
   Future<void> buyPremium(ProductDetails product) async {
     if (_isAnonymous()) {
       throw StateError('buyPremium dipanggil selagi masih anonim — pasang ensureAccountForPurchase() di UI pemanggil.');
     }
-    final account = (await apiState?.refresh())?.billingAccountId;
+    final me = await apiState?.refresh();
+    final account = me?.billingAccountId;
     if (account == null || account.isEmpty) throw StateError('Server billing account required');
-    await _iap.buyNonConsumable(purchaseParam: PurchaseParam(productDetails: product, applicationUserName: account));
+    final activePlan = me!.activePremiumPlan;
+    if (activePlan == product.id) throw StateError('Plan $activePlan sudah aktif');
+    ChangeSubscriptionParam? change;
+    if (activePlan != null) {
+      if (_activeSubscription?.productID != activePlan) await restorePurchases();
+      final current = _activeSubscription;
+      if (current == null || current.productID != activePlan) {
+        throw StateError('Langganan aktif $activePlan tidak ditemukan di akun Play ini');
+      }
+      // withTimeProration berlaku untuk dua arah (bulanan ↔ tahunan); harga
+      // per bulan tahunan lebih murah, jadi chargeProratedPrice ditolak Play.
+      change = ChangeSubscriptionParam(oldPurchaseDetails: current, replacementMode: ReplacementMode.withTimeProration);
+    }
+    final launched = await _iap.buyNonConsumable(
+      purchaseParam: GooglePlayPurchaseParam(productDetails: product, applicationUserName: account, changeSubscriptionParam: change),
+    );
+    if (!launched) throw StateError('Google Play purchase flow not launched');
   }
 
-  Future<void> restorePurchases() => _iap.restorePurchases();
+  /// Tidak pernah throw. Selesai saat Play menjawab (termasuk daftar
+  /// kosong), saat Play melempar error, atau setelah [restoreTimeout].
+  Future<RestoreOutcome> restorePurchases() async {
+    final pending = _restoreWaiter;
+    if (pending != null) return pending.future;
+    final waiter = Completer<RestoreOutcome>();
+    _restoreWaiter = waiter;
+    try {
+      await _iap.restorePurchases();
+    } catch (error, stack) {
+      _report(error, stack, 'billing_restore_call_failed');
+      if (identical(_restoreWaiter, waiter)) _restoreWaiter = null;
+      if (!waiter.isCompleted) waiter.complete(RestoreOutcome.failed);
+    }
+    return waiter.future.timeout(restoreTimeout, onTimeout: () {
+      if (identical(_restoreWaiter, waiter)) _restoreWaiter = null;
+      return RestoreOutcome.failed;
+    });
+  }
 
-  Future<void> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
+  /// Mengembalikan jumlah pembelian yang berhasil diverifikasi & diterima,
+  /// dan apakah ada langganan yang ditolak karena milik akun Riung lain.
+  Future<({int delivered, bool otherAccount})> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
+    var deliveredCount = 0;
+    var otherAccount = false;
     final restored = purchases.where((p) => p.status == PurchaseStatus.restored).toList();
     final restoredResults = <String, BillingResult>{};
     if (restored.isNotEmpty && apiState != null) {
@@ -197,10 +274,19 @@ class BillingService {
           try {
             final response = await apiState!.api.restore(chunk.map((p) => (productId: p.productID, purchaseToken: p.verificationData.serverVerificationData)).toList());
             final results = response['results'] as List? ?? [];
-            for (var i = 0; i < results.length && i < chunk.length; i++) {
-              final row = jsonObject(results[i]);
-              if (row['error'] != null) continue;
-              restoredResults[chunk[i].verificationData.serverVerificationData] = BillingResult(row['result'] is Map ? jsonObject(row['result']) : row);
+            for (final (i, raw) in results.indexed) {
+              final row = jsonObject(raw);
+              final purchase = _restoreRowPurchase(row, i, chunk, results.length);
+              if (purchase == null) continue;
+              if (row['error'] != null) {
+                final code = jsonObject(row['error'])['code'];
+                if (code == 'purchase_invalid' && PremiumSku.values.any((s) => s.productId == purchase.productID)) {
+                  otherAccount = true;
+                  _updatesController.add(BillingUpdate(productId: purchase.productID, status: BillingStatus.error, errorKind: BillingErrorKind.otherAccount));
+                }
+                continue;
+              }
+              restoredResults[purchase.verificationData.serverVerificationData] = BillingResult(row['result'] is Map ? jsonObject(row['result']) : row);
             }
             break;
           } catch (error, stack) {
@@ -241,6 +327,10 @@ class BillingService {
             if (purchase.status == PurchaseStatus.restored && !restoredResults.containsKey(purchase.verificationData.serverVerificationData)) continue;
             final delivered = await _deliver(purchase, restoredResult: restoredResults[purchase.verificationData.serverVerificationData]);
             if (!delivered) continue;
+            deliveredCount++;
+            if (purchase is GooglePlayPurchaseDetails && PremiumSku.values.any((s) => s.productId == purchase.productID)) {
+              _activeSubscription = purchase;
+            }
             _updatesController.add(BillingUpdate(productId: purchase.productID, status: BillingStatus.success));
           } catch (e) {
             _updatesController.add(BillingUpdate(
@@ -251,6 +341,20 @@ class BillingService {
           }
       }
     }
+    return (delivered: deliveredCount, otherAccount: otherAccount);
+  }
+
+  /// Baris hasil `/v1/billing/restore` dicocokkan lewat `purchaseToken`
+  /// (server boleh menghilangkan/mengurutkan ulang baris). Indeks hanya
+  /// dipakai bila server tidak mengirim token DAN jumlah baris sama persis —
+  /// selain itu baris diabaikan (pembelian tetap tertunda di Play) daripada
+  /// ack/consume jatuh ke pembelian yang salah.
+  static PurchaseDetails? _restoreRowPurchase(Map<String, dynamic> row, int index, List<PurchaseDetails> chunk, int rowCount) {
+    final token = row['purchaseToken'] ?? jsonObject(row['result'])['purchaseToken'];
+    if (token is String && token.isNotEmpty) {
+      return chunk.where((p) => p.verificationData.serverVerificationData == token).firstOrNull;
+    }
+    return rowCount == chunk.length ? chunk[index] : null;
   }
 
   Future<bool> _deliver(PurchaseDetails purchase, {BillingResult? restoredResult}) async {

@@ -48,6 +48,15 @@ class StreakNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Akun berganti/keluar: lupakan streak akun lama (audit C-01).
+  void clearSession() {
+    _uid = null;
+    _current = 0;
+    _longest = 0;
+    _lastCheckinDate = null;
+    notifyListeners();
+  }
+
   /// Menandai check-in hari ini selesai. Koin check-in TIDAK ditambahkan
   /// di sini — pemanggil bertanggung jawab memanggil
   /// `WalletNotifier.earn(...)` juga (lihat [sudahCheckinHariIni] untuk

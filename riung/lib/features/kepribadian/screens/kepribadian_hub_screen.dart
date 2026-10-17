@@ -46,7 +46,8 @@ class _KepribadianHubScreenState extends State<KepribadianHubScreen> {
     final scope = AppScope.of(context);
     setState(() => _loadingSignals = true);
     try {
-      if (await scope.pinService.hasPin) {
+      final pinUid = scope.auth.uid;
+      if (pinUid != null && await scope.pinService.hasPin(pinUid)) {
         if (!mounted) return;
         final ok = await Navigator.of(context).push<bool>(
           MaterialPageRoute(builder: (_) => const JurnalPinUnlockScreen(), fullscreenDialog: true),

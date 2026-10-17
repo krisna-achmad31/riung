@@ -30,6 +30,13 @@ abstract class WalletFunctionsService {
   Future<List<CoinTransaction>> getTransactions({required String uid, int limit = 50});
 }
 
+/// Jumlah mutasi koin tidak boleh negatif — `spendCoins(-100)` akan lolos
+/// cek saldo lalu MENAMBAH koin. Nol diizinkan (sub-langkah bundel Aplikasi
+/// Beku memotong 0 koin). Dipanggil di awal setiap implementasi.
+void checkCoinAmount(int amount) {
+  if (amount < 0) throw ArgumentError.value(amount, 'amount', 'Jumlah koin tidak boleh negatif');
+}
+
 class InsufficientCoinsException implements Exception {
   InsufficientCoinsException(this.balance, this.requested);
   final int balance;

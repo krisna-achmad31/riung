@@ -1,8 +1,8 @@
 import '../../../core/services/assessment_draft_store.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/services/api/api_client.dart';
 import '../../../core/widgets/api_error_feedback.dart';
-import '../../../core/l10n/api_strings.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/services/services.dart';
@@ -39,7 +39,10 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
           style: AppTextStyles.title.copyWith(fontSize: 17),
         ),
         content: Text(
-          '${dialogContext.s.profil.deleteConfirmBody}${AppScope.of(context).auth.profile?.premiumNow == true ? '\n\n${deleteSubscriptionWarning(Localizations.localeOf(context).languageCode == 'en')}' : ''}',
+          AppScope.of(context).auth.profile?.premiumNow == true
+              ? '${dialogContext.s.profil.deleteConfirmBody}\n\n'
+                    '${dialogContext.s.profil.deleteSubDialogNote}'
+              : dialogContext.s.profil.deleteConfirmBody,
           style: AppTextStyles.body.copyWith(fontSize: 13),
         ),
         actions: [
@@ -73,7 +76,7 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
       } else {
         await scope.auth.deleteAccount();
       }
-      await scope.pinService.clearPin();
+      if (uid != null) await scope.pinService.clearPin(uid);
       await scope.userRepository.deleteAllLocalData();
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -97,7 +100,8 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final wallet = AppScope.of(context).wallet;
+    final scope = AppScope.of(context);
+    final wallet = scope.wallet;
     final t = context.s.profil;
     return Scaffold(
       body: SafeArea(
@@ -165,6 +169,21 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
                           color: AppColors.teksSekunder,
                         ),
                       ),
+                    ),
+                    ListenableBuilder(
+                      listenable: scope.auth,
+                      builder: (context, _) {
+                        final profile = scope.auth.profile;
+                        if (profile == null || !profile.premiumNow) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: AppSpacing.md),
+                          child: _LanggananPlayWarning(
+                            premiumPlan: profile.premiumPlan,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Container(
@@ -240,6 +259,82 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// H-05 (audit 2026-10): hapus akun TIDAK membatalkan langganan Play. Kalau
+/// Premium masih berlaku, beri tahu dengan jelas + jalan pintas ke halaman
+/// langganan Play — tanpa menghalangi penghapusan (bukan dark pattern).
+class _LanggananPlayWarning extends StatelessWidget {
+  const _LanggananPlayWarning({required this.premiumPlan});
+
+  final String? premiumPlan;
+
+  // Pola sama dengan `_kelolaLangganan` di langganan_screen.dart.
+  Future<void> _kelolaDiPlay() async {
+    final productId = premiumPlan;
+    final uri = Uri.parse(
+      'https://play.google.com/store/account/subscriptions'
+      '${productId != null ? '?sku=$productId&package=com.riung.riung' : ''}',
+    );
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.s.profil;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.aksenHangatLembut.withValues(alpha: 0.8),
+        border: Border.all(
+          color: AppColors.aksenHangat.withValues(alpha: 0.7),
+          width: AppGlass.edgeWidth,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                size: 18,
+                color: AppColors.aksenHangatGelap,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  t.deleteSubWarningTitle,
+                  style: AppTextStyles.title.copyWith(
+                    fontSize: 14,
+                    color: AppColors.teksUtama,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            t.deleteSubWarningBody,
+            style: AppTextStyles.caption.copyWith(
+              fontSize: 12,
+              height: 1.45,
+              fontWeight: FontWeight.w500,
+              color: AppColors.teksUtama,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          RiungButton(
+            label: t.deleteManagePlay,
+            variant: RiungButtonVariant.secondary,
+            onPressed: _kelolaDiPlay,
+          ),
+        ],
       ),
     );
   }

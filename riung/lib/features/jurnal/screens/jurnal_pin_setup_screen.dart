@@ -52,12 +52,12 @@ class _JurnalPinSetupScreenState extends State<JurnalPinSetupScreen> {
 
     if (_current == _firstPin) {
       final scope = AppScope.of(context);
-      await scope.pinService.setPin(_current);
+      final uid = scope.auth.uid;
+      if (uid != null) await scope.pinService.setPin(uid, _current);
       // Backup PIN (hash+salt, bukan plain text) ke Firestore — cuma
       // untuk user yang sudah login, supaya bisa dipulihkan di device
       // baru (lihat JurnalPinRecoverScreen). Anonim dilewati: tidak ada
       // uid permanen buat disambungkan.
-      final uid = scope.auth.uid;
       if (uid != null && !scope.auth.isAnonymous) {
         final salt = scope.pinService.generateSalt();
         final hash = scope.pinService.hashPin(_current, salt);

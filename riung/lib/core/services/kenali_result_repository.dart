@@ -61,11 +61,19 @@ class KenaliResultRepository {
     _cache = {for (final r in _history) r.testId: r};
   }
 
+  /// Akun aktif berganti: buang hasil akun lama dari memori lalu baca
+  /// milik akun baru (hasil & kuncinya per uid, audit C-01).
+  Future<void> reload(LocalPrefsStore prefs) {
+    clearCache();
+    return load(prefs);
+  }
+
   Future<void> _doLoad(LocalPrefsStore prefs) async {
+    final uid = prefs.accountUid;
     final cipher = prefs.kenaliResultsCipher;
-    if (cipher == null) return;
+    if (uid == null || cipher == null) return;
     try {
-      final map = jsonDecode(await _crypto.decryptText(cipher)) as Map<String, dynamic>;
+      final map = jsonDecode(await _crypto.decryptText(uid, cipher)) as Map<String, dynamic>;
       final raw = map[_fHistory];
       _setHistory(raw is List
           ? [
@@ -87,12 +95,14 @@ class KenaliResultRepository {
   Future<void> save(LocalPrefsStore prefs, KenaliResult result) async {
     _setHistory([..._history, result]);
     revision.value++;
+    final uid = prefs.accountUid;
+    if (uid == null) return;
     try {
       final plain = jsonEncode({
         _fVersion: 2,
         _fHistory: [for (final r in _history) {_fTestId: r.testId, ...r.toMap()}],
       });
-      await prefs.setKenaliResultsCipher(await _crypto.encryptText(plain));
+      await prefs.setKenaliResultsCipher(await _crypto.encryptText(uid, plain));
     } catch (e) {
       // Secure storage tak tersedia: hasil tetap ada di sesi ini saja.
       debugPrint('KenaliResultRepository: gagal menyimpan hasil ($e)');

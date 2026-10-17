@@ -96,13 +96,13 @@ class LocalUserRepository implements UserRepository {
 
   @override
   Future<List<CheckIn>> getCheckIns(String uid) async {
-    final rows = await _db.allCheckIns();
+    final rows = await _db.allCheckIns(uid);
     return rows.map(_checkInFromRow).toList();
   }
 
   @override
   Future<CheckIn> saveCheckIn(String uid, CheckIn checkIn) async {
-    await _db.insertCheckIn({
+    await _db.insertCheckIn(uid, {
       'id': _uuid.v4(),
       'date': checkIn.toMap()[CheckIn.fDate],
       'mood': checkIn.mood,
@@ -118,7 +118,7 @@ class LocalUserRepository implements UserRepository {
   @override
   Future<bool> hasCheckedInToday(String uid) async {
     final todayIso = DateTime.now().toIso8601String().split('T').first;
-    final rows = await _db.allCheckIns();
+    final rows = await _db.allCheckIns(uid);
     return rows.any((r) => r['date'] == todayIso);
   }
 
@@ -136,17 +136,17 @@ class LocalUserRepository implements UserRepository {
 
   @override
   Future<List<JournalEntry>> getJournalEntries(String uid) async {
-    final rows = await _db.allJournalEntries();
+    final rows = await _db.allJournalEntries(uid);
     final entries = <JournalEntry>[];
     for (final row in rows) {
-      entries.add(await _journalEntryFromRow(row));
+      entries.add(await _journalEntryFromRow(uid, row));
     }
     return entries;
   }
 
-  Future<JournalEntry> _journalEntryFromRow(Map<String, Object?> row) async {
+  Future<JournalEntry> _journalEntryFromRow(String uid, Map<String, Object?> row) async {
     final encryptedText = row['text_encrypted'] as String;
-    final text = await _crypto.decryptText(encryptedText);
+    final text = await _crypto.decryptText(uid, encryptedText);
     final tagsRaw = row['tags'] as String?;
     return JournalEntry(
       entryId: row['id'] as String,
@@ -160,8 +160,8 @@ class LocalUserRepository implements UserRepository {
 
   @override
   Future<JournalEntry> saveJournalEntry(String uid, JournalEntry entry) async {
-    final encryptedText = await _crypto.encryptText(entry.text);
-    await _db.insertJournalEntry({
+    final encryptedText = await _crypto.encryptText(uid, entry.text);
+    await _db.insertJournalEntry(uid, {
       'id': entry.entryId,
       'date': entry.createdAt.toIso8601String().split('T').first,
       'prompt_id': entry.promptId,
@@ -176,7 +176,7 @@ class LocalUserRepository implements UserRepository {
   @override
   Future<int> journalEntryCountForDate(String uid, DateTime date) {
     final iso = date.toIso8601String().split('T').first;
-    return _db.journalEntryCountForDate(iso);
+    return _db.journalEntryCountForDate(uid, iso);
   }
 
   @override
@@ -216,7 +216,7 @@ class LocalUserRepository implements UserRepository {
   @override
   Future<void> deleteAllLocalData() async {
     await _db.deleteAll();
-    await _crypto.deleteKey();
+    await _crypto.deleteAllKeys();
     await _prefs.clearAll();
     KenaliResultRepository.instance.clearCache();
   }

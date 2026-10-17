@@ -86,6 +86,10 @@ abstract class ProfilStrings {
   String get deleteBack;
   String get deleting;
   String get deleteYes;
+  String get deleteSubWarningTitle;
+  String get deleteSubWarningBody;
+  String get deleteSubDialogNote;
+  String get deleteManagePlay;
 
   // ── PIN jurnal ──
   String get pinChange;
@@ -328,6 +332,16 @@ class ProfilStringsId extends ProfilStrings {
   String get deleting => 'Menghapus...';
   @override
   String get deleteYes => 'Ya, hapus akunku';
+  @override
+  String get deleteSubWarningTitle => 'Langganan Premium-mu masih aktif';
+  @override
+  String get deleteSubWarningBody =>
+      'Menghapus akun tidak menghentikan langganan Google Play. Tagihan tetap jalan sampai kamu membatalkannya sendiri di Google Play. Batalkan dulu di sana, baru hapus akun di sini.';
+  @override
+  String get deleteSubDialogNote =>
+      'Ingat: langganan Google Play-mu tidak ikut berhenti kalau akun dihapus.';
+  @override
+  String get deleteManagePlay => 'Kelola di Google Play';
 
   @override
   String get pinChange => 'Ganti PIN';
@@ -441,7 +455,7 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get switchYearly => 'Lihat paket tahunan';
   @override
-  String priceVia(String price, bool monthly) => 'Rp$price/${monthly ? 'bulan' : 'tahun'} via Google Play';
+  String priceVia(String price, bool monthly) => '$price/${monthly ? 'bulan' : 'tahun'} via Google Play';
   @override
   String get whatYouGet => 'YANG KAMU DAPAT';
   @override
@@ -652,6 +666,16 @@ class ProfilStringsEn extends ProfilStrings {
   String get deleting => 'Deleting...';
   @override
   String get deleteYes => 'Yes, delete my account';
+  @override
+  String get deleteSubWarningTitle => 'Your Premium subscription is still active';
+  @override
+  String get deleteSubWarningBody =>
+      'Deleting your account does not stop your Google Play subscription. You will keep being charged until you cancel it yourself in Google Play. Cancel it there first, then delete your account here.';
+  @override
+  String get deleteSubDialogNote =>
+      'Remember: your Google Play subscription does not stop when your account is deleted.';
+  @override
+  String get deleteManagePlay => 'Manage in Google Play';
 
   @override
   String get pinChange => 'Change PIN';
@@ -765,7 +789,7 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get switchYearly => 'See the yearly plan';
   @override
-  String priceVia(String price, bool monthly) => 'Rp$price/${monthly ? 'month' : 'year'} via Google Play';
+  String priceVia(String price, bool monthly) => '$price/${monthly ? 'month' : 'year'} via Google Play';
   @override
   String get whatYouGet => 'WHAT YOU GET';
   @override

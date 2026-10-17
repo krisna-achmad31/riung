@@ -9,7 +9,7 @@ Yang harus disiapkan manual sebelum submit (Claude tidak bisa generate gambar/sc
 | Aset | Spesifikasi | Status |
 |---|---|---|
 | Ikon aplikasi (hi-res) | 512×512 px, PNG 32-bit, tanpa alpha untuk store listing | Bisa diekspor dari `assets/icon/icon.png` (upscale/crop jika perlu — sumbernya sudah 1024×1024) |
-| Feature graphic | 1024×500 px, JPG/PNG, tanpa teks kecil (terpotong di beberapa device) | **Belum ada — perlu didesain manual** |
+| Feature graphic | 1024×500 px, JPG/PNG, tanpa teks kecil (terpotong di beberapa device) | **Sudah ada:** `design/campaign.pen` frame `rB1QZ` (versi EN). Tugas tersisa: versi ID. |
 | Screenshot HP | Min. 2, maks. 8. Rasio 16:9 atau 9:16, sisi pendek min. 320px, sisi panjang maks. 3840px | **Belum ada — ambil dari app berjalan di HP/emulator** |
 | Screenshot tablet 7" (opsional) | Sama rasio, kalau app dioptimasi tablet | Opsional — app ini Android-first HP, boleh dilewati dulu |
 | Screenshot tablet 10" (opsional) | Sama | Opsional |

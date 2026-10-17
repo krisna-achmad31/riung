@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
+import 'riung_skeleton.dart';
 
 /// Opsi pilihan kaca berradio (frame `Tahunan`/`Bulanan`, `1 sesi`/`Paket 5
 /// sesi`): radio, judul + badge opsional, sub, trailing opsional (harga).
+/// [subtitle] null = masih memuat (mis. harga dari Play) → skeleton.
 class RiungRadioOption extends StatelessWidget {
   const RiungRadioOption({
     super.key,
@@ -18,7 +20,7 @@ class RiungRadioOption extends StatelessWidget {
   });
 
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final bool selected;
   final VoidCallback onTap;
   final String? badge;
@@ -34,10 +36,10 @@ class RiungRadioOption extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: selected ? AppColors.permukaanPadat.withValues(alpha: 0.88) : AppColors.kartu,
+          color: selected ? AppColors.kartuTerpilih : AppColors.kartuOpsi,
           border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2 : AppGlass.edgeWidth),
           borderRadius: BorderRadius.circular(24),
-          boxShadow: selected ? AppGlass.shadow : null,
+          boxShadow: AppGlass.shadow,
         ),
         child: Row(
           children: [
@@ -49,8 +51,6 @@ class RiungRadioOption extends StatelessWidget {
                 color: selected ? AppColors.primer : Colors.transparent,
                 border: Border.all(color: selected ? AppColors.primer : AppColors.teksRedup, width: 1.5),
               ),
-              alignment: Alignment.center,
-              child: selected ? Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.diAtasTinta)) : null,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -72,7 +72,10 @@ class RiungRadioOption extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                  if (subtitle case final text?)
+                    Text(text, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder))
+                  else
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 2), child: RiungSkeleton(width: 140, height: 12)),
                 ],
               ),
             ),

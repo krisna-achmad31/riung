@@ -18,6 +18,15 @@ class ApiSnapshot {
   String get billingAccountId => raw['billingAccountId'] as String? ?? '';
   Map<String, dynamic> get today => jsonObject(raw['today']);
   Map<String, dynamic> get inventory => jsonObject(raw['inventory']);
+
+  /// Plan Premium yang sedang berjalan menurut server (`active`/`in_grace`,
+  /// sama dengan `ApiUserRepository.getUserProfile`), null bila tidak ada.
+  String? get activePremiumPlan {
+    final premium = jsonObject(raw['premium']);
+    final active = premium['status'] == 'active' || premium['status'] == 'in_grace' || premium['active'] == true;
+    final plan = premium['plan'];
+    return active && plan is String && plan.isNotEmpty ? plan : null;
+  }
 }
 
 enum ActivityType {

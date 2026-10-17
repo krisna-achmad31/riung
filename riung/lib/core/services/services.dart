@@ -20,6 +20,7 @@ export 'firebase/remote_config_service.dart';
 export 'hybrid_wallet_functions_service.dart';
 export 'journal_crypto_service.dart';
 export 'kenali_result_repository.dart';
+export 'legacy_account_migration.dart';
 export 'jurnal_pin_service.dart';
 export 'local_database_service.dart';
 export 'local_notification_service.dart';
