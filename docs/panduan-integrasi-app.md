@@ -7,7 +7,8 @@ server yang menentukan **berapa nilainya**. Firebase tetap dipakai untuk login (
 Analytics, Crashlytics, dan Remote Config (hanya saklar fitur/A-B, bukan harga).
 
 Dokumen ini panduan praktis. Kontrak lengkap (semua field, batas, keamanan): `docs/backend-api-spec.md`.
-Untuk mencoba setiap endpoint: Postman collection di `backend/postman/`. Daftar pekerjaan app yang sudah
+Untuk mencoba setiap endpoint: Postman collection di `backend/postman/`. Perubahan API per rilis:
+`backend/CHANGELOG.md`. Daftar pekerjaan app yang sudah
 dipetakan: `docs/todo-luar-backend.md` §B–C.
 
 ---

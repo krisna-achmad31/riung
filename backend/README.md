@@ -7,6 +7,7 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
 - Spesifikasi API, keamanan, rate limit, logging: [`docs/backend-api-spec.md`](../docs/backend-api-spec.md)
 - Pekerjaan di luar backend (app, infra): [`docs/todo-luar-backend.md`](../docs/todo-luar-backend.md)
 - **Untuk tim app**: [`docs/panduan-integrasi-app.md`](../docs/panduan-integrasi-app.md) · Postman: [`postman/`](postman/README.md)
+- Riwayat perubahan per rilis: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Status
 
