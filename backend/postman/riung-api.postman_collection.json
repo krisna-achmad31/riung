@@ -847,7 +847,7 @@
     {
       "id": "cd61376c-1e27-54e5-b8a2-f43a933ee05c",
       "name": "6. Google Play billing",
-      "description": "Akun permanen. **Produksi**: belum aktif (503) dan butuh `purchaseToken` asli dari Play. **Lokal** (`DEV_BILLING`): token palsu di bawah.",
+      "description": "Akun permanen. **Produksi**: `verify`/`restore` belum aktif (503), webhook 404 selama billing mati; setelah aktif butuh `purchaseToken` asli dari Play. **Lokal** (`DEV_BILLING`, env `devBilling`): token palsu dibuat otomatis dan disimpan di `coinToken`/`subToken`; di produksi isi keduanya dengan token asli.",
       "item": [
         {
           "id": "0600f3f4-1220-5a39-9114-8b00da1f3fc4",
@@ -874,7 +874,7 @@
             "description": "Jalankan **Me** dulu (`billingAccountId`). Status `credited`/`already_credited` → app meng-*consume* paket koin (`consumePurchase`; beli dengan `autoConsume: false`).",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"productId\": \"coin_pack_large\",\n  \"purchaseToken\": \"dev-coin:{{billingAccountId}}:coin_pack_large:{{$timestamp}}\"\n}",
+              "raw": "{\n  \"productId\": \"coin_pack_large\",\n  \"purchaseToken\": \"{{coinToken}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -882,7 +882,30 @@
               }
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.environment.get('devBilling') === 'true') pm.environment.set('coinToken', `dev-coin:${pm.environment.get('billingAccountId')}:coin_pack_large:${Date.now()}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.test('paket koin dikreditkan', () => pm.expect(j.result.status).to.be.oneOf(['credited', 'already_credited']));",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "id": "ab0aa149-9bbc-5310-8cdd-08ab2ff11a4d",
@@ -909,7 +932,7 @@
             "description": "Status `active`/`inactive` → app memanggil `completePurchase` (acknowledge langganan).",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"productId\": \"premium_yearly\",\n  \"purchaseToken\": \"dev-sub:{{billingAccountId}}:premium_yearly:365:{{$timestamp}}\"\n}",
+              "raw": "{\n  \"productId\": \"premium_yearly\",\n  \"purchaseToken\": \"{{subToken}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -917,7 +940,31 @@
               }
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.environment.get('devBilling') === 'true') pm.environment.set('subToken', `dev-sub:${pm.environment.get('billingAccountId')}:premium_yearly:365:${Date.now()}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.test('langganan aktif', () => pm.expect(j.result.status).to.eql('active'));",
+                  "  pm.test('premium tahunan', () => pm.expect(j.premium.plan).to.eql('premium_yearly'));",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "id": "df591f97-805d-5824-aec5-53db0a91e83c",
@@ -941,10 +988,10 @@
                 "restore"
               ]
             },
-            "description": "",
+            "description": "Hasil `restorePurchases()` di app, ≤ 20 pembelian. Satu baris per pembelian dengan urutan yang sama, masing-masing membawa `purchaseToken` — **cocokkan lewat token**, bukan posisi. Dua token pertama = pembelian dari dua request sebelumnya (`already_credited`/`active`, tanpa koin dobel); baris ke-3 = token akun lain → `ok: false`, `purchase_invalid`. Daftar kosong ditolak (400): kalau Play tidak mengembalikan apa pun, app tidak memanggil endpoint ini.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"purchases\": [\n    {\n      \"productId\": \"coin_pack_small\",\n      \"purchaseToken\": \"dev-coin:{{billingAccountId}}:coin_pack_small:restore1\"\n    }\n  ]\n}",
+              "raw": "{\n  \"purchases\": [\n    {\n      \"productId\": \"coin_pack_large\",\n      \"purchaseToken\": \"{{coinToken}}\"\n    },\n    {\n      \"productId\": \"premium_yearly\",\n      \"purchaseToken\": \"{{subToken}}\"\n    },\n    {\n      \"productId\": \"coin_pack_small\",\n      \"purchaseToken\": \"dev-coin:ba_akun_lain:coin_pack_small:1\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -952,7 +999,43 @@
               }
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Lokal tanpa Verifikasi lebih dulu: buat token baru (dikreditkan saat restore).",
+                  "if (pm.environment.get('devBilling') === 'true') {",
+                  "  const ba = pm.environment.get('billingAccountId');",
+                  "  if (!pm.environment.get('coinToken')) pm.environment.set('coinToken', `dev-coin:${ba}:coin_pack_large:${Date.now()}`);",
+                  "  if (!pm.environment.get('subToken')) pm.environment.set('subToken', `dev-sub:${ba}:premium_yearly:365:${Date.now()}`);",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const sent = JSON.parse(pm.variables.replaceIn(pm.request.body.raw)).purchases;",
+                  "  const rows = pm.response.json().results;",
+                  "  pm.test('satu baris per pembelian, urutan sama', () => pm.expect(rows.map(r => r.purchaseToken)).to.eql(sent.map(p => p.purchaseToken)));",
+                  "  pm.test('productId ikut dikembalikan', () => pm.expect(rows.map(r => r.productId)).to.eql(sent.map(p => p.productId)));",
+                  "  // Di app: cocokkan lewat purchaseToken, bukan posisi baris.",
+                  "  const byToken = Object.fromEntries(rows.map(r => [r.purchaseToken, r]));",
+                  "  const coin = byToken[pm.environment.get('coinToken')], sub = byToken[pm.environment.get('subToken')];",
+                  "  pm.test('paket koin tidak dikreditkan dua kali', () => pm.expect(coin.ok && coin.result.status).to.be.oneOf(['credited', 'already_credited']));",
+                  "  pm.test('langganan dipulihkan', () => pm.expect(sub.ok && sub.result.status).to.eql('active'));",
+                  "  pm.test('token akun lain ditolak', () => pm.expect(rows[2].ok === false && rows[2].error.code).to.eql('purchase_invalid'));",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "id": "78c1a385-51bb-5611-b49e-447487a38c53",
@@ -1018,7 +1101,7 @@
                 "google-play"
               ]
             },
-            "description": "Hanya lokal (bearer `dev-pubsub`). Di produksi dipanggil Pub/Sub dengan token OIDC Google. 204.",
+            "description": "Lokal (bearer `dev-pubsub`) → 204. Produksi: 404 selama billing belum aktif; setelah aktif hanya Pub/Sub dengan token OIDC Google.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"message\": {\n    \"data\": \"{{rtdnData}}\",\n    \"messageId\": \"{{rtdnMessageId}}\"\n  },\n  \"subscription\": \"projects/riung-5e979/subscriptions/play-rtdn\"\n}",
@@ -1859,7 +1942,7 @@
                 "me"
               ]
             },
-            "description": "⚠️ Menghapus semua data + user Firebase. Akun permanen: login ≤ 5 menit (`recent_login_required`). App Check limited-use. 204."
+            "description": "⚠️ Menghapus semua data + user Firebase. Akun permanen: login ≤ 5 menit (`recent_login_required`). App Check limited-use. 204. Langganan Play **tidak** ikut berhenti: bila `premium.autoRenewing` (dari **Me**/**Status Premium**) = true, app menampilkan peringatan + tautan kelola langganan Play sebelum tombol hapus."
           },
           "response": []
         }

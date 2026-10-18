@@ -59,6 +59,49 @@ save_etag = [
     "const tag = pm.response.headers.get('ETag');",
     "if (tag) pm.environment.set('configEtag', tag);",
 ]
+# Token dev disimpan supaya Restore mengirim pembelian yang sama seperti di HP. Produksi (devBilling kosong):
+# isi coinToken/subToken dengan purchaseToken asli dari app.
+coin_token_pre = [
+    "if (pm.environment.get('devBilling') === 'true') pm.environment.set('coinToken', `dev-coin:${pm.environment.get('billingAccountId')}:coin_pack_large:${Date.now()}`);",
+]
+sub_token_pre = [
+    "if (pm.environment.get('devBilling') === 'true') pm.environment.set('subToken', `dev-sub:${pm.environment.get('billingAccountId')}:premium_yearly:365:${Date.now()}`);",
+]
+coin_verify_test = [
+    "if (pm.response.code === 200) {",
+    "  const j = pm.response.json();",
+    "  pm.test('paket koin dikreditkan', () => pm.expect(j.result.status).to.be.oneOf(['credited', 'already_credited']));",
+    "}",
+]
+sub_verify_test = [
+    "if (pm.response.code === 200) {",
+    "  const j = pm.response.json();",
+    "  pm.test('langganan aktif', () => pm.expect(j.result.status).to.eql('active'));",
+    "  pm.test('premium tahunan', () => pm.expect(j.premium.plan).to.eql('premium_yearly'));",
+    "}",
+]
+restore_pre = [
+    "// Lokal tanpa Verifikasi lebih dulu: buat token baru (dikreditkan saat restore).",
+    "if (pm.environment.get('devBilling') === 'true') {",
+    "  const ba = pm.environment.get('billingAccountId');",
+    "  if (!pm.environment.get('coinToken')) pm.environment.set('coinToken', `dev-coin:${ba}:coin_pack_large:${Date.now()}`);",
+    "  if (!pm.environment.get('subToken')) pm.environment.set('subToken', `dev-sub:${ba}:premium_yearly:365:${Date.now()}`);",
+    "}",
+]
+restore_test = [
+    "if (pm.response.code === 200) {",
+    "  const sent = JSON.parse(pm.variables.replaceIn(pm.request.body.raw)).purchases;",
+    "  const rows = pm.response.json().results;",
+    "  pm.test('satu baris per pembelian, urutan sama', () => pm.expect(rows.map(r => r.purchaseToken)).to.eql(sent.map(p => p.purchaseToken)));",
+    "  pm.test('productId ikut dikembalikan', () => pm.expect(rows.map(r => r.productId)).to.eql(sent.map(p => p.productId)));",
+    "  // Di app: cocokkan lewat purchaseToken, bukan posisi baris.",
+    "  const byToken = Object.fromEntries(rows.map(r => [r.purchaseToken, r]));",
+    "  const coin = byToken[pm.environment.get('coinToken')], sub = byToken[pm.environment.get('subToken')];",
+    "  pm.test('paket koin tidak dikreditkan dua kali', () => pm.expect(coin.ok && coin.result.status).to.be.oneOf(['credited', 'already_credited']));",
+    "  pm.test('langganan dipulihkan', () => pm.expect(sub.ok && sub.result.status).to.eql('active'));",
+    "  pm.test('token akun lain ditolak', () => pm.expect(rows[2].ok === false && rows[2].error.code).to.eql('purchase_invalid'));",
+    "}",
+]
 rtdn_pre = [
     "// Pub/Sub push body: base64 DeveloperNotification + messageId unik.",
     "const n = { version: '1.0', packageName: 'com.riung.riung', eventTimeMillis: String(Date.now()), testNotification: { version: '1.0' } };",
@@ -147,21 +190,24 @@ items = [
             desc="Halaman berikut: tambah `cursor` = `nextCursor`."),
         req("Akses jurnal", "GET", "/v1/journal/access", query=[("promptId", "p_hakim", "opsional")]),
     ]),
-    folder("6. Google Play billing", "Akun permanen. **Produksi**: belum aktif (503) dan butuh `purchaseToken` asli dari Play. **Lokal** (`DEV_BILLING`): token palsu di bawah.", [
-        req("Verifikasi paket koin (dev)", "POST", "/v1/billing/verify",
-            body={"productId": "coin_pack_large", "purchaseToken": "dev-coin:{{billingAccountId}}:coin_pack_large:{{$timestamp}}"},
+    folder("6. Google Play billing", "Akun permanen. **Produksi**: `verify`/`restore` belum aktif (503), webhook 404 selama billing mati; setelah aktif butuh `purchaseToken` asli dari Play. **Lokal** (`DEV_BILLING`, env `devBilling`): token palsu dibuat otomatis dan disimpan di `coinToken`/`subToken`; di produksi isi keduanya dengan token asli.", [
+        req("Verifikasi paket koin (dev)", "POST", "/v1/billing/verify", pre=coin_token_pre, tests=coin_verify_test,
+            body={"productId": "coin_pack_large", "purchaseToken": "{{coinToken}}"},
             desc="Jalankan **Me** dulu (`billingAccountId`). Status `credited`/`already_credited` → app meng-*consume* paket koin (`consumePurchase`; beli dengan `autoConsume: false`)."),
-        req("Verifikasi langganan (dev)", "POST", "/v1/billing/verify",
-            body={"productId": "premium_yearly", "purchaseToken": "dev-sub:{{billingAccountId}}:premium_yearly:365:{{$timestamp}}"},
+        req("Verifikasi langganan (dev)", "POST", "/v1/billing/verify", pre=sub_token_pre, tests=sub_verify_test,
+            body={"productId": "premium_yearly", "purchaseToken": "{{subToken}}"},
             desc="Status `active`/`inactive` → app memanggil `completePurchase` (acknowledge langganan)."),
-        req("Restore", "POST", "/v1/billing/restore",
-            body={"purchases": [{"productId": "coin_pack_small", "purchaseToken": "dev-coin:{{billingAccountId}}:coin_pack_small:restore1"}]}),
+        req("Restore", "POST", "/v1/billing/restore", pre=restore_pre, tests=restore_test,
+            body={"purchases": [{"productId": "coin_pack_large", "purchaseToken": "{{coinToken}}"},
+                                {"productId": "premium_yearly", "purchaseToken": "{{subToken}}"},
+                                {"productId": "coin_pack_small", "purchaseToken": "dev-coin:ba_akun_lain:coin_pack_small:1"}]},
+            desc="Hasil `restorePurchases()` di app, ≤ 20 pembelian. Satu baris per pembelian dengan urutan yang sama, masing-masing membawa `purchaseToken` — **cocokkan lewat token**, bukan posisi. Dua token pertama = pembelian dari dua request sebelumnya (`already_credited`/`active`, tanpa koin dobel); baris ke-3 = token akun lain → `ok: false`, `purchase_invalid`. Daftar kosong ditolak (400): kalau Play tidak mengembalikan apa pun, app tidak memanggil endpoint ini."),
         req("Status Premium", "GET", "/v1/billing/subscription"),
         req("Koin harian Premium tahunan", "POST", "/v1/premium/daily-coins",
             desc="Akun permanen + Premium **tahunan** aktif (lokal: setelah *Verifikasi langganan*); +2 koin 1×/hari."),
         req("Webhook RTDN (dev)", "POST", "/v1/webhooks/google-play", auth="{{pubsubToken}}", pre=rtdn_pre,
             body={"message": {"data": "{{rtdnData}}", "messageId": "{{rtdnMessageId}}"}, "subscription": "projects/riung-5e979/subscriptions/play-rtdn"},
-            desc="Hanya lokal (bearer `dev-pubsub`). Di produksi dipanggil Pub/Sub dengan token OIDC Google. 204."),
+            desc="Lokal (bearer `dev-pubsub`) → 204. Produksi: 404 selama billing belum aktif; setelah aktif hanya Pub/Sub dengan token OIDC Google."),
     ]),
     folder("7. Toko & loadout", "Harga dari `Config` → `catalog`; `expectedPrice` harus sama.", [
         req("Beli kosmetik monster", "POST", "/v1/shop/purchase", body={"itemType": "cosmetic", "itemId": "topi_rajut", "expectedPrice": 100}),
@@ -202,7 +248,7 @@ items = [
     ]),
     folder("11. Hapus akun", "Jalankan terakhir: menghapus akun yang dipakai koleksi ini.", [
         req("Hapus akun", "DELETE", "/v1/me",
-            desc="⚠️ Menghapus semua data + user Firebase. Akun permanen: login ≤ 5 menit (`recent_login_required`). App Check limited-use. 204."),
+            desc="⚠️ Menghapus semua data + user Firebase. Akun permanen: login ≤ 5 menit (`recent_login_required`). App Check limited-use. 204. Langganan Play **tidak** ikut berhenti: bila `premium.autoRenewing` (dari **Me**/**Status Premium**) = true, app menampilkan peringatan + tautan kelola langganan Play sebelum tombol hapus."),
     ]),
 ]
 
@@ -238,6 +284,7 @@ local = env("riung-local", [
     ("pubsubToken", "dev-pubsub", "default"),
     ("appVersion", "1.0.0", "default"),
     ("userId", "", "default"), ("billingAccountId", "", "default"), ("ticketId", "", "default"), ("configEtag", "", "default"),
+    ("devBilling", "true", "default"), ("coinToken", "", "default"), ("subToken", "", "default"),
 ])
 prod = env("riung-prod", [
     ("baseUrl", "https://riung.e55techlab.com", "default"),
@@ -248,6 +295,7 @@ prod = env("riung-prod", [
     ("pubsubToken", "", "secret"),
     ("appVersion", "1.0.0", "default"),
     ("userId", "", "default"), ("billingAccountId", "", "default"), ("ticketId", "", "default"), ("configEtag", "", "default"),
+    ("coinToken", "", "secret"), ("subToken", "", "secret"),
 ])
 
 for fname, obj in [("riung-api.postman_collection.json", collection), ("riung-local.postman_environment.json", local),

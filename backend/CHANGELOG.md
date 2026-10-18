@@ -11,7 +11,12 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
-_(kosong)_
+### Diubah
+- Postman collection (`backend/postman/`): request *Verifikasi* menyimpan `coinToken`/`subToken`, lalu
+  **Restore** mengirim ulang keduanya ditambah satu token akun lain. Restore dites: satu baris per pembelian,
+  urutan sama, `purchaseToken` di setiap baris, tanpa koin dobel, `purchase_invalid`. Folder billing & hapus
+  akun mengikuti perilaku sekarang (webhook `404` selama billing mati, peringatan `premium.autoRenewing`).
+  52 request, 64 assertion. Tidak mengubah API.
 
 ---
 
