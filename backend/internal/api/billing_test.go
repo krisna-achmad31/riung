@@ -126,6 +126,12 @@ func TestBillingRestore(t *testing.T) {
 	if len(results) != 3 || results[0].(map[string]any)["ok"] != true || results[2].(map[string]any)["ok"] != false {
 		t.Fatalf("restore results: %s", r.raw)
 	}
+	// Every row names its token, so the app never has to rely on row order.
+	for i, want := range []string{"tok-restore-small-1", "tok-restore-sub-1", "tok-restore-bogus"} {
+		if got := results[i].(map[string]any)["purchaseToken"]; got != want {
+			t.Fatalf("row %d purchaseToken = %v, want %s", i, got, want)
+		}
+	}
 	// Restoring again grants nothing new.
 	r = e.do(req{method: "POST", path: "/v1/billing/restore", token: tok, idemKey: newKey(), body: body})
 	if walletNum(r, "purchasedCoins") != 80 {

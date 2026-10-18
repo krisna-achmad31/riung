@@ -156,6 +156,48 @@ Aplikasi Beku, pembelian).
       source}` + field honeypot `website` yang disembunyikan (harus kosong). Isi `CORS_LANDING_ORIGIN` di
       server dengan domain landing.
 
+## C2. Hasil uji frontend branch `implement_and_integrations_api` (`c95887a`) — dicek ulang 2026-10-18
+
+Setiap temuan agent testing dicocokkan dengan kode branch itu dan source plugin `in_app_purchase_android` 0.5.3.
+
+- [ ] **C-01 (Critical) — terkonfirmasi.** Data lokal bocor antar akun di HP yang sama: `AuthNotifier.signOut()`
+      hanya `FirebaseAuth.signOut()` lalu kembali ke Splash (`pengaturan_screen.dart`); `journal_entries` &
+      `checkin_history` tanpa `user_id` (outbox sudah punya); kunci enkripsi jurnal (`JournalCryptoService`),
+      PIN (`JurnalPinService`, disimpan apa adanya, bukan hash) dan `LocalPrefsStore` satu untuk seluruh
+      perangkat. Perbaikan: saat logout kirim outbox lalu hapus DB lokal + secure storage + prefs (atau
+      simpan per `uid`); saat login akun lain, mulai dari data kosong lalu tarik `GET /v1/me`.
+- [ ] **H-01 — terkonfirmasi.** `paywall_step.dart` & `paywall_premium_screen.dart`: update `pending`
+      memasang `_processing = true` sampai update berikutnya (VA/Indomaret bisa berjam-jam); "Lanjut versi
+      gratis" dan tombol tutup ikut nonaktif. Perbaikan: `pending` → tampilkan "menunggu pembayaran" dan
+      lepas tombol; status akhir datang lewat `purchaseStream`/restore saat app dibuka.
+- [ ] **H-02 — terkonfirmasi, lebih luas.** `_products = {for p in productDetails: p.id: p}` menimpa offer:
+      plugin mengembalikan satu `ProductDetails` per offer dengan `id` sama dan `price` = fase pertama
+      (trial → "Gratis"). Akibatnya harga yang tampil **dan offer yang dibeli** acak. Lama trial diambil dari
+      `rc.premiumTrialHari`, bukan dari Play. Perbaikan: panduan app §11.2.
+- [ ] **H-03 — terkonfirmasi.** `_pulihkanPembelian` memasang `_restoring/_processing` lalu menunggu update;
+      `restorePurchases()` tanpa riwayat mengirim list kosong → tidak ada update → macet. Perbaikan: lepas
+      status setelah `await restorePurchases()` selesai dan tampilkan "tidak ada pembelian untuk dipulihkan"
+      bila tidak ada item `restored`.
+- [ ] **H-04 — terkonfirmasi.** Tidak ada `changeSubscriptionParam` di app → beli tahunan saat bulanan aktif
+      membuat langganan kedua (tertagih ganda). Backend memilih langganan yang berakhir paling lama, tapi
+      tidak bisa mencegah tagihan. Perbaikan: panduan app §11.2.
+- [ ] **H-05 — sebagian.** `hapus_akun_screen.dart` sudah menambah peringatan bila `premiumNow`, tapi tetap
+      bisa lanjut dan tidak ada tautan ke halaman langganan Play; `premiumNow` juga benar untuk langganan
+      yang sudah dibatalkan. Perbaikan: peringatan + tombol Play hanya bila `premium.autoRenewing` (panduan
+      §7). Opsi backend di §D.
+- [ ] **M-01 — terkonfirmasi.** Harga per negara sudah dari Play (`ProductDetails.price`) di paywall, tapi
+      cadangan paywall, `langganan_screen.dart` (`rc.premiumHarga*Idr`), `premium_locked_screen.dart`
+      (`EconomyPremium.hargaBulananIdr`), dan analytics pembelian (`priceIdr`) masih Rupiah. Satu app cukup
+      (harga per negara di Play Console). Perbaikan: selalu `ProductDetails.price`; analytics `rawPrice` +
+      `currencyCode`.
+- [ ] **M-04 — terkonfirmasi, juga backend.** Tidak ada jalur StoreKit di app, dan backend hanya
+      memverifikasi Google Play. Rilis iOS butuh fase backend baru: verifikasi App Store Server API
+      (`transactionId` → Premium/koin), App Store Server Notifications V2 (pengganti RTDN), refund, dan
+      `appAccountToken` (UUID) sebagai padanan `billingAccountId`.
+- [x] **Backend — `purchaseToken` di setiap baris `/v1/billing/restore`** (2026-10-18). App bisa beralih dari
+      pencocokan urutan baris ke pencocokan token (urutan tetap sama dengan request, jadi kode lama tetap benar
+      sampai diganti).
+
 ## D. Keputusan produk yang belum final
 
 Backend memakai default di kolom kanan sampai diputuskan lain.
@@ -171,3 +213,5 @@ Backend memakai default di kolom kanan sampai diputuskan lain.
 | Sesi Fokus yang dibayar koin (bisa dari koin beli) memberi progres monster +4 seperti app sekarang. Aturan #4 dibaca "progres tidak dijual langsung — pembelian hanya membuka akses ke latihan" (sama seperti konten Premium). Atau tiket `coins` dibatasi ke koin latihan saja? | sesuai app: semua koin boleh, progres dari sesi yang dijalankan |
 | Jeda 60 detik antar buka-berbayar Aplikasi Beku juga berlaku untuk pembelian dari Toko (sekarang app hanya menunggu di interstisial)? | ya, server menerapkan jeda untuk semua buka-berbayar |
 | Utang koin hasil refund (`debtCoins`) ditampilkan ke user? Teks apa? | tidak ada copy; API mengembalikan `debtCoins` |
+| Backend menolak `DELETE /v1/me` (`409 subscription_active`) selama langganan masih diperpanjang otomatis, kecuali app mengirim konfirmasi eksplisit? Lebih aman dari bug app, tapi menambah langkah sebelum user bisa menghapus akunnya | tidak — app yang memperingatkan (panduan §7) |
+| Rilis iOS: kapan? (butuh StoreKit di app + verifikasi App Store di backend) | belum direncanakan |

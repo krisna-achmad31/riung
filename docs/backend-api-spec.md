@@ -425,7 +425,8 @@ Error: `409 purchase_invalid` (Google tidak mengonfirmasi pembelian untuk akun i
 dibatalkan/sudah di-refund) · `400 invalid_request` (productId tidak dikenal) · `503 unavailable` (Google Play
 tidak bisa dihubungi atau billing belum dikonfigurasi — app me-retry nanti, pembelian tetap tersimpan di Play).
 
-`restore` menjawab `{ "results": [{ "productId", "ok", "result" | "error": {code, message} }], "wallet", "premium" }`
+`restore` menjawab `{ "results": [{ "productId", "purchaseToken", "ok", "result" | "error": {code, message} }], "wallet", "premium" }`
+— satu baris per item request dengan urutan yang sama; cocokkan dengan **`purchaseToken`**, bukan posisi baris
 — satu item gagal tidak menggagalkan yang lain; gangguan Google/DB atau melewati anggaran 12 detik menggagalkan
 seluruh request (503/500) dan app mengulang (token yang sudah diverifikasi dijawab dari DB). Setiap panggilan ke
 Google dibatasi 5 detik.

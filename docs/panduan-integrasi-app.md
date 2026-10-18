@@ -199,12 +199,17 @@ koin membawa `wallet` terbaru — perbarui `WalletNotifier` dari situ, jangan me
 | Profil | `PATCH /v1/me/profile` | `displayName` (≤ 40 karakter), `avatarId` (`av1`–`av6`), `locale` (`id`/`en`), `persona` (`pelajar`/`mahasiswa`/`pekerja`/`lainnya`), `onboardingDone`, `tz` (IANA); kirim hanya field yang berubah |
 | Hasil asesmen ringkas | `PUT /v1/me/assessment` | `dominantSaboteurs` (1–7 id saboteur), `scores` (id saboteur → 0–100), `completedAt`. Jawaban & hasil detail **tetap di HP** |
 | Anonim → email/Google | `POST /v1/me/link` | setelah `linkWithCredential` di Firebase (uid sama, tanpa body); semua data anonim ikut |
-| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Peringatkan bila langganan masih aktif — batalkan di Play Store dulu |
+| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Bila `premium.autoRenewing` = true (masih ditagih), tampilkan peringatan dengan tombol ke `https://play.google.com/store/account/subscriptions?sku=<plan>&package=com.riung.riung` sebelum tombol hapus — langganan tidak ikut terhapus dan tidak bisa dipindah ke akun baru |
 | Unduh data server | `GET /v1/me/export` | melengkapi `DataExportBuilder` lokal |
 | Backup PIN jurnal | `PUT/GET/DELETE /v1/me/journal-pin-backup`, `POST …/verify` | akun permanen; hash PIN dihitung di HP (`hash` 16–256, `salt` 8–256 karakter base64/hex). `GET` hanya mengembalikan `salt`; verifikasi → `{match, attemptsLeft}`, terkunci 1 jam setelah 10 gagal/hari |
 
 Pembelian dengan uang hanya untuk akun permanen (supaya tidak hilang kalau app dihapus). Akun anonim yang
 tidak dibuka 90 hari dihapus otomatis.
+
+**Logout / ganti akun di HP yang sama**: data lokal (jurnal, check-in, kunci enkripsi jurnal, PIN, prefs,
+tiket Fokus, outbox) milik akun yang keluar. Sebelum akun lain masuk, kirim sisa outbox bila online, lalu
+hapus data lokal — atau simpan semuanya per `uid` (kolom `user_id` / kunci secure storage ber-prefix uid).
+Data di server aman: semua endpoint memakai akun dari token.
 
 ## 8. Latihan, koin & outbox
 
@@ -365,14 +370,27 @@ Future<void> _onPurchase(PurchaseDetails p) async {
 - `409 purchase_invalid` → jangan consume/complete; tampilkan pesan. Google me-refund otomatis setelah 3 hari.
 - `503`/gagal jaringan → jangan apa-apa; pembelian tetap ada di Play dan muncul lagi lewat `restorePurchases()`.
 - Impor `package:in_app_purchase_android/in_app_purchase_android.dart` (tambahkan ke `pubspec.yaml`) untuk
-  `InAppPurchaseAndroidPlatformAddition`. Upgrade bulanan → tahunan: `GooglePlayPurchaseParam` dengan
-  `changeSubscriptionParam`; server memindahkan Premium ke token baru.
+  `InAppPurchaseAndroidPlatformAddition`.
+- **Satu langganan = beberapa `ProductDetails`.** `queryProductDetails` mengembalikan satu
+  `GooglePlayProductDetails` per *offer* (trial, base plan) dengan `id` sama; `price` = fase harga pertama
+  offer itu (trial → "Gratis"). Jangan simpan di map berkunci `id`. Pilih offer dengan sengaja lewat
+  `productDetails.subscriptionOfferDetails[subscriptionIndex]` (`offerId`/`basePlanId`, `pricingPhases`):
+  tampilkan harga dari fase berbayar dan lama trial dari fase gratis (bukan Remote Config), lalu beli
+  `ProductDetails` offer yang dipilih.
+- **Upgrade/downgrade** bulanan ↔ tahunan: `GooglePlayPurchaseParam(productDetails: …, applicationUserName: …,
+  changeSubscriptionParam: ChangeSubscriptionParam(oldPurchaseDetails: langgananAktif, replacementMode: …))`.
+  Tanpa ini Play membuat langganan kedua dan user tertagih dua kali. Server memindahkan Premium ke token baru.
+- **Harga** selalu `ProductDetails.price` (sudah dalam mata uang negara user dari Play); angka IDR di
+  `economy.dart`/Remote Config hanya cadangan saat Play tidak bisa dihubungi. Analytics pembelian memakai
+  `rawPrice` + `currencyCode`, bukan konstanta IDR.
 
 ### 11.3 Restore & status
 - Saat app dibuka/login: `InAppPurchase.instance.restorePurchases()` → pembelian yang belum di-*consume*
   dan langganan aktif datang lewat `purchaseStream` dengan status `restored`. Kirim sekaligus ke
   `POST /v1/billing/restore` `{purchases: [{productId, purchaseToken}]}` (≤ 20, hasil per item), lalu
-  consume/complete per item dengan aturan §11.2. Token yang sudah dikreditkan tidak dikreditkan ulang.
+  consume/complete per item dengan aturan §11.2. Setiap baris hasil membawa `purchaseToken` — cocokkan
+  `PurchaseDetails` dengan token itu, jangan dengan urutan baris. Token yang sudah dikreditkan tidak
+  dikreditkan ulang.
 - `GET /v1/billing/subscription` / `GET /v1/me` → `premium.status`: aktif bila `active` atau `in_grace`.
   Membatalkan perpanjangan (auto-renew mati) tetap Premium sampai `expiresAt`.
 

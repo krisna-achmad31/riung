@@ -139,11 +139,14 @@ type restoreRequest struct {
 	Purchases []purchaseRef `json:"purchases"`
 }
 
+// restoreItem is one row of POST /v1/billing/restore, in request order. It
+// echoes the purchaseToken so the app matches rows by token, not position.
 type restoreItem struct {
-	ProductID string          `json:"productId"`
-	OK        bool            `json:"ok"`
-	Result    *billing.Result `json:"result,omitempty"`
-	Error     *batchError     `json:"error,omitempty"`
+	ProductID     string          `json:"productId"`
+	PurchaseToken string          `json:"purchaseToken"`
+	OK            bool            `json:"ok"`
+	Result        *billing.Result `json:"result,omitempty"`
+	Error         *batchError     `json:"error,omitempty"`
 }
 
 func (s *Server) postBillingRestore(w http.ResponseWriter, r *http.Request) {
@@ -162,18 +165,18 @@ func (s *Server) postBillingRestore(w http.ResponseWriter, r *http.Request) {
 	items := make([]restoreItem, 0, len(req.Purchases))
 	for _, ref := range req.Purchases {
 		if !ref.valid() {
-			items = append(items, restoreItem{ProductID: ref.ProductID, Error: &batchError{Code: httpx.CodeInvalidRequest, Message: "invalid purchase reference"}})
+			items = append(items, restoreItem{ProductID: ref.ProductID, PurchaseToken: ref.PurchaseToken, Error: &batchError{Code: httpx.CodeInvalidRequest, Message: "invalid purchase reference"}})
 			continue
 		}
 		res, _, err := s.billingSvc.Verify(ctx, *c.User, ref.ProductID, ref.PurchaseToken)
 		s.logPurchase(r, c.User.ID, ref, res, err)
 		switch {
 		case err == nil:
-			items = append(items, restoreItem{ProductID: ref.ProductID, OK: true, Result: &res})
+			items = append(items, restoreItem{ProductID: ref.ProductID, PurchaseToken: ref.PurchaseToken, OK: true, Result: &res})
 		case errors.Is(err, billing.ErrInvalidPurchase):
-			items = append(items, restoreItem{ProductID: ref.ProductID, Error: &batchError{Code: httpx.CodePurchaseInvalid, Message: "not confirmed by Google Play"}})
+			items = append(items, restoreItem{ProductID: ref.ProductID, PurchaseToken: ref.PurchaseToken, Error: &batchError{Code: httpx.CodePurchaseInvalid, Message: "not confirmed by Google Play"}})
 		case errors.Is(err, billing.ErrUnknownProduct):
-			items = append(items, restoreItem{ProductID: ref.ProductID, Error: &batchError{Code: httpx.CodeInvalidRequest, Message: "unknown product"}})
+			items = append(items, restoreItem{ProductID: ref.ProductID, PurchaseToken: ref.PurchaseToken, Error: &batchError{Code: httpx.CodeInvalidRequest, Message: "unknown product"}})
 		default:
 			s.billingError(w, r, err) // Play/DB down: let the app retry the whole restore
 			return
