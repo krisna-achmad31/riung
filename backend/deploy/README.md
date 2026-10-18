@@ -284,5 +284,9 @@ Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:8250
 - Redeploy B6 (2026-10-13): image `e5f0110` + config nginx (suite TLS AEAD, header tidak ganda). Config
   sebelumnya disimpan di `/root/riung.nginx.before-b6.conf`; image `825085e` tetap ada untuk rollback.
   Dicek: header & CSP, suite CBC ditolak, situs lain tetap 200/302, field `appCheck` di log.
-- Redeploy 2026-10-13: image `81f763f` (webhook billing → 404 selama billing mati, bukan 503/ERROR). Image
-  `e5f0110` dan `825085e` tetap di VPS untuk rollback.
+- Redeploy 2026-10-13: image `81f763f` (webhook billing → 404 selama billing mati, bukan 503/ERROR).
+- Redeploy 2026-10-18: image `92ef4ed` (`purchaseToken` di setiap baris `/v1/billing/restore`). Sebelum deploy:
+  tes + race, lint, govulncheck bersih, Newman 52 request di stack dev bersih. Di VPS kini hanya `92ef4ed`
+  dan `81f763f` (image lama sempat dibersihkan) — rollback: `./deploy.sh ghcr.io/krisna-achmad31/riung-api:81f763f`.
+- Catatan 2026-10-17: VPS reboot 09:40 WIB; `riung-api` gagal 4× dalam 2 detik karena `shared-postgres` belum
+  menyala (nama host belum bisa di-resolve), lalu jalan normal — `restart: unless-stopped` menanganinya.

@@ -68,6 +68,9 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `core-shared`: Grafana alerting sengaja kosong — sepakati dulu dengan pengelola `core-shared`.
 - [ ] **P1 — App Check `enforce`** setelah app mengirim token: kriteria di `docs/backend-b6-review.md` §4.
 - [ ] **P2 — Uji beban di VPS** saat beta (token Firebase sungguhan), pantau p95 dari Loki.
+- [ ] **P2 — Backend menunggu DB saat start**: setelah reboot VPS (2026-10-17) `riung-api` sempat restart 4×
+      karena `shared-postgres` belum siap (pulih sendiri dalam 4 detik). Perbaikan kecil di backend: coba ulang
+      koneksi DB ±60 detik sebelum keluar, supaya tidak ada log ERROR palsu tiap reboot.
 - [ ] **P2 — `server_tokens off;`** di `shared-nginx` (versi nginx terlihat di header `Server`; berlaku semua situs).
 - [ ] **P2 — CI Flutter**: tambahkan `paths-ignore: ['backend/**']` di
       `.github/workflows/firebase_app_distribution.yml` supaya perubahan backend tidak memicu build APK.

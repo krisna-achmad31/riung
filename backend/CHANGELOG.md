@@ -11,6 +11,12 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+_(kosong)_
+
+---
+
+## [92ef4ed] — 2026-10-18 · produksi
+
 ### Ditambahkan
 - `POST /v1/billing/restore`: setiap baris `results` membawa `purchaseToken` (urutan baris tetap sama
   dengan request). (`7b1bd12`)
