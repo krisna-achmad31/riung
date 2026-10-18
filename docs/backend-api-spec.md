@@ -1,5 +1,5 @@
 # Riung Backend — Spesifikasi API, Keamanan, Rate Limit & Logging
-*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-13 (B0–B6 selesai, API live di `riung.e55techlab.com`; kesiapan produksi: `docs/backend-b6-review.md`)*
+*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-18 (B0–B6 selesai, API live di `riung.e55techlab.com`; kesiapan produksi: `docs/backend-b6-review.md`)*
 
 Untuk tim app, mulai dari **`docs/panduan-integrasi-app.md`** (ringkas & praktis); dokumen ini kontrak lengkapnya.
 

@@ -1,5 +1,5 @@
 # TODO di luar backend
-*Dikumpulkan selama perencanaan & audit backend Go (branch `feat/go-backend`, 2026-10-11, diperbarui 2026-10-13).*
+*Dikumpulkan selama perencanaan & audit backend Go (branch `feat/go-backend`, 2026-10-11, diperbarui 2026-10-18).*
 
 Backend dikerjakan sesuai `docs/backend-go-plan.md` dan `docs/backend-api-spec.md`. Daftar ini berisi
 pekerjaan **di luar** `backend/` yang dibutuhkan supaya backend benar-benar terpakai, ditambah celah yang

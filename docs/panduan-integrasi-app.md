@@ -1,5 +1,5 @@
 # Panduan integrasi app ↔ backend Riung
-*Untuk tim Flutter (`riung/`) · backend Go di `backend/` · API `/v1` · diperbarui 2026-10-13*
+*Untuk tim Flutter (`riung/`) · backend Go di `backend/` · API `/v1` · diperbarui 2026-10-18*
 
 Backend Go menggantikan peran "Cloud Functions" di `CLAUDE.md`: semua koin, progres monster, pembelian,
 tiket Fokus, dan buka-waktu Aplikasi Beku sekarang diputuskan server. App mengirim **apa yang terjadi**,
