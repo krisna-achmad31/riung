@@ -26,7 +26,8 @@ diubah di Flutter).
 - Deploy lewat GitHub Actions: setiap push ke `main`/`feat/go-backend` mem-push image `:<sha 7>` ke GHCR;
   deploy = *Run workflow* dengan `deploy` ✓, lewat user `deploy` di VPS (tanpa password, kunci CI dibatasi
   forced command `riung-ci-deploy`), lalu smoke test. Deploy berhenti bila `deploy.sh`/compose di VPS beda
-  dengan commit. Tag image dan `riung version` = sha 7 karakter.
+  dengan commit. Tag image dan `riung version` = sha 7 karakter. Rollback = *Run workflow* dengan `rollback_tag`
+  (image dari GHCR, tanpa build; image lokal di VPS dihapus cron prune setelah 24 jam).
 - Loki menyimpan log `riung-api`/`riung-migrate` 30 hari (sebelumnya 7).
 
 ### Diubah

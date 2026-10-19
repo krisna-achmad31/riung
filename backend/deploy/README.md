@@ -13,6 +13,7 @@ GitHub Actions (.github/workflows/backend.yml)
    1. test   : go vet, go test -race (+ Postgres 16), govulncheck, golangci-lint
    2. image  : docker build (linux/amd64) → scan Trivy → push ghcr.io/krisna-achmad31/riung-api:<sha 7>
    3. deploy : hanya Run workflow dengan deploy ✓ (atau push ke main bila vars.RIUNG_DEPLOY_ENABLED)
+               → backend-deploy.yml (rollback: Run workflow dengan rollback_tag, tanpa test/build)
                ssh deploy@VPS check          → hash deploy.sh + compose harus sama dengan commit
                ssh deploy@VPS deploy <sha 7> → /usr/local/bin/riung-ci-deploy (forced command)
                smoke test /healthz + /v1/config
@@ -251,12 +252,16 @@ Grafana → Explore → Loki: `{container="riung-api"} | json | level="ERROR"`.
 
 ## D. Rollback
 
-Jalankan `deploy.sh` dengan tag image sebelumnya (image yang pernah di-deploy masih ada di VPS:
-`docker images ghcr.io/krisna-achmad31/riung-api`):
+Deploy ulang tag sebelumnya (lihat CHANGELOG.md atau `gh api /users/krisna-achmad31/packages/container/riung-api/versions`):
 
 ```sh
-ssh -p 8443 deploy@76.13.20.72 'cd /var/www/riung && ./deploy.sh ghcr.io/krisna-achmad31/riung-api:<sha-sebelumnya>'
+gh workflow run Backend --ref feat/go-backend -f rollback_tag=<sha-sebelumnya>
 ```
+
+Image di VPS dihapus cron `/etc/cron.d/docker-image-prune` (`docker image prune -af --filter until=24h`,
+milik VPS bersama), jadi rollback mengambil image dari GHCR — hanya tag yang di-push CI (mulai `f8e9489`).
+Tanpa CI: `ssh -p 8443 deploy@76.13.20.72 'cd /var/www/riung && ./deploy.sh ghcr.io/krisna-achmad31/riung-api:<sha>'`
+(image harus masih ada di VPS, atau pull manual dulu — langkah 5).
 
 Aturan migrasi supaya rollback selalu aman: perubahan skema bersifat **menambah** (kolom/tabel baru,
 nullable/default) dan baru dihapus di rilis berikutnya setelah tidak dipakai (expand → contract).
@@ -271,7 +276,7 @@ nullable/default) dan baru dihapus di rilis berikutnya setelah tidak dipakai (ex
 | 502 dari nginx | `riung-api` mati/restart; situs lain tidak terdampak (pola `resolver`). |
 | `/readyz` 503 di dalam network | shared-postgres tidak terjangkau / password `riung_app` salah. |
 | Pull gagal | CI: job deploy butuh `packages: read` dan package `riung-api` harus memberi akses Actions ke repo ini; manual: lihat langkah 5. Tag salah = sha 7 karakter. |
-| CI: `differ from this commit` | `deploy.sh`/compose di VPS beda dengan commit — salin (langkah 2), jalankan ulang workflow. |
+| CI: `differ from this commit` | `deploy.sh`/compose di VPS beda dengan commit — salin (langkah A.2), jalankan ulang workflow. |
 | Restart berulang setelah reboot | API menunggu Postgres ±60 detik (`database not ready, retrying`, WARN); lebih dari itu = `shared-postgres` mati. |
 
 ## F. Gladi resik lokal (2026-10-11)

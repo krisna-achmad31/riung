@@ -172,3 +172,4 @@ Ringkas: push ke `main`/`feat/go-backend` → CI test, build, scan, push image `
 `gh workflow run Backend --ref <branch> -f deploy=true` → SSH sebagai `deploy` (forced command
 `deploy/riung-ci-deploy.sh`) → `deploy/deploy.sh <image>` di VPS (pull → migrate → recreate `riung-api` →
 tunggu healthy) → smoke test. Push ke `main` deploy sendiri hanya bila `vars.RIUNG_DEPLOY_ENABLED == 'true'`.
+Rollback: `gh workflow run Backend --ref <branch> -f rollback_tag=<sha7>` (image dari GHCR, tanpa build).

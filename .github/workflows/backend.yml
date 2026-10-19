@@ -6,16 +6,22 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/backend.yml"
+      - ".github/workflows/backend-deploy.yml"
   pull_request:
     paths:
       - "backend/**"
       - ".github/workflows/backend.yml"
+      - ".github/workflows/backend-deploy.yml"
   workflow_dispatch:
     inputs:
       deploy:
         description: "Deploy this commit to production after the image is pushed"
         type: boolean
         default: false
+      rollback_tag:
+        description: "Rollback only: deploy this existing image tag (7-char sha) without building"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -33,6 +39,7 @@ defaults:
 jobs:
   test:
     name: Test & lint
+    if: ${{ !inputs.rollback_tag }}
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -133,65 +140,32 @@ jobs:
           echo "$TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           docker push "$IMAGE"
 
-  # Production deploy over SSH as user `deploy`, whose key is bound to
-  # /usr/local/bin/riung-ci-deploy (backend/deploy/riung-ci-deploy.sh): it can
-  # only compare the compose files and deploy a riung-api tag.
-  # Run: Actions → Backend → Run workflow → deploy ✓ (or
-  # `gh workflow run Backend --ref <branch> -f deploy=true`). Pushes to main
+  # Production deploy: backend-deploy.yml (SSH as user `deploy`, forced
+  # command, smoke test). Run: Actions → Backend → Run workflow → deploy ✓, or
+  # `gh workflow run Backend --ref <branch> -f deploy=true`. Pushes to main
   # deploy by themselves only when vars.RIUNG_DEPLOY_ENABLED == 'true'.
   deploy:
-    name: Deploy to VPS
     needs: image
     if: >-
-      (github.event_name == 'workflow_dispatch' && inputs.deploy) ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy && !inputs.rollback_tag) ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RIUNG_DEPLOY_ENABLED == 'true')
-    runs-on: ubuntu-latest
-    environment: production
     permissions:
       contents: read
       packages: read
-    concurrency:
-      group: deploy-production
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v4
+    uses: ./.github/workflows/backend-deploy.yml
+    with:
+      tag: ${{ needs.image.outputs.tag }}
+    secrets: inherit
 
-      - name: Configure SSH
-        env:
-          SSH_KEY: ${{ secrets.VPS_DEPLOY_KEY }}
-          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
-        run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
-          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-
-      # deploy.sh and the compose file are copied to the VPS by an admin; a
-      # commit that changes them must not be deployed with the old copies.
-      - name: Compare compose files with the VPS
-        env:
-          HOST: ${{ secrets.VPS_HOST }}
-          PORT: ${{ secrets.VPS_SSH_PORT }}
-        run: |
-          ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" check > vps.sha256
-          sha256sum deploy/deploy.sh deploy/docker-compose.prod.yml | sed 's|deploy/||' > repo.sha256
-          if ! diff -u vps.sha256 repo.sha256; then
-            echo "::error::deploy.sh / docker-compose.prod.yml on the VPS differ from this commit. Copy them first (backend/deploy/README.md §G), then rerun."
-            exit 1
-          fi
-
-      - name: Deploy
-        env:
-          HOST: ${{ secrets.VPS_HOST }}
-          PORT: ${{ secrets.VPS_SSH_PORT }}
-          TAG: ${{ needs.image.outputs.tag }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          printf '%s' "$TOKEN" | ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" deploy "$TAG"
-
-      - name: Smoke test
-        run: |
-          for path in /healthz /v1/config; do
-            code="$(curl -s -o /dev/null -w '%{http_code}' "https://riung.e55techlab.com$path")"
-            echo "$path $code"
-            [ "$code" = 200 ] || exit 1
-          done
+  # Rollback: `gh workflow run Backend --ref <branch> -f rollback_tag=<sha7>`
+  # redeploys an image already in GHCR; no test or build (the tag was tested
+  # when it was built).
+  rollback:
+    if: github.event_name == 'workflow_dispatch' && inputs.rollback_tag
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/backend-deploy.yml
+    with:
+      tag: ${{ inputs.rollback_tag }}
+    secrets: inherit

@@ -1,0 +1,84 @@
+name: Backend deploy
+
+# Deploys one riung-api image (ghcr.io/krisna-achmad31/riung-api:<tag>) to the
+# VPS. Called by backend.yml: after a build (deploy ✓) or with rollback_tag.
+# Images on the VPS are pruned after 24 h (cron), so a rollback pulls from
+# GHCR: only tags pushed by CI exist there.
+#
+# SSH goes to user `deploy`, whose key is bound to the forced command
+# /usr/local/bin/riung-ci-deploy (backend/deploy/riung-ci-deploy.sh): it can
+# only compare the compose files and deploy a tag.
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if ! printf '%s' "$TAG" | grep -Eq '^[0-9a-f]{7,40}$'; then
+            echo "::error::tag must be a hex git sha (7–40 characters), got '$TAG'"
+            exit 1
+          fi
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.VPS_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # deploy.sh and the compose file are copied to the VPS by an admin; a
+      # commit that changes them must not be deployed with the old copies.
+      - name: Compare compose files with the VPS
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+          PORT: ${{ secrets.VPS_SSH_PORT }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" check > vps.sha256
+          sha256sum deploy/deploy.sh deploy/docker-compose.prod.yml | sed 's|deploy/||' > repo.sha256
+          if ! diff -u vps.sha256 repo.sha256; then
+            echo "::error::deploy.sh / docker-compose.prod.yml on the VPS differ from this commit. Copy them first (backend/deploy/README.md, step A.2), then rerun."
+            exit 1
+          fi
+
+      - name: Deploy
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+          PORT: ${{ secrets.VPS_SSH_PORT }}
+          TAG: ${{ inputs.tag }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$TOKEN" | ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" deploy "$TAG"
+
+      - name: Smoke test
+        run: |
+          for path in /healthz /v1/config; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' "https://riung.e55techlab.com$path")"
+            echo "$path $code"
+            [ "$code" = 200 ] || exit 1
+          done
