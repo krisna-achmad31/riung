@@ -11,6 +11,17 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+_(kosong)_
+
+---
+
+## [c43f374] — 2026-10-20 · produksi (App Store **aktif**)
+
+### Operasional
+- `APPSTORE_*` terisi (bundle `id.riung.riung`, key `6M37Z83MZ5`, app `6824618033`); key di
+  `secrets/appstore-iap-key.p8`. Log start `"appStore":true`. Notifikasi TEST sandbox dari Apple diterima dan
+  lolos verifikasi JWS (200, `kind=test`). Google Play masih mati.
+
 ### Ditambahkan
 - `riung appstore-check [--notify]`: menguji In-App Purchase key ke Apple (sandbox wajib lolos; production `401`
   sampai app rilis = WARN) dan, dengan `--notify`, meminta Apple mengirim notifikasi TEST ke webhook lalu

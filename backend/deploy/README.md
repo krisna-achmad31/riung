@@ -350,5 +350,10 @@ Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:8250
   > 24 jam, jadi rollback selalu lewat GHCR.
 - 2026-10-20: `6d05579` lewat CI (jalur App Store siap tapi mati: log start `"appStore":false`, webhook
   `/v1/webhooks/app-store` 404; `GET /v1/me` membawa `appAccountToken`). Healthy, 0 ERROR, situs lain normal.
+- 2026-10-20: App Store **diaktifkan** — `c43f374` + `APPSTORE_*` di `.env` (cadangan `.env` sebelumnya:
+  `/root/riung.env.before-appstore.2026-10-20`), key `secrets/appstore-iap-key.p8` (65532, 400). Sebelum deploy:
+  `appstore-check` di container sementara lolos (sandbox; production 401 karena app belum rilis). Sesudah:
+  `"appStore":true`, `appstore-check --notify` → notifikasi TEST sandbox `SUCCESS`, diterima API 200 dan lolos
+  verifikasi Apple Root CA G3; JWS palsu → 400. Situs lain normal.
 - Catatan 2026-10-17: VPS reboot 09:40 WIB; `riung-api` gagal 4× dalam 2 detik karena `shared-postgres` belum
   menyala (nama host belum bisa di-resolve), lalu jalan normal — `restart: unless-stopped` menanganinya.

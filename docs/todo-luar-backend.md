@@ -78,7 +78,11 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
 - [ ] **P2 — CI Flutter**: tambahkan `paths-ignore: ['backend/**']` di
       `.github/workflows/firebase_app_distribution.yml` supaya perubahan backend tidak memicu build APK.
 
-- [ ] **P1 (saat rilis iOS dijadwalkan) — App Store Connect** (runbook langkah 4d): Paid Apps agreement +
+- [x] **App Store di backend aktif** (2026-10-20): In-App Purchase key `6M37Z83MZ5`, Issuer ID, app `6824618033`,
+      URL Server Notifications V2 terpasang, notifikasi TEST sandbox diterima. Simpan `.p8` di password manager
+      lalu hapus salinan `~/Downloads/SubscriptionKey_6M37Z83MZ5.p8`. `AuthKey_S76JA9YKP5.p8` (APNs + DeviceCheck)
+      untuk Firebase, bukan backend. Production API Apple menjawab 401 sampai app rilis pertama (normal).
+- [ ] **P1 (saat rilis iOS dijadwalkan) — App Store Connect, sisa** (runbook langkah 4d): Paid Apps agreement +
       bank/pajak; produk dengan id sama seperti Play (consumable `coin_pack_*`, satu subscription group berisi
       `premium_monthly|yearly`, intro offer 7 hari); key *In-App Purchase* (`.p8`, Key ID, Issuer ID) →
       `secrets/appstore-iap-key.p8`; Server Notifications **V2** (URL production & sandbox =
