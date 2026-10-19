@@ -213,6 +213,51 @@ func TestClientFallsBackToSandbox(t *testing.T) {
 	}
 }
 
+// Before the first release production answers 401 while the sandbox (App
+// Review, TestFlight) works with the same key.
+func TestClientUsesSandboxWhileProductionRejects(t *testing.T) {
+	ca := appstoretest.NewCA(t)
+	sandbox := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]string{"signedTransactionInfo": ca.Sign(t, sampleTxn())})
+	})
+	c := newClient(t, ca, status(401, ``), sandbox)
+	if got, err := c.Transaction(context.Background(), "2000000123"); err != nil || got.TransactionID != "2000000123" {
+		t.Fatalf("got %+v err %v", got, err)
+	}
+	if err := c.CheckAuth(context.Background(), true); err != nil {
+		t.Fatalf("sandbox auth: %v", err)
+	}
+	if err := c.CheckAuth(context.Background(), false); !errors.Is(err, appstore.ErrAuth) {
+		t.Fatalf("production auth: %v", err)
+	}
+}
+
+func TestClientTestNotification(t *testing.T) {
+	ca := appstoretest.NewCA(t)
+	sandbox := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.Method == http.MethodPost && r.URL.Path == "/inApps/v1/notifications/test":
+			_ = json.NewEncoder(w).Encode(map[string]string{"testNotificationToken": "tok-1"})
+		case r.Method == http.MethodGet && r.URL.Path == "/inApps/v1/notifications/test/tok-1":
+			_, _ = w.Write([]byte(`{"signedPayload":"x","sendAttempts":[{"attemptDate":1,"sendAttemptResult":"TIMED_OUT"},{"attemptDate":2,"sendAttemptResult":"SUCCESS"}]}`))
+		default:
+			t.Errorf("unexpected %s %s", r.Method, r.URL.Path)
+			w.WriteHeader(500)
+		}
+	})
+	c := newClient(t, ca, status(401, ``), sandbox)
+	tok, err := c.RequestTestNotification(context.Background(), true)
+	if err != nil || tok != "tok-1" {
+		t.Fatalf("request: %q %v", tok, err)
+	}
+	if res, err := c.TestNotificationResult(context.Background(), true, tok); err != nil || res != "SUCCESS" {
+		t.Fatalf("result: %q %v", res, err)
+	}
+	if _, err := c.RequestTestNotification(context.Background(), false); !errors.Is(err, appstore.ErrAuth) {
+		t.Fatalf("production before release: %v", err)
+	}
+}
+
 func TestClientErrors(t *testing.T) {
 	ca := appstoretest.NewCA(t)
 	otherBundle := sampleTxn()
@@ -224,7 +269,8 @@ func TestClientErrors(t *testing.T) {
 	}{
 		"unknown everywhere":   {status(404, `{}`), status(404, `{}`), appstore.ErrNotFound},
 		"invalid id":           {status(400, `{"errorCode":4000006}`), status(400, `{"errorCode":4000006}`), appstore.ErrNotFound},
-		"key rejected":         {status(401, ``), status(404, `{}`), appstore.ErrAuth},
+		"key rejected":         {status(401, ``), status(401, ``), appstore.ErrAuth},
+		"prod 401, unknown":    {status(401, ``), status(404, `{}`), appstore.ErrAuth},
 		"apple down":           {status(503, ``), status(404, `{}`), appstore.ErrUnavailable},
 		"rate limited":         {status(429, ``), status(404, `{}`), appstore.ErrUnavailable},
 		"another app's bundle": {status(200, `{"signedTransactionInfo":"`+signedOther+`"}`), status(404, `{}`), appstore.ErrNotFound},

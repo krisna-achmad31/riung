@@ -130,8 +130,12 @@ Langkah lengkap di sisi Apple (akun, App ID, produk, key, sandbox, App Review): 
    `chmod 400`) dan salinannya di password manager.
 5. App → *App Information → App Store Server Notifications*: **Version 2**, URL production **dan** sandbox =
    `https://riung.e55techlab.com/v1/webhooks/app-store` (nginx tidak perlu diubah).
-6. Isi `APPSTORE_*` di `.env` (lihat `env.example`; `APPSTORE_APP_APPLE_ID` = Apple ID numerik app), lalu
-   deploy ulang (Run workflow, `rollback_tag` = tag yang sedang jalan). Log start harus `"appStore":true`.
+6. Isi `APPSTORE_*` di `.env` (lihat `env.example`; `APPSTORE_APP_APPLE_ID` = Apple ID numerik app). Cek dulu
+   tanpa menyentuh API yang jalan: `docker run --rm --env-file .env -v "$PWD/secrets:/run/secrets:ro" <image>
+   appstore-check` (sandbox harus menerima key; production menjawab `401` sampai app rilis pertama — WARN, bukan
+   gagal). Lalu deploy ulang (Run workflow); log start harus `"appStore":true`.
+6b. `docker exec riung-api /riung appstore-check --notify` → Apple mengirim notifikasi TEST ke URL sandbox (dan
+   production setelah rilis); hasil harus `SUCCESS` dan log `rtdn_received` `store=app_store` `kind=test`.
 7. Uji: akun sandbox (*Users and Access → Sandbox*) / TestFlight beli tiap paket & langganan → log
    `purchase_verified` dengan `test=true`; notifikasi sandbox → `rtdn_received` `store=app_store`; refund
    sandbox → `refund_applied`.

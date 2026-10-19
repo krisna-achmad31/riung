@@ -11,6 +11,16 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+### Ditambahkan
+- `riung appstore-check [--notify]`: menguji In-App Purchase key ke Apple (sandbox wajib lolos; production `401`
+  sampai app rilis = WARN) dan, dengan `--notify`, meminta Apple mengirim notifikasi TEST ke webhook lalu
+  melaporkan hasil pengirimannya.
+
+### Diperbaiki
+- Verifikasi App Store: production App Store Server API menjawab `401` sampai app rilis pertama (diuji
+  2026-10-20 dengan key asli; sandbox menerima key yang sama). `401` production kini diteruskan ke sandbox —
+  tanpa ini pembelian TestFlight & App Review gagal `500`.
+
 ### Diubah
 - Bundle id iOS = `id.riung.riung` (Apple Developer); `DEV_BILLING` memakainya sebagai default
   `APPSTORE_BUNDLE_ID`. Android tetap `com.riung.riung`. Produksi tidak berubah (App Store masih mati).

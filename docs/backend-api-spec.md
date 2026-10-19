@@ -465,7 +465,9 @@ Alur `verify`:
 1. `transactionId` = id transaksi StoreKit (`PurchaseDetails.purchaseID`). Server **tidak** memakai data
    transaksi dari HP: ia memanggil `GET /inApps/v1/transactions/{id}` (JWT ES256 dari kunci *In-App Purchase*
    App Store Connect), production dulu lalu sandbox bila tidak dikenal (App Review & TestFlight memakai
-   sandbox; `result.test = true`).
+   sandbox; `result.test = true`). Sebelum rilis pertama, production menjawab `401` untuk key yang sah — itu juga
+   diteruskan ke sandbox; `401` dari keduanya (atau `401` production + sandbox tidak kenal) = key bermasalah → `500`
+   dan log ERROR. `riung appstore-check [--notify]` menguji key dan pengiriman notifikasi tanpa pembelian.
 2. Jawaban Apple berupa JWS: rantai x5c harus berakhir di **Apple Root CA - G3** (tertanam di binary, SHA-256
    `63:34:3A:…:91:79`), dengan penanda sertifikat App Store, valid pada `signedDate`; tanda tangan ES256 dari
    sertifikat daun; `bundleId` = `APPSTORE_BUNDLE_ID`.

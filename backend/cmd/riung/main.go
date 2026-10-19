@@ -10,6 +10,7 @@
 //	riung cleanup-anon [--dry-run] delete long-inactive anonymous accounts (cron)
 //	riung reapply-deletions       re-delete deleted accounts after a backup restore
 //	riung admin grant|revoke      give/remove Admin API access (needs Firebase credentials)
+//	riung appstore-check [--notify] prove the App Store key; --notify: Apple sends TEST notifications
 //	riung healthcheck             probe the local /healthz (Docker HEALTHCHECK)
 //	riung version                 print the build version
 package main
@@ -53,6 +54,7 @@ const usage = `usage:
   riung settings set <key> <value> <reason...>
   riung settings reset <key> <reason...>
   riung admin grant|revoke <email> <reason...>
+  riung appstore-check [--notify]
   riung cleanup
   riung billing-sync
   riung reconcile
@@ -111,6 +113,8 @@ func run(args []string) int {
 		err = runReapplyDeletions(ctx, cfg, logger)
 	case "admin":
 		err = runAdmin(ctx, cfg, args[1:], logger)
+	case "appstore-check":
+		err = runAppStoreCheck(ctx, cfg, args[1:], logger)
 	case "seed-content":
 		src := "-"
 		if len(args) > 1 {

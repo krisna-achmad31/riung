@@ -158,25 +158,79 @@ func (c *Client) Subscription(ctx context.Context, originalTransactionID string)
 	return SubscriptionStatus{}, ErrNotFound
 }
 
-// get asks production first and the sandbox when production does not know
-// the id — Apple's advice, since App Review buys with sandbox accounts in
-// production builds.
-func (c *Client) get(ctx context.Context, path string, out any) error {
-	for _, base := range []string{c.opts.ProductionURL, c.opts.SandboxURL} {
-		err := c.getOnce(ctx, base+path, out)
-		if !errors.Is(err, ErrNotFound) {
-			return err
-		}
+// CheckAuth asks one environment about a transaction id that cannot exist:
+// any answer but 401 proves Apple accepts the key, issuer id and bundle id.
+// Production answers 401 until the app has been released; sandbox does not.
+func (c *Client) CheckAuth(ctx context.Context, sandbox bool) error {
+	err := c.do(ctx, http.MethodGet, c.base(sandbox)+"/inApps/v1/transactions/0", &struct{}{})
+	if err == nil || errors.Is(err, ErrNotFound) {
+		return nil
 	}
-	return ErrNotFound
+	return err
 }
 
-func (c *Client) getOnce(ctx context.Context, u string, out any) error {
+// RequestTestNotification asks Apple to send a TEST notification to the URL
+// configured in App Store Connect for production or sandbox, and returns the
+// token to look the delivery up with TestNotificationResult.
+func (c *Client) RequestTestNotification(ctx context.Context, sandbox bool) (string, error) {
+	var r struct {
+		Token string `json:"testNotificationToken"`
+	}
+	if err := c.do(ctx, http.MethodPost, c.base(sandbox)+"/inApps/v1/notifications/test", &r); err != nil {
+		return "", err
+	}
+	return r.Token, nil
+}
+
+// TestNotificationResult returns Apple's last delivery result for a test
+// notification ("SUCCESS", "TIMED_OUT", "UNSUCCESSFUL_HTTP_RESPONSE_CODE", …),
+// or "" while Apple has not tried yet.
+func (c *Client) TestNotificationResult(ctx context.Context, sandbox bool, token string) (string, error) {
+	var r struct {
+		SendAttempts []struct {
+			Result string `json:"sendAttemptResult"`
+		} `json:"sendAttempts"`
+	}
+	if err := c.do(ctx, http.MethodGet, c.base(sandbox)+"/inApps/v1/notifications/test/"+url.PathEscape(token), &r); err != nil {
+		return "", err
+	}
+	if n := len(r.SendAttempts); n > 0 {
+		return r.SendAttempts[n-1].Result, nil
+	}
+	return "", nil
+}
+
+func (c *Client) base(sandbox bool) string {
+	if sandbox {
+		return c.opts.SandboxURL
+	}
+	return c.opts.ProductionURL
+}
+
+// get asks production first and the sandbox when production does not know
+// the id — Apple's advice, since App Review buys with sandbox accounts in
+// production builds. Production answers 401 until the app's first release
+// (sandbox works with the same key), so a production 401 also falls back;
+// if the sandbox does not know the id either, the 401 is reported.
+func (c *Client) get(ctx context.Context, path string, out any) error {
+	err := c.do(ctx, http.MethodGet, c.opts.ProductionURL+path, out)
+	if !errors.Is(err, ErrNotFound) && !errors.Is(err, ErrAuth) {
+		return err
+	}
+	prodErr := err
+	err = c.do(ctx, http.MethodGet, c.opts.SandboxURL+path, out)
+	if errors.Is(err, ErrNotFound) && errors.Is(prodErr, ErrAuth) {
+		return ErrAuth
+	}
+	return err
+}
+
+func (c *Client) do(ctx context.Context, method, u string, out any) error {
 	tok, err := c.authToken()
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	req, err := http.NewRequestWithContext(ctx, method, u, nil)
 	if err != nil {
 		return err
 	}
