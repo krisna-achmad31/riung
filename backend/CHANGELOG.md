@@ -11,6 +11,12 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+_(kosong)_
+
+---
+
+## [6f3a51a] — 2026-10-19 · produksi (deploy pertama lewat CI)
+
 ### Diperbaiki
 - `riung api` menunggu Postgres sampai 60 detik saat start (coba ulang 0,5 → 5 detik, log WARN `database not
   ready, retrying`). Sebelumnya API langsung keluar dengan ERROR bila `shared-postgres` belum siap, seperti

@@ -316,5 +316,10 @@ Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:8250
 - Redeploy 2026-10-18: image `92ef4ed` (`purchaseToken` di setiap baris `/v1/billing/restore`). Sebelum deploy:
   tes + race, lint, govulncheck bersih, Newman 52 request di stack dev bersih. Di VPS kini hanya `92ef4ed`
   dan `81f763f` (image lama sempat dibersihkan) — rollback: `./deploy.sh ghcr.io/krisna-achmad31/riung-api:81f763f`.
+- 2026-10-19: user `deploy` + kunci CI (forced command), retensi Loki 30 hari untuk riung, lalu **deploy pertama
+  lewat CI**: `f8e9489` (API menunggu Postgres saat start) dan `6f3a51a` (kunci PIN melewati tengah malam UTC) —
+  pull dari GHCR, migrasi, healthy, smoke test 200, 0 ERROR; situs lain tetap 200/302. Jalur rollback
+  (`rollback_tag=6f3a51a`) diuji: container tidak dibuat ulang karena image sama. Cron prune VPS menghapus image
+  > 24 jam, jadi rollback selalu lewat GHCR.
 - Catatan 2026-10-17: VPS reboot 09:40 WIB; `riung-api` gagal 4× dalam 2 detik karena `shared-postgres` belum
   menyala (nama host belum bisa di-resolve), lalu jalan normal — `restart: unless-stopped` menanganinya.
