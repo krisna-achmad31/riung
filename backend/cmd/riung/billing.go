@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
+	"os"
 
+	"github.com/krisna-achmad31/riung/backend/internal/appstore"
 	"github.com/krisna-achmad31/riung/backend/internal/billing"
 	"github.com/krisna-achmad31/riung/backend/internal/config"
 	"github.com/krisna-achmad31/riung/backend/internal/economy"
@@ -12,26 +15,43 @@ import (
 	"github.com/krisna-achmad31/riung/backend/internal/store"
 )
 
-// newBilling builds the billing service: a fake Play in DEV_BILLING, the real
-// Android Publisher client when PLAY_PACKAGE_NAME is set, otherwise a service
-// without a publisher (billing endpoints answer 503).
+// newBilling builds the billing service: fakes of Play and the App Store in
+// DEV_BILLING; otherwise the Android Publisher client when PLAY_PACKAGE_NAME
+// is set and the App Store Server API client when APPSTORE_BUNDLE_ID is set.
+// A store that is not configured answers 503 on its endpoints.
 func newBilling(ctx context.Context, cfg config.Config, st *store.Store, econ economy.Props, hasher logx.Hasher,
 	logger *slog.Logger) (*billing.Service, billing.PushVerifier, error) {
 	svc := &billing.Service{Store: st, Economy: econ, Hasher: hasher, AccountKey: cfg.BillingAccountKey, Now: nowFunc}
-	switch {
-	case cfg.DevBilling:
-		logger.Warn("DEV_BILLING enabled: Google Play is faked (dev-coin:/dev-sub: tokens)", logx.KeyEvent, logx.EventStartup)
+	if cfg.DevBilling {
+		logger.Warn("DEV_BILLING enabled: Google Play and the App Store are faked (dev-coin:/dev-sub: ids)",
+			logx.KeyEvent, logx.EventStartup)
 		svc.Publisher = billing.NewFakePublisher()
+		fake := appstore.NewFake(cfg.AppStoreBundleID)
+		fake.Now = nowFunc
+		svc.AppStore = fake
 		return svc, billing.DevPushVerifier{}, nil
-	case cfg.PlayPackageName != "":
-		pub, err := billing.NewGooglePublisher(ctx, cfg.PlayPackageName, cfg.PlayCredentialsFile)
+	}
+	if cfg.AppStoreBundleID != "" {
+		key, err := os.ReadFile(cfg.AppStorePrivateKeyFile)
+		if err != nil {
+			return nil, nil, fmt.Errorf("read APPSTORE_PRIVATE_KEY_FILE: %w", err)
+		}
+		client, err := appstore.NewClient(appstore.ClientOptions{BundleID: cfg.AppStoreBundleID, IssuerID: cfg.AppStoreIssuerID,
+			KeyID: cfg.AppStoreKeyID, PrivateKeyPEM: key, Now: nowFunc})
 		if err != nil {
 			return nil, nil, err
 		}
-		svc.Publisher = pub
-		return svc, billing.GooglePushVerifier{Audience: cfg.RTDNAudience, ServiceAccount: cfg.RTDNServiceAccount}, nil
+		svc.AppStore = client
 	}
-	return svc, nil, nil
+	if cfg.PlayPackageName == "" {
+		return svc, nil, nil
+	}
+	pub, err := billing.NewGooglePublisher(ctx, cfg.PlayPackageName, cfg.PlayCredentialsFile)
+	if err != nil {
+		return nil, nil, err
+	}
+	svc.Publisher = pub
+	return svc, billing.GooglePushVerifier{Audience: cfg.RTDNAudience, ServiceAccount: cfg.RTDNServiceAccount}, nil
 }
 
 func runBillingSync(ctx context.Context, cfg config.Config, logger *slog.Logger) error {

@@ -16,6 +16,8 @@ import (
 	"time"
 
 	"github.com/krisna-achmad31/riung/backend/internal/api"
+	"github.com/krisna-achmad31/riung/backend/internal/appstore"
+	"github.com/krisna-achmad31/riung/backend/internal/appstore/appstoretest"
 	"github.com/krisna-achmad31/riung/backend/internal/authn"
 	"github.com/krisna-achmad31/riung/backend/internal/billing"
 	"github.com/krisna-achmad31/riung/backend/internal/config"
@@ -46,6 +48,18 @@ func (c *clock) advance(d time.Duration) {
 	c.mu.Unlock()
 }
 
+// skipMidnight moves the clock to 01:00 the next day when less than margin
+// is left before midnight in loc, so a test that counts "per day" never sees
+// the day change halfway (CI runs at any hour). Only for tests that do not
+// need a fresh login: DevVerifier stamps auth_time with the real time.
+func (c *clock) skipMidnight(loc *time.Location, margin time.Duration) {
+	now := c.now().In(loc)
+	next := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, loc)
+	if next.Sub(now) < margin {
+		c.advance(next.Add(time.Hour).Sub(now))
+	}
+}
+
 type syncBuffer struct {
 	mu sync.Mutex
 	b  bytes.Buffer
@@ -72,6 +86,8 @@ type env struct {
 	clock    *clock
 	logs     *syncBuffer
 	play     *billing.FakePublisher
+	apple    *appstore.Fake
+	appleCA  *appstoretest.CA
 	billing  *billing.Service
 }
 
@@ -96,27 +112,30 @@ func newEnvWith(t *testing.T, appCheck authn.AppChecker, opts ...option) *env {
 		o(&cfg)
 	}
 	e := &env{t: t, store: store.New(pool), verifier: &authn.DevVerifier{}, clock: &clock{}, logs: &syncBuffer{},
-		play: billing.NewFakePublisher()}
+		play: billing.NewFakePublisher(), apple: appstore.NewFake(cfg.AppStoreBundleID), appleCA: appstoretest.NewCA(t)}
+	e.apple.Now = e.clock.now
 	econ := economy.MustLoad()
 	hasher := logx.NewHasher(cfg.LogPepper, cfg.IPHashKey)
 	e.billing = &billing.Service{Store: e.store, Economy: econ, Hasher: hasher,
 		AccountKey: cfg.BillingAccountKey, Now: e.clock.now, AckAfter: time.Nanosecond}
 	if cfg.DevBilling {
 		e.billing.Publisher = e.play
+		e.billing.AppStore = e.apple
 	}
 	deps := api.Deps{
-		Config:   cfg,
-		Logger:   logx.New(e.logs, slog.LevelInfo),
-		Hasher:   hasher,
-		Store:    e.store,
-		Verifier: e.verifier,
-		AppCheck: appCheck,
-		Economy:  econ,
-		Limiter:  ratelimit.New(e.clock.now),
-		Settings: settings.NewCache(e.store, econ.Caps, 30*time.Second, e.clock.now),
-		Billing:  e.billing,
-		Push:     billing.DevPushVerifier{},
-		Now:      e.clock.now,
+		Config:      cfg,
+		Logger:      logx.New(e.logs, slog.LevelInfo),
+		Hasher:      hasher,
+		Store:       e.store,
+		Verifier:    e.verifier,
+		AppCheck:    appCheck,
+		Economy:     econ,
+		Limiter:     ratelimit.New(e.clock.now),
+		Settings:    settings.NewCache(e.store, econ.Caps, 30*time.Second, e.clock.now),
+		Billing:     e.billing,
+		Push:        billing.DevPushVerifier{},
+		AppStoreJWS: e.appleCA.Verifier(t),
+		Now:         e.clock.now,
 	}
 	srv := httptest.NewServer(api.NewHandler(deps))
 	t.Cleanup(srv.Close)
@@ -353,10 +372,8 @@ func TestJournalPinBackup(t *testing.T) {
 		return e.do(req{method: "POST", path: path + "/verify", token: googleToken, body: map[string]string{"hash": h}})
 	}
 	// Failures count per UTC day and the steps below move the clock about an
-	// hour: start well after midnight so the count never resets mid-test.
-	if now := e.clock.now().UTC(); now.Hour() >= 21 {
-		e.clock.advance(now.Truncate(24 * time.Hour).Add(25 * time.Hour).Sub(now))
-	}
+	// hour: the count must not reset mid-test.
+	e.clock.skipMidnight(time.UTC, 3*time.Hour)
 	if r := verify(hash); r.status != 200 || r.body["match"] != true {
 		t.Fatalf("correct PIN: %d %s", r.status, r.raw)
 	}

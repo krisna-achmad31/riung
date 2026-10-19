@@ -19,16 +19,19 @@ import (
 // --- response shapes (docs/backend-api-spec.md §3.2) ---------------------------------
 
 type userJSON struct {
-	ID               string    `json:"id"`
-	BillingAccountID string    `json:"billingAccountId"`
-	IsAnonymous      bool      `json:"isAnonymous"`
-	DisplayName      string    `json:"displayName"`
-	AvatarID         string    `json:"avatarId"`
-	Locale           string    `json:"locale"`
-	Persona          *string   `json:"persona"`
-	TZ               string    `json:"tz"`
-	OnboardingDone   bool      `json:"onboardingDone"`
-	CreatedAt        time.Time `json:"createdAt"`
+	ID               string `json:"id"`
+	BillingAccountID string `json:"billingAccountId"`
+	// AppAccountToken is passed by the iOS app as applicationUserName
+	// (StoreKit appAccountToken); Android uses billingAccountId.
+	AppAccountToken string    `json:"appAccountToken"`
+	IsAnonymous     bool      `json:"isAnonymous"`
+	DisplayName     string    `json:"displayName"`
+	AvatarID        string    `json:"avatarId"`
+	Locale          string    `json:"locale"`
+	Persona         *string   `json:"persona"`
+	TZ              string    `json:"tz"`
+	OnboardingDone  bool      `json:"onboardingDone"`
+	CreatedAt       time.Time `json:"createdAt"`
 }
 
 type premiumJSON struct {
@@ -108,7 +111,8 @@ func (s *Server) billingAccountID(userID string) string {
 
 func (s *Server) userJSON(u store.User) userJSON {
 	return userJSON{
-		ID: u.ID, BillingAccountID: s.billingAccountID(u.ID), IsAnonymous: u.IsAnonymous,
+		ID: u.ID, BillingAccountID: s.billingAccountID(u.ID), AppAccountToken: billing.AppAccountToken(s.Config.BillingAccountKey, u.ID),
+		IsAnonymous: u.IsAnonymous,
 		DisplayName: u.DisplayName, AvatarID: u.AvatarID, Locale: u.Locale, Persona: u.Persona,
 		TZ: u.TZ, OnboardingDone: u.OnboardingDone, CreatedAt: u.CreatedAt.UTC(),
 	}

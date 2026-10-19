@@ -113,6 +113,27 @@ unduh key JSON, simpan sebagai `/var/www/riung/secrets/firebase-service-account.
    `rtdn_received` dengan `kind=test`.
 6. Isi `PLAY_*`/`RTDN_*` di `.env` (lihat `env.example`), `./deploy.sh` ulang.
 
+**4d. App Store billing (iOS)** (menyusul saat rilis iOS dijadwalkan; tanpa ini `APPSTORE_BUNDLE_ID`
+dikosongkan, `/v1/billing/appstore/*` menjawab 503 dan `/v1/webhooks/app-store` 404)
+
+1. Apple Developer Program aktif (tim yang sama dengan sertifikat build iOS); App ID `com.riung.riung`
+   (atau bundle id final) dengan capability *In-App Purchase* (dan *Sign in with Apple* bila dipakai).
+2. App Store Connect → *Business*: perjanjian **Paid Apps**, data bank & pajak lengkap — tanpa ini produk
+   tidak bisa dibeli, juga di sandbox.
+3. App Store Connect → app → *Monetization*: consumable `coin_pack_small|medium|large`; subscription group
+   (mis. "Riung Premium") berisi `premium_monthly` dan `premium_yearly`; *introductory offer* gratis 7 hari.
+   Harga per negara diatur di sini (app menampilkan `ProductDetails.price`).
+4. *Users and Access → Integrations → In-App Purchase* → buat key → unduh `.p8` (**hanya sekali**), catat
+   Key ID dan Issuer ID. Simpan sebagai `/var/www/riung/secrets/appstore-iap-key.p8` (`chown 65532:65532`,
+   `chmod 400`) dan salinannya di password manager.
+5. App → *App Information → App Store Server Notifications*: **Version 2**, URL production **dan** sandbox =
+   `https://riung.e55techlab.com/v1/webhooks/app-store` (nginx tidak perlu diubah).
+6. Isi `APPSTORE_*` di `.env` (lihat `env.example`; `APPSTORE_APP_APPLE_ID` = Apple ID numerik app), lalu
+   deploy ulang (Run workflow, `rollback_tag` = tag yang sedang jalan). Log start harus `"appStore":true`.
+7. Uji: akun sandbox (*Users and Access → Sandbox*) / TestFlight beli tiap paket & langganan → log
+   `purchase_verified` dengan `test=true`; notifikasi sandbox → `rtdn_received` `store=app_store`; refund
+   sandbox → `refund_applied`.
+
 **5. Akses GHCR** — tidak ada login tersimpan di VPS. Deploy CI mengirim `GITHUB_TOKEN` job (berlaku sampai
 job selesai) lewat stdin; `riung-ci-deploy` memakainya untuk satu `docker login` di direktori config sementara.
 Pull manual (jarang perlu — image yang pernah di-deploy tetap ada di VPS):

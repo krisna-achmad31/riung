@@ -108,12 +108,25 @@ type Config struct {
 	// push subscription and the service account it signs as.
 	RTDNAudience       string
 	RTDNServiceAccount string
-	// DevBilling fakes Play (dev-coin:/dev-sub: tokens). Only in dev.
+	// DevBilling fakes Play and the App Store (dev-coin:/dev-sub: ids). Only in dev.
 	DevBilling bool
+
+	// App Store billing (iOS). Enabled when AppStoreBundleID is set (or
+	// DevBilling). The key is an App Store Connect In-App Purchase key (.p8).
+	AppStoreBundleID       string
+	AppStoreIssuerID       string
+	AppStoreKeyID          string
+	AppStorePrivateKeyFile string
+	// AppStoreAppAppleID, when set, must match appAppleId on production
+	// notifications (the numeric Apple ID of the app).
+	AppStoreAppAppleID int64
 }
 
 // BillingEnabled reports whether purchase verification is configured.
 func (c Config) BillingEnabled() bool { return c.DevBilling || c.PlayPackageName != "" }
+
+// AppStoreEnabled reports whether App Store verification is configured.
+func (c Config) AppStoreEnabled() bool { return c.DevBilling || c.AppStoreBundleID != "" }
 
 // Load parses the environment through getenv (os.Getenv in production,
 // a map lookup in tests). It applies defaults but does not check that
@@ -258,6 +271,24 @@ func Load(getenv func(string) string) (Config, error) {
 		if c.RTDNAudience == "" || c.RTDNServiceAccount == "" {
 			errs = append(errs, errors.New("RTDN_AUDIENCE and RTDN_SERVICE_ACCOUNT are required for billing"))
 		}
+	}
+	c.AppStoreBundleID = strings.TrimSpace(getenv("APPSTORE_BUNDLE_ID"))
+	c.AppStoreIssuerID = strings.TrimSpace(getenv("APPSTORE_ISSUER_ID"))
+	c.AppStoreKeyID = strings.TrimSpace(getenv("APPSTORE_KEY_ID"))
+	c.AppStorePrivateKeyFile = strings.TrimSpace(getenv("APPSTORE_PRIVATE_KEY_FILE"))
+	if v := strings.TrimSpace(getenv("APPSTORE_APP_APPLE_ID")); v != "" {
+		id, err := strconv.ParseInt(v, 10, 64)
+		if err != nil || id <= 0 {
+			errs = append(errs, errors.New("APPSTORE_APP_APPLE_ID must be the numeric Apple ID of the app"))
+		}
+		c.AppStoreAppAppleID = id
+	}
+	if c.DevBilling && c.AppStoreBundleID == "" {
+		c.AppStoreBundleID = "com.riung.riung"
+	}
+	if c.AppStoreBundleID != "" && !c.DevBilling &&
+		(c.AppStoreIssuerID == "" || c.AppStoreKeyID == "" || c.AppStorePrivateKeyFile == "") {
+		errs = append(errs, errors.New("APPSTORE_ISSUER_ID, APPSTORE_KEY_ID and APPSTORE_PRIVATE_KEY_FILE are required with APPSTORE_BUNDLE_ID"))
 	}
 	c.MinAppVersion = orDefault(getenv("MIN_APP_VERSION"), "0.0.0")
 	if _, ok := ParseVersion(c.MinAppVersion); !ok {

@@ -11,7 +11,23 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
-_(kosong)_
+### Ditambahkan
+- **App Store (iOS)** — siap, **mati** sampai `APPSTORE_*` diisi (runbook 4d, spec §3.9b):
+  `POST /v1/billing/appstore/verify` dan `/restore` (`{productId, transactionId}`, hasil sama dengan Play; server
+  mengambil transaksi dari App Store Server API, production lalu sandbox), `POST /v1/webhooks/app-store`
+  (Server Notifications V2: refund/revoke paket koin menarik koin, notifikasi langganan membaca ulang status dari
+  Apple). Semua JWS Apple diverifikasi sampai Apple Root CA - G3 yang tertanam. Tanpa migrasi DB.
+- `GET /v1/me` → `user.appAccountToken` (UUID) untuk `applicationUserName` di iOS.
+- Login Sign in with Apple (`apple.com`) didukung juga di `DEV_AUTH`; `DEV_BILLING` ikut memalsukan App Store.
+- Postman: folder *6b. App Store billing (iOS)* (verify koin & langganan, restore dengan tes `transactionId`);
+  **Me** menyimpan `appAccountToken`. 55 request, 72 assertion.
+
+### Diperbaiki
+- Tes `TestAppBekuEthicalGuard` dan `TestFocusFreeTicketLifecycle` tidak lagi gagal bila CI berjalan dekat
+  tengah malam WIB (17:00 UTC); batas harian sendiri memang di-reset pada tengah malam waktu user.
+
+### Untuk tim app
+- iOS: panduan §11.6 (`appAccountToken`, `transactionId` = `purchaseID`, `completePurchase` setelah server).
 
 ---
 

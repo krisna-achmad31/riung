@@ -48,7 +48,7 @@ func (d *DevVerifier) Verify(_ context.Context, token string, checkRevoked bool)
 		return Identity{}, ErrInvalidToken
 	}
 	switch parts[2] {
-	case ProviderAnonymous, ProviderPassword, ProviderGoogle:
+	case ProviderAnonymous, ProviderPassword, ProviderGoogle, ProviderApple:
 	default:
 		return Identity{}, ErrInvalidToken
 	}

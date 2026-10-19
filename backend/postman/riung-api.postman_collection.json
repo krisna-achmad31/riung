@@ -261,7 +261,7 @@
                 "me"
               ]
             },
-            "description": "Profil, `billingAccountId`, Premium, streak, wallet, monster, inventori, loadout, `today`. Menyimpan `userId` & `billingAccountId` ke environment."
+            "description": "Profil, `billingAccountId`, `appAccountToken`, Premium, streak, wallet, monster, inventori, loadout, `today`. Menyimpan `userId`, `billingAccountId` & `appAccountToken` ke environment."
           },
           "response": [],
           "event": [
@@ -274,6 +274,7 @@
                   "  const j = pm.response.json();",
                   "  pm.environment.set('userId', j.user.id);",
                   "  pm.environment.set('billingAccountId', j.user.billingAccountId);",
+                  "  pm.environment.set('appAccountToken', j.user.appAccountToken);",
                   "  pm.test('billingAccountId tersimpan', () => pm.expect(j.user.billingAccountId).to.match(/^ba_/));",
                   "}"
                 ]
@@ -1133,6 +1134,188 @@
                   "const n = { version: '1.0', packageName: 'com.riung.riung', eventTimeMillis: String(Date.now()), testNotification: { version: '1.0' } };",
                   "pm.variables.set('rtdnData', btoa(JSON.stringify(n)));",
                   "pm.variables.set('rtdnMessageId', String(Date.now()));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e67b2ddb-956e-5d8d-ba3f-b1bd3646a76e",
+      "name": "6b. App Store billing (iOS)",
+      "description": "Siap di server, **mati di produksi** sampai App Store Connect disiapkan (503; webhook 404). **Lokal** (`DEV_BILLING`): `transactionId` palsu dibuat dari `appAccountToken` (disimpan oleh **Me**) di `appleCoinTx`/`appleSubTx`. Webhook App Store tidak ada di sini: butuh tanda tangan Apple (diuji lewat tes Go).",
+      "item": [
+        {
+          "id": "9a913ba0-bdd1-5512-8e97-9111bddd79b5",
+          "name": "Verifikasi paket koin (dev)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/billing/appstore/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "billing",
+                "appstore",
+                "verify"
+              ]
+            },
+            "description": "iOS: `transactionId` = `PurchaseDetails.purchaseID`; beli dengan `applicationUserName` = `appAccountToken`. Lalu `completePurchase` untuk `credited`/`already_credited`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"coin_pack_small\",\n  \"transactionId\": \"{{appleCoinTx}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.environment.get('devBilling') === 'true') pm.environment.set('appleCoinTx', `dev-coin:${pm.environment.get('appAccountToken')}:coin_pack_small:${Date.now()}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.test('paket koin dikreditkan', () => pm.expect(j.result.status).to.be.oneOf(['credited', 'already_credited']));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "99e5dd50-6f59-521b-a442-6f666d535a30",
+          "name": "Verifikasi langganan (dev)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/billing/appstore/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "billing",
+                "appstore",
+                "verify"
+              ]
+            },
+            "description": "Langganan dicatat per `originalTransactionId`; status dibaca dari Apple. `completePurchase` untuk `active`/`inactive`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"premium_monthly\",\n  \"transactionId\": \"{{appleSubTx}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.environment.get('devBilling') === 'true') pm.environment.set('appleSubTx', `dev-sub:${pm.environment.get('appAccountToken')}:premium_monthly:30:${Date.now()}`);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "504a80b8-ca43-5a28-a105-22e36b10d784",
+          "name": "Restore",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/billing/appstore/restore",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "billing",
+                "appstore",
+                "restore"
+              ]
+            },
+            "description": "Satu baris per pembelian dengan urutan sama, masing-masing membawa `transactionId` — cocokkan lewat id itu. Baris ke-3 = transaksi akun lain → `purchase_invalid`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purchases\": [\n    {\n      \"productId\": \"coin_pack_small\",\n      \"transactionId\": \"{{appleCoinTx}}\"\n    },\n    {\n      \"productId\": \"premium_monthly\",\n      \"transactionId\": \"{{appleSubTx}}\"\n    },\n    {\n      \"productId\": \"coin_pack_small\",\n      \"transactionId\": \"dev-coin:00000000-0000-8000-8000-000000000000:coin_pack_small:1\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.environment.get('devBilling') === 'true') {",
+                  "  const aat = pm.environment.get('appAccountToken');",
+                  "  if (!pm.environment.get('appleCoinTx')) pm.environment.set('appleCoinTx', `dev-coin:${aat}:coin_pack_small:${Date.now()}`);",
+                  "  if (!pm.environment.get('appleSubTx')) pm.environment.set('appleSubTx', `dev-sub:${aat}:premium_monthly:30:${Date.now()}`);",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const sent = JSON.parse(pm.variables.replaceIn(pm.request.body.raw)).purchases;",
+                  "  const rows = pm.response.json().results;",
+                  "  pm.test('satu baris per pembelian, urutan sama', () => pm.expect(rows.map(r => r.transactionId)).to.eql(sent.map(p => p.transactionId)));",
+                  "  const byId = Object.fromEntries(rows.map(r => [r.transactionId, r]));",
+                  "  const coin = byId[pm.environment.get('appleCoinTx')], sub = byId[pm.environment.get('appleSubTx')];",
+                  "  pm.test('paket koin tidak dikreditkan dua kali', () => pm.expect(coin.ok && coin.result.status).to.be.oneOf(['credited', 'already_credited']));",
+                  "  pm.test('langganan dipulihkan', () => pm.expect(sub.ok && sub.result.status).to.eql('active'));",
+                  "  pm.test('transaksi akun lain ditolak', () => pm.expect(rows[2].ok === false && rows[2].error.code).to.eql('purchase_invalid'));",
+                  "}"
                 ]
               }
             }

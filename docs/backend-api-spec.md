@@ -1,5 +1,5 @@
 # Riung Backend — Spesifikasi API, Keamanan, Rate Limit & Logging
-*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-18 (B0–B6 selesai, API live di `riung.e55techlab.com`; kesiapan produksi: `docs/backend-b6-review.md`)*
+*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-20 (B0–B6 selesai; App Store disiapkan, §3.9b, API live di `riung.e55techlab.com`; kesiapan produksi: `docs/backend-b6-review.md`)*
 
 Untuk tim app, mulai dari **`docs/panduan-integrasi-app.md`** (ringkas & praktis); dokumen ini kontrak lengkapnya.
 
@@ -161,7 +161,7 @@ harga sudah dihitung), dan `focusTicketKeys` (§3.7). Ringkas:
 | 6 | `GET /v1/me` | user | 60/mnt | — | **bootstrap**: profil, premium, streak, asesmen, wallet, monster, inventori, loadout, consumables, jatah fokus & misi hari ini. Akun baru (termasuk anonim) otomatis dibuat di sini |
 | 7 | `PATCH /v1/me/profile` | user | 20/mnt | ✓ | `displayName`, `avatarId`, `locale`, `persona`, `onboardingDone`, `tz` |
 | 8 | `PUT /v1/me/assessment` | user | 10/mnt | ✓ | hasil asesmen onboarding: `dominantSaboteurs`, `scores` (0–100 per saboteur), `completedAt` |
-| 9 | `POST /v1/me/link` | user (+ cek pencabutan) | 5/jam | ✓ | dipanggil setelah anonim → email/Google; token **harus** sudah ber-provider `password`/`google.com` (bukan `anonymous`), server set `isAnonymous=false`. Tidak memakai syarat `auth_time` karena link tidak memperbarui waktu login |
+| 9 | `POST /v1/me/link` | user (+ cek pencabutan) | 5/jam | ✓ | dipanggil setelah anonim → email/Google; token **harus** sudah ber-provider `password`/`google.com`/`apple.com` (bukan `anonymous`), server set `isAnonymous=false`. Tidak memakai syarat `auth_time` karena link tidak memperbarui waktu login |
 | 10 | `DELETE /v1/me` | user+fresh | 3/jam | — | hapus akun: semua data server + user Firebase Auth (§4.9) |
 | 11 | `GET /v1/me/export` | user | 3/jam | — | salinan data yang disimpan **server** (melengkapi `DataExportBuilder` lokal) |
 | 12 | `GET /v1/me/journal-pin-backup` | permanent | 10/mnt | — | hanya `salt` + `updatedAt` (hash **tidak** pernah dikirim balik) |
@@ -173,7 +173,7 @@ harga sudah dihitung), dan `focusTicketKeys` (§3.7). Ringkas:
 
 ```json
 {
-  "user": { "id": "7b1e…", "billingAccountId": "ba_3f9c…", "isAnonymous": true, "displayName": "", "avatarId": "av1", "locale": "id",
+  "user": { "id": "7b1e…", "billingAccountId": "ba_3f9c…", "appAccountToken": "5d0c2a9e-…", "isAnonymous": true, "displayName": "", "avatarId": "av1", "locale": "id",
             "tz": "Asia/Jakarta", "onboardingDone": false, "createdAt": "2026-10-11T03:00:00Z" },
   "premium": { "status": "none", "plan": null, "expiresAt": null, "autoRenewing": false },
   "streak": { "current": 0, "longest": 0, "lastCheckinDate": null, "shields": 0 },
@@ -188,7 +188,8 @@ harga sudah dihitung), dan `focusTicketKeys` (§3.7). Ringkas:
 ```
 
 `billingAccountId` = HMAC(server secret, `users.id`) — app memasukkannya ke `applicationUserName` saat membeli
-(§3.9). App tidak bisa menghitungnya sendiri karena kuncinya hanya di server.
+(§3.9). App tidak bisa menghitungnya sendiri karena kuncinya hanya di server. `appAccountToken` = padanannya
+untuk iOS (UUID, §3.9b).
 
 ### 3.3 Aktivitas latihan (sumber koin & progres monster)
 
@@ -445,6 +446,58 @@ Dev (`DEV_BILLING=true`, hanya `RIUNG_ENV=dev`): Google Play dipalsukan — toke
 `dev-coin:<billingAccountId>:<productId>:<n>` dan `dev-sub:<billingAccountId>:<productId>:<hari>:<n>`,
 bearer webhook `dev-pubsub`.
 
+### 3.9b Pembelian App Store (iOS)
+
+Siap di server, **mati** sampai `APPSTORE_*` diisi (runbook langkah 4d). Hasil, status, dan error sama
+dengan §3.9; produk sama (`coin_pack_small|medium|large` consumable, `premium_monthly|yearly` dalam satu
+*subscription group*). Koin & Premium dari Play dan App Store masuk ke wallet/langganan yang sama.
+
+| # | Method & path | Akses | RL | Idem | Fungsi |
+|---|---|---|---|---|---|
+| 27b | `POST /v1/billing/appstore/verify` | permanent | 10/mnt, 30/jam (bersama Play) | ✓ | `{ productId, transactionId }` → server mengambil transaksi dari App Store Server API → kredit koin / aktifkan Premium |
+| 28b | `POST /v1/billing/appstore/restore` | permanent | 5/jam (bersama Play) | ✓ | `{ purchases: [{productId, transactionId}] }` (≤ 20) |
+| 30b | `POST /v1/webhooks/app-store` | Apple (JWS) | 120/mnt per IP + 300/mnt global | — | App Store Server Notifications V2: renew, expire, refund, revoke, … |
+
+`GET /v1/me` → `user.appAccountToken`: UUID per akun (turunan HMAC `BILLING_ACCOUNT_KEY`, stabil). App iOS
+mengirimnya sebagai `applicationUserName` (StoreKit `appAccountToken`), padanan `billingAccountId` di Android.
+
+Alur `verify`:
+1. `transactionId` = id transaksi StoreKit (`PurchaseDetails.purchaseID`). Server **tidak** memakai data
+   transaksi dari HP: ia memanggil `GET /inApps/v1/transactions/{id}` (JWT ES256 dari kunci *In-App Purchase*
+   App Store Connect), production dulu lalu sandbox bila tidak dikenal (App Review & TestFlight memakai
+   sandbox; `result.test = true`).
+2. Jawaban Apple berupa JWS: rantai x5c harus berakhir di **Apple Root CA - G3** (tertanam di binary, SHA-256
+   `63:34:3A:…:91:79`), dengan penanda sertifikat App Store, valid pada `signedDate`; tanda tangan ES256 dari
+   sertifikat daun; `bundleId` = `APPSTORE_BUNDLE_ID`.
+3. Paket koin: `type = Consumable`, `productId` sama, belum dicabut (`revocationDate`), `appAccountToken` =
+   milik user ini. Dikreditkan sekali per `transactionId` (kunci `appstore:<transactionId>` di `purchases`) ×
+   `quantity`.
+4. Langganan: dicatat per `originalTransactionId` (tetap sama saat perpanjangan, upgrade, downgrade dalam
+   satu grup — tidak perlu `linkedPurchaseToken`). Status dibaca dari `GET /inApps/v1/subscriptions/{id}`:
+   `1` aktif (`autoRenewStatus = 0` → `canceled`, tetap aktif sampai `expiresDate`) · `4` `in_grace` (sampai
+   `gracePeriodExpiresDate`) · `3` `on_hold` · `2` `expired` · `5` `revoked`. Semua `appAccountToken` yang ada
+   harus milik user ini; langganan ulang dari Settings tanpa token hanya diterima bila langganan itu sudah
+   terikat ke user.
+5. Apple tidak butuh acknowledge dari server. App memanggil `completePurchase` (StoreKit `finish()`) setelah
+   server menjawab `credited`/`already_credited`/`active`/`inactive`; transaksi yang belum di-*finish* dikirim
+   ulang StoreKit saat app dibuka, jadi kredit yang terputus tetap selesai.
+
+`restore` menjawab `{ "results": [{ "productId", "transactionId", "ok", "result" | "error" }], "wallet", "premium" }` —
+aturan sama dengan restore Play; cocokkan baris lewat **`transactionId`**.
+
+Webhook (URL production & sandbox di App Store Connect): body `{ "signedPayload": "<JWS>" }`, diverifikasi
+seperti langkah 2 (juga `signedTransactionInfo`/`signedRenewalInfo` di dalamnya). Idempoten per
+`notificationUUID` (`rtdn_messages`, prefiks `appstore:`). `REFUND`/`REVOKE` paket koin → koin ditarik seperti
+refund Play (§3.9 langkah 6). Notifikasi langganan apa pun → status dibaca ulang dari Apple (isi notifikasi
+tidak dipercaya mentah); langganan yang belum pernah diverifikasi menunggu app. `TEST` dicatat. Jawaban: `200`
+(diproses, duplikat, bundle/app lain), `400` bukan JWS dari Apple, `404` selama App Store belum dikonfigurasi,
+`429`/`5xx` sementara (Apple mengulang 5× dalam ±3 hari). Bila `APPSTORE_APP_APPLE_ID` diisi, notifikasi
+production untuk `appAppleId` lain diabaikan.
+
+Dev (`DEV_BILLING=true`): App Store dipalsukan — `transactionId` `dev-coin:<appAccountToken>:<productId>:<n>` dan
+`dev-sub:<appAccountToken>:<productId>:<hari>:<n>`. Webhook tidak bisa dipalsukan di dev (butuh tanda tangan
+Apple); diuji lewat tes dengan rantai sertifikat sendiri.
+
 ### 3.10 Daftar yang sengaja TIDAK ada di server (privasi)
 
 Tidak ada endpoint, tabel, atau log untuk: **isi jurnal**, isi check-in (mood, faktor, catatan),
@@ -530,7 +583,7 @@ Belum dibuat (menyusul bila dibutuhkan): `wallet-adjust` (koreksi saldo manual, 
   SDK dengan cache kunci publik Google. Aksi `user+fresh` juga cek pencabutan token + `auth_time` ≤ 5 menit.
   Cek pencabutan (panggilan ke Firebase) baru dijalankan **setelah** rate limit, jadi request di atas batas
   tidak pernah sampai ke Firebase.
-- Provider dibaca dari klaim `firebase.sign_in_provider` (`anonymous` / `password` / `google.com`).
+- Provider dibaca dari klaim `firebase.sign_in_provider` (`anonymous` / `password` / `google.com` / `apple.com`).
 - Identitas dipetakan lewat `auth_identities (provider, subject) → users.id` — siap untuk auth sendiri.
 - Akun baru (anonim maupun permanen): maks **10 akun baru/IP/hari** (cegah farming koin dengan ratusan
   akun anonim). Angkanya pengaturan admin `maxNewAccountsPerIpPerDay` (§3.11). Catatan: operator seluler

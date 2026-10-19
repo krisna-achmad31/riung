@@ -55,6 +55,12 @@ func (s *Server) billingError(w http.ResponseWriter, r *http.Request, err error)
 		httpx.WriteError(w, r, invalid("unknown productId", "productId"))
 	case errors.Is(err, billing.ErrNotConfigured):
 		httpx.WriteError(w, r, errBillingOff)
+	case errors.Is(err, billing.ErrAppStoreUnavailable):
+		s.Logger.LogAttrs(r.Context(), slog.LevelError, "app store unavailable",
+			slog.String(logx.KeyEvent, logx.EventDependencyError),
+			slog.String(logx.KeyRequestID, httpx.RequestIDFrom(r.Context())),
+			slog.String("dependency", "app_store"), slog.String("error", err.Error()))
+		httpx.WriteError(w, r, httpx.ErrUnavailable)
 	case errors.Is(err, billing.ErrPlayUnavailable), errors.Is(err, context.DeadlineExceeded):
 		s.Logger.LogAttrs(r.Context(), slog.LevelError, "google play unavailable",
 			slog.String(logx.KeyEvent, logx.EventDependencyError),
@@ -90,7 +96,8 @@ func (s *Server) logPurchase(r *http.Request, userID string, ref purchaseRef, re
 			reason = "not_valid_for_account"
 		case errors.Is(err, billing.ErrUnknownProduct):
 			reason = "unknown_product"
-		case errors.Is(err, billing.ErrNotConfigured), errors.Is(err, billing.ErrPlayUnavailable):
+		case errors.Is(err, billing.ErrNotConfigured), errors.Is(err, billing.ErrPlayUnavailable),
+			errors.Is(err, billing.ErrAppStoreUnavailable):
 			return // logged as dependency errors
 		}
 		s.logWarn(r, eventPurchaseRejected, "purchase rejected", append(attrs, slog.String("reason", reason))...)

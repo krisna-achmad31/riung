@@ -45,8 +45,11 @@ var (
 	rlSubscription  = ratelimit.Policy{Name: "billing_subscription", Limit: 30, Window: time.Minute}
 	rlWebhookIP     = ratelimit.Policy{Name: "play_webhook_ip", Limit: 120, Window: time.Minute}
 	rlWebhook       = ratelimit.Policy{Name: "play_webhook", Limit: 300, Window: time.Minute}
-	rlAdminRead     = ratelimit.Policy{Name: "admin_read", Limit: 30, Window: time.Minute}
-	rlAdminWrite    = ratelimit.Policy{Name: "admin_write", Limit: 10, Window: time.Minute}
+	// App Store notifications: same budget as Play, counted separately.
+	rlAppStoreWebhookIP = ratelimit.Policy{Name: "appstore_webhook_ip", Limit: 120, Window: time.Minute}
+	rlAppStoreWebhook   = ratelimit.Policy{Name: "appstore_webhook", Limit: 300, Window: time.Minute}
+	rlAdminRead         = ratelimit.Policy{Name: "admin_read", Limit: 30, Window: time.Minute}
+	rlAdminWrite        = ratelimit.Policy{Name: "admin_write", Limit: 10, Window: time.Minute}
 )
 
 // maxBatchEvents caps POST /v1/activities/batch.

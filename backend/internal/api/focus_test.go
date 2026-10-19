@@ -35,6 +35,8 @@ func focusDone(e *env, tok, ticketID string, at time.Time) resp {
 
 func TestFocusFreeTicketLifecycle(t *testing.T) {
 	e := newEnv(t)
+	// The free ticket ends at local midnight and the test moves ~1 hour.
+	e.clock.skipMidnight(mustLoc(t, "Asia/Jakarta"), 2*time.Hour)
 	tok := "dev:focus-free:anonymous"
 	cfg := e.do(req{method: "GET", path: "/v1/config", headers: map[string]string{"X-Firebase-AppCheck": "dev"}})
 	keys, _ := cfg.body["focusTicketKeys"].([]any)
@@ -207,6 +209,8 @@ const (
 
 func TestAppBekuEthicalGuard(t *testing.T) {
 	e := newEnv(t)
+	// Paid unlocks count per local day (Asia/Jakarta, the default timezone).
+	e.clock.skipMidnight(mustLoc(t, "Asia/Jakarta"), time.Hour)
 	tok := "dev:beku:anonymous"
 	userID := get(e.do(req{method: "GET", path: "/v1/me", token: tok}).body, "user", "id").(string)
 	seed(t, e, userID, 300)

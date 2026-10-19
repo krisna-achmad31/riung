@@ -8,6 +8,7 @@ import (
 	"time"
 	_ "time/tzdata" // distroless has no zoneinfo; users.tz must always resolve
 
+	"github.com/krisna-achmad31/riung/backend/internal/appstore"
 	"github.com/krisna-achmad31/riung/backend/internal/authn"
 	"github.com/krisna-achmad31/riung/backend/internal/billing"
 	"github.com/krisna-achmad31/riung/backend/internal/catalog"
@@ -41,6 +42,8 @@ type Deps struct {
 	Billing *billing.Service
 	// Push authenticates RTDN Pub/Sub pushes.
 	Push billing.PushVerifier
+	// AppStoreJWS verifies App Store notifications; defaults to Apple Root CA - G3.
+	AppStoreJWS *appstore.Verifier
 	// Tickets signs Focus tickets; nil = built from Config (503 if that fails).
 	Tickets *ticket.Signer
 	// Now is the clock (tests inject a fixed one). Defaults to time.Now.
@@ -53,6 +56,7 @@ type Server struct {
 	settings     *settings.Cache
 	rules        *rules.Service
 	billingSvc   *billing.Service
+	appStoreJWS  *appstore.Verifier
 	tickets      *ticket.Signer
 	publicConfig configResponse
 }
@@ -78,6 +82,10 @@ func newServer(d Deps) *Server {
 	s.billingSvc = d.Billing
 	if s.billingSvc == nil {
 		s.billingSvc = &billing.Service{Store: d.Store, Economy: d.Economy, Hasher: d.Hasher, AccountKey: d.Config.BillingAccountKey, Now: d.Now}
+	}
+	s.appStoreJWS = d.AppStoreJWS
+	if s.appStoreJWS == nil {
+		s.appStoreJWS = appstore.NewAppleVerifier()
 	}
 	s.publicConfig = buildPublicConfig(d)
 	s.publicConfig.FocusTicketKeys = s.ticketKeys()
@@ -149,6 +157,10 @@ func (s *Server) routes(mux *http.ServeMux) {
 	s.handle(mux, "POST /v1/billing/restore", s.postBillingRestore, route{access: accessPermanent, limits: []ratelimit.Policy{rlRestore}, idempotent: true})
 	s.handle(mux, "GET /v1/billing/subscription", s.getSubscription, route{access: accessUser, limits: []ratelimit.Policy{rlSubscription}})
 	s.handle(mux, "POST /v1/webhooks/google-play", s.postPlayWebhook, route{access: accessPublic, bodyLimit: 256 << 10})
+	// §3.9b App Store billing (iOS)
+	s.handle(mux, "POST /v1/billing/appstore/verify", s.postAppStoreVerify, route{access: accessPermanent, checkRevoked: true, limitedUseAppCheck: true, limits: []ratelimit.Policy{rlVerifyMin, rlVerifyHour}, idempotent: true})
+	s.handle(mux, "POST /v1/billing/appstore/restore", s.postAppStoreRestore, route{access: accessPermanent, limits: []ratelimit.Policy{rlRestore}, idempotent: true})
+	s.handle(mux, "POST /v1/webhooks/app-store", s.postAppStoreWebhook, route{access: accessPublic, bodyLimit: 256 << 10})
 }
 
 func (s *Server) now() time.Time { return s.Now() }

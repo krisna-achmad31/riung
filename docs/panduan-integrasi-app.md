@@ -1,5 +1,5 @@
 # Panduan integrasi app ↔ backend Riung
-*Untuk tim Flutter (`riung/`) · backend Go di `backend/` · API `/v1` · diperbarui 2026-10-18*
+*Untuk tim Flutter (`riung/`) · backend Go di `backend/` · API `/v1` · diperbarui 2026-10-20*
 
 Backend Go menggantikan peran "Cloud Functions" di `CLAUDE.md`: semua koin, progres monster, pembelian,
 tiket Fokus, dan buka-waktu Aplikasi Beku sekarang diputuskan server. App mengirim **apa yang terjadi**,
@@ -20,7 +20,7 @@ dipetakan: `docs/todo-luar-backend.md` §B–C.
 | Produksi | `https://riung.e55techlab.com/v1` | ID token Firebase (`riung-5e979`) | `monitor` (belum menolak) |
 | Lokal | `http://localhost:8080/v1` (`cd backend && make dev-up`) | token dev `dev:<uid>:<provider>` | mati |
 
-Lokal memakai `DEV_AUTH`: token `Bearer dev:rani:anonymous` (atau `:password`, `:google.com`) menggantikan ID
+Lokal memakai `DEV_AUTH`: token `Bearer dev:rani:anonymous` (atau `:password`, `:google.com`, `:apple.com`) menggantikan ID
 token Firebase, App Check cukup `dev`, dan Google Play dipalsukan (§11.5). Di Android emulator, host laptop =
 `http://10.0.2.2:8080`. Untuk build debug yang menembak stack lokal, ID token Firebase sungguhan tidak
 dikenali — pakai token dev lewat konfigurasi build (`--dart-define`).
@@ -167,7 +167,7 @@ Firebase sign-in (anonim kalau belum login)
   → GET /v1/focus/tickets  + ambil tiket free_daily bila online (§9)
 ```
 
-`GET /v1/me` adalah sumber tunggal state user: profil, `billingAccountId`, Premium, streak + jumlah
+`GET /v1/me` adalah sumber tunggal state user: profil, `billingAccountId` (Android) / `appAccountToken` (iOS), Premium, streak + jumlah
 pelindung, wallet, asesmen, progres monster, inventori + sesi Fokus prabayar, loadout, dan `today`
 (`missionsDone`, `freeFocusLeft`, `paidUnlocksUsed`, `fightsToday`, `premiumDailyClaimed`). Semua yang
 sekarang disimpan di `LocalPrefsStore` dan bernilai uang pindah ke sini.
@@ -200,7 +200,7 @@ koin membawa `wallet` terbaru — perbarui `WalletNotifier` dari situ, jangan me
 | Profil | `PATCH /v1/me/profile` | `displayName` (≤ 40 karakter), `avatarId` (`av1`–`av6`), `locale` (`id`/`en`), `persona` (`pelajar`/`mahasiswa`/`pekerja`/`lainnya`), `onboardingDone`, `tz` (IANA); kirim hanya field yang berubah |
 | Hasil asesmen ringkas | `PUT /v1/me/assessment` | `dominantSaboteurs` (1–7 id saboteur), `scores` (id saboteur → 0–100), `completedAt`. Jawaban & hasil detail **tetap di HP** |
 | Anonim → email/Google | `POST /v1/me/link` | setelah `linkWithCredential` di Firebase (uid sama, tanpa body); semua data anonim ikut |
-| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Bila `premium.autoRenewing` = true (masih ditagih), tampilkan peringatan dengan tombol ke `https://play.google.com/store/account/subscriptions?sku=<plan>&package=com.riung.riung` sebelum tombol hapus — langganan tidak ikut terhapus dan tidak bisa dipindah ke akun baru |
+| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Bila `premium.autoRenewing` = true (masih ditagih), tampilkan peringatan dengan tombol ke `https://play.google.com/store/account/subscriptions?sku=<plan>&package=com.riung.riung` (iOS: `https://apps.apple.com/account/subscriptions`) sebelum tombol hapus — langganan tidak ikut terhapus dan tidak bisa dipindah ke akun baru |
 | Unduh data server | `GET /v1/me/export` | melengkapi `DataExportBuilder` lokal |
 | Backup PIN jurnal | `PUT/GET/DELETE /v1/me/journal-pin-backup`, `POST …/verify` | akun permanen; hash PIN dihitung di HP (`hash` 16–256, `salt` 8–256 karakter base64/hex). `GET` hanya mengembalikan `salt`; verifikasi → `{match, attemptsLeft}`, terkunci 1 jam setelah 10 gagal/hari |
 
@@ -403,16 +403,55 @@ Refund dari Google menarik kembali koinnya. Kalau koinnya sudah terpakai, sisany
 Stack dev memakai Google Play palsu: token `dev-coin:<billingAccountId>:<productId>:<n>` dan
 `dev-sub:<billingAccountId>:<productId>:<hari>:<n>` (Postman folder *6. Google Play billing*).
 
+### 11.6 App Store (iOS) — server siap, aktif setelah App Store Connect disiapkan
+Server sudah punya jalur iOS (spec §3.9b) tapi **mati** sampai kredensial App Store diisi (runbook 4d);
+sebelum itu `POST /v1/billing/appstore/*` menjawab `503`. Bedanya dengan Android:
+
+| | Android | iOS |
+|---|---|---|
+| `applicationUserName` | `me.billingAccountId` | `me.appAccountToken` (UUID → StoreKit `appAccountToken`) |
+| Verifikasi | `POST /v1/billing/verify` `{productId, purchaseToken}` | `POST /v1/billing/appstore/verify` `{productId, transactionId}` |
+| Nilai yang dikirim | `verificationData.serverVerificationData` | `PurchaseDetails.purchaseID` (id transaksi StoreKit) |
+| Restore | `/v1/billing/restore`, cocokkan `purchaseToken` | `/v1/billing/appstore/restore`, cocokkan `transactionId` |
+| Paket koin | `buyConsumable(autoConsume: false)` + `consumePurchase` | `buyConsumable(...)` **tanpa** `autoConsume: false` (plugin iOS menolaknya); koin baru "terpakai" saat `completePurchase` |
+| Selesaikan | consume / `completePurchase` | `completePurchase` (= `finish()`) untuk `credited`, `already_credited`, `active`, `inactive` |
+| Upgrade bulanan ↔ tahunan | `ChangeSubscriptionParam` | beli plan lain biasa — App Store mengganti dalam satu *subscription group* tanpa tagihan ganda |
+| Kelola langganan (hapus akun) | `play.google.com/store/account/subscriptions?…` | `https://apps.apple.com/account/subscriptions` |
+
+```dart
+final param = PurchaseParam(
+  productDetails: product,
+  applicationUserName: Platform.isIOS ? me.appAccountToken : me.billingAccountId,
+);
+// iOS
+final r = await billingApi.verifyAppStore(productId: p.productID, transactionId: p.purchaseID!);
+if (const {'credited', 'already_credited', 'active', 'inactive'}.contains(r.status) && p.pendingCompletePurchase) {
+  await InAppPurchase.instance.completePurchase(p);
+}
+```
+
+- `409 purchase_invalid` → **jangan** `completePurchase`: transaksi milik akun Riung lain di Apple ID yang sama
+  tetap tertunda dan terkredit saat akun pemiliknya login lagi. StoreKit mengirim ulang transaksi yang belum
+  selesai setiap app dibuka — cukup verifikasi lagi.
+- Produk di App Store Connect memakai id yang sama (`coin_pack_*` consumable, `premium_monthly|yearly`
+  auto-renewable dalam **satu** subscription group, trial 7 hari sebagai *introductory offer*). Harga dan lama
+  trial dibaca dari `ProductDetails`, seperti Android.
+- Login **Sign in with Apple** (`apple.com`) diterima server seperti Google; App Check iOS memakai App Attest
+  (fallback DeviceCheck), tetap dengan `getLimitedUseToken` untuk endpoint sensitif.
+- Uji lokal: `transactionId` palsu `dev-coin:<appAccountToken>:<productId>:<n>` dan
+  `dev-sub:<appAccountToken>:<productId>:<hari>:<n>` (Postman folder *6b. App Store billing*). Uji sungguhan:
+  akun sandbox App Store Connect / TestFlight (server menandai `result.test = true`).
+
 ## 12. Rate limit yang perlu diperhatikan
 
 Batas per user (sisanya di spec §5): `GET /v1/me` & `/v1/wallet` 60/menit, `POST /v1/activities` 60/menit,
 `/batch` 10/menit, belanja & Aplikasi Beku 10/menit, tiket Fokus 20/menit, `billing/verify` 10/menit & 30/jam,
-`billing/restore` 5/jam, `/me/link` 5/jam, hapus/ekspor akun 3/jam. Jangan polling — `/v1/me` saat app dibuka
+`billing/restore` 5/jam (Play dan App Store berbagi batas), `/me/link` 5/jam, hapus/ekspor akun 3/jam. Jangan polling — `/v1/me` saat app dibuka
 dan setelah aksi penting sudah cukup.
 
 ## 13. Mencoba lokal
 
-Cara tercepat: **Postman collection** di `backend/postman/` (52 request, environment lokal & produksi,
+Cara tercepat: **Postman collection** di `backend/postman/` (55 request, environment lokal & produksi,
 header dan Idempotency-Key otomatis) — lihat `backend/postman/README.md`. Atau dengan curl:
 
 ```sh
@@ -435,6 +474,7 @@ Detail & prioritas: `docs/todo-luar-backend.md` §B–C.
 - [ ] Outbox `sqflite` + `/v1/activities/batch` (§8); hapus mutasi koin di HP (§6, `firestore.rules`)
 - [ ] Toko, loadout, Aplikasi Beku, tiket Fokus lewat server (§9–10)
 - [ ] `BillingService`: `autoConsume: false`, verifikasi server, consume/complete setelah sukses, restore (§11)
+- [ ] iOS (saat rilis iOS dijadwalkan): `appAccountToken`, `/v1/billing/appstore/*`, `completePurchase` setelah server (§11.6)
 - [ ] App Check (Play Integrity) + `getLimitedUseToken` untuk 3 endpoint sensitif
 - [ ] Teks untuk semua `code` di §4 (Bahasa Indonesia & Inggris)
 - [ ] Tes parity: `economy.dart` == `docs/economy-props.json`, katalog app == `docs/catalog.json`

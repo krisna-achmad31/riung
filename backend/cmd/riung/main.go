@@ -237,7 +237,7 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 		go func(srv *http.Server, name string) {
 			logger.Info(name+" listening", logx.KeyEvent, logx.EventStartup, "addr", srv.Addr, "version", version,
 				"env", cfg.Env, "appCheck", cfg.AppCheckMode, "economy", econ.Version, "catalog", cat.Version,
-				"billing", cfg.BillingEnabled())
+				"billing", cfg.BillingEnabled(), "appStore", cfg.AppStoreEnabled())
 			if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				errCh <- fmt.Errorf("%s server: %w", name, err)
 			}

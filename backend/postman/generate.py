@@ -45,6 +45,7 @@ save_me = [
     "  const j = pm.response.json();",
     "  pm.environment.set('userId', j.user.id);",
     "  pm.environment.set('billingAccountId', j.user.billingAccountId);",
+    "  pm.environment.set('appAccountToken', j.user.appAccountToken);",
     "  pm.test('billingAccountId tersimpan', () => pm.expect(j.user.billingAccountId).to.match(/^ba_/));",
     "}",
 ]
@@ -102,6 +103,32 @@ restore_test = [
     "  pm.test('token akun lain ditolak', () => pm.expect(rows[2].ok === false && rows[2].error.code).to.eql('purchase_invalid'));",
     "}",
 ]
+# App Store (iOS): dev transactionId dibuat dari appAccountToken (GET /v1/me).
+apple_coin_pre = [
+    "if (pm.environment.get('devBilling') === 'true') pm.environment.set('appleCoinTx', `dev-coin:${pm.environment.get('appAccountToken')}:coin_pack_small:${Date.now()}`);",
+]
+apple_sub_pre = [
+    "if (pm.environment.get('devBilling') === 'true') pm.environment.set('appleSubTx', `dev-sub:${pm.environment.get('appAccountToken')}:premium_monthly:30:${Date.now()}`);",
+]
+apple_restore_pre = [
+    "if (pm.environment.get('devBilling') === 'true') {",
+    "  const aat = pm.environment.get('appAccountToken');",
+    "  if (!pm.environment.get('appleCoinTx')) pm.environment.set('appleCoinTx', `dev-coin:${aat}:coin_pack_small:${Date.now()}`);",
+    "  if (!pm.environment.get('appleSubTx')) pm.environment.set('appleSubTx', `dev-sub:${aat}:premium_monthly:30:${Date.now()}`);",
+    "}",
+]
+apple_restore_test = [
+    "if (pm.response.code === 200) {",
+    "  const sent = JSON.parse(pm.variables.replaceIn(pm.request.body.raw)).purchases;",
+    "  const rows = pm.response.json().results;",
+    "  pm.test('satu baris per pembelian, urutan sama', () => pm.expect(rows.map(r => r.transactionId)).to.eql(sent.map(p => p.transactionId)));",
+    "  const byId = Object.fromEntries(rows.map(r => [r.transactionId, r]));",
+    "  const coin = byId[pm.environment.get('appleCoinTx')], sub = byId[pm.environment.get('appleSubTx')];",
+    "  pm.test('paket koin tidak dikreditkan dua kali', () => pm.expect(coin.ok && coin.result.status).to.be.oneOf(['credited', 'already_credited']));",
+    "  pm.test('langganan dipulihkan', () => pm.expect(sub.ok && sub.result.status).to.eql('active'));",
+    "  pm.test('transaksi akun lain ditolak', () => pm.expect(rows[2].ok === false && rows[2].error.code).to.eql('purchase_invalid'));",
+    "}",
+]
 rtdn_pre = [
     "// Pub/Sub push body: base64 DeveloperNotification + messageId unik.",
     "const n = { version: '1.0', packageName: 'com.riung.riung', eventTimeMillis: String(Date.now()), testNotification: { version: '1.0' } };",
@@ -150,7 +177,7 @@ items = [
     ]),
     folder("2. Akun", "Akun dibuat otomatis di panggilan pertama `GET /v1/me` (termasuk anonim).", [
         req("Me (bootstrap)", "GET", "/v1/me", tests=save_me,
-            desc="Profil, `billingAccountId`, Premium, streak, wallet, monster, inventori, loadout, `today`. Menyimpan `userId` & `billingAccountId` ke environment."),
+            desc="Profil, `billingAccountId`, `appAccountToken`, Premium, streak, wallet, monster, inventori, loadout, `today`. Menyimpan `userId`, `billingAccountId` & `appAccountToken` ke environment."),
         req("Update profil", "PATCH", "/v1/me/profile",
             body={"displayName": "Rani", "avatarId": "av2", "locale": "id", "persona": "mahasiswa", "onboardingDone": True, "tz": "Asia/Jakarta"},
             desc="Kirim hanya field yang berubah. `avatarId` av1–av6; `persona` pelajar|mahasiswa|pekerja|lainnya; `tz` IANA."),
@@ -208,6 +235,19 @@ items = [
         req("Webhook RTDN (dev)", "POST", "/v1/webhooks/google-play", auth="{{pubsubToken}}", pre=rtdn_pre,
             body={"message": {"data": "{{rtdnData}}", "messageId": "{{rtdnMessageId}}"}, "subscription": "projects/riung-5e979/subscriptions/play-rtdn"},
             desc="Lokal (bearer `dev-pubsub`) → 204. Produksi: 404 selama billing belum aktif; setelah aktif hanya Pub/Sub dengan token OIDC Google."),
+    ]),
+    folder("6b. App Store billing (iOS)", "Siap di server, **mati di produksi** sampai App Store Connect disiapkan (503; webhook 404). **Lokal** (`DEV_BILLING`): `transactionId` palsu dibuat dari `appAccountToken` (disimpan oleh **Me**) di `appleCoinTx`/`appleSubTx`. Webhook App Store tidak ada di sini: butuh tanda tangan Apple (diuji lewat tes Go).", [
+        req("Verifikasi paket koin (dev)", "POST", "/v1/billing/appstore/verify", pre=apple_coin_pre, tests=coin_verify_test,
+            body={"productId": "coin_pack_small", "transactionId": "{{appleCoinTx}}"},
+            desc="iOS: `transactionId` = `PurchaseDetails.purchaseID`; beli dengan `applicationUserName` = `appAccountToken`. Lalu `completePurchase` untuk `credited`/`already_credited`."),
+        req("Verifikasi langganan (dev)", "POST", "/v1/billing/appstore/verify", pre=apple_sub_pre,
+            body={"productId": "premium_monthly", "transactionId": "{{appleSubTx}}"},
+            desc="Langganan dicatat per `originalTransactionId`; status dibaca dari Apple. `completePurchase` untuk `active`/`inactive`."),
+        req("Restore", "POST", "/v1/billing/appstore/restore", pre=apple_restore_pre, tests=apple_restore_test,
+            body={"purchases": [{"productId": "coin_pack_small", "transactionId": "{{appleCoinTx}}"},
+                                {"productId": "premium_monthly", "transactionId": "{{appleSubTx}}"},
+                                {"productId": "coin_pack_small", "transactionId": "dev-coin:00000000-0000-8000-8000-000000000000:coin_pack_small:1"}]},
+            desc="Satu baris per pembelian dengan urutan sama, masing-masing membawa `transactionId` — cocokkan lewat id itu. Baris ke-3 = transaksi akun lain → `purchase_invalid`."),
     ]),
     folder("7. Toko & loadout", "Harga dari `Config` → `catalog`; `expectedPrice` harus sama.", [
         req("Beli kosmetik monster", "POST", "/v1/shop/purchase", body={"itemType": "cosmetic", "itemId": "topi_rajut", "expectedPrice": 100}),
@@ -285,6 +325,7 @@ local = env("riung-local", [
     ("appVersion", "1.0.0", "default"),
     ("userId", "", "default"), ("billingAccountId", "", "default"), ("ticketId", "", "default"), ("configEtag", "", "default"),
     ("devBilling", "true", "default"), ("coinToken", "", "default"), ("subToken", "", "default"),
+    ("appAccountToken", "", "default"), ("appleCoinTx", "", "default"), ("appleSubTx", "", "default"),
 ])
 prod = env("riung-prod", [
     ("baseUrl", "https://riung.e55techlab.com", "default"),
@@ -296,6 +337,7 @@ prod = env("riung-prod", [
     ("appVersion", "1.0.0", "default"),
     ("userId", "", "default"), ("billingAccountId", "", "default"), ("ticketId", "", "default"), ("configEtag", "", "default"),
     ("coinToken", "", "secret"), ("subToken", "", "secret"),
+    ("appAccountToken", "", "default"), ("appleCoinTx", "", "secret"), ("appleSubTx", "", "secret"),
 ])
 
 for fname, obj in [("riung-api.postman_collection.json", collection), ("riung-local.postman_environment.json", local),

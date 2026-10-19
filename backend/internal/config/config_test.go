@@ -196,6 +196,28 @@ func TestBillingConfig(t *testing.T) {
 	}
 }
 
+func TestAppStoreConfig(t *testing.T) {
+	c, err := Load(env(nil))
+	if err != nil || c.AppStoreEnabled() {
+		t.Fatalf("off by default: %v %+v", err, c.AppStoreEnabled())
+	}
+	if _, err := Load(env(map[string]string{"APPSTORE_BUNDLE_ID": "com.riung.riung"})); err == nil || !strings.Contains(err.Error(), "APPSTORE_KEY_ID") {
+		t.Fatalf("bundle without key must fail: %v", err)
+	}
+	if _, err := Load(env(map[string]string{"APPSTORE_APP_APPLE_ID": "riung"})); err == nil || !strings.Contains(err.Error(), "APPSTORE_APP_APPLE_ID") {
+		t.Fatalf("non-numeric app id must fail: %v", err)
+	}
+	c, err = Load(env(map[string]string{"APPSTORE_BUNDLE_ID": "com.riung.riung", "APPSTORE_ISSUER_ID": "57246542-96fe-1a63-e053-0824d011072a",
+		"APPSTORE_KEY_ID": "2X9R4HXF34", "APPSTORE_PRIVATE_KEY_FILE": "/run/secrets/appstore.p8", "APPSTORE_APP_APPLE_ID": "1234567890"}))
+	if err != nil || !c.AppStoreEnabled() || c.AppStoreAppAppleID != 1234567890 || c.BillingEnabled() {
+		t.Fatalf("app store only: %v %+v", err, c)
+	}
+	c, err = Load(env(map[string]string{"DEV_BILLING": "true"}))
+	if err != nil || !c.AppStoreEnabled() || c.AppStoreBundleID != "com.riung.riung" {
+		t.Fatalf("dev billing fakes the App Store too: %v %q", err, c.AppStoreBundleID)
+	}
+}
+
 func TestFocusTicketKey(t *testing.T) {
 	c, err := Load(env(nil))
 	if err != nil || len(c.FocusTicketKey) != 32 || c.FocusTicketKid != "k1" {

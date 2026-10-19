@@ -15,6 +15,7 @@ const (
 	ProviderAnonymous = "anonymous"
 	ProviderPassword  = "password"
 	ProviderGoogle    = "google.com"
+	ProviderApple     = "apple.com" // Sign in with Apple (iOS)
 )
 
 // IdentityProviderFirebase is the auth_identities.provider value for Firebase.
@@ -25,7 +26,7 @@ type Identity struct {
 	// Provider is the identity system ("firebase"); Subject its user id.
 	Provider string
 	Subject  string
-	// SignInProvider is how the user signed in: anonymous, password, google.com.
+	// SignInProvider is how the user signed in: anonymous, password, google.com, apple.com.
 	SignInProvider string
 	AuthTime       time.Time
 	EmailVerified  bool

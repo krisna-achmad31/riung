@@ -2,7 +2,7 @@
 
 | File | Isi |
 |---|---|
-| `riung-api.postman_collection.json` | 52 request dalam 12 folder, urut seperti alur app (akun → latihan → billing → toko → Fokus → Aplikasi Beku → admin → hapus akun) |
+| `riung-api.postman_collection.json` | 55 request dalam 13 folder, urut seperti alur app (akun → latihan → billing Play & App Store → toko → Fokus → Aplikasi Beku → admin → hapus akun) |
 | `riung-local.postman_environment.json` | stack dev (`make dev-up`): token dev siap pakai, `devBilling=true` (token pembelian palsu dibuat otomatis) |
 | `riung-prod.postman_environment.json` | `https://riung.e55techlab.com`: isi `idToken` (ID token Firebase, berlaku 1 jam) dan `appCheckToken` bila ada; `coinToken`/`subToken` diisi `purchaseToken` asli dari app |
 | `generate.py` | sumber koleksi — ubah di sini lalu `python3 postman/generate.py postman` (jangan edit JSON manual) |
@@ -18,7 +18,10 @@ Postman Console beserta `requestId`.
 Tes kontrak di folder **6. Google Play billing**: paket koin `credited`/`already_credited`, langganan `active`
 dengan plan `premium_yearly`, dan **Restore** — satu baris per pembelian dengan urutan yang sama, setiap baris
 membawa `productId` + `purchaseToken` (app mencocokkan lewat token), token yang sudah diverifikasi tidak
-dikreditkan dua kali, token akun lain `purchase_invalid`.
+dikreditkan dua kali, token akun lain `purchase_invalid`. Folder **6b. App Store billing (iOS)** sama untuk
+`/v1/billing/appstore/*`: `transactionId` dev dibuat dari `appAccountToken` (disimpan **Me**) di
+`appleCoinTx`/`appleSubTx`, Restore dicocokkan lewat `transactionId`. Webhook App Store tidak ada di koleksi
+(butuh tanda tangan Apple; diuji di tes Go).
 
 ## Lokal
 
@@ -38,7 +41,7 @@ docker run --rm -v "$PWD/postman:/etc/newman" postman/newman:6-alpine run riung-
   --env-var baseUrl=http://host.docker.internal:8080 --env-var adminBaseUrl=http://host.docker.internal:8081
 ```
 
-Hasil yang benar (diuji 2026-10-19, database kosong): 52 request, 64 assertion, 0 gagal; semua 2xx (satu
+Hasil yang benar (diuji 2026-10-20, database kosong): 55 request, 72 assertion, 0 gagal; semua 2xx (satu
 `304` dari *Config If-None-Match*) kecuali empat `409` yang disengaja —
 bundel aksesori (`price_changed`, dikirim dengan harga 0), sesi Fokus (`ticket_invalid` `too_early`), dan dua
 bundel Aplikasi Beku (`cooldown` 60 detik).
@@ -46,7 +49,7 @@ bundel Aplikasi Beku (`cooldown` 60 detik).
 ## Produksi
 
 - Ambil ID token dari app debug (`FirebaseAuth.instance.currentUser!.getIdToken()`) dan tempel di `idToken`.
-- Billing belum aktif: `verify`/`restore` → `503`, webhook → `404`. Setelah aktif, isi `coinToken`/`subToken`
+- Billing belum aktif (Play dan App Store): `verify`/`restore` → `503`, webhook → `404`. Setelah aktif, isi `coinToken`/`subToken`
   dengan `purchaseToken` asli dari Play (`devBilling` kosong, jadi token tidak ditimpa); webhook RTDN hanya dari
   Pub/Sub.
 - Admin API hanya lewat VPN (`http://172.19.0.16:8081`) dengan token akun admin (login ≤ 15 menit).

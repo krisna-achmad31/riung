@@ -8,6 +8,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/krisna-achmad31/riung/backend/internal/appstore"
 	"github.com/krisna-achmad31/riung/backend/internal/economy"
 	"github.com/krisna-achmad31/riung/backend/internal/logx"
 	"github.com/krisna-achmad31/riung/backend/internal/rules"
@@ -35,7 +36,9 @@ type Service struct {
 	Store     *store.Store
 	Economy   economy.Props
 	Publisher Publisher // nil = billing not configured
-	Hasher    logx.Hasher
+	// AppStore verifies iOS purchases; nil = App Store billing not configured.
+	AppStore appstore.API
+	Hasher   logx.Hasher
 	// AccountKey derives the obfuscated account id the app passes to Play.
 	AccountKey []byte
 	Now        func() time.Time
@@ -287,6 +290,10 @@ func (s *Service) applySubscription(tx *store.UserTx, userID, token string, sp S
 	return tx.SetSubscription(store.Subscription{Plan: sp.ProductID, Status: status, ExpiresAt: sp.ExpiresAt, AutoRenewing: sp.AutoRenewing}, token)
 }
 
+func (s *Service) premiumActive(sub *store.Subscription) bool {
+	return rules.PremiumStatus(sub, s.Now(), s.Economy.Premium.GraceDays).Active()
+}
+
 // Subscription returns the user's stored subscription.
 func (s *Service) Subscription(ctx context.Context, userID string) (*store.Subscription, error) {
 	return s.Store.Subscription(ctx, userID)
@@ -334,12 +341,18 @@ func (s *Service) ApplyVoided(ctx context.Context, v VoidedPurchase) (RefundResu
 	if p.Kind == store.PurchaseSubscription {
 		return s.voidSubscription(ctx, *p.UserID, p, r)
 	}
+	return s.voidCoinPack(ctx, *p.UserID, p, v.VoidedAt, r)
+}
+
+// voidCoinPack takes back exactly what a refunded coin pack credited, once
+// (unspent coins first, the rest becomes debt). Shared by Play and App Store.
+func (s *Service) voidCoinPack(ctx context.Context, userID string, p store.Purchase, at time.Time, r RefundResult) (RefundResult, error) {
 	if p.VoidedAt != nil {
 		r.AlreadyRun = true
 		return r, nil
 	}
-	err = s.Store.WithUserTx(ctx, *p.UserID, func(tx *store.UserTx) error {
-		cur, err := tx.PurchaseByToken(v.Token)
+	err := s.Store.WithUserTx(ctx, userID, func(tx *store.UserTx) error {
+		cur, err := tx.PurchaseByToken(p.Token)
 		if err != nil {
 			return err
 		}
@@ -348,17 +361,17 @@ func (s *Service) ApplyVoided(ctx context.Context, v VoidedPurchase) (RefundResu
 			return nil
 		}
 		if cur.CreditedAt != nil {
-			credited, err := tx.CreditedValue(ledgerKey("purchase", v.Token))
+			credited, err := tx.CreditedValue(ledgerKey("purchase", p.Token))
 			if err != nil {
 				return err
 			}
 			if credited > 0 {
-				if r.Clawed, r.Debt, err = tx.Clawback(credited, "refund", cur.ProductID, ledgerKey("refund", v.Token)); err != nil {
+				if r.Clawed, r.Debt, err = tx.Clawback(credited, "refund", cur.ProductID, ledgerKey("refund", p.Token)); err != nil {
 					return err
 				}
 			}
 		}
-		return tx.MarkVoided(v.Token, v.VoidedAt)
+		return tx.MarkVoided(p.Token, at)
 	})
 	return r, err
 }
