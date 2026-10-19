@@ -118,8 +118,8 @@ dikosongkan, `/v1/billing/appstore/*` menjawab 503 dan `/v1/webhooks/app-store` 
 
 Langkah lengkap di sisi Apple (akun, App ID, produk, key, sandbox, App Review): `docs/panduan-apple-developer.md`.
 
-1. Apple Developer Program aktif (tim yang sama dengan sertifikat build iOS); App ID `com.riung.riung`
-   (atau bundle id final) dengan capability *In-App Purchase* (dan *Sign in with Apple* bila dipakai).
+1. Apple Developer Program aktif (tim yang sama dengan sertifikat build iOS); App ID `id.riung.riung`
+   (bundle id iOS; Android tetap `com.riung.riung`) dengan capability *In-App Purchase* (dan *Sign in with Apple* bila dipakai).
 2. App Store Connect → *Business*: perjanjian **Paid Apps**, data bank & pajak lengkap — tanpa ini produk
    tidak bisa dibeli, juga di sandbox.
 3. App Store Connect → app → *Monetization*: consumable `coin_pack_small|medium|large`; subscription group
@@ -344,5 +344,7 @@ Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:8250
   pull dari GHCR, migrasi, healthy, smoke test 200, 0 ERROR; situs lain tetap 200/302. Jalur rollback
   (`rollback_tag=6f3a51a`) diuji: container tidak dibuat ulang karena image sama. Cron prune VPS menghapus image
   > 24 jam, jadi rollback selalu lewat GHCR.
+- 2026-10-20: `6d05579` lewat CI (jalur App Store siap tapi mati: log start `"appStore":false`, webhook
+  `/v1/webhooks/app-store` 404; `GET /v1/me` membawa `appAccountToken`). Healthy, 0 ERROR, situs lain normal.
 - Catatan 2026-10-17: VPS reboot 09:40 WIB; `riung-api` gagal 4× dalam 2 detik karena `shared-postgres` belum
   menyala (nama host belum bisa di-resolve), lalu jalan normal — `restart: unless-stopped` menanganinya.

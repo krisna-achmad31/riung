@@ -284,7 +284,7 @@ func Load(getenv func(string) string) (Config, error) {
 		c.AppStoreAppAppleID = id
 	}
 	if c.DevBilling && c.AppStoreBundleID == "" {
-		c.AppStoreBundleID = "com.riung.riung"
+		c.AppStoreBundleID = "id.riung.riung" // iOS bundle id (Android package stays com.riung.riung)
 	}
 	if c.AppStoreBundleID != "" && !c.DevBilling &&
 		(c.AppStoreIssuerID == "" || c.AppStoreKeyID == "" || c.AppStorePrivateKeyFile == "") {

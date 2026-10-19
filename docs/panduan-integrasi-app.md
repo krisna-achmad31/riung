@@ -434,6 +434,8 @@ if (const {'credited', 'already_credited', 'active', 'inactive'}.contains(r.stat
 - `409 purchase_invalid` → **jangan** `completePurchase`: transaksi milik akun Riung lain di Apple ID yang sama
   tetap tertunda dan terkredit saat akun pemiliknya login lagi. StoreKit mengirim ulang transaksi yang belum
   selesai setiap app dibuka — cukup verifikasi lagi.
+- Bundle id iOS **`id.riung.riung`** (Android tetap `com.riung.riung`): ganti `PRODUCT_BUNDLE_IDENTIFIER` di
+  Xcode dan pakai `GoogleService-Info.plist` dari app Firebase iOS dengan bundle id itu.
 - Produk di App Store Connect memakai id yang sama (`coin_pack_*` consumable, `premium_monthly|yearly`
   auto-renewable dalam **satu** subscription group, trial 7 hari sebagai *introductory offer*). Harga dan lama
   trial dibaca dari `ProductDetails`, seperti Android.

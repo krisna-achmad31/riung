@@ -11,6 +11,14 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+### Diubah
+- Bundle id iOS = `id.riung.riung` (Apple Developer); `DEV_BILLING` memakainya sebagai default
+  `APPSTORE_BUNDLE_ID`. Android tetap `com.riung.riung`. Produksi tidak berubah (App Store masih mati).
+
+---
+
+## [6d05579] — 2026-10-20 · produksi (App Store disiapkan, masih mati)
+
 ### Ditambahkan
 - **App Store (iOS)** — siap, **mati** sampai `APPSTORE_*` diisi (runbook 4d, spec §3.9b):
   `POST /v1/billing/appstore/verify` dan `/restore` (`{productId, transactionId}`, hasil sama dengan Play; server

@@ -4,8 +4,13 @@
 Backend sudah siap untuk iOS (spec §3.9b) dan **mati** sampai langkah di sini selesai. Urutan: A (akun) →
 B (Developer portal) → C (App Store Connect) → D (Firebase) → E (kirim ke backend) → F (uji) → G (review).
 
-Data app: bundle id **`com.riung.riung`** (dari `riung/ios/Runner.xcodeproj`), nama **Riung**, Team ID
-**`C75S43V9FY`** (dari `ios_development.cer`).
+Data app: bundle id iOS **`id.riung.riung`** (terdaftar di Apple Developer), nama **Riung**, Team ID
+**`C75S43V9FY`** (dari `ios_development.cer`). Android tetap `com.riung.riung` di Play.
+
+> **Perlu disamakan di app**: proyek Flutter masih `com.riung.riung` (`riung/ios/Runner.xcodeproj`,
+> `PRODUCT_BUNDLE_IDENTIFIER`, 3 konfigurasi; target tes `….RunnerTests`). Ganti ke `id.riung.riung`, lalu
+> daftarkan app iOS dengan bundle id ini di Firebase dan pakai `GoogleService-Info.plist` barunya (D1) —
+> plist lama untuk `com.riung.riung` membuat Firebase Auth/FCM/App Check di iOS tidak cocok.
 
 ---
 
@@ -20,7 +25,7 @@ Data app: bundle id **`com.riung.riung`** (dari `riung/ios/Runner.xcodeproj`), n
 
 ## B. Developer portal — <https://developer.apple.com/account/resources>
 
-1. [ ] **Identifiers → App IDs → +** → *App* → Explicit Bundle ID `com.riung.riung`. Capability:
+1. [ ] **Identifiers → App IDs → +** → *App* → Explicit Bundle ID `id.riung.riung` (sudah dibuat). Capability:
    - *In-App Purchase* (bawaan menyala)
    - *Sign in with Apple* — app memakai `google_sign_in`; App Review 4.8 mewajibkan satu login lain yang
      menjaga privasi bila ada login pihak ketiga, dan Sign in with Apple adalah cara termudah memenuhinya
@@ -38,7 +43,7 @@ Data app: bundle id **`com.riung.riung`** (dari `riung/ios/Runner.xcodeproj`), n
 1. [ ] **Business** (dulu *Agreements, Tax, and Banking*): setujui **Paid Apps Agreement**, isi rekening bank
    dan formulir pajak (individu non-AS: W-8BEN). Status harus **Active** — tanpa ini produk tidak bisa dibeli,
    **juga di sandbox**. Verifikasi bank bisa makan beberapa hari, jadi mulai dari sini.
-2. [ ] **Apps → + → New App**: iOS, nama *Riung*, bahasa utama Indonesian, bundle id `com.riung.riung`, SKU
+2. [ ] **Apps → + → New App**: iOS, nama *Riung*, bahasa utama Indonesian, bundle id `id.riung.riung`, SKU
    bebas (mis. `riung-ios`).
 3. [ ] **App Information**:
    - catat **Apple ID** (angka, mis. `6741234567`) → `APPSTORE_APP_APPLE_ID`
@@ -79,7 +84,9 @@ Data app: bundle id **`com.riung.riung`** (dari `riung/ios/Runner.xcodeproj`), n
 
 ## D. Firebase (project `riung-5e979`)
 
-1. [ ] App iOS `com.riung.riung` terdaftar (`GoogleService-Info.plist` sudah ada di secret CI — cocokkan bundle id).
+1. [ ] *Project settings → Add app → iOS* dengan bundle id `id.riung.riung` → unduh `GoogleService-Info.plist`, ganti
+   file di `riung/ios/Runner/` dan secret CI `GOOGLE_SERVICE_INFO_PLIST`. App iOS lama (`com.riung.riung`), bila
+   ada, bisa dihapus setelah build baru jalan.
 2. [ ] *Project settings → Cloud Messaging → Apple app configuration*: unggah **APNs key** (B2), Key ID, Team ID
    `C75S43V9FY`.
 3. [ ] *App Check → Apps → iOS*: daftarkan **App Attest** (dan **DeviceCheck** dengan key B2). App tetap
@@ -95,7 +102,7 @@ Taruh di `~/Downloads`, sebutkan nama filenya, nanti saya salin ke VPS (`/var/ww
 
 | Nilai | Dari | Env |
 |---|---|---|
-| Bundle ID | `com.riung.riung` | `APPSTORE_BUNDLE_ID` |
+| Bundle ID | `id.riung.riung` | `APPSTORE_BUNDLE_ID` |
 | Issuer ID (UUID) | C6 | `APPSTORE_ISSUER_ID` |
 | Key ID (10 karakter) | C6 | `APPSTORE_KEY_ID` |
 | File `SubscriptionKey_XXXXXXXXXX.p8` / `AuthKey_….p8` | C6 | `APPSTORE_PRIVATE_KEY_FILE` |

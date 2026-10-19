@@ -28,7 +28,7 @@ import (
 var signedAt = time.Date(2026, 10, 19, 8, 0, 0, 0, time.UTC).UnixMilli()
 
 func sampleTxn() appstore.Transaction {
-	return appstore.Transaction{TransactionID: "2000000123", OriginalTransactionID: "2000000123", BundleID: "com.riung.riung",
+	return appstore.Transaction{TransactionID: "2000000123", OriginalTransactionID: "2000000123", BundleID: "id.riung.riung",
 		ProductID: "coin_pack_small", Type: appstore.TypeConsumable, Quantity: 1, Environment: appstore.EnvSandbox,
 		AppAccountToken: "6F9619FF-8B86-D011-B42D-00C04FC964FF", SignedDate: signedAt}
 }
@@ -158,7 +158,7 @@ func checkAuth(t *testing.T, r *http.Request, pub *ecdsa.PublicKey) {
 	_ = json.Unmarshal(h, &hdr)
 	_ = json.Unmarshal(c, &claims)
 	if hdr["alg"] != "ES256" || hdr["kid"] != "KEY123" || claims["iss"] != "issuer-uuid" ||
-		claims["aud"] != "appstoreconnect-v1" || claims["bid"] != "com.riung.riung" {
+		claims["aud"] != "appstoreconnect-v1" || claims["bid"] != "id.riung.riung" {
 		t.Errorf("jwt header %v claims %v", hdr, claims)
 	}
 	if exp, iat := claims["exp"].(float64), claims["iat"].(float64); exp-iat > 3600 || exp <= iat {
@@ -181,7 +181,7 @@ func newClient(t *testing.T, ca *appstoretest.CA, prod, sandbox http.Handler) *a
 		t.Cleanup(s.Close)
 		return s
 	}
-	c, err := appstore.NewClient(appstore.ClientOptions{BundleID: "com.riung.riung", IssuerID: "issuer-uuid", KeyID: "KEY123",
+	c, err := appstore.NewClient(appstore.ClientOptions{BundleID: "id.riung.riung", IssuerID: "issuer-uuid", KeyID: "KEY123",
 		PrivateKeyPEM: pemKey, Verifier: ca.Verifier(t), ProductionURL: wrap(prod).URL, SandboxURL: wrap(sandbox).URL})
 	if err != nil {
 		t.Fatal(err)
@@ -276,7 +276,7 @@ func TestNewClientRejectsBadKeys(t *testing.T) {
 }
 
 func TestFakeDevIDs(t *testing.T) {
-	f := appstore.NewFake("com.riung.riung")
+	f := appstore.NewFake("id.riung.riung")
 	tok := "6f9619ff-8b86-8011-b42d-00c04fc964ff"
 	coin, err := f.Transaction(context.Background(), "dev-coin:"+tok+":coin_pack_small:1")
 	if err != nil || coin.Type != appstore.TypeConsumable || coin.AccountToken() != tok || coin.ProductID != "coin_pack_small" {

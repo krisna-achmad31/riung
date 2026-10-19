@@ -85,6 +85,10 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `/v1/webhooks/app-store`); isi `APPSTORE_*`. Server sudah siap (spec §3.9b) dan mati sampai ini diisi.
       Panduan langkah demi langkah: `docs/panduan-apple-developer.md`. Sertifikat `ios_development.cer` (Team `C75S43V9FY`) hanya untuk menandatangani build di Xcode — backend
       tidak memakainya.
+- [ ] **P1 (iOS) — Bundle id `id.riung.riung`** (Apple Developer, 2026-10-20): proyek Flutter masih
+      `com.riung.riung` → ganti `PRODUCT_BUNDLE_IDENTIFIER` di `riung/ios/Runner.xcodeproj` (Runner &
+      RunnerTests), daftarkan app iOS `id.riung.riung` di Firebase, ganti `GoogleService-Info.plist` dan secret CI
+      `GOOGLE_SERVICE_INFO_PLIST`. Server: `APPSTORE_BUNDLE_ID=id.riung.riung`. Android tetap `com.riung.riung`.
 - [ ] **P1 (iOS) — Uji sandbox App Store**: pastikan `appAccountToken` dari `applicationUserName` muncul di
       transaksi (kalau kosong, server menolak `purchase_invalid`), beli/refund/upgrade/batal di sandbox.
 - [ ] **P2 (iOS) — Riwayat refund Apple**: notifikasi `REFUND` yang terlewat (5 kali gagal) belum disusul job;
