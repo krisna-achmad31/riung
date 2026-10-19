@@ -116,6 +116,8 @@ unduh key JSON, simpan sebagai `/var/www/riung/secrets/firebase-service-account.
 **4d. App Store billing (iOS)** (menyusul saat rilis iOS dijadwalkan; tanpa ini `APPSTORE_BUNDLE_ID`
 dikosongkan, `/v1/billing/appstore/*` menjawab 503 dan `/v1/webhooks/app-store` 404)
 
+Langkah lengkap di sisi Apple (akun, App ID, produk, key, sandbox, App Review): `docs/panduan-apple-developer.md`.
+
 1. Apple Developer Program aktif (tim yang sama dengan sertifikat build iOS); App ID `com.riung.riung`
    (atau bundle id final) dengan capability *In-App Purchase* (dan *Sign in with Apple* bila dipakai).
 2. App Store Connect → *Business*: perjanjian **Paid Apps**, data bank & pajak lengkap — tanpa ini produk

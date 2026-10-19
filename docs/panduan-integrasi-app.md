@@ -404,7 +404,8 @@ Stack dev memakai Google Play palsu: token `dev-coin:<billingAccountId>:<product
 `dev-sub:<billingAccountId>:<productId>:<hari>:<n>` (Postman folder *6. Google Play billing*).
 
 ### 11.6 App Store (iOS) — server siap, aktif setelah App Store Connect disiapkan
-Server sudah punya jalur iOS (spec §3.9b) tapi **mati** sampai kredensial App Store diisi (runbook 4d);
+Server sudah punya jalur iOS (spec §3.9b) tapi **mati** sampai kredensial App Store diisi (runbook 4d;
+langkah di Apple: `docs/panduan-apple-developer.md`);
 sebelum itu `POST /v1/billing/appstore/*` menjawab `503`. Bedanya dengan Android:
 
 | | Android | iOS |

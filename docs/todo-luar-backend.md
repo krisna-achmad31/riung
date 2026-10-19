@@ -83,7 +83,7 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `premium_monthly|yearly`, intro offer 7 hari); key *In-App Purchase* (`.p8`, Key ID, Issuer ID) →
       `secrets/appstore-iap-key.p8`; Server Notifications **V2** (URL production & sandbox =
       `/v1/webhooks/app-store`); isi `APPSTORE_*`. Server sudah siap (spec §3.9b) dan mati sampai ini diisi.
-      Sertifikat `ios_development.cer` (Team `C75S43V9FY`) hanya untuk menandatangani build di Xcode — backend
+      Panduan langkah demi langkah: `docs/panduan-apple-developer.md`. Sertifikat `ios_development.cer` (Team `C75S43V9FY`) hanya untuk menandatangani build di Xcode — backend
       tidak memakainya.
 - [ ] **P1 (iOS) — Uji sandbox App Store**: pastikan `appAccountToken` dari `applicationUserName` muncul di
       transaksi (kalau kosong, server menolak `purchase_invalid`), beli/refund/upgrade/batal di sandbox.
