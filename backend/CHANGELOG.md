@@ -11,6 +11,18 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+### Diperbaiki
+- `riung api` menunggu Postgres sampai 60 detik saat start (coba ulang 0,5 → 5 detik, log WARN `database not
+  ready, retrying`). Sebelumnya API langsung keluar dengan ERROR bila `shared-postgres` belum siap, seperti
+  saat VPS reboot 2026-10-17 (4 restart). Job cron & perintah admin tetap mencoba sekali.
+
+### Operasional
+- Deploy lewat GitHub Actions: setiap push ke `main`/`feat/go-backend` mem-push image `:<sha 7>` ke GHCR;
+  deploy = *Run workflow* dengan `deploy` ✓, lewat user `deploy` di VPS (tanpa password, kunci CI dibatasi
+  forced command `riung-ci-deploy`), lalu smoke test. Deploy berhenti bila `deploy.sh`/compose di VPS beda
+  dengan commit. Tag image dan `riung version` = sha 7 karakter.
+- Loki menyimpan log `riung-api`/`riung-migrate` 30 hari (sebelumnya 7).
+
 ### Diubah
 - Postman collection (`backend/postman/`): request *Verifikasi* menyimpan `coinToken`/`subToken`, lalu
   **Restore** mengirim ulang keduanya ditambah satu token akun lain. Restore dites: satu baris per pembelian,

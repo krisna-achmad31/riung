@@ -168,6 +168,7 @@ negatif, ledger idempoten, `riung_app` **tidak bisa** mengubah/menghapus `coin_l
 Runbook lengkap (setup pertama, rilis rutin, verifikasi, rollback, masalah umum):
 [`deploy/README.md`](deploy/README.md).
 
-Ringkas: merge ke `main` → CI test, build, scan, push image ke GHCR → `deploy/deploy.sh <image>` di VPS
-(pull → migrate → recreate `riung-api` → tunggu healthy). Deploy otomatis aktif setelah
-`vars.RIUNG_DEPLOY_ENABLED == 'true'`.
+Ringkas: push ke `main`/`feat/go-backend` → CI test, build, scan, push image `:<sha 7>` ke GHCR. Deploy =
+`gh workflow run Backend --ref <branch> -f deploy=true` → SSH sebagai `deploy` (forced command
+`deploy/riung-ci-deploy.sh`) → `deploy/deploy.sh <image>` di VPS (pull → migrate → recreate `riung-api` →
+tunggu healthy) → smoke test. Push ke `main` deploy sendiri hanya bila `vars.RIUNG_DEPLOY_ENABLED == 'true'`.

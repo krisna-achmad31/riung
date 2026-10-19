@@ -25,7 +25,19 @@ type PoolOptions struct {
 	MaxConns         int32
 	StatementTimeout time.Duration
 	AppName          string
+	// ConnectWait keeps retrying the first ping for up to this long (0 = one
+	// try). After a host reboot the API container can start before
+	// shared-postgres is up or its name resolves.
+	ConnectWait time.Duration
+	// Logger gets one warning per failed attempt while waiting (optional).
+	Logger *slog.Logger
 }
+
+// Retry delays while waiting for the database: doubling, capped.
+const (
+	connectRetryFirst = 500 * time.Millisecond
+	connectRetryMax   = 5 * time.Second
+)
 
 // Open connects the pool and verifies it with a ping. Every session gets a
 // statement_timeout so one slow query cannot pin a connection.
@@ -49,13 +61,47 @@ func Open(ctx context.Context, url string, opt PoolOptions) (*pgxpool.Pool, erro
 	if err != nil {
 		return nil, fmt.Errorf("create pool: %w", err)
 	}
-	pingCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	if err := pool.Ping(pingCtx); err != nil {
+	if err := waitForPing(ctx, pool, opt); err != nil {
 		pool.Close()
-		return nil, fmt.Errorf("ping database: %w", err)
+		return nil, err
 	}
 	return pool, nil
+}
+
+// waitForPing pings until it succeeds, ctx ends, or the next retry would
+// pass opt.ConnectWait. Failed attempts before the last are warnings, so a
+// slow database start does not raise the server-error alert.
+func waitForPing(ctx context.Context, pool *pgxpool.Pool, opt PoolOptions) error {
+	start := time.Now()
+	delay := connectRetryFirst
+	for attempt := 1; ; attempt++ {
+		pingCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		err := pool.Ping(pingCtx)
+		cancel()
+		if err == nil {
+			if attempt > 1 && opt.Logger != nil {
+				opt.Logger.LogAttrs(ctx, slog.LevelInfo, "database ready",
+					slog.String(logx.KeyEvent, logx.EventStartup),
+					slog.Int("attempt", attempt), slog.Int64("waitedMs", time.Since(start).Milliseconds()))
+			}
+			return nil
+		}
+		if ctx.Err() != nil || time.Since(start)+delay > opt.ConnectWait {
+			return fmt.Errorf("ping database (attempt %d): %w", attempt, err)
+		}
+		if opt.Logger != nil {
+			opt.Logger.LogAttrs(ctx, slog.LevelWarn, "database not ready, retrying",
+				slog.String(logx.KeyEvent, logx.EventStartup),
+				slog.Int("attempt", attempt), slog.Int64("retryInMs", delay.Milliseconds()),
+				slog.String("error", err.Error()))
+		}
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("ping database (attempt %d): %w", attempt, err)
+		case <-time.After(delay):
+		}
+		delay = min(2*delay, connectRetryMax)
+	}
 }
 
 // Migration commands accepted by Migrate.

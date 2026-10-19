@@ -6,17 +6,20 @@ Domain: `https://riung.e55techlab.com`. Rancangan lengkap: `docs/backend-go-plan
 ## Gambaran alur
 
 ```
-push/merge ke main
+push ke main / feat/go-backend, atau Run workflow (deploy ✓)
    │
    ▼
 GitHub Actions (.github/workflows/backend.yml)
    1. test   : go vet, go test -race (+ Postgres 16), govulncheck, golangci-lint
-   2. image  : docker build (linux/amd64) → scan Trivy → push ghcr.io/krisna-achmad31/riung-api:<sha>
-   3. deploy : scp compose + deploy.sh → ssh deploy@VPS "./deploy.sh <image>"
+   2. image  : docker build (linux/amd64) → scan Trivy → push ghcr.io/krisna-achmad31/riung-api:<sha 7>
+   3. deploy : hanya Run workflow dengan deploy ✓ (atau push ke main bila vars.RIUNG_DEPLOY_ENABLED)
+               ssh deploy@VPS check          → hash deploy.sh + compose harus sama dengan commit
+               ssh deploy@VPS deploy <sha 7> → /usr/local/bin/riung-ci-deploy (forced command)
+               smoke test /healthz + /v1/config
    │
    ▼
 VPS /var/www/riung/deploy.sh <image>
-   a. pull image dari GHCR
+   a. pull image dari GHCR (login sementara dengan GITHUB_TOKEN job; tidak ada token GHCR tersimpan di VPS)
    b. riung-migrate (sekali jalan, kredensial DDL) → `riung migrate up`
       gagal? → deploy berhenti, API lama tetap jalan
    c. recreate riung-api (172.19.0.16) dengan image baru
@@ -34,19 +37,26 @@ DDL hanya ada di `riung-migrate`; `riung-api` hanya memegang role `riung_app`.
 
 Jalankan sebagai root di VPS kecuali disebut lain.
 
-**1. User deploy & SSH** (lihat juga `docs/todo-luar-backend.md` §A — ganti password root dulu)
+**1. User deploy & SSH** (dibuat 2026-10-19; lihat juga `docs/todo-luar-backend.md` §A)
 
 ```sh
-adduser --disabled-password --gecos "" deploy
-usermod -aG docker deploy            # catatan: grup docker setara akses root ke Docker
-install -d -o deploy -g deploy -m 700 /home/deploy/.ssh
-# tempel public key CI ke /home/deploy/.ssh/authorized_keys (chmod 600, owner deploy)
-install -d -o deploy -g deploy -m 750 /var/www/riung /var/www/riung/secrets
+useradd -m -s /bin/bash -G docker -c "riung deploy (CI + admin, key only)" deploy
+usermod -p '*' deploy                # tanpa password sama sekali → hanya bisa login dengan key
+install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
+install -m 755 riung-ci-deploy.sh /usr/local/bin/riung-ci-deploy    # dari backend/deploy/
+# /home/deploy/.ssh/authorized_keys (owner deploy, chmod 600):
+#   restrict,command="/usr/local/bin/riung-ci-deploy" ssh-ed25519 AAAA… riung-ci@github-actions
+#   ssh-ed25519 AAAA… admin-laptop                     # admin: shell biasa sebagai deploy
+cd /var/www/riung && chgrp deploy . .env .env.migrate deploy.sh && chmod 750 . deploy.sh && chmod 640 .env .env.migrate
 ```
 
-Lalu `/etc/ssh/sshd_config.d/`: `PermitRootLogin prohibit-password`, `PasswordAuthentication no`
-(ingat `50-cloud-init.conf` saat ini menimpa jadi `yes`), `systemctl reload ssh`. Uji login key dari
-terminal lain sebelum menutup sesi.
+Grup `docker` setara akses root ke Docker, karena itu kunci CI dibatasi forced command: hanya `check`
+(hash `deploy.sh` + compose) dan `deploy <sha>` (hex 7–40 karakter); shell, `scp`, port forwarding, dan
+injeksi argumen ditolak (diuji 2026-10-19). Private key CI hanya ada di secret GitHub `VPS_DEPLOY_KEY`.
+
+Masih terbuka (TODO P0): `PermitRootLogin prohibit-password`, `PasswordAuthentication no` (ingat
+`50-cloud-init.conf` menimpa jadi `yes`), `systemctl reload ssh` — uji login key dari terminal lain
+sebelum menutup sesi.
 
 **2. Salin artefak deploy** (dari laptop, folder repo)
 
@@ -56,7 +66,8 @@ scp -P 8443 -r backend/deploy/docker-compose.prod.yml backend/deploy/deploy.sh \
   backend/deploy/nginx backend/deploy/sql backend/deploy/monitoring deploy@76.13.20.72:/var/www/riung/
 ```
 
-CI menyalin ulang `docker-compose.prod.yml` dan `deploy.sh` di setiap deploy; sisanya hanya untuk setup.
+`docker-compose.prod.yml` dan `deploy.sh` disalin **oleh admin** (root atau `deploy` dengan key laptop) setiap
+kali berubah; kunci CI tidak bisa menulis file. Deploy CI berhenti bila salinan di VPS beda dengan commit.
 
 **3. Database `riung` di shared-postgres** (password hex supaya aman dipakai di URL)
 
@@ -69,7 +80,7 @@ docker exec -i -e RIUNG_MIGRATOR_PASSWORD="$MIG_PW" -e RIUNG_APP_PASSWORD="$APP_
 
 Script berhenti (exit 3) bila password kosong/< 16 karakter. Simpan kedua password untuk langkah 4.
 
-**4. File env** (`/var/www/riung`, owner `deploy`, `chmod 600`)
+**4. File env** (`/var/www/riung`, `root:deploy`, `chmod 640`)
 
 - `.env` dari `env.example` — `DATABASE_URL` (riung_app + `$APP_PW`), `TRUSTED_PROXIES=172.19.0.2/32`,
   `LOG_PEPPER`, `IP_HASH_KEY`, `PIN_PEPPER`, `BILLING_ACCOUNT_KEY` (masing-masing `openssl rand -hex 32`,
@@ -101,10 +112,14 @@ unduh key JSON, simpan sebagai `/var/www/riung/secrets/firebase-service-account.
    `rtdn_received` dengan `kind=test`.
 6. Isi `PLAY_*`/`RTDN_*` di `.env` (lihat `env.example`), `./deploy.sh` ulang.
 
-**5. Akses GHCR** (sebagai user `deploy`; token GitHub dengan scope `read:packages` saja)
+**5. Akses GHCR** — tidak ada login tersimpan di VPS. Deploy CI mengirim `GITHUB_TOKEN` job (berlaku sampai
+job selesai) lewat stdin; `riung-ci-deploy` memakainya untuk satu `docker login` di direktori config sementara.
+Pull manual (jarang perlu — image yang pernah di-deploy tetap ada di VPS):
 
 ```sh
-echo "$GHCR_READ_TOKEN" | docker login ghcr.io -u <github-user> --password-stdin
+export DOCKER_CONFIG="$(mktemp -d)"   # token tidak tertinggal di ~/.docker
+echo "$GHCR_READ_TOKEN" | docker login ghcr.io -u <github-user> --password-stdin   # PAT read:packages
+docker pull ghcr.io/krisna-achmad31/riung-api:<sha>; rm -rf "$DOCKER_CONFIG"
 ```
 
 **6. DNS** — Cloudflare: `A riung → 76.13.20.72`, **DNS only**. Cek: `dig +short riung.e55techlab.com`.
@@ -126,7 +141,9 @@ Perpanjangan sertifikat sudah ditangani cron certbot core-shared (03:00).
 
 **8. Monitoring** — gabungkan `monitoring/loki-retention.snippet.yml` ke
 `core-shared/monitoring/loki/config.yml` dan `monitoring/promtail-riung.snippet.yml` ke config Promtail,
-lalu `docker compose up -d --force-recreate loki promtail` di core-shared.
+lalu `docker compose up -d --force-recreate loki promtail` di core-shared. Retensi 30 hari untuk
+`riung-api`/`riung-migrate` terpasang 2026-10-19 (`-verify-config` dulu, cadangan
+`config.yml.bak-2026-10-19`, `docker restart shared-loki`); stage `json` Promtail belum.
 
 **8b. Alert Telegram** (opsional sampai ada bot; lihat `docs/backend-b6-review.md` §3)
 
@@ -188,33 +205,36 @@ Admin API diakses dari laptop yang tersambung VPN: `http://172.19.0.16:8081/admi
 token Firebase akun admin (login ≤ 15 menit). Semua perubahan tercatat di `admin_audit_log` dan log
 `admin_setting_changed`.
 
-**11. Aktifkan deploy otomatis** — GitHub repo → Settings:
-- Secrets: `VPS_HOST`, `VPS_SSH_PORT` (`8443`), `VPS_DEPLOY_KEY` (private key CI),
-  `VPS_KNOWN_HOSTS` (`ssh-keyscan -p 8443 76.13.20.72`, cocokkan fingerprint).
-- Variable: `RIUNG_DEPLOY_ENABLED=true`.
-- Environment `production` (opsional: wajib persetujuan sebelum deploy).
+**11. Deploy lewat CI** (terpasang 2026-10-19) — secret repo: `VPS_HOST`, `VPS_SSH_PORT` (`8443`),
+`VPS_DEPLOY_KEY` (private key CI, `ed25519 SHA256:3KcL9On+x10g3FG2ircJ9i8iAEhiv27pp2KOmGU1UIk`),
+`VPS_KNOWN_HOSTS` (`ssh-keyscan -p 8443`, fingerprint dicocokkan dengan `/etc/ssh/ssh_host_*`). Deploy otomatis
+saat push ke `main` hanya bila variable `RIUNG_DEPLOY_ENABLED=true` (belum diset). Environment `production`
+dibuat otomatis oleh job; pemilik repo bisa menambah *required reviewers*. Ganti kunci CI: buat pasangan baru,
+ganti baris `riung-ci` di `authorized_keys` dan secret `VPS_DEPLOY_KEY`.
 
 **12. Dokumentasi core-shared** — catat IP `.16`/`.17`, domain, dan `shared-postgres` = "n8n + riung" di
 `CLAUDE.md`/`README.md` core-shared, commit ke branch `grafana`.
 
 ## B. Rilis rutin
 
-Merge ke `main` → CI otomatis test, build, scan, push, deploy. Manual (misalnya CI mati):
+Push → CI test, build, scan, push image `:<sha 7>` ke GHCR (tanpa deploy). Deploy commit itu:
 
 ```sh
-ssh -p 8443 deploy@76.13.20.72 'cd /var/www/riung && ./deploy.sh ghcr.io/krisna-achmad31/riung-api:<sha>'
+gh workflow run Backend --ref feat/go-backend -f deploy=true    # atau Actions → Backend → Run workflow
+gh run watch "$(gh run list --workflow Backend --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId')"
 ```
 
+Kalau commit mengubah `deploy.sh` atau `docker-compose.prod.yml`, salin dulu (langkah 2), baru jalankan.
 Image selalu dari CI (linux/amd64). Jangan push image hasil build Mac (arm64) ke produksi.
 
-Sebelum branch di-merge ke `main` (belum ada image di GHCR), image dibuat lokal **untuk linux/amd64** dari commit
-yang sudah di-commit, lalu dimuat langsung ke VPS (`deploy.sh` memakai image lokal tanpa pull):
+Cadangan bila CI tidak bisa dipakai: image dibuat lokal **untuk linux/amd64** dari commit yang sudah
+di-commit, lalu dimuat langsung ke VPS (`deploy.sh` memakai image lokal tanpa pull):
 
 ```sh
 SHA=$(git rev-parse --short HEAD)
 docker buildx build --platform linux/amd64 --build-arg VERSION=$SHA -t ghcr.io/krisna-achmad31/riung-api:$SHA --load backend
-docker save ghcr.io/krisna-achmad31/riung-api:$SHA | gzip -1 | ssh -p 8443 root@76.13.20.72 'gunzip | docker load'
-ssh -p 8443 root@76.13.20.72 "cd /var/www/riung && ./deploy.sh ghcr.io/krisna-achmad31/riung-api:$SHA"
+docker save ghcr.io/krisna-achmad31/riung-api:$SHA | gzip -1 | ssh -p 8443 deploy@76.13.20.72 'gunzip | docker load'
+ssh -p 8443 deploy@76.13.20.72 "cd /var/www/riung && ./deploy.sh ghcr.io/krisna-achmad31/riung-api:$SHA"
 ```
 
 ## C. Verifikasi setelah deploy
@@ -231,10 +251,11 @@ Grafana → Explore → Loki: `{container="riung-api"} | json | level="ERROR"`.
 
 ## D. Rollback
 
-Jalankan `deploy.sh` dengan tag image sebelumnya:
+Jalankan `deploy.sh` dengan tag image sebelumnya (image yang pernah di-deploy masih ada di VPS:
+`docker images ghcr.io/krisna-achmad31/riung-api`):
 
 ```sh
-./deploy.sh ghcr.io/krisna-achmad31/riung-api:<sha-sebelumnya>
+ssh -p 8443 deploy@76.13.20.72 'cd /var/www/riung && ./deploy.sh ghcr.io/krisna-achmad31/riung-api:<sha-sebelumnya>'
 ```
 
 Aturan migrasi supaya rollback selalu aman: perubahan skema bersifat **menambah** (kolom/tabel baru,
@@ -249,7 +270,9 @@ nullable/default) dan baru dihapus di rilis berikutnya setelah tidak dipakai (ex
 | `did not become healthy` | `docker logs riung-api` — biasanya `.env` (DATABASE_URL, secret < 32 karakter). |
 | 502 dari nginx | `riung-api` mati/restart; situs lain tidak terdampak (pola `resolver`). |
 | `/readyz` 503 di dalam network | shared-postgres tidak terjangkau / password `riung_app` salah. |
-| Pull gagal | `docker login ghcr.io` di user `deploy` kedaluwarsa / tag salah. |
+| Pull gagal | CI: job deploy butuh `packages: read` dan package `riung-api` harus memberi akses Actions ke repo ini; manual: lihat langkah 5. Tag salah = sha 7 karakter. |
+| CI: `differ from this commit` | `deploy.sh`/compose di VPS beda dengan commit — salin (langkah 2), jalankan ulang workflow. |
+| Restart berulang setelah reboot | API menunggu Postgres ±60 detik (`database not ready, retrying`, WARN); lebih dari itu = `shared-postgres` mati. |
 
 ## F. Gladi resik lokal (2026-10-11)
 

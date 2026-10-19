@@ -11,13 +11,20 @@ on:
       - "backend/**"
       - ".github/workflows/backend.yml"
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy this commit to production after the image is pushed"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
+# Only pull requests cancel an older run: a push or a dispatch may be in the
+# middle of a deploy (migration), which must never be interrupted.
 concurrency:
-  group: backend-${{ github.ref }}
-  cancel-in-progress: true
+  group: backend-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
   run:
@@ -83,11 +90,15 @@ jobs:
       packages: write
     outputs:
       image: ${{ steps.meta.outputs.image }}
+      tag: ${{ steps.meta.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
 
+      # Tag = 7-char sha, as in CHANGELOG.md and `riung version`.
       - id: meta
-        run: echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/riung-api:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/riung-api:${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -95,7 +106,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: backend
-          build-args: VERSION=${{ github.sha }}
+          build-args: VERSION=${{ steps.meta.outputs.tag }}
           tags: ${{ steps.meta.outputs.image }}
           load: true
           push: false
@@ -111,8 +122,10 @@ jobs:
           ignore-unfixed: true
           exit-code: "1"
 
-      - name: Push to GHCR (main only)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      # Every push to main / feat/go-backend (and every dispatch) publishes its
+      # image, so any commit can be deployed or rolled back to; PRs never push.
+      - name: Push to GHCR
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         env:
           IMAGE: ${{ steps.meta.outputs.image }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -120,12 +133,26 @@ jobs:
           echo "$TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           docker push "$IMAGE"
 
+  # Production deploy over SSH as user `deploy`, whose key is bound to
+  # /usr/local/bin/riung-ci-deploy (backend/deploy/riung-ci-deploy.sh): it can
+  # only compare the compose files and deploy a riung-api tag.
+  # Run: Actions → Backend → Run workflow → deploy ✓ (or
+  # `gh workflow run Backend --ref <branch> -f deploy=true`). Pushes to main
+  # deploy by themselves only when vars.RIUNG_DEPLOY_ENABLED == 'true'.
   deploy:
     name: Deploy to VPS
     needs: image
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RIUNG_DEPLOY_ENABLED == 'true'
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.deploy) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RIUNG_DEPLOY_ENABLED == 'true')
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      packages: read
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
@@ -138,12 +165,33 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
           printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
 
-      - name: Copy compose files and deploy
+      # deploy.sh and the compose file are copied to the VPS by an admin; a
+      # commit that changes them must not be deployed with the old copies.
+      - name: Compare compose files with the VPS
         env:
           HOST: ${{ secrets.VPS_HOST }}
           PORT: ${{ secrets.VPS_SSH_PORT }}
-          IMAGE: ${{ needs.image.outputs.image }}
         run: |
-          SSH="ssh -i ~/.ssh/deploy_key -p $PORT -o StrictHostKeyChecking=yes"
-          scp -i ~/.ssh/deploy_key -P "$PORT" deploy/docker-compose.prod.yml deploy/deploy.sh "deploy@$HOST:/var/www/riung/"
-          $SSH "deploy@$HOST" "cd /var/www/riung && ./deploy.sh '$IMAGE'"
+          ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" check > vps.sha256
+          sha256sum deploy/deploy.sh deploy/docker-compose.prod.yml | sed 's|deploy/||' > repo.sha256
+          if ! diff -u vps.sha256 repo.sha256; then
+            echo "::error::deploy.sh / docker-compose.prod.yml on the VPS differ from this commit. Copy them first (backend/deploy/README.md §G), then rerun."
+            exit 1
+          fi
+
+      - name: Deploy
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+          PORT: ${{ secrets.VPS_SSH_PORT }}
+          TAG: ${{ needs.image.outputs.tag }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$TOKEN" | ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" deploy "$TAG"
+
+      - name: Smoke test
+        run: |
+          for path in /healthz /v1/config; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' "https://riung.e55techlab.com$path")"
+            echo "$path $code"
+            [ "$code" = 200 ] || exit 1
+          done

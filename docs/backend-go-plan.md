@@ -336,9 +336,10 @@ Folder `/var/www/riung`, `docker-compose.prod.yml` mengikuti aturan core-shared 
   `riung-api` lewat `retention_stream` Loki (global VPS tetap 7 hari) — detail di spec §6.5.
 - **CI** (`.github/workflows/backend.yml`, `paths: backend/**`): `go mod verify`, `go vet`, `golangci-lint`,
   `go test -race` (Postgres 16 sebagai service container), govulncheck, build image + scan Trivy; push
-  `ghcr.io/krisna-achmad31/riung-api:<sha>` hanya dari `main`, lalu (bila `vars.RIUNG_DEPLOY_ENABLED`)
-  deploy via SSH ke user `deploy` (key-only, grup `docker`) dengan `deploy/deploy.sh`. VPS butuh
-  `docker login ghcr.io` dengan token read-only. Dependabot memperbarui modul Go & image Docker backend.
+  `ghcr.io/krisna-achmad31/riung-api:<sha 7>` dari setiap push ke `main`/`feat/go-backend`. Deploy = *Run
+  workflow* dengan `deploy` ✓ (atau push ke `main` bila `vars.RIUNG_DEPLOY_ENABLED`): SSH ke user `deploy`
+  (tanpa password, kunci CI dibatasi forced command `deploy/riung-ci-deploy.sh`) → `deploy/deploy.sh`. Token
+  GHCR = `GITHUB_TOKEN` job, dipakai sekali di VPS dan tidak disimpan. Dependabot memperbarui modul Go & image Docker backend.
   Workflow Flutter perlu `paths-ignore: backend/**` (TODO §A).
 
 ## 9. Di luar backend

@@ -135,11 +135,22 @@ func runMigrate(ctx context.Context, cfg config.Config, cmd string, logger *slog
 	return database.Migrate(ctx, cfg.MigrationURL(), cmd, cfg.Env == config.EnvProd, logger)
 }
 
+// apiDBWait is how long `riung api` waits for Postgres at start-up: after a
+// VPS reboot the container can start before shared-postgres resolves.
+// Jobs and admin commands try once (a cron failure should alert).
+const apiDBWait = 60 * time.Second
+
 func openStore(ctx context.Context, cfg config.Config) (*store.Store, func(), error) {
+	return openStoreWait(ctx, cfg, 0, nil)
+}
+
+func openStoreWait(ctx context.Context, cfg config.Config, wait time.Duration, logger *slog.Logger) (*store.Store, func(), error) {
 	pool, err := database.Open(ctx, cfg.DatabaseURL, database.PoolOptions{
 		MaxConns:         cfg.DBMaxConns,
 		StatementTimeout: cfg.DBStatementTimeout,
 		AppName:          "riung-api",
+		ConnectWait:      wait,
+		Logger:           logger,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -178,7 +189,7 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 		verifier, appCheck = fb, fb.AppCheck()
 	}
 
-	st, closeStore, err := openStore(ctx, cfg)
+	st, closeStore, err := openStoreWait(ctx, cfg, apiDBWait, logger)
 	if err != nil {
 		return err
 	}

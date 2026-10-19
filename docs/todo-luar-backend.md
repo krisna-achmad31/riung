@@ -1,5 +1,5 @@
 # TODO di luar backend
-*Dikumpulkan selama perencanaan & audit backend Go (branch `feat/go-backend`, 2026-10-11, diperbarui 2026-10-18).*
+*Dikumpulkan selama perencanaan & audit backend Go (branch `feat/go-backend`, 2026-10-11, diperbarui 2026-10-19).*
 
 Backend dikerjakan sesuai `docs/backend-go-plan.md` dan `docs/backend-api-spec.md`. Daftar ini berisi
 pekerjaan **di luar** `backend/` yang dibutuhkan supaya backend benar-benar terpakai, ditambah celah yang
@@ -13,8 +13,9 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
 ## A. Infra & akses (VPS `76.13.20.72`, Firebase/Google Cloud, GitHub)
 
 - [ ] **P0 — Ganti password root VPS.** Password root sempat dibagikan di chat perencanaan.
-- [ ] **P0 — Pengerasan SSH**: buat user `deploy` (key-only, grup `docker`) untuk CI; set
-      `PermitRootLogin prohibit-password` dan `PasswordAuthentication no`. Perhatikan
+- [ ] **P0 — Pengerasan SSH**: ~~buat user `deploy` (key-only, grup `docker`) untuk CI~~ (2026-10-19: tanpa
+      password, kunci CI dengan forced command — runbook langkah 1); sisa: `PermitRootLogin prohibit-password`
+      dan `PasswordAuthentication no`. Perhatikan
       `/etc/ssh/sshd_config.d/50-cloud-init.conf` saat ini menimpa jadi `PasswordAuthentication yes`.
       Pertimbangkan menutup port 22 bila SSH cukup lewat 8443.
 - [ ] **P0 — Rotasi key `firebase-adminsdk`** (`riung-5e979-firebase-adminsdk-…json`). File sempat
@@ -36,14 +37,17 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       Simpan salinan secret di password manager: `BILLING_ACCOUNT_KEY`/`LOG_PEPPER`/`PIN_PEPPER` tidak bisa
       diganti tanpa memutus pembelian, `deleted_users`, dan backup PIN.
 - [x] **P1 — Nginx + TLS**: `riung.e55techlab.com` aktif 2026-10-13 (sertifikat diperpanjang cron certbot yang ada).
-- [ ] **P1 — Loki** (log riung sudah masuk Loki, retensi masih 7 hari): tambahkan `retention_stream` 30 hari untuk `{container="riung-api"}` di
-      `core-shared/monitoring/loki/config.yml` (snippet di spec §6.5), dan stage `json` di Promtail
-      (label hanya `level`, `event`).
+- [x] **P1 — Loki retensi 30 hari** (2026-10-19): `retention_stream` `{container=~"riung-api|riung-migrate"}`
+      30 hari di `core-shared/monitoring/loki/config.yml`; stream lain tetap 7 hari. File di VPS belum di-commit
+      ke repo `core-shared` (repo itu punya perubahan orang lain yang belum di-commit) — ikut item dokumentasi
+      di bawah.
+- [ ] **P2 — Promtail stage `json`** untuk riung (label hanya `level`, `event`); query sekarang memakai `| json`.
 - [ ] **P1 — Dokumentasi core-shared** (commit ke branch `grafana`): IP `172.19.0.16`/`.17` dipakai
       `riung-api`/`riung-migrate`, `shared-postgres` dipakai "n8n + riung", domain baru di tabel nginx.
-- [ ] **P1 — GHCR & deploy otomatis**: deploy pertama memakai image build lokal (runbook §B). Untuk CI:
-      merge ke `main`, `docker login ghcr.io` di VPS dengan token **read-only**, user `deploy`, secret GitHub
-      Actions (host, port 8443, private key), `vars.RIUNG_DEPLOY_ENABLED=true`.
+- [x] **P1 — GHCR & deploy lewat CI** (2026-10-19): setiap push ke `main`/`feat/go-backend` mem-push image
+      `:<sha 7>` ke GHCR; deploy = *Run workflow* dengan `deploy` ✓ (user `deploy`, forced command, token GHCR
+      sementara dari job). Deploy otomatis saat merge ke `main`: set `vars.RIUNG_DEPLOY_ENABLED=true` (perlu
+      pemilik repo) — opsional.
 - [ ] **P1 — Google Play billing** (langkah lengkap: `backend/deploy/README.md` 4c): aktifkan Android
       Publisher API & Pub/Sub API; service account `riung-play` diundang di Play Console (*View financial
       data* + *Manage orders and subscriptions*), key → `secrets/play-service-account.json`; topic `play-rtdn`
@@ -68,9 +72,8 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       `core-shared`: Grafana alerting sengaja kosong — sepakati dulu dengan pengelola `core-shared`.
 - [ ] **P1 — App Check `enforce`** setelah app mengirim token: kriteria di `docs/backend-b6-review.md` §4.
 - [ ] **P2 — Uji beban di VPS** saat beta (token Firebase sungguhan), pantau p95 dari Loki.
-- [ ] **P2 — Backend menunggu DB saat start**: setelah reboot VPS (2026-10-17) `riung-api` sempat restart 4×
-      karena `shared-postgres` belum siap (pulih sendiri dalam 4 detik). Perbaikan kecil di backend: coba ulang
-      koneksi DB ±60 detik sebelum keluar, supaya tidak ada log ERROR palsu tiap reboot.
+- [x] **P2 — Backend menunggu DB saat start** (2026-10-19): `riung api` mencoba ulang koneksi DB sampai 60 detik
+      (WARN `database not ready, retrying`), baru keluar dengan ERROR bila DB tetap tidak ada.
 - [ ] **P2 — `server_tokens off;`** di `shared-nginx` (versi nginx terlihat di header `Server`; berlaku semua situs).
 - [ ] **P2 — CI Flutter**: tambahkan `paths-ignore: ['backend/**']` di
       `.github/workflows/firebase_app_distribution.yml` supaya perubahan backend tidak memicu build APK.
