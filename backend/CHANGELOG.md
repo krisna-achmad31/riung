@@ -16,6 +16,12 @@ diubah di Flutter).
   ready, retrying`). Sebelumnya API langsung keluar dengan ERROR bila `shared-postgres` belum siap, seperti
   saat VPS reboot 2026-10-17 (4 restart). Job cron & perintah admin tetap mencoba sekali.
 
+### Keamanan
+- Kunci verifikasi PIN jurnal (`pin_locked`, 1 jam setelah 10 gagal) kini tetap berlaku melewati tengah malam
+  UTC. Sebelumnya kunci dicari per hari, jadi user yang terkunci pukul 23:50 UTC mendapat 10 percobaan baru
+  pukul 00:00 (rate limit 5/15 menit tetap berlaku). Tes yang sesekali gagal di CI dekat tengah malam UTC
+  (`TestJournalPinBackup`) kini deterministik.
+
 ### Operasional
 - Deploy lewat GitHub Actions: setiap push ke `main`/`feat/go-backend` mem-push image `:<sha 7>` ke GHCR;
   deploy = *Run workflow* dengan `deploy` ✓, lewat user `deploy` di VPS (tanpa password, kunci CI dibatasi

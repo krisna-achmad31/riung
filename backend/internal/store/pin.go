@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -39,20 +38,16 @@ func (s *Store) DeletePinBackup(ctx context.Context, userID string) error {
 	return err
 }
 
-// PinLockedUntil returns the active lock for day, if any.
-func (s *Store) PinLockedUntil(ctx context.Context, userID string, day, now time.Time) (*time.Time, error) {
+// PinLockedUntil returns the active lock, if any. Failures are counted per
+// UTC day, but a lock set late in one day still holds after midnight.
+func (s *Store) PinLockedUntil(ctx context.Context, userID string, now time.Time) (*time.Time, error) {
 	var until *time.Time
-	err := s.pool.QueryRow(ctx, `SELECT locked_until FROM pin_attempts WHERE user_id = $1 AND day = $2`, userID, day).Scan(&until)
-	if err = notFound(err); errors.Is(err, ErrNotFound) {
-		return nil, nil
-	}
+	err := s.pool.QueryRow(ctx, `SELECT max(locked_until) FROM pin_attempts WHERE user_id = $1 AND locked_until > $2`,
+		userID, now).Scan(&until)
 	if err != nil {
 		return nil, err
 	}
-	if until != nil && until.After(now) {
-		return until, nil
-	}
-	return nil, nil
+	return until, nil
 }
 
 // RecordPinFailure counts a failed verification; at maxFailures the user is

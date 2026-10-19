@@ -170,11 +170,26 @@ func TestPinAttemptsLock(t *testing.T) {
 			t.Fatalf("failure %d: n=%d until=%v err=%v", i, n, until, err)
 		}
 	}
-	if until, _ := st.PinLockedUntil(ctx, u.ID, day, now.Add(30*time.Minute)); until == nil {
+	if until, _ := st.PinLockedUntil(ctx, u.ID, now.Add(30*time.Minute)); until == nil {
 		t.Fatal("must be locked for an hour")
 	}
-	if until, _ := st.PinLockedUntil(ctx, u.ID, day, now.Add(61*time.Minute)); until != nil {
+	if until, _ := st.PinLockedUntil(ctx, u.ID, now.Add(61*time.Minute)); until != nil {
 		t.Fatal("lock must expire")
+	}
+
+	// Locked at 23:30 UTC: the new day's counter must not lift the lock at midnight.
+	late := time.Date(2026, 10, 12, 23, 30, 0, 0, time.UTC)
+	lateDay := time.Date(2026, 10, 12, 0, 0, 0, 0, time.UTC)
+	for i := 1; i <= 3; i++ {
+		if _, _, err := st.RecordPinFailure(ctx, u.ID, lateDay, late, 3, time.Hour); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if until, err := st.PinLockedUntil(ctx, u.ID, late.Add(40*time.Minute)); err != nil || until == nil || !until.Equal(late.Add(time.Hour)) {
+		t.Fatalf("00:10 the next day must still be locked until 00:30: until=%v err=%v", until, err)
+	}
+	if until, _ := st.PinLockedUntil(ctx, u.ID, late.Add(61*time.Minute)); until != nil {
+		t.Fatal("late lock must expire after an hour")
 	}
 }
 

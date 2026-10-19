@@ -105,7 +105,7 @@ func (s *Server) verifyPin(w http.ResponseWriter, r *http.Request) {
 	now := s.now()
 	day := utcDay(now)
 
-	if until, err := s.Store.PinLockedUntil(ctx, c.User.ID, day, now); err != nil {
+	if until, err := s.Store.PinLockedUntil(ctx, c.User.ID, now); err != nil {
 		s.internalError(w, r, "pin_lock", err)
 		return
 	} else if until != nil {

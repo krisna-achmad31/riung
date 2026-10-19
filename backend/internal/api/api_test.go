@@ -352,6 +352,11 @@ func TestJournalPinBackup(t *testing.T) {
 	verify := func(h string) resp {
 		return e.do(req{method: "POST", path: path + "/verify", token: googleToken, body: map[string]string{"hash": h}})
 	}
+	// Failures count per UTC day and the steps below move the clock about an
+	// hour: start well after midnight so the count never resets mid-test.
+	if now := e.clock.now().UTC(); now.Hour() >= 21 {
+		e.clock.advance(now.Truncate(24 * time.Hour).Add(25 * time.Hour).Sub(now))
+	}
 	if r := verify(hash); r.status != 200 || r.body["match"] != true {
 		t.Fatalf("correct PIN: %d %s", r.status, r.raw)
 	}
