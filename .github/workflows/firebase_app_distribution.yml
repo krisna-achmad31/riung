@@ -61,11 +61,37 @@ jobs:
           ${{ secrets.GOOGLE_SERVICES_JSON }}
           EOF
 
+      # Keystore rilis → android/key.properties (dibaca app/build.gradle.kts,
+      # lihat docs/release-signing.md). Wajib: tanpa ini Gradle jatuh ke kunci
+      # debug yang dibuat baru di tiap runner, SHA-1-nya tidak terdaftar di
+      # Firebase, dan login Google di APK gagal.
+      - name: Install release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for v in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            [ -n "${!v}" ] || { echo "::error::secret signing Android kosong ($v); lihat docs/release-signing.md"; exit 1; }
+          done
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/riung-release.keystore"
+          {
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storeFile=$RUNNER_TEMP/riung-release.keystore"
+          } > android/key.properties
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Android APK
         run: flutter build apk --release
+
+      - name: Remove signing material
+        if: always()
+        run: rm -f android/key.properties "$RUNNER_TEMP/riung-release.keystore"
 
       - name: Upload APK to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
