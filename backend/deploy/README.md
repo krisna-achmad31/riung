@@ -113,8 +113,8 @@ unduh key JSON, simpan sebagai `/var/www/riung/secrets/firebase-service-account.
    `rtdn_received` dengan `kind=test`.
 6. Isi `PLAY_*`/`RTDN_*` di `.env` (lihat `env.example`), `./deploy.sh` ulang.
 
-**4d. App Store billing (iOS)** (menyusul saat rilis iOS dijadwalkan; tanpa ini `APPSTORE_BUNDLE_ID`
-dikosongkan, `/v1/billing/appstore/*` menjawab 503 dan `/v1/webhooks/app-store` 404)
+**4d. App Store billing (iOS)** (**aktif sejak 2026-10-20**, lihat §G; tanpa `APPSTORE_BUNDLE_ID`,
+`/v1/billing/appstore/*` menjawab 503 dan `/v1/webhooks/app-store` 404)
 
 Langkah lengkap di sisi Apple (akun, App ID, produk, key, sandbox, App Review): `docs/panduan-apple-developer.md`.
 
@@ -304,6 +304,9 @@ nullable/default) dan baru dihapus di rilis berikutnya setelah tidak dipakai (ex
 | `/readyz` 503 di dalam network | shared-postgres tidak terjangkau / password `riung_app` salah. |
 | Pull gagal | CI: job deploy butuh `packages: read` dan package `riung-api` harus memberi akses Actions ke repo ini; manual: lihat langkah 5. Tag salah = sha 7 karakter. |
 | CI: `differ from this commit` | `deploy.sh`/compose di VPS beda dengan commit — salin (langkah A.2), jalankan ulang workflow. |
+| API tidak start: `read APPSTORE_PRIVATE_KEY_FILE` / `app store: private key …` | file `.p8` tidak ada/terbaca uid 65532 di `secrets/` (`chown 65532:65532`, `chmod 400`) atau bukan key EC P-256. Selalu uji dulu dengan `appstore-check` di container sementara (langkah 4d.6). |
+| Verifikasi iOS `500`, log `app store: API key rejected` | key dicabut/salah: `docker exec riung-api /riung appstore-check`. Production `401` saja (sandbox lolos) normal sampai app rilis. |
+| `appstore-check --notify` bukan `SUCCESS` | URL Server Notifications di App Store Connect salah / bukan Version 2, atau webhook ditolak — cek log `rtdn_rejected` `store=app_store`. |
 | Restart berulang setelah reboot | API menunggu Postgres ±60 detik (`database not ready, retrying`, WARN); lebih dari itu = `shared-postgres` mati. |
 
 ## F. Gladi resik lokal (2026-10-11)

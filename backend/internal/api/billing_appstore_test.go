@@ -304,6 +304,11 @@ func TestAppStoreWebhookRejects(t *testing.T) {
 	if r := notify(e, e.appleCA, other); r.status != 200 || !strings.Contains(e.logs.String(), `"action":"other_bundle"`) {
 		t.Fatalf("other bundle: %d", r.status)
 	}
+	summary := map[string]any{"notificationType": "RENEWAL_EXTENSION", "subtype": "SUMMARY",
+		"notificationUUID": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "version": "2.0"}
+	if r := notify(e, e.appleCA, summary); r.status != 200 || !strings.Contains(e.logs.String(), `"action":"no_data"`) {
+		t.Fatalf("notification without data: %d", r.status)
+	}
 	if strings.Contains(e.logs.String(), `"level":"ERROR"`) {
 		t.Fatalf("rejections must not log errors:\n%s", e.logs.String())
 	}

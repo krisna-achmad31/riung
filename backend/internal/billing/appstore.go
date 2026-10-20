@@ -239,7 +239,11 @@ func (s *Service) HandleAppStoreNotification(ctx context.Context, ev AppStoreEve
 	}
 	n := ev.Notification
 	out := HandleOutcome{Kind: n.NotificationType, Action: "logged"}
-	if n.Data == nil || n.Data.BundleID != bundleID {
+	if n.Data == nil { // e.g. a RENEWAL_EXTENSION summary: nothing to apply
+		out.Action = "no_data"
+		return out, nil
+	}
+	if n.Data.BundleID != bundleID {
 		out.Action = "other_bundle"
 		return out, nil
 	}

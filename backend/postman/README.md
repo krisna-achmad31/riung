@@ -49,8 +49,10 @@ bundel Aplikasi Beku (`cooldown` 60 detik).
 ## Produksi
 
 - Ambil ID token dari app debug (`FirebaseAuth.instance.currentUser!.getIdToken()`) dan tempel di `idToken`.
-- Billing belum aktif (Play dan App Store): `verify`/`restore` → `503`, webhook → `404`. Setelah aktif, isi `coinToken`/`subToken`
+- Google Play belum aktif: `verify`/`restore` → `503`, webhook → `404`. Setelah aktif, isi `coinToken`/`subToken`
   dengan `purchaseToken` asli dari Play (`devBilling` kosong, jadi token tidak ditimpa); webhook RTDN hanya dari
   Pub/Sub.
+- App Store aktif (2026-10-20): folder 6b butuh `transactionId` asli (sandbox/TestFlight) di
+  `appleCoinTx`/`appleSubTx` — id `dev-…` ditolak (`409 purchase_invalid`). Webhook App Store hanya dari Apple.
 - Admin API hanya lewat VPN (`http://172.19.0.16:8081`) dengan token akun admin (login ≤ 15 menit).
 - Folder **11. Hapus akun** benar-benar menghapus akun yang dipakai — jangan jalankan dengan akun sungguhan.

@@ -1,5 +1,5 @@
 # Riung Backend — Go + PostgreSQL + Docker (Plan)
-*Branch: `feat/go-backend` · status: B0–B6 selesai, live di `riung.e55techlab.com` (sisa infra di TODO §A) · diperbarui 2026-10-13*
+*Branch: `feat/go-backend` · status: B0–B7 selesai, live di `riung.e55techlab.com` (sisa infra di TODO §A) · diperbarui 2026-10-20*
 
 ## 0. Kenapa, dan apa yang berubah
 
@@ -356,8 +356,9 @@ terbuka dicatat di **`docs/todo-luar-backend.md`**. Dokumen ini dan spec hanya m
 | **B2 Ekonomi** ✅ | `economy-props.json` + katalog, wallet ledger + bucket, activities + cap, check-in/streak, monster progress, shop, Admin API + `app_settings` | tes konkurensi (N request paralel, saldo tidak pernah negatif/dobel), tes idempotensi, tes parity ekonomi |
 | **B3 Billing** ✅ | `/billing/verify` & `/billing/restore` & `/billing/subscription`, RTDN Pub/Sub (OIDC), `riung billing-sync` (refund → tarik koin/utang, cabut Premium, acknowledge yang terlewat), `riung reconcile`, Premium status | beli sandbox dengan license tester: koin & Premium masuk HANYA lewat server |
 | **B4 Fokus & Aplikasi Beku** ✅ | tiket Ed25519 (`free_daily`/`prepaid`/`coins`) + `focus_completed`, unlock dengan cap/eskalasi/jeda/koin latihan, bundel atomik, katalog `appbeku` | Fokus jalan offline penuh; rekonsiliasi idempoten; unlock ke-4 ditolak |
-| **B5 Deploy** 🟡 (deploy pertama 2026-10-13, sisa infra di TODO §A) | artefak deploy siap pakai (compose prod, nginx conf, SQL DB/role, snippet Loki/Promtail, workflow deploy, Dependabot), `cleanup-anon` + `reapply-deletions`, deploy `riung-api`, cron. Langkah infra & cutover app ada di `docs/todo-luar-backend.md` §A–B | `https://riung.e55techlab.com/healthz` 200 dari luar; `/readyz` 200 dari dalam; smoke test semua endpoint |
+| **B5 Deploy** ✅ (deploy pertama 2026-10-13; deploy lewat CI + user `deploy` 2026-10-19; sisa infra di TODO §A) | artefak deploy siap pakai (compose prod, nginx conf, SQL DB/role, snippet Loki/Promtail, workflow deploy, Dependabot), `cleanup-anon` + `reapply-deletions`, deploy `riung-api`, cron. Langkah infra & cutover app ada di `docs/todo-luar-backend.md` §A–B | `https://riung.e55techlab.com/healthz` 200 dari luar; `/readyz` 200 dari dalam; smoke test semua endpoint |
 | **B6 Produksi** ✅ | uji beban k6 (`backend/loadtest`), security review + perbaikan, aturan alert Grafana, kriteria App Check `enforce` (`docs/backend-b6-review.md`) | p95 < 200 ms di beban target — **11,9 ms** di 200 pengguna aktif, 9 ms di 400 |
+| **B7 App Store (iOS)** ✅ (aktif 2026-10-20) | `/billing/appstore/verify` & `/restore` (App Store Server API, JWS ke Apple Root CA G3, `appAccountToken`), webhook Server Notifications V2, `riung appstore-check`, login `apple.com` — tanpa migrasi (`purchases` berprefiks `appstore:`) | notifikasi TEST Apple diterima & terverifikasi; tes kredit/refund/langganan |
 | **Nanti: Auth sendiri** | implementasi `Verifier` baru + endpoint login/daftar/reset, tambah baris `auth_identities` untuk user lama saat mereka login, lalu lepas Firebase Auth | user lama tetap punya data yang sama setelah pindah auth |
 
 ## 11. Status keputusan

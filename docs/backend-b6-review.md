@@ -1,5 +1,5 @@
 # Riung Backend — B6: Kesiapan produksi
-*Branch `feat/go-backend` · 2026-10-13 · pendamping `docs/backend-api-spec.md` & `docs/backend-go-plan.md`*
+*Branch `feat/go-backend` · 2026-10-13, diperbarui 2026-10-20 · pendamping `docs/backend-api-spec.md` & `docs/backend-go-plan.md`*
 
 Isi: uji beban, review keamanan (OWASP API Top 10 2023 + infrastruktur), alert, dan kapan App Check boleh
 dipindah ke `enforce`.
@@ -118,3 +118,15 @@ Pindah ke `enforce` bila **semua** terpenuhi:
 | Panduan app | 6 rujukan § salah sejak penomoran berubah — diperbaiki; tiga contoh Dart dikompilasi dengan Flutter 3.44.0 + versi paket app (`flutter analyze`: bersih) |
 | Klaim panduan dibuktikan tes | `Idempotency-Key` sama tetap bisa dipakai setelah `429`; batch dikirim ulang dengan key baru → `replayed`, hanya event baru yang memberi koin |
 | Webhook saat billing mati | dulu `503` → setiap orang bisa membuat log ERROR (dan memicu alert error server) tanpa login. Sekarang `404` selama tidak ada publisher Play |
+
+### Audit 3 (2026-10-19 – 2026-10-20)
+
+| Area | Hasil |
+|---|---|
+| Deploy | User `deploy` tanpa password; kunci CI hanya `check` / `deploy <sha>` lewat forced command (shell, injeksi argumen, port forwarding diuji ditolak); token GHCR = `GITHUB_TOKEN` job, tidak tersimpan di VPS. Grup `docker` tetap setara root — batasnya ada di kunci, bukan di user |
+| Diperbaiki | Kunci PIN jurnal dulu dicari per hari UTC: user terkunci pukul 23:50 mendapat 10 percobaan baru pukul 00:00 (rate limit 5/15 menit tetap berlaku) — kini kunci berlaku melewati tengah malam. API tidak lagi keluar dengan ERROR bila Postgres belum siap saat reboot |
+| App Store | Semua JWS Apple diverifikasi: rantai x5c ke Apple Root CA - G3 tertanam (SHA-256 dicek tes), penanda sertifikat Apple, valid pada `signedDate`, ES256 dari sertifikat daun; data transaksi dari HP tidak dipakai (server bertanya ke Apple); pembeli terikat `appAccountToken` HMAC; webhook idempoten per `notificationUUID`, `bundleId`/`appAppleId` dicek; tidak ada token/`.p8` di log. Diuji dengan notifikasi TEST asli Apple (200) dan JWS palsu (400) |
+| Ditemukan saat uji key asli | Production App Store Server API menjawab `401` sebelum rilis pertama (sandbox menerima key yang sama). Tanpa fallback, semua pembelian TestFlight/App Review akan `500` — kini diteruskan ke sandbox |
+| Risiko diterima | Pembelian sandbox App Store dikreditkan di produksi (dibutuhkan App Review) — TestFlight eksternal bisa mendapat koin/Premium gratis (keputusan di TODO §D). `REFUND_REVERSED` belum mengembalikan koin (TODO §C) |
+| Rahasia baru | `secrets/appstore-iap-key.p8` (uid 65532, `chmod 400`); salinan perlu di password manager, file di `~/Downloads` dihapus setelahnya |
+| Tetap terbuka | §2.3: key `firebase-adminsdk`, login SSH root dengan password (`PasswordAuthentication yes`), secret & backup off-site |

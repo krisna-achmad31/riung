@@ -1,10 +1,24 @@
 # Panduan Apple Developer & App Store Connect — Riung iOS
 *Untuk pemegang akun Apple Developer · 2026-10-20 · pendamping runbook `backend/deploy/README.md` langkah 4d*
 
-Backend sudah siap untuk iOS (spec §3.9b) dan **mati** sampai langkah di sini selesai. Urutan: A (akun) →
-B (Developer portal) → C (App Store Connect) → D (Firebase) → E (kirim ke backend) → F (uji) → G (review).
+Urutan: A (akun) → B (Developer portal) → C (App Store Connect) → D (Firebase) → E (kirim ke backend) →
+F (uji) → G (review).
 
-Data app: bundle id iOS **`id.riung.riung`** (terdaftar di Apple Developer), nama **Riung**, Team ID
+**Status 2026-10-20** — backend App Store **aktif** (key `6M37Z83MZ5` diterima di sandbox; production API Apple
+menjawab `401` sampai rilis pertama — normal; notifikasi TEST sandbox sampai ke server).
+
+| Bagian | Status |
+|---|---|
+| A. Program berbayar | ✅ (App Store Connect & key IAP bisa dibuat) |
+| B1 App ID `id.riung.riung` | ✅ dibuat — **capability Push, Sign in with Apple, App Attest belum masuk profil** |
+| B2 Key APNs + DeviceCheck | ✅ `S76JA9YKP5` ("FCM") — untuk Firebase (D2, D3), bukan backend |
+| B3 Sertifikat & profil | ✅ distribution + development, profil `Riung Production`/`Riung Development` — buat ulang setelah capability B1 |
+| C2/C3 App, Apple ID, Server Notifications | ✅ app `6824618033`, URL webhook terpasang |
+| C6 In-App Purchase key | ✅ `6M37Z83MZ5`, terpasang di server |
+| E Kirim ke backend | ✅ selesai |
+| C1 Paid Apps, C4–C5 produk, C7 sandbox tester, D Firebase, F uji, G review | ⏳ belum dicek |
+
+Data app: bundle id iOS **`id.riung.riung`** (terdaftar di Apple Developer), Apple ID app **`6824618033`**, nama **Riung**, Team ID
 **`C75S43V9FY`** (dari `ios_development.cer`). Android tetap `com.riung.riung` di Play.
 
 > **Perlu disamakan di app**: proyek Flutter masih `com.riung.riung` (`riung/ios/Runner.xcodeproj`,

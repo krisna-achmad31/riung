@@ -1,5 +1,5 @@
 # Riung Backend — Spesifikasi API, Keamanan, Rate Limit & Logging
-*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-20 (B0–B6 selesai; App Store disiapkan, §3.9b, API live di `riung.e55techlab.com`; kesiapan produksi: `docs/backend-b6-review.md`)*
+*Pendamping `docs/backend-go-plan.md` · branch `feat/go-backend` · diperbarui 2026-10-20 (B0–B6 selesai; App Store aktif sejak 2026-10-20, §3.9b, API live di `riung.e55techlab.com`; kesiapan produksi: `docs/backend-b6-review.md`)*
 
 Untuk tim app, mulai dari **`docs/panduan-integrasi-app.md`** (ringkas & praktis); dokumen ini kontrak lengkapnya.
 
@@ -448,8 +448,9 @@ bearer webhook `dev-pubsub`.
 
 ### 3.9b Pembelian App Store (iOS)
 
-Siap di server, **mati** sampai `APPSTORE_*` diisi (runbook langkah 4d). Hasil, status, dan error sama
-dengan §3.9; produk sama (`coin_pack_small|medium|large` consumable, `premium_monthly|yearly` dalam satu
+**Aktif di produksi sejak 2026-10-20** (`c43f374`, bundle `id.riung.riung`, runbook langkah 4d); tanpa
+`APPSTORE_*` endpoint menjawab 503 dan webhook 404. Sampai rilis pertama app, hanya transaksi sandbox (TestFlight,
+App Review, akun sandbox) yang ada — lihat langkah 1. Hasil, status, dan error sama dengan §3.9; produk sama (`coin_pack_small|medium|large` consumable, `premium_monthly|yearly` dalam satu
 *subscription group*). Koin & Premium dari Play dan App Store masuk ke wallet/langganan yang sama.
 
 | # | Method & path | Akses | RL | Idem | Fungsi |
@@ -711,6 +712,7 @@ limit_conn_status 429;
 location /v1/                { limit_req zone=riung_api burst=100 nodelay;   limit_conn riung_conn 100; … }
 location = /v1/waitlist      { limit_req zone=riung_waitlist burst=5 nodelay; … }
 location = /v1/webhooks/google-play { … }   # tanpa limit per IP (IP Google bergantian), dijaga JWT
+# /v1/webhooks/app-store memakai location /v1/ (volume Apple kecil; keaslian dari tanda tangan JWS)
 location = /healthz          { … }                 # liveness boleh dari luar
 location /                   { return 404; }       # termasuk /readyz dan path lain
 ```
@@ -730,8 +732,8 @@ location /                   { return 404; }       # termasuk /readyz dan path l
 | `PUT /loadouts/*` | 30/mnt | user |
 | `POST /focus/tickets` | 20/mnt | user |
 | `GET /focus/tickets` | 30/mnt | user |
-| `POST /billing/verify` | 10/mnt dan 30/jam | user |
-| `POST /billing/restore` | 5/jam | user |
+| `POST /billing/verify`, `POST /billing/appstore/verify` | 10/mnt dan 30/jam (bucket bersama) | user |
+| `POST /billing/restore`, `POST /billing/appstore/restore` | 5/jam (bucket bersama) | user |
 | `POST /me/link`, `PUT/DELETE /me/journal-pin-backup` | 5/jam | user |
 | `POST /me/journal-pin-backup/verify` | 5/15 mnt; lockout 1 jam setelah 10 gagal/hari | user |
 | `DELETE /v1/me`, `GET /v1/me/export` | 3/jam | user |
@@ -740,9 +742,12 @@ location /                   { return 404; }       # termasuk /readyz dan path l
 | `POST /v1/waitlist` | 20/jam | IP |
 | `GET /billing/subscription` | 30/mnt | user |
 | `POST /v1/webhooks/google-play` | 120/mnt per IP sebelum autentikasi, 300/mnt global sesudahnya | IP / global |
+| `POST /v1/webhooks/app-store` | 120/mnt per IP sebelum verifikasi, 300/mnt global (bucket terpisah dari Play) | IP / global |
 
 - Setiap endpoint punya **bucket sendiri** walau angkanya sama (mis. ekspor data tidak pernah memblokir hapus
-  akun, `GET /v1/me` tidak berbagi kuota dengan `/v1/wallet`).
+  akun, `GET /v1/me` tidak berbagi kuota dengan `/v1/wallet`). Pengecualian disengaja: verify/restore Play dan
+  App Store berbagi bucket — satu user memakai satu toko, dan batasnya tidak bisa digandakan dengan berganti
+  endpoint.
 - Respons 429 berisi header `Retry-After` dan `RateLimit-Policy` / `RateLimit` (format IETF draft),
   body `{"error":{"code":"rate_limited",…}}`.
 - v1: limiter in-memory (satu instance `riung-api`). Kalau nanti >1 instance, pindah ke `shared-redis`
@@ -804,13 +809,14 @@ tidak mungkin tercatat. Layar krisis tidak menghasilkan request apa pun.
 | `shop_purchase` | INFO | `itemType`, `itemId`, `price` |
 | `appbeku_unlock` / `appbeku_blocked` | INFO / WARN | `target` (`unit`/id bundel — bukan aplikasi), `n`, `price` / `reason` (`limit`, `cooldown`, `earned_only`) |
 | `focus_ticket_issued` / `focus_ticket_redeemed` / `focus_ticket_invalid` | INFO / INFO / WARN | `source`, `durationMin` / — / `reason` (`not_found`, `used`, `too_early`, `expired`, `overlap`) |
-| `purchase_verified` / `purchase_rejected` | INFO / WARN | `productId`, `tokenTail` (6 karakter terakhir), `status`, `coins`, `test` / `reason` (`not_valid_for_account`, `unknown_product`) |
-| `rtdn_received` / `rtdn_rejected` | INFO / WARN | `kind`, `notificationType`, `productId`, `action` / `reason` (`auth`, `envelope`, `notification`) |
-| `refund_applied` | WARN | `productId`, `coinsClawedBack`, `debt`, `premiumRevoked`, `orphan` |
+| `purchase_verified` / `purchase_rejected` | INFO / WARN | `productId`, `tokenTail` (6 karakter terakhir `purchaseToken` / `transactionId`), `status`, `coins`, `test` / `reason` (`not_valid_for_account`, `unknown_product`) |
+| `rtdn_received` / `rtdn_rejected` | INFO / WARN | Play: `kind`, `notificationType`, `productId`, `action` / `reason` (`auth`, `envelope`, `notification`). App Store: `store=app_store`, `kind` (`notificationType` Apple, `test`), `subtype`, `environment`, `action` (`logged`, `refund_applied`, `updated`, `awaiting_verify`, `other_bundle`, `other_app`, `no_data`, …) / `reason` (`envelope`, `signature`, `transaction_signature`, `renewal_signature`) |
+| `refund_applied` | WARN | `productId`, `coinsClawedBack`, `debt`, `premiumRevoked`, `orphan` (+ `store=app_store` untuk iOS) |
+| `appstore_check` | INFO / WARN | CLI `riung appstore-check`: `sandbox`, `production` (key diterima), `environment`, `result` (notifikasi TEST) |
 | `pin_verify_failed` / `pin_locked` | WARN | `attemptsToday` |
 | `idempotency_conflict` | WARN | `route` |
 | `ledger_mismatch` | ERROR | `earned`/`ledgerEarned`, `purchased`/`ledgerPurchased`, `debt`/`ledgerDebt` (job `reconcile`) |
-| `dependency_error` | ERROR | `dependency` (`postgres`, `google_play`, `firebase`), `op`, `durationMs` |
+| `dependency_error` | ERROR | `dependency` (`postgres`, `google_play`, `app_store`, `firebase`), `op`, `durationMs` |
 | `panic` | ERROR | `stack` (hanya di log, tidak ke client) |
 | `job_run` | INFO / ERROR | `job` (`cleanup`, `cleanup_anon`, `billing_sync`, `reconcile`, `reapply_deletions`), `ok`, jumlah baris |
 | `activity` | INFO | `type`, `coins`, `capReason` (bila ter-cap) |

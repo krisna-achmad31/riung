@@ -82,13 +82,11 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       URL Server Notifications V2 terpasang, notifikasi TEST sandbox diterima. Simpan `.p8` di password manager
       lalu hapus salinan `~/Downloads/SubscriptionKey_6M37Z83MZ5.p8`. `AuthKey_S76JA9YKP5.p8` (APNs + DeviceCheck)
       untuk Firebase, bukan backend. Production API Apple menjawab 401 sampai app rilis pertama (normal).
-- [ ] **P1 (saat rilis iOS dijadwalkan) — App Store Connect, sisa** (runbook langkah 4d): Paid Apps agreement +
-      bank/pajak; produk dengan id sama seperti Play (consumable `coin_pack_*`, satu subscription group berisi
-      `premium_monthly|yearly`, intro offer 7 hari); key *In-App Purchase* (`.p8`, Key ID, Issuer ID) →
-      `secrets/appstore-iap-key.p8`; Server Notifications **V2** (URL production & sandbox =
-      `/v1/webhooks/app-store`); isi `APPSTORE_*`. Server sudah siap (spec §3.9b) dan mati sampai ini diisi.
-      Panduan langkah demi langkah: `docs/panduan-apple-developer.md`. Sertifikat `ios_development.cer` (Team `C75S43V9FY`) hanya untuk menandatangani build di Xcode — backend
-      tidak memakainya.
+- [ ] **P1 (saat rilis iOS dijadwalkan) — App Store Connect, sisa** (`docs/panduan-apple-developer.md`, tabel
+      status): Paid Apps agreement + bank/pajak; produk dengan id sama seperti Play (consumable `coin_pack_*`, satu
+      subscription group berisi `premium_monthly|yearly`, intro offer 7 hari, Family Sharing mati); sandbox tester;
+      capability Push/Sign in with Apple/App Attest di App ID lalu buat ulang profil. Key, Server Notifications, dan
+      `APPSTORE_*` sudah selesai (server aktif 2026-10-20).
 - [ ] **P1 (iOS) — Bundle id `id.riung.riung`** (Apple Developer, 2026-10-20): proyek Flutter masih
       `com.riung.riung` → ganti `PRODUCT_BUNDLE_IDENTIFIER` di `riung/ios/Runner.xcodeproj` (Runner &
       RunnerTests), daftarkan app iOS `id.riung.riung` di Firebase, ganti `GoogleService-Info.plist` dan secret CI
@@ -97,6 +95,8 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       transaksi (kalau kosong, server menolak `purchase_invalid`), beli/refund/upgrade/batal di sandbox.
 - [ ] **P2 (iOS) — Riwayat refund Apple**: notifikasi `REFUND` yang terlewat (5 kali gagal) belum disusul job;
       tambahkan sinkron lewat *Get Refund History* / *Get Notification History* bila volume iOS sudah ada.
+- [ ] **P2 (iOS) — `REFUND_REVERSED`**: Apple bisa membatalkan refund; sekarang hanya dicatat (`action=logged`),
+      koin paket yang sudah ditarik tidak dikembalikan. Jarang terjadi — tangani manual sampai ada kasus.
 
 ## B. App Flutter (`riung/`) — integrasi backend (P1)
 
@@ -217,7 +217,7 @@ Setiap temuan agent testing dicocokkan dengan kode branch itu dan source plugin 
       (harga per negara di Play Console). Perbaikan: selalu `ProductDetails.price`; analytics `rawPrice` +
       `currencyCode`.
 - [ ] **M-04 — terkonfirmasi; sisi backend selesai 2026-10-20.** Tidak ada jalur StoreKit di app. Backend
-      sudah siap (mati sampai App Store Connect diisi, §A): `/v1/billing/appstore/verify|restore` (App Store
+      aktif sejak 2026-10-20 (§A): `/v1/billing/appstore/verify|restore` (App Store
       Server API, JWS diverifikasi sampai Apple Root CA G3), `/v1/webhooks/app-store` (Notifications V2:
       refund, perpanjangan, kedaluwarsa), `user.appAccountToken` di `/v1/me`, login `apple.com`. Sisa di app:
       panduan §11.6.
@@ -241,4 +241,5 @@ Backend memakai default di kolom kanan sampai diputuskan lain.
 | Jeda 60 detik antar buka-berbayar Aplikasi Beku juga berlaku untuk pembelian dari Toko (sekarang app hanya menunggu di interstisial)? | ya, server menerapkan jeda untuk semua buka-berbayar |
 | Utang koin hasil refund (`debtCoins`) ditampilkan ke user? Teks apa? | tidak ada copy; API mengembalikan `debtCoins` |
 | Backend menolak `DELETE /v1/me` (`409 subscription_active`) selama langganan masih diperpanjang otomatis, kecuali app mengirim konfirmasi eksplisit? Lebih aman dari bug app, tapi menambah langkah sebelum user bisa menghapus akunnya | tidak — app yang memperingatkan (panduan §7) |
-| Rilis iOS: kapan? (backend sudah siap 2026-10-20; tinggal StoreKit di app + App Store Connect) | belum direncanakan |
+| Rilis iOS: kapan? (backend aktif 2026-10-20; tinggal StoreKit di app + App Store Connect) | belum direncanakan |
+| Pembelian **sandbox** App Store (TestFlight, App Review, akun sandbox) dikreditkan ke akun produksi (`test=true`), seperti license tester Play — wajib agar App Review bisa membeli. Risiko: penguji TestFlight **eksternal** mendapat koin/Premium gratis. Batasi TestFlight ke penguji internal/terpercaya, atau tambahkan saklar `APPSTORE_ACCEPT_SANDBOX` (mati setelah rilis kecuali saat review)? | diterima; pantau `purchase_verified` `test=true` |

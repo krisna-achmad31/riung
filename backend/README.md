@@ -7,6 +7,7 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
 - Spesifikasi API, keamanan, rate limit, logging: [`docs/backend-api-spec.md`](../docs/backend-api-spec.md)
 - Pekerjaan di luar backend (app, infra): [`docs/todo-luar-backend.md`](../docs/todo-luar-backend.md)
 - **Untuk tim app**: [`docs/panduan-integrasi-app.md`](../docs/panduan-integrasi-app.md) · Postman: [`postman/`](postman/README.md)
+- Setup Apple (App Store Connect, key, produk): [`docs/panduan-apple-developer.md`](../docs/panduan-apple-developer.md)
 - Riwayat perubahan per rilis: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Status
@@ -63,11 +64,21 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
   | `POST /v1/appbeku/unlocks` | buka-waktu berbayar hanya dengan koin latihan, maks 3/hari, +10 tiap kali, jeda 60 detik; bundel `santai`/`sosmed` atomik; aplikasi yang dibuka tidak disimpan/dicatat |
 - **B5 — deploy** ✅ (live sejak 2026-10-13): `riung cleanup-anon` (akun anonim tak dibuka > 90 hari, data server + user
   Firebase), `riung reapply-deletions` (setelah restore backup), Dependabot untuk modul Go & image. Deploy ke
-  VPS mengikuti [`deploy/README.md`](deploy/README.md).
+  VPS mengikuti [`deploy/README.md`](deploy/README.md); sejak 2026-10-19 lewat GitHub Actions (user `deploy`,
+  forced command) dengan rollback dari GHCR. `riung api` menunggu Postgres sampai 60 detik saat start.
 - **B6 — kesiapan produksi** ✅ ([`docs/backend-b6-review.md`](../docs/backend-b6-review.md)): uji beban
   k6 ([`loadtest/`](loadtest/README.md), p95 11,9 ms di 200 pengguna aktif), review keamanan (cek pencabutan
   token setelah rate limit, CSP, TLS AEAD, field `appCheck` di access log), 12 aturan alert Grafana (Telegram),
   kriteria App Check `enforce`.
+- **B7 — App Store (iOS)** ✅ (aktif 2026-10-20, bundle `id.riung.riung`): verifikasi lewat App Store Server API,
+  semua JWS Apple diverifikasi sampai Apple Root CA - G3 yang tertanam, pembeli terikat lewat `appAccountToken`
+  (UUID di `GET /v1/me`), tanpa migrasi DB:
+
+  | Endpoint / perintah | Isi |
+  |---|---|
+  | `POST /v1/billing/appstore/verify`, `/restore` (≤ 20) | `{productId, transactionId}`; hasil sama dengan Play; production lalu sandbox |
+  | `POST /v1/webhooks/app-store` | Server Notifications V2: refund/revoke paket koin → tarik koin; status langganan dibaca ulang dari Apple |
+  | `riung appstore-check [--notify]` | uji key ke Apple; `--notify` meminta notifikasi TEST dan melaporkan hasil pengirimannya |
 
 ## Menjalankan lokal
 
@@ -80,7 +91,7 @@ curl localhost:8080/healthz
 make dev-down
 ```
 
-Stack dev memakai `DEV_AUTH=true`: token `Bearer dev:<uid>:<anonymous|password|google.com>` menggantikan
+Stack dev memakai `DEV_AUTH=true`: token `Bearer dev:<uid>:<anonymous|password|google.com|apple.com>` menggantikan
 ID token Firebase, contoh:
 
 ```sh
@@ -92,7 +103,7 @@ curl -X PATCH localhost:8080/v1/me/profile -H 'Authorization: Bearer dev:rani:an
 `DEV_AUTH` ditolak saat `RIUNG_ENV=prod`. Admin lokal: panggil `/v1/me` sekali dengan `dev:<uid>:google.com`, lalu
 `riung admin grant dev:<uid> "alasan"` dan pakai token `dev:<uid>:google.com:admin` ke port 8081.
 
-Stack dev juga memakai `DEV_BILLING=true` (Google Play palsu). Ambil `billingAccountId` dari `/v1/me`, lalu:
+Stack dev juga memakai `DEV_BILLING=true` (Google Play dan App Store palsu). Ambil `billingAccountId` dari `/v1/me`, lalu:
 
 ```sh
 BA=ba_...   # dari /v1/me; di zsh tulis ${BA} — "$BA:c..." dibaca zsh sebagai modifier
@@ -100,6 +111,8 @@ curl -X POST localhost:8080/v1/billing/verify -H 'Authorization: Bearer dev:rani
   -H 'X-Firebase-AppCheck: dev' -H 'Content-Type: application/json' -H "Idempotency-Key: $(uuidgen)" \
   -d "{\"productId\":\"coin_pack_small\",\"purchaseToken\":\"dev-coin:${BA}:coin_pack_small:1\"}"
 # langganan: "dev-sub:${BA}:premium_yearly:365:1"; webhook: Authorization: Bearer dev-pubsub
+# App Store: POST /v1/billing/appstore/verify {"productId":…,"transactionId":"dev-coin:${AAT}:coin_pack_small:1"}
+#            dengan AAT = user.appAccountToken dari /v1/me (webhook App Store butuh tanda tangan Apple → tes Go)
 ```
 
 Tanpa Docker (Postgres sudah ada, role dibuat dengan `deploy/sql/create-riung-db.sql`):
@@ -123,7 +136,7 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `DB_STATEMENT_TIMEOUT` | `5s` | batas waktu per query |
 | `TRUSTED_PROXIES` | kosong | IP/CIDR yang boleh mengisi `X-Real-IP`/`X-Request-Id` (prod: `172.19.0.2/32`) |
 | `LOG_PEPPER`, `IP_HASH_KEY` | dev placeholder | kunci hash log; prod wajib ≥ 32 karakter |
-| `PIN_PEPPER`, `BILLING_ACCOUNT_KEY` | dev placeholder | HMAC backup PIN jurnal & id akun Play; prod wajib ≥ 32 karakter; keempat secret wajib berbeda |
+| `PIN_PEPPER`, `BILLING_ACCOUNT_KEY` | dev placeholder | HMAC backup PIN jurnal & id akun pembeli (`billingAccountId` Play, `appAccountToken` App Store — jangan diganti setelah ada pembelian); prod wajib ≥ 32 karakter; keempat secret wajib berbeda |
 | `FIREBASE_PROJECT_ID` | — | project Firebase (`riung-5e979`); wajib kecuali `DEV_AUTH` |
 | `FIREBASE_CREDENTIALS_FILE` | — | service account (Firebase Auth Admin); wajib di prod (cek pencabutan, hapus akun) |
 | `APP_CHECK_MODE` | dev `off`, prod `monitor` | `off` / `monitor` (catat saja) / `enforce` (tolak); `off` ditolak di prod |
@@ -133,7 +146,11 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `PLAY_PACKAGE_NAME` | kosong (billing mati, 503) | `com.riung.riung`; mengaktifkan billing |
 | `PLAY_CREDENTIALS_FILE` | `FIREBASE_CREDENTIALS_FILE` | service account yang diundang di Play Console |
 | `RTDN_AUDIENCE`, `RTDN_SERVICE_ACCOUNT` | — | wajib bila billing aktif: audience & service account push subscription Pub/Sub |
-| `DEV_BILLING` | `false` | Google Play palsu (`dev-coin:`/`dev-sub:`); hanya di `RIUNG_ENV=dev` |
+| `DEV_BILLING` | `false` | Google Play & App Store palsu (`dev-coin:`/`dev-sub:`); hanya di `RIUNG_ENV=dev` |
+| `APPSTORE_BUNDLE_ID` | kosong (App Store mati: 503, webhook 404) | `id.riung.riung`; mengaktifkan App Store |
+| `APPSTORE_ISSUER_ID`, `APPSTORE_KEY_ID` | — | wajib bila App Store aktif: Issuer ID & Key ID In-App Purchase key |
+| `APPSTORE_PRIVATE_KEY_FILE` | — | file `.p8` In-App Purchase key (prod `/run/secrets/appstore-iap-key.p8`) |
+| `APPSTORE_APP_APPLE_ID` | kosong | Apple ID numerik app (`6824618033`); notifikasi production untuk app lain diabaikan |
 | `CORS_LANDING_ORIGIN` | kosong | satu-satunya origin browser untuk `POST /v1/waitlist` |
 | `MIN_APP_VERSION` | `0.0.0` | app di bawah versi ini mendapat `426 upgrade_required` |
 | `ADMIN_LISTEN_ADDR` | kosong (mati) | port Admin API, mis. `:8081`; tidak pernah dipasang di nginx |
@@ -156,7 +173,10 @@ Tes end-to-end (`internal/api/api_test.go`) menjalankan server HTTP sungguhan ke
 mencakup: auth wajib, akun anonim otomatis, validasi & idempotensi (replay identik byte-per-byte), batas akun
 per IP + override admin, rate limit per user/IP, header IP palsu diabaikan, App Check `monitor`/`enforce`/
 gangguan Google, versi app minimum, ETag config/konten, CORS & honeypot waitlist, PIN (salt saja yang keluar,
-lockout), hapus akun (login ulang, akun Firebase ikut terhapus), dan log tanpa uid/email/hash PIN.
+lockout), hapus akun (login ulang, akun Firebase ikut terhapus), log tanpa uid/email/hash PIN, serta billing Play
+dan App Store (kredit sekali, akun lain ditolak, langganan, restore, refund lewat webhook). Paket
+`internal/appstore` menguji verifikasi JWS dengan rantai sertifikat uji (8 kasus penolakan, termasuk root Apple
+asli untuk rantai palsu), fallback sandbox, dan JWT ke Apple.
 
 Tes integrasi membuat database sementara dan memastikan: migrasi naik/turun bersih, saldo tidak bisa
 negatif, ledger idempoten, `riung_app` **tidak bisa** mengubah/menghapus `coin_ledger`,

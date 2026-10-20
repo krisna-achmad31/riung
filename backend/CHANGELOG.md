@@ -11,7 +11,9 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
-_(kosong)_
+### Diperbaiki
+- Notifikasi App Store tanpa objek `data` (mis. ringkasan `RENEWAL_EXTENSION`) dicatat `action=no_data`, bukan
+  `other_bundle`. Hanya label log.
 
 ---
 

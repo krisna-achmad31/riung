@@ -25,8 +25,9 @@ token Firebase, App Check cukup `dev`, dan Google Play dipalsukan (§11.5). Di A
 `http://10.0.2.2:8080`. Untuk build debug yang menembak stack lokal, ID token Firebase sungguhan tidak
 dikenali — pakai token dev lewat konfigurasi build (`--dart-define`).
 
-Status produksi: API live, database kosong, **billing Google Play belum aktif** (`/v1/billing/verify` &
-`/restore` → 503) sampai Play Console & Pub/Sub disiapkan.
+Status produksi: API live, database kosong. **Billing Google Play belum aktif** (`/v1/billing/verify` &
+`/restore` → 503) sampai Play Console & Pub/Sub disiapkan. **App Store aktif** sejak 2026-10-20
+(`/v1/billing/appstore/*`, §11.6) — sampai app rilis, pembelian yang ada hanya sandbox (TestFlight, App Review).
 
 ## 2. Setiap request
 
@@ -403,10 +404,10 @@ Refund dari Google menarik kembali koinnya. Kalau koinnya sudah terpakai, sisany
 Stack dev memakai Google Play palsu: token `dev-coin:<billingAccountId>:<productId>:<n>` dan
 `dev-sub:<billingAccountId>:<productId>:<hari>:<n>` (Postman folder *6. Google Play billing*).
 
-### 11.6 App Store (iOS) — server siap, aktif setelah App Store Connect disiapkan
-Server sudah punya jalur iOS (spec §3.9b) tapi **mati** sampai kredensial App Store diisi (runbook 4d;
-langkah di Apple: `docs/panduan-apple-developer.md`);
-sebelum itu `POST /v1/billing/appstore/*` menjawab `503`. Bedanya dengan Android:
+### 11.6 App Store (iOS)
+Server **aktif** sejak 2026-10-20 (spec §3.9b; bundle `id.riung.riung`; notifikasi TEST Apple sudah diterima).
+Pembelian sungguhan masih menunggu produk & Paid Apps Agreement di App Store Connect
+(`docs/panduan-apple-developer.md`). Bedanya dengan Android:
 
 | | Android | iOS |
 |---|---|---|
