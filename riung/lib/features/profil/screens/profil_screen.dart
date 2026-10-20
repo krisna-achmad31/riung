@@ -39,7 +39,7 @@ class ProfilScreen extends StatelessWidget {
           builder: (context, _) {
             final profile = scope.auth.profile;
             if (profile == null) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primer));
+              return const RiungSkeletonList();
             }
             final tamedCount = scope.monsterProgress.all.values.where((m) => m.state == MonsterState.tamed).length;
             final avatar = AvatarCatalog.byId(profile.avatarId);
@@ -72,7 +72,19 @@ class ProfilScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(profile.displayName.isEmpty ? t.defaultName : profile.displayName, style: AppTextStyles.title.copyWith(fontSize: 22)),
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        profile.displayName.isEmpty ? t.defaultName : profile.displayName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyles.title.copyWith(fontSize: 22),
+                                      ),
+                                    ),
+                                    if (profile.premiumNow) ...[const SizedBox(width: AppSpacing.sm), const ProBadge()],
+                                  ],
+                                ),
                                 const SizedBox(height: 4),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n.dart';
+import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
@@ -25,6 +26,7 @@ class _KalenderLatihanScreenState extends State<KalenderLatihanScreen> {
   Set<DateTime> _tanggalCheckin = {};
   Set<DateTime> _tanggalJurnal = {};
   bool _loading = true;
+  Object? _error;
 
   @override
   void initState() {
@@ -35,17 +37,21 @@ class _KalenderLatihanScreenState extends State<KalenderLatihanScreen> {
   DateTime _tanpaWaktu(DateTime d) => DateTime(d.year, d.month, d.day);
 
   Future<void> _muat() async {
+    if (_error != null) setState(() => _error = null);
     final scope = AppScope.of(context);
     final uid = scope.auth.uid;
-    if (uid == null) return;
-    final checkIns = await scope.userRepository.getCheckIns(uid);
-    final jurnal = await scope.userRepository.getJournalEntries(uid);
-    if (!mounted) return;
-    setState(() {
-      _tanggalCheckin = checkIns.map((c) => _tanpaWaktu(c.date)).toSet();
-      _tanggalJurnal = jurnal.map((j) => _tanpaWaktu(j.createdAt)).toSet();
-      _loading = false;
-    });
+    try {
+      final checkIns = uid == null ? const <CheckIn>[] : await scope.userRepository.getCheckIns(uid);
+      final jurnal = uid == null ? const <JournalEntry>[] : await scope.userRepository.getJournalEntries(uid);
+      if (!mounted) return;
+      setState(() {
+        _tanggalCheckin = checkIns.map((c) => _tanpaWaktu(c.date)).toSet();
+        _tanggalJurnal = jurnal.map((j) => _tanpaWaktu(j.createdAt)).toSet();
+        _loading = false;
+      });
+    } catch (error) {
+      if (mounted) setState(() => _error = error);
+    }
   }
 
   @override
@@ -71,9 +77,10 @@ class _KalenderLatihanScreenState extends State<KalenderLatihanScreen> {
             children: [
               RiungGlassHeader(title: t.calendarScreenTitle),
               Expanded(
-                child: _loading
-                    ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
-                    : RiungBleedListView(
+                child: RiungStateView(
+                  status: RiungStateView.statusOf(loading: _loading, error: _error),
+                  onRetry: _muat,
+                  builder: (context) => RiungBleedListView(
                         padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.xl),
                         children: [
                           ListenableBuilder(
@@ -153,7 +160,7 @@ class _KalenderLatihanScreenState extends State<KalenderLatihanScreen> {
                           const SizedBox(height: AppSpacing.md),
                           Text(t.calendarNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, fontWeight: FontWeight.w600, color: AppColors.primer)),
                         ],
-                      ),
+                      )),
               ),
             ],
           ),

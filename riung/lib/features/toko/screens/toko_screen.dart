@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
@@ -26,18 +28,26 @@ class TokoScreen extends StatefulWidget {
 }
 
 class _TokoScreenState extends State<TokoScreen> {
-  Map<String, ProductDetails> _products = {};
+  /// null = masih memuat dari Play; paket yang tidak ada = Play gagal.
+  Map<String, ProductDetails>? _products;
   bool _purchasingCoinPack = false;
+  StreamSubscription<BillingUpdate>? _sub;
 
   @override
   void initState() {
     super.initState();
     final billing = AppScope.of(context).billing;
-    billing.updates.listen(_onBillingUpdate);
+    _sub = billing.updates.listen(_onBillingUpdate);
     billing.queryProducts().then((res) {
       if (!mounted) return;
       setState(() => _products = {for (final p in res.productDetails) p.id: p});
     });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   void _onBillingUpdate(BillingUpdate update) {
@@ -58,16 +68,30 @@ class _TokoScreenState extends State<TokoScreen> {
 
   Future<void> _buyCoinPack(CoinPack pack) async {
     final sku = billingSkuFor(pack);
-    final product = _products[sku.productId];
+    final product = _products?[sku.productId];
     if (product == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.s.toko.packUnavailable)),
       );
       return;
     }
-    if (!await ensureAccountForPurchase(context)) return;
-    if (!mounted) return;
-    await AppScope.of(context).billing.buyCoinPack(product);
+    // Kunci kartu sebelum await pertama supaya dobel-tap tidak memicu dua
+    // alur beli sebelum sheet Play muncul.
+    if (_purchasingCoinPack) return;
+    setState(() => _purchasingCoinPack = true);
+    try {
+      if (!await ensureAccountForPurchase(context) || !mounted) {
+        if (mounted) setState(() => _purchasingCoinPack = false);
+        return;
+      }
+      await AppScope.of(context).billing.buyCoinPack(product);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _purchasingCoinPack = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.s.toko.billingError(BillingErrorKind.purchaseFailed, null))),
+      );
+    }
   }
 
   Future<void> _buyStreakShield(int price) async {
@@ -169,7 +193,8 @@ class _TokoScreenState extends State<TokoScreen> {
                       Expanded(
                         child: _CoinPackCard(
                           pack: EconomyCoinPacks.all[i],
-                          product: _products[billingSkuFor(EconomyCoinPacks.all[i]).productId],
+                          loading: _products == null,
+                          product: _products?[billingSkuFor(EconomyCoinPacks.all[i]).productId],
                           busy: _purchasingCoinPack,
                           onTap: () => _buyCoinPack(EconomyCoinPacks.all[i]),
                         ),
@@ -308,9 +333,10 @@ class _KosmetikCard extends StatelessWidget {
 /// Paket koin (frame `Paket …`): yang terpopuler berbingkai emas, harga
 /// berlatar tinta.
 class _CoinPackCard extends StatelessWidget {
-  const _CoinPackCard({required this.pack, required this.product, required this.busy, required this.onTap});
+  const _CoinPackCard({required this.pack, required this.loading, required this.product, required this.busy, required this.onTap});
 
   final CoinPack pack;
+  final bool loading;
   final ProductDetails? product;
   final bool busy;
   final VoidCallback onTap;
@@ -357,13 +383,16 @@ class _CoinPackCard extends StatelessWidget {
                   color: highlight ? AppColors.tinta : AppColors.permukaanPadat.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    product?.price ?? t.priceShort(pack.priceIdr),
-                    style: AppTextStyles.chipLabel.copyWith(fontSize: 12, color: highlight ? AppColors.diAtasTinta : AppColors.teksUtama),
-                  ),
-                ),
+                child: loading
+                    ? const RiungSkeleton(width: 48, height: 12)
+                    : FittedBox(
+                        fit: BoxFit.scaleDown,
+                        // Harga & mata uang hanya dari Play; tanpa Play → teks netral.
+                        child: Text(
+                          product?.price ?? t.priceOnPlayShort,
+                          style: AppTextStyles.chipLabel.copyWith(fontSize: 12, color: highlight ? AppColors.diAtasTinta : AppColors.teksUtama),
+                        ),
+                      ),
               ),
             ],
           ),

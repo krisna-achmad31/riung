@@ -109,10 +109,8 @@ class _WaswasReactionScreenState extends State<WaswasReactionScreen> with Single
     final scope = AppScope.of(context);
     final wasTamed = scope.monsterProgress.progressOf(widget.saboteur.id)?.state == MonsterState.tamed;
     final delta = won ? EconomyEarn.minigameWinProgressPercent : EconomyEarn.minigameLoseProgressPercent;
+    await scope.wallet.finishMinigame(widget.saboteur.id, won);
     await scope.monsterProgress.tambahProgres(saboteurId: widget.saboteur.id, delta: delta);
-    if (won) {
-      await scope.wallet.earn(amount: EconomyEarn.menangGame, reason: 'minigame_win:${widget.saboteur.id}');
-    }
     if (!mounted) return;
     final justTamed = !wasTamed && scope.monsterProgress.progressOf(widget.saboteur.id)?.state == MonsterState.tamed;
     scope.analytics.minigameComplete(saboteurId: widget.saboteur.id, won: won);

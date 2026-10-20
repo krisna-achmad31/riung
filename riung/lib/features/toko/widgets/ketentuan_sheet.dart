@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n.dart';
-import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../profil/screens/kebijakan_privasi_screen.dart';
 
 /// Ketentuan langganan Premium — dibuka dari tautan "Ketentuan" di paywall.
 /// Menjelaskan trial, penagihan lewat Google Play, dan cara membatalkan,
-/// plus pintasan ke kebijakan privasi.
-Future<void> showKetentuanSheet(BuildContext context) {
-  final trialDays = AppScope.of(context).remoteConfig.premiumTrialHari;
+/// plus pintasan ke kebijakan privasi. [trialDays] berasal dari offer trial
+/// Play (`PremiumOffer.trialDays`); null = tidak eligible → trial tidak disebut.
+Future<void> showKetentuanSheet(BuildContext context, {int? trialDays}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     builder: (sheetContext) {
       final t = sheetContext.s.toko;
-      final points = [t.termsTrial(trialDays), t.termsPlay, t.termsCancel, t.termsFree];
+      final points = [if (trialDays != null) t.termsTrial(trialDays), t.termsPlay, t.termsCancel, t.termsFree];
       return SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 26),

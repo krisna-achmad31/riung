@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategi Konten Sosmed — Riung (3 Akun)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
+
+:root {
+  --lavender: #E4DEF3;
+  --ink: #1F2A2C;
+  --ink-soft: #3D484A;
+  --ink-faint: #6A7A7C;
+  --glass: rgba(255,255,255,0.65);
+  --peach-soft: #FCECE4;
+  --lav-soft: #F0ECF8;
+  --primary-soft: #E8EAF2;
+  --sky-soft: #DCE8EE;
+  --primary: #7A6FB0;
+  --shadow: rgba(31,42,44,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: linear-gradient(180deg, #F8F6F4 0%, #F0ECF8 100%);
+  color: var(--ink);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  padding: 48px 24px;
+}
+.container { max-width: 1000px; margin: 0 auto; }
+
+/* Header */
+.hero {
+  text-align: center;
+  padding: 64px 0 48px;
+}
+.hero .badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--lav-soft);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 5.5vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.hero .subline {
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Glass card */
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 24px;
+  padding: 32px 32px 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 12px 40px var(--shadow), 0 1px 3px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 3px;
+  background: linear-gradient(90deg, #E4DEF3 0%, #DCE8EE 50%, #FCECE4 100%);
+  opacity: 0.7;
+}
+
+.card h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+.card h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 20px 0 8px;
+  color: var(--primary);
+  letter-spacing: 0.3px;
+}
+.card h4 {
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--ink-faint);
+  margin-bottom: 6px;
+}
+
+.card .meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(31,42,44,0.06);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+
+/* Monster pills */
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.pill.lav { background: var(--lav-soft); color: var(--primary); }
+.pill.sky { background: var(--sky-soft); color: #4A6E8C; }
+.pill.peach { background: var(--peach-soft); color: #8B5A3A; }
+.pill.ink { background: var(--ink); color: #fff; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid rgba(31,42,44,0.06); }
+table { width: 100%; border-collapse: collapse; min-width: 500px; font-size: 0.92rem; }
+thead { background: linear-gradient(90deg, var(--lav-soft), var(--sky-soft)); }
+thead th { text-align: left; padding: 10px 12px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-soft); border-bottom: 1px solid rgba(31,42,44,0.08); }
+tbody td { padding: 10px 12px; vertical-align: top; border-bottom: 1px solid rgba(31,42,44,0.05); }
+tr:hover td { background: rgba(228,222,243,0.15); }
+td strong { color: var(--ink); font-weight: 700; }
+
+/* Hook box */
+.hook-box {
+  background: linear-gradient(135deg, #1F2A2C 0%, #3D484A 100%);
+  border-radius: 16px;
+  padding: 20px 22px;
+  color: #fff;
+  margin-top: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.hook-box::after {
+  content: '';
+  position: absolute;
+  top: -30%; right: -20%;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(122,111,176,0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hook-box .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #A8B0C0;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.hook-box .hook-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  line-height: 1.35;
+  color: #F8F6F4;
+}
+.hook-box .caption-body {
+  margin-top: 10px;
+  font-size: 0.92rem;
+  color: #D6DCE0;
+  line-height: 1.55;
+}
+
+/* Two-columns */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Section divider */
+.divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(31,42,44,0.1) 30%, rgba(31,42,44,0.1) 70%, transparent 100%);
+  margin: 8px 0 20px;
+}
+
+/* Badge color per account */
+.account-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #fff;
+  margin-left: 6px;
+}
+.account-badge.riung { background: linear-gradient(135deg, #7A6FB0, #5A4F8A); }
+.account-badge.id { background: linear-gradient(135deg, #B85A4A, #8B3F2E); }
+.account-badge.en { background: linear-gradient(135deg, #4A7A8A, #2A4A5A); }
+
+/* Small notes */
+.note {
+  background: rgba(255,255,255,0.45);
+  border-left: 3px solid var(--primary);
+  padding: 12px 16px;
+  border-radius: 0 12px 12px 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-top: 10px;
+}
+.note strong { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HERO -->
+<header class="hero">
+  <div class="badge">Social Media Strategy — Campaign Plan</div>
+  <h1>Rencana Konten Sosmed <br><span style="font-style:italic;font-weight:400;color:#6A7A7C;">3 Akun, 13 Monster, 2 Budaya</span></h1>
+  <p class="subline">
+    Analisis perbedaan masalah mental di Indonesia vs global, penyesuaian bahasa & gaya konten, serta rencana 3 minggu siap eksekusi untuk <strong style="color:#1F2A2C">@riung</strong>, <strong style="color:#B85A4A">@riung.id</strong>, dan <strong style="color:#4A7A8A">@riung.en</strong>.
+  </p>
+</header>
+
+<hr class="divider">
+
+<!-- ANALISIS PERBEDAAN MASALAH -->
+<section class="card" style="border-top-color:#E4DEF3;">
+  <div class="meta"><span>●</span> Analisis Inti — Indonesia vs Global</div>
+  <h2>Perbedaan Masalah Mental yang Paling Umum</h2>
+  <p style="color:var(--ink-soft);font-size:0.95rem;margin-bottom:20px;">
+    Aplikasi <strong>Riung</strong> menggunakan 13 monster (7 Monster Pikiran = distorsi kognitif CBT; 6 Monster Kebiasaan = pola perilaku) sebagai bahasa visual untuk kesehatan mental. Berikut bagaimana setiap kelompok monster muncul berbeda di pasar Indonesia dan global.
+  </p>
+
+  <div class="pill-row">
+    <span class="pill lav">7 Monster Pikiran</span>
+    <span class="pill sky">6 Monster Kebiasaan</span>
+    <span class="pill peach">2 Keluarga</span>
+  </div>
+
+  <div class="table-wrap">
+  <table>
+<thead>
+<tr><th>Dimensi</th><th>Pasar Indonesia (@riung.id)</th><th>Pasar Global (@riung.en)</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Tekanan utama</strong></td>
+  <td>Keluarga & kolektivisme: "Apa kata orang?" ekspektasi orang tua, beban PKL, tekanan akademik (matematika, ranking, beasiswa). Stigma: "Orang gila = aib".</td>
+  <td>Individualisme: work-life balance, burnout, "hustle culture", imposter syndrome,孤独 (loneliness di tengah keramaian digital), self-optimization.</td>
+</tr>
+<tr>
+  <td><strong>Social comparison</strong></td>
+  <td>Sosmed = panggung prestasi: "Jajan bareng" foto, liburan, nilai ujian. Bandingkan diri dengan saudara, teman sekolah, "siapa duluan nikah".</td>
+  <td>Sosmed = panggung produktivitas & kesehatan: "5 AM routine", gym, terapi. Bandingkan diri dengan influencer wellness, peer dari LinkedIn.</td>
+</tr>
+<tr>
+  <td><strong>Gaya stres & emosi</strong></td>
+  <td>Menghindar (<strong>Si Mengelak</strong>) karena konfrontasi = tidak sopan; melawan (<strong>Si Meronta</strong>) karena harga diri terancam; menghakimi (<strong>Si Hakim</strong>) karena budaya "tanggung jawab".</td>
+  <td>Menghindar karena overwhelm; melawan karena keadilan (justice); menghakimi diri karena perfeksionisme budaya "you can do anything".</td>
+</tr>
+<tr>
+  <td><strong>Bahasa & nada</strong></td>
+  <td>Hangat, tidak formal berlebihan, menggunakan bahasa sehari-hari: "jajan", "galau", "bete", "ngambek", "cape", "ngerasa". Humor ringan, meme lokal.</td>
+  <td>Profesional tapi empatik; bahasa terapi (CBT, cognitive distortion) diperkenalkan secara lembut, bukan akademik. Humor: self-deprecating, relatable.</td>
+</tr>
+<tr>
+  <td><strong>Referensi budaya</strong></td>
+  <td>Budaya jajan, PKL, matematika, ranking kelas, orang tua yang "demi masa depanmu", agama (tanpa eksplisit), meme TikTok lokal ("udh lah", "kepo").</td>
+  <td>Headspace, Calm, BetterHelp, CBT research (Beck, Burns), mindfulness, "therapy speak" yang sudah populer, buku self-help, podcast mental health.</td>
+</tr>
+<tr>
+  <td><strong>Stigma mental health</strong></td>
+  <td>Tinggi: mencari terapi = "lemah mental"; aplikasi = rahasia; fokus pada "kenali diri" bukan "sakit".</td>
+  <td>Rendah tapi privasi tetap penting: aplikasi = alat wellness; fokus pada "growth" dan "self-awareness".</td>
+</tr>
+<tr>
+  <td><strong>Format konten paling efektif</strong></td>
+  <td>IG Carousel (4:5), Reels pendek (15–30 detik), Story interaktif (poll, quiz), Chat-style post (seperti percakapan WhatsApp) — karena kebiasaan membaca chat.</td>
+  <td>IG Carousel (4:5), Thread / Twitter-style carousel, Reels (30–60 detik), Story dengan swipe-up link, Newsletter-style caption (panjang tapi terstruktur).</td>
+</tr>
+</tbody>
+</table>
+  </div>
+
+  <div class="note">
+    <strong>Catatan strategis:</strong> Di Indonesia, monster tidak boleh terasa seperti "penyakit"; mereka harus terasa seperti <em>teman kecil yang bisa diajak ngobrol</em>. Di global, monster bisa diperkenalkan sebagai <em>personifikasi dari pola pikir yang umum</em> — lebih analitis tapi tetap hangat.
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- RENCANA MINGGUAN -->
+<section class="card" style="border-top-color:#B85A4A;">
+  <div class="meta"><span>●</span> Akun Indonesia — Pemasaran Lokal</div>
+  <h2>Rencana Konten Mingguan — <span class="account-badge id">@riung.id</span> <span style="font-size:0.85em;color:#B85A4A;font-weight:600;">(Indonesia)</span></h2>
+  <p style="color:var(--ink-soft);font-size:0.9rem;margin-bottom:18px;">Fokus: budaya lokal, bahasa sehari-hari, tekanan keluarga, PKL, jajan, ranking, stigma rendah. 3–4 post/minggu.</p>
+
+  <h3>Minggu 1 — "Si Sempurna & Tekanan Orang Tua"</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Hari</th><th>Format</th><th>Topik & Monster</th><th>Hook (Bahasa Indonesia)</th></tr></thead>
+<tbody>
+<tr><td><strong>Senin</strong></td><td>IG Carousel (4:5, 6 slide)</td><td><strong>Si Sempurna</strong> — standar tak pernah cukup</td><td>"Ketika nilai 95 masih dianggap 'kurang usaha' — ini Si Sempurna."</td></tr>
+<tr><td><strong>Rabu</strong></td><td>Reels (20 detik)</td><td><strong>Si Cermin</strong> — membandingkan dengan teman</td><td>"Temenmu upload nilai ujian. Kamu buka Instagram. Ini Si Cermin."</td></tr>
+<tr><td><strong>Jumat</strong></td><td>Story (Poll + Quiz)</td><td><strong>Si Waswas</strong> — skenario terburuk</td><td>"Kamu belum mulai tugas. Otomatis mikir: 'Gagal total.' — benar atau salah?"</td></tr>
+<tr><td><strong>Minggu</strong></td><td>Chat-style post</td><td><strong>Si Mengelak</strong> — menghindar tugas</td><td>"[Percakapan WhatsApp] 'Nanti aja deh tugasnya.' — 'Nanti' itu siapa ya?"</td></tr>
+</tbody>
+  </table>
+  </div>
+
+  <h4 style="margin-top:16px;">Contoh Caption Lengkap — Senin (Carousel Si Sempurna)</h4>
+  <div class="hook-box">
+    <div class="label">Hook (Slide 1)</div>
+    <div class="hook-text">"Ketika 95 masih dianggap 'kurang usaha' — ini bukan kamu yang gagal. Ini Si Sempurna."</div>
+    <div class="caption-body">
+      <strong>Slide 1 (Cover):</strong> Ilustrasi Si Sempurna (versi jinak) dengan bintang kintsugi (kosmetik khas). Teks besar: "Standar yang Tak Pernah Cukup".<br>
+      <strong>Slide 2:</strong> "Si Sempurna itu monster kebiasaan yang suka bilang: 'Kamu bisa lebih baik lagi.' Padahal kamu sudah capek."<br>
+      <strong>Slide 3:</strong> Referensi lokal: "Di kelas, ada yang dapat nilai 95 tapi tetap dimarahi karena 'bisa 100'. Di rumah, ada yang berhasil PKL tapi ditanya 'kenapa belum nikah?'. Ini bukan motivasi — ini distorsi kognitif."<br>
+      <strong>Slide 4:</strong> "Latihan kecil dari aplikasi Riung: Tulis satu hal yang sudah kamu lakukan dengan baik hari ini. Bukan yang 'harus lebih baik' — yang sudah cukup."<br>
+      <strong>Slide 5:</strong> "Jika kamu merasa ini familiar, coba kenali Si Sempurna di aplikasi. Bukan untuk menghapusnya — tapi untuk tahu kapan dia muncul."<br>
+      <strong>Slide 6 (CTA):</strong> "Download Riung. Kenali monsternya. Pelan-pelan jinakkan. 🌙 Link di bio."
+    </div>
+  </div>
+
+  <h4 style="margin-top:16px;">Contoh Caption Lengkap — Minggu (Chat-style Si Mengelak)</h4>
+  <div class="hook-box">
+    <div class="label">Hook (Format Chat)</div>
+    <div class="hook-text">"[Percakapan WhatsApp] 'Nanti aja deh tugasnya.' — 'Nanti' itu siapa ya? Ini Si Mengelak."</div>
+    <div class="caption-body">
+      <strong>Teks Chat (seperti bubble):</strong><br>
+      👤 Kamu: "Udah mulai tugas belum?"<br>
+      👤 Kamu (lagi): "Belum sih... nanti aja deh."<br>
+      👤 Kamu (lagi): "Nanti kapan? Besok? Minggu depan? Tahun depan?"<br>
+      👀 Si Mengelak (monster kebiasaan): *tersenyum sambil menghindar*<br><br>
+      <strong>Caption bawah:</strong> "Si Mengelak bukan 'malas' — dia hanya ingin melindungi kamu dari hal yang tidak nyaman. Tapi semakin kamu menghindar, semakin besar tugasnya terasa. Di Riung, kamu bisa latihan kecil: 'Satu langkah kecil hari ini.' Bukan semua. Cuma satu. 🌱"
+    </div>
+  </div>
+
+  <h3>Minggu 2 — "Si Kabut & Pikiran Berkabut"</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Hari</th><th>Format</th><th>Topik & Monster</th><th>Hook (Bahasa Indonesia)</th></tr></thead>
+<tbody>
+<tr><td><strong>Senin</strong></td><td>IG Carousel (4:5, 5 slide)</td><td><strong>Si Kabut</strong> — pikiran berkabut, mati rasa</td><td>"Ketika kamu merasa 'kosong' tapi tetap harus senyum — ini Si Kabut."</td></tr>
+<tr><td><strong>Selasa</strong></td><td>Story (Quiz)</td><td><strong>Si Meronta</strong> — emosi meluap</td><td>"Kamu marah tapi tidak tahu kenapa? Ini bukan 'galau' biasa."</td></tr>
+<tr><td><strong>Kamis</strong></td><td>Reels (25 detik)</td><td><strong>Si Waswas</strong> — skenario terburuk</td><td>"Kamu belum mulai ujian. Otak langsung: 'Gagal semua.' — benar?"</td></tr>
+<tr><td><strong>Sabtu</strong></td><td>Chat-style post + meme lokal</td><td><strong>Si Hakim</strong> — menghakimi diri</td><td>"'Aku bodoh.' 'Aku gagal.' — ini bukan fakta. Ini Si Hakim."</td></tr>
+</tbody>
+  </table>
+  </div>
+
+  <h3>Minggu 3 — "Si Cermin & Social Comparison"</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Hari</th><th>Format</th><th>Topik & Monster</th><th>Hook (Bahasa Indonesia)</th></tr></thead>
+<tbody>
+<tr><td><strong>Senin</strong></td><td>IG Carousel (4:5, 6 slide)</td><td><strong>Si Cermin</strong> — membandingkan</td><td>"Kamu buka Instagram. Temanmu upload liburan. Kamu merasa kecil. Ini Si Cermin."</td></tr>
+<tr><td><strong>Rabu</strong></td><td>Reels (30 detik)</td><td><strong>Si Sempurna</strong> + budaya jajan</td><td>"Semua orang jajan bareng, kamu di rumah. Bukan berarti kamu gagal."</td></tr>
+<tr><td><strong>Jumat</strong></td><td>Story (Poll: "Pernah? / Belum?")</td><td><strong>Si Kabut</strong> — mati rasa</td><td>"Pernah merasa 'kosong' padahal semua baik-baik saja?"</td></tr>
+<tr><td><strong>Minggu</strong></td><td>Carousel penutup (Cover + 7 monster)</td><td>Semua 7 Monster Pikiran</td><td>"7 monster, 1 aplikasi. Kenali yang paling sering muncul untukmu."</td></tr>
+</tbody>
+  </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="card" style="border-top-color:#4A7A8A;">
+  <div class="meta"><span>●</span> Akun Global — Bahasa Inggris</div>
+  <h2>Rencana Konten Mingguan — <span class="account-badge en">@riung.en</span> <span style="font-size:0.85em;color:#4A7A8A;font-weight:600;">(Global / English)</span></h2>
+  <p style="color:var(--ink-soft);font-size:0.9rem;margin-bottom:18px;">Fokus: CBT terms diperkenalkan lembut, wellness culture, individual growth, work-life balance, imposter syndrome, referensi Headspace/Calm/CBT. Nada: hangat tapi analitis.</p>
+
+  <h3>Minggu 1 — "Meet the Monsters (Series Launch)"</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Day</th><th>Format</th><th>Topic & Monster</th><th>Hook (English)</th></tr></thead>
+<tbody>
+<tr><td><strong>Monday</strong></td><td>IG Carousel (4:5, 6 slides)</td><td><strong>Si Waswas</strong> (Catastrophizing)</td><td>"Your brain just wrote a horror movie. The script? One small worry."</td></tr>
+<tr><td><strong>Wednesday</strong></td><td>Reels (25 sec)</td><td><strong>Si Sempurna</strong> (Perfectionism)</td><td>"95 out of 100 feels like failure. That's not ambition — that's a cognitive distortion."</td></tr>
+<tr><td><strong>Friday</strong></td><td>Story (Poll)</td><td><strong>Si Kabut</strong> (Brain fog)</td><td>"Ever felt empty but smiled anyway? You might be meeting Si Kabut."</td></tr>
+<tr><td><strong>Sunday</strong></td><td>Chat-style / Thread post</td><td><strong>Si Mengelak</strong> (Avoidance)</td><td>"'I'll do it tomorrow.' Tomorrow is a character. Meet Si Mengelak."</td></tr>
+</tbody>
+  </table>
+  </div>
+
+  <h4 style="margin-top:16px;">Contoh Caption Lengkap — Senin (Carousel Si Waswas / Catastrophizing)</h4>
+  <div class="hook-box">
+    <div class="label">Hook (Slide 1)</div>
+    <div class="hook-text">"Your brain just wrote a horror movie. The script? One small worry. Meet Si Waswas."</div>
+    <div class="caption-body">
+      <strong>Slide 1 (Cover):</strong> Soft gradient + 3D monster illustration (Si Waswas, jinak version). Title: "When Worry Becomes a Movie".<br>
+      <strong>Slide 2:</strong> "In CBT, this is called <em>catastrophizing</em> — imagining the worst-case scenario as if it's already real. In Riung, we call it Si Waswas (The Anxious One)."<br>
+      <strong>Slide 3:</strong> "Example: You haven't started a task. Your brain says: 'I'll fail everything. My career is over. I'll disappoint everyone.' — all before opening the document."<br>
+      <strong>Slide 4:</strong> "The app doesn't tell you to 'just relax.' It gives you a small training: write the worry down, breathe for 2 minutes, talk back gently. Not to erase it — to know it by name."<br>
+      <strong>Slide 5:</strong> "If this sounds familiar, you're not broken. You're human. The monster is real — and you can learn to sit with it."<br>
+      <strong>Slide 6 (CTA):</strong> "Know yourself. Meet your monsters. Start with a 1-minute check-in. Link in bio 🌙"
+    </div>
+  </div>
+
+  <h4 style="margin-top:16px;">Contoh Caption Lengkap — Minggu (Chat-style / Thread Si Mengelak)</h4>
+  <div class="hook-box">
+    <div class="label">Hook (Thread / Chat-style Format)</div>
+    <div class="hook-text">"'I'll do it tomorrow.' Tomorrow is a character. Meet Si Mengelak — the Avoider."</div>
+    <div class="caption-body">
+      <strong>Text thread-style:</strong><br>
+      👤 You: "I should start that report."<br>
+      👤 You (30 min later): "Maybe after one episode."<br>
+      👤 You (2 hours later): "Tomorrow. Definitely tomorrow."<br>
+      👁️ Si Mengelak: *smiling, gently pushing the task away*<br><br>
+      <strong>Caption below:</strong> "Avoidance isn't laziness. It's protection — your brain trying to shield you from discomfort. But the longer you avoid, the bigger the discomfort grows. In Riung, we don't fight the monster. We give it a name (Si Mengelak), a small exercise (one tiny step), and a gentle reminder: you don't have to do everything today. Just start."<br>
+      <strong>CTA:</strong> "Try the 'One Small Step' training in the app. No score. No rank. Just you and the monster. 🌱"
+    </div>
+  </div>
+
+  <h3>Minggu 2 — "Si Hakim & Self-Judgment"</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Day</th><th>Format</th><th>Topic & Monster</th><th>Hook (English)</th></tr></thead>
+<tbody>
+<tr><td><strong>Monday</strong></td><td>IG Carousel (4:5, 6 slides)</td><td><strong>Si Hakim</strong> (Self-criticism / The Judge)</td><td>"Your inner voice says: 'You're not enough.' That's not truth. That's Si Hakim."</td></tr>
+<tr><td><strong>Wednesday</strong></td><td>Reels (30 sec)</td><td><strong>Si Cermin</strong> (Social comparison)</td><td>"You open LinkedIn at 10 PM. Everyone is 'thriving.' You're just tired. Meet Si Cermin."</td></tr>
+<tr><td><strong>Friday</strong></td><td>Story (Swipe-up link)</td><td><strong>Si Sempurna</strong> + CBT reference</td><td>"Perfectionism isn't excellence. It's fear in a fancy suit."</td></tr>
+<tr><td><strong>Sunday</strong></td><td>Carousel (Cover + 7 monsters recap)</td><td>All 7 Mind Monsters</td><td>"7 cognitive distortions. 7 monsters. 1 app to meet them gently."</td></tr>
+</tbody>
+  </table>
+  </div>
+
+  <h3>Minggu 3 — "Si Kabut & Brain Fog"</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Day</th><th>Format</th><th>Topic & Monster</th><th>Hook (English)</th></tr></thead>
+<tbody>
+<tr><td><strong>Monday</strong></td><td>IG Carousel (4:5, 5 slides)</td><td><strong>Si Kabut</strong> (Brain fog / dissociation)</td><td>"You smile. You function. You feel nothing. That's Si Kabut."</td></tr>
+<tr><td><strong>Wednesday</strong></td><td>Reels (25 sec)</td><td><strong>Si Meronta</strong> (Emotional overflow)</td><td>"When anger is grief in disguise. Si Meronta doesn't ask for permission."</td></tr>
+<tr><td><strong>Friday</strong></td><td>Story (Quiz)</td><td><strong>Si Waswas</strong> (Catastrophizing)</td><td>"How many 'what ifs' did you create before lunch?"</td></tr>
+<tr><td><strong>Sunday</strong></td><td>Chat-style post</td><td><strong>Si Mengelak</strong> + app CTA</td><td>"Avoidance wears a mask. Today, let's unmask it — gently."</td></tr>
+</tbody>
+  </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FORMAT KONTEN -->
+<section class="card" style="border-top-color:#E8EAF2;">
+  <div class="meta"><span>●</span> Strategi Format</div>
+  <h2>Format Konten yang Efektif — Per Pasar</h2>
+
+  <div class="two-col">
+    <div>
+      <h3 style="color:#B85A4A;">@riung.id (Indonesia)</h3>
+      <h4>IG Carousel (4:5)</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Paling kuat untuk edukasi monster. Pengguna Indonesia lebih nyaman membaca slide berurutan seperti buku mini. Gunakan bahasa sehari-hari, emoji lokal (🌙, 🌱, 🍵), dan ilustrasi monster yang lucu tapi tidak "kartun anak-anak".</p>
+
+      <h4>Reels (15–30 detik)</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Gunakan teks besar di tengah layar, musik lo-fi / piano lembut, dan teks pendek per slide. Contoh: "Ini Si Sempurna. Dia bilang kamu belum cukup. Padahal kamu sudah capek."</p>
+
+      <h4>Story Interaktif</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Poll: "Pernah merasa ini? Ya / Belum." Quiz: "Monster mana yang paling sering muncul? A) Si Waswas B) Si Kabut C) Si Sempurna." Slider: "Seberapa sering kamu membandingkan diri?"</p>
+
+      <h4>Chat-style Post</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Format seperti percakapan WhatsApp. Sangat cocok untuk pasar Indonesia karena kebiasaan membaca chat lebih tinggi daripada membaca artikel panjang. Gunakan bubble putih (pesan kamu) dan bubble abu-abu (monster) dengan emoji.</p>
+    </div>
+    <div>
+      <h3 style="color:#4A7A8A;">@riung.en (Global)</h3>
+      <h4>IG Carousel (4:5)</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Gunakan struktur: Cover → Problem → CBT Explanation → App Solution → CTA. Bahasa: profesional tapi empatik. Referensi: Beck, Burns, Headspace.</p>
+
+      <h4>Reels (30–60 detik)</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Lebih panjang dari versi Indonesia. Gunakan subtitle lengkap karena banyak pengguna menonton tanpa suara. Nada: "You're not broken. You're noticing a pattern."</p>
+
+      <h4>Story (Swipe-up Link)</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Gunakan swipe-up untuk link ke artikel blog atau halaman landing. Konten: "Swipe up to read about catastrophizing and how CBT reframes it."</p>
+
+      <h4>Thread / Newsletter-style Caption</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Caption panjang (150–250 kata) dengan struktur jelas. Gunakan bullet, bold, dan emoji sebagai penanda. Ini cocok untuk audiens global yang terbiasa membaca artikel pendek di sosial media.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- REFERENSI BUDAYA -->
+<section class="card" style="border-top-color:#FCECE4;">
+  <div class="meta"><span>●</span> Referensi Budaya & Meme Lokal</div>
+  <h2>Referensi yang Relevan — Per Akun</h2>
+
+  <div class="two-col">
+    <div>
+      <h3 style="color:#B85A4A;">@riung.id</h3>
+      <ul style="font-size:0.92rem;color:var(--ink-soft);line-height:1.7;padding-left:18px;list-style-type:none;">
+        <li>🍜 <strong>Budaya jajan</strong> — "Semua orang jajan bareng, kamu di rumah." → referensi sosial pressure.</li>
+        <li>📚 <strong>PKL & akademik</strong> — "Nilai 95 belum cukup." → tekanan prestasi.</li>
+        <li>👨‍👩‍👧 <strong>Orang tua</strong> — "Demi masa depanmu." → beban kolektivisme.</li>
+        <li>📱 <strong>Meme TikTok lokal</strong> — "Udh lah", "Kepo", "Galau", "Bete", "Cape", "Ngerasa", "Ngambek".</li>
+        <li>🕌 <strong>Agama (halus)</strong> — "Tuhan tidak akan membebani seseorang melebihi kemampuannya." → tanpa eksplisit.</li>
+        <li>🎮 <strong>Game & ranking</strong> — "Level up" sebagai metafora pertumbuhan, bukan kompetisi.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:#4A7A8A;">@riung.en</h3>
+      <ul style="font-size:0.92rem;color:var(--ink-soft);line-height:1.7;padding-left:18px;list-style-type:none;">
+        <li>🧠 <strong>CBT Research</strong> — Aaron Beck, David Burns (Feeling Good), Judith Beck.</li>
+        <li>📱 <strong>Aplikasi wellness</strong> — Headspace, Calm, BetterHelp, Woebot.</li>
+        <li>📚 <strong>Buku & podcast</strong> — "The Happiness Trap" (Russ Harris), "Dare to Be You" (Matthew Hussey).</li>
+        <li>📰 <strong>Isu global</strong> — Burnout, imposter syndrome, hustle culture, quiet quitting.</li>
+        <li>🎵 <strong>Musik</strong> — Lo-fi, piano instrumental, ambient — sebagai latar Reels.</li>
+        <li>🏷️ <strong>Tag populer</strong> — #mentalhealthmatters, #cbt, #selfawareness, #mindfulness, #therapyisok.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- AKUN UTAMA -->
+<section class="card" style="border-top-color:#E4DEF3;">
+  <div class="meta"><span>●</span> Akun Utama</div>
+  <h2>Strategi <span class="account-badge riung">@riung</span> — Akun Utama Aplikasi</h2>
+  <p style="font-size:0.9rem;color:var(--ink-soft);margin-bottom:18px;">Akun utama berfungsi sebagai <strong>hub</strong> — menyatukan konten dari @riung.id dan @riung.en, serta menjadi wajah resmi aplikasi. Nada: netral tapi hangat; bahasa: bilingual (Indonesia & Inggris) dengan transisi mulus.</p>
+
+  <h3>Konten Unggulan (3–4 post/minggu)</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Hari</th><th>Format</th><th>Fungsi</th><th>Contoh Konten</th></tr></thead>
+<tbody>
+<tr><td><strong>Senin</strong></td><td>IG Carousel (Bilingual)</td><td>Launch monster minggu ini</td><td>"Meet Si Kabut — The Fog Monster. Pikiran berkabut & mati rasa. (EN + ID caption)"</td></tr>
+<tr><td><strong>Rabu</strong></td><td>Reels / TikTok</td><td>Demo aplikasi</td><td>"1-minute check-in → earn coins → unlock monster card. No score. Just awareness."</td></tr>
+<tr><td><strong>Jumat</strong></td><td>Story (User Generated)</td><td>Community</td><td>Repost cerita pengguna: "Hari ini saya kenali Si Waswas."</td></tr>
+<tr><td><strong>Minggu</strong></td><td>Carousel (Recap)</td><td>Weekly reflection</td><td>"This week's monsters: Si Waswas, Si Kabut, Si Sempurna. Which one spoke loudest to you?"</td></tr>
+</tbody>
+  </table>
+  </div>
+
+  <h3>Strategi Bilingual</h3>
+  <p style="font-size:0.9rem;color:var(--ink-soft);">Gunakan format <strong>split caption</strong>: bagian atas dalam bahasa Inggris (untuk audiens global), bagian bawah dalam bahasa Indonesia (untuk audiens lokal). Atau sebaliknya, tergantung topik. Jangan terjemahkan secara harfiah — adaptasi nada dan referensi.</p>
+  <div class="note">
+    <strong>Tip implementasi:</strong> Gunakan emoji sebagai pemisah visual antara bagian EN dan ID: 🌙 (bahasa Indonesia) / 🌍 (bahasa Inggris). Ini membantu pengguna memahami struktur tanpa membaca semua.
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- COMMUNITY BUILDING -->
+<section class="card" style="border-top-color:#DCE8EE;">
+  <div class="meta"><span>●</span> Community Building</div>
+  <h2>Strategi Komunitas — Per Akun</h2>
+
+  <div class="two-col">
+    <div>
+      <h3 style="color:#B85A4A;">@riung.id</h3>
+      <h4>Engagement Harian</h4>
+      <ul style="font-size:0.9rem;color:var(--ink-soft);line-height:1.7;padding-left:18px;">
+        <li>Balas setiap komentar dalam bahasa yang sama (jika pengguna pakai bahasa gaul, balas dengan gaul).</li>
+        <li>Gunakan nama pengguna dalam balasan: "Terima kasih, @nama! 🌙"</li>
+        <li>Buat highlight Story: "Kenali Dirimu" — kumpulan semua monster dalam format kartu.</li>
+        <li>Buat hashtag komunitas: <strong>#KenaliDirimu</strong>, <strong>#MonsterRiung</strong>, <strong>#PelanPelan</strong>.</li>
+      </ul>
+      <h4>Kolaborasi Lokal</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Kolaborasi dengan akun wellness lokal (bukan hanya "influencer besar" tapi juga akun kecil yang punya audiens setia): akun meditasi, psikolog lokal, komunitas mahasiswa, akun buku self-help Indonesia.</p>
+    </div>
+    <div>
+      <h3 style="color:#4A7A8A;">@riung.en</h3>
+      <h4>Engagement Harian</h4>
+      <ul style="font-size:0.9rem;color:var(--ink-soft);line-height:1.7;padding-left:18px;">
+        <li>Balas komentar dengan pertanyaan lanjutan: "Thanks for sharing — which monster spoke loudest for you?"</li>
+        <li>Gunakan DM sebagai ruang aman: "Feel free to DM us if you want to talk more about this."</li>
+        <li>Buat highlight Story: "Know Yourself" — semua 7 monster dalam bahasa Inggris.</li>
+        <li>Buat hashtag komunitas: <strong>#KnowYourself</strong>, <strong>#RiungMonsters</strong>, <strong>#GentleGrowth</strong>.</li>
+      </ul>
+      <h4>Kolaborasi Global</h4>
+      <p style="font-size:0.9rem;color:var(--ink-soft);">Kolaborasi dengan akun wellness, psikolog internasional, podcast mental health, dan akun CBT/therapy. Gunakan format "guest carousel" — satu slide dari akun kolaborator tentang monster yang sama.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CATATAN IMPLEMENTASI -->
+<section class="card" style="border-top-color:#E4DEF3;">
+  <div class="meta"><span>●</span> Implementasi</div>
+  <h2>Catatan Implementasi — Siap Pakai</h2>
+
+  <h3>Rencana Produksi Konten (3 Minggu)</h3>
+  <div class="table-wrap">
+  <table>
+<thead><tr><th>Minggu</th><th>@riung.id (3–4 post)</th><th>@riung.en (3–4 post)</th><th>@riung (3–4 post)</th></tr></thead>
+<tbody>
+<tr><td><strong>1</strong></td><td>Si Sempurna (carousel), Si Cermin (reels), Si Waswas (story), Si Mengelak (chat)</td><td>Si Waswas (carousel), Si Sempurna (reels), Si Kabut (story), Si Mengelak (chat)</td><td>Launch monster, demo app, community story, weekly recap</td></tr>
+<tr><td><strong>2</strong></td><td>Si Kabut (carousel), Si Meronta (story), Si Waswas (reels), Si Hakim (chat)</td><td>Si Hakim (carousel), Si Cermin (reels), Si Sempurna (story), 7-monster recap</td><td>Bilingual carousel, user story, community highlight, reflection</td></tr>
+<tr><td><strong>3</strong></td><td>Si Cermin (carousel), Si Kabut (reels), Si Sempurna (story), 7-monster recap</td><td>Si Kabut (carousel), Si Meronta (reels), Si Waswas (story), Si Mengelak (chat)</td><td>Weekly recap, app update, community post, bilingual reflection</td></tr>
+</tbody>
+  </table>
+  </div>
+
+  <h3>Checklist Per Post</h3>
+  <ul style="font-size:0.9rem;color:var(--ink-soft);line-height:1.7;padding-left:18px;list-style-type:none;">
+    <li>☐ <strong>Hook:</strong> Apakah 3 detik pertama bisa membuat orang berhenti scroll?</li>
+    <li>☐ <strong>Monster:</strong> Apakah nama monster muncul di slide pertama atau dalam 5 detik pertama Reels?</li>
+    <li>☐ <strong>Bahasa:</strong> Apakah nada sesuai dengan pasar (hangat & gaul / hangat & analitis)?</li>
+    <li>☐ <strong>CTA:</strong> Apakah ada ajakan yang jelas tapi tidak memaksa (bukan "Download sekarang!" tapi "Coba kenali Si Sempurna di aplikasi.")?</li>
+    <li>☐ <strong>Konsistensi visual:</strong> Apakah warna, font, dan ilustrasi monster konsisten dengan desain aplikasi?</li>
+  </ul>
+
+  <h3>Referensi Visual (Dari Design File)</h3>
+  <p style="font-size:0.9rem;color:var(--ink-soft);">Semua ilustrasi monster (versi jinak dan liar) sudah tersedia di folder <code>design/aset3d_cut/</code>. Gunakan versi <strong>jinak</strong> untuk konten edukasi (lebih ramah), dan versi <strong>liar</strong> hanya jika membahas dampak negatif monster (misalnya: "Ketika Si Hakim mengambil alih — ini versi liarnya."). Kosmetik khas setiap monster (batu tenang, lentera kecil, bintang kintsugi, bingkai emas, senter mungil, selimut peluk) bisa digunakan sebagai elemen dekoratif di caption atau sebagai emoji visual.</p>
+
+  <div class="note">
+    <strong>Catatan akhir:</strong> Strategi ini bukan hanya tentang "posting" — ini tentang membangun bahasa baru untuk kesehatan mental di Indonesia dan global. Monster bukan karakter lucu; mereka adalah jembatan antara ilmu (CBT) dan pengalaman sehari-hari. Setiap post harus membuat pengguna merasa: <em>"Ini saya. Ini bukan aib. Ini bisa dipelajari."</em>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="text-align:center;padding:40px 0 20px;color:var(--ink-faint);font-size:0.85rem;">
+  <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--ink-soft);margin-bottom:8px;">"Kenali monsternya. Pelan-pelan jinakkan."</p>
+  <p>Strategi Konten Sosial Media — Riung · 2026 · Dibuat berdasarkan <code>design/campaign.pen</code> & desain aplikasi</p>
+</footer>
+
+</div>
+</body>
+</html>

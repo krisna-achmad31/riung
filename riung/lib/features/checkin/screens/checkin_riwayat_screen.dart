@@ -25,34 +25,12 @@ const Map<String, String> _moodEmoji = {
 
 /// Riwayat mood 7 hari terakhir, dari data check-in nyata. Implement
 /// persis `design/Checkin.dc.html` § Riwayat mood.
-class CheckInRiwayatScreen extends StatefulWidget {
+class CheckInRiwayatScreen extends StatelessWidget {
   const CheckInRiwayatScreen({super.key});
 
   @override
-  State<CheckInRiwayatScreen> createState() => _CheckInRiwayatScreenState();
-}
-
-class _CheckInRiwayatScreenState extends State<CheckInRiwayatScreen> {
-  List<CheckIn>? _checkIns;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final scope = AppScope.of(context);
-    final uid = scope.auth.uid;
-    if (uid == null) return;
-    final list = await scope.userRepository.getCheckIns(uid);
-    if (!mounted) return;
-    setState(() => _checkIns = list);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final checkIns = _checkIns;
+    final scope = AppScope.of(context);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -62,11 +40,15 @@ class _CheckInRiwayatScreenState extends State<CheckInRiwayatScreen> {
               child: RiungGlassHeader(title: context.s.checkin.historyTitle),
             ),
             Expanded(
-              child: checkIns == null
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
-                  : checkIns.isEmpty
-                      ? const _EmptyRiwayat()
-                      : _RiwayatBody(checkIns: checkIns),
+              child: RiungAsyncView<List<CheckIn>>(
+                load: () async {
+                  final uid = scope.auth.uid;
+                  return uid == null ? const <CheckIn>[] : scope.userRepository.getCheckIns(uid);
+                },
+                isEmpty: (checkIns) => checkIns.isEmpty,
+                empty: const _EmptyRiwayat(),
+                builder: (context, checkIns) => _RiwayatBody(checkIns: checkIns),
+              ),
             ),
           ],
         ),

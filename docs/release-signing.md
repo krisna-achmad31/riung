@@ -110,7 +110,7 @@ Hasilnya beberapa APK terpisah per arsitektur CPU di `build/app/outputs/flutter-
 ## Langkah 7 — Google Sign-In: tambahkan SHA fingerprint rilis ke Firebase
 
 Fingerprint SHA-1/SHA-256 yang sekarang terdaftar di Firebase Console
-(**Project settings → Your apps → `com.riung.riung`**) itu punya
+(**Project settings → Your apps → `id.riung.riung`**) itu punya
 keystore **debug**, dipakai supaya tombol "Lanjutkan dengan Google" jalan
 pas development. Untuk rilis sungguhan, keystore-nya beda
 (`riung-release.keystore` dari Langkah 1) — SHA-nya juga beda, jadi
@@ -123,7 +123,7 @@ sekaligus — **tambahkan**, jangan ganti yang lama.
    keytool -list -v -keystore riung-release.keystore -alias riung
    ```
    (masukkan password keystore-nya saat diminta)
-2. Firebase Console → Project settings → app `com.riung.riung` →
+2. Firebase Console → Project settings → app `id.riung.riung` →
    **Add fingerprint**, tempel SHA-1 & SHA-256 di atas.
 3. Kalau kamu mengaktifkan **Play App Signing** (default/disarankan untuk
    app baru di Play Console) — Google menandatangani ulang app dengan

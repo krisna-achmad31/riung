@@ -9,7 +9,6 @@ import '../models/journal_pin_backup.dart';
 import '../models/monster_progress.dart';
 import '../models/user_profile.dart';
 import '../models/wallet.dart';
-import 'dummy_data_loader.dart';
 import 'journal_crypto_service.dart';
 import 'local_database_service.dart';
 import 'local_prefs_store.dart';
@@ -19,49 +18,34 @@ import 'kenali_result_repository.dart';
 /// Implementasi [UserRepository] sungguhan sejak M3 — profil/wallet/streak/
 /// progres monster di [LocalPrefsStore] (shared_preferences), jurnal &
 /// check-in di [LocalDatabaseService] (sqflite, teks jurnal terenkripsi AES
-/// lewat [JournalCryptoService]). Data seed pertama kali diambil dari
-/// `docs/dummy-data-seed.json` (user `u_001`) supaya first-run tidak
-/// kosong, lalu setiap perubahan persisten sungguhan — bertahan setelah
-/// app di-restart.
+/// lewat [JournalCryptoService]). First-run selalu mulai dari keadaan
+/// KOSONG (profil baru, saldo 0, belum ada progres monster) — tidak pernah
+/// dari data contoh `dummy-data-seed.json`, supaya user baru tidak mewarisi
+/// koin/streak/monster milik user contoh. Setiap perubahan persisten
+/// sungguhan — bertahan setelah app di-restart.
 class LocalUserRepository implements UserRepository {
   LocalUserRepository({
     required LocalPrefsStore prefs,
     required LocalDatabaseService db,
     required JournalCryptoService crypto,
-    DummyDataLoader? dummyLoader,
   })  : _prefs = prefs,
         _db = db,
-        _crypto = crypto,
-        _dummyLoader = dummyLoader ?? DummyDataLoader.instance;
+        _crypto = crypto;
 
   final LocalPrefsStore _prefs;
   final LocalDatabaseService _db;
   final JournalCryptoService _crypto;
-  final DummyDataLoader _dummyLoader;
   static const _uuid = Uuid();
-
-  Future<Map<String, dynamic>> _findDummyUser(String uid) async {
-    final data = await _dummyLoader.load();
-    final users = (data['users_sample'] as List).cast<Map<String, dynamic>>();
-    return users.firstWhere((u) => u['uid'] == uid, orElse: () => users.first);
-  }
 
   @override
   Future<UserProfile> getUserProfile(String uid) async {
     final stored = _prefs.userProfileJson;
     if (stored != null) return UserProfile.fromMap(uid, stored);
 
-    // First run: seed dari dummy data, lalu persist supaya konsisten
-    // setelah ini.
-    final user = await _findDummyUser(uid);
-    final seeded = UserProfile.fromMap(uid, {
-      UserProfile.kProfile: user['profile'],
-      UserProfile.kPremium: user['premium'],
-      UserProfile.kStreak: user['streak'],
-      UserProfile.kAssessment: user['assessment'],
-    });
-    await saveUserProfile(seeded);
-    return seeded;
+    // First run: profil kosong, lalu persist supaya konsisten setelah ini.
+    final fresh = UserProfile.fromMap(uid, const {});
+    await saveUserProfile(fresh);
+    return fresh;
   }
 
   @override
@@ -85,13 +69,11 @@ class LocalUserRepository implements UserRepository {
         lifetimeSpent: _prefs.lifetimeSpent,
       );
     }
-    final user = await _findDummyUser(uid);
-    final walletRaw = (user['wallet'] as Map?)?.cast<String, dynamic>();
-    final seeded = walletRaw == null ? Wallet.zero() : Wallet.fromMap(walletRaw);
-    await _prefs.setCoins(seeded.coins);
-    await _prefs.setLifetimeEarned(seeded.lifetimeEarned);
-    await _prefs.setLifetimeSpent(seeded.lifetimeSpent);
-    return seeded;
+    final fresh = Wallet.zero();
+    await _prefs.setCoins(fresh.coins);
+    await _prefs.setLifetimeEarned(fresh.lifetimeEarned);
+    await _prefs.setLifetimeSpent(fresh.lifetimeSpent);
+    return fresh;
   }
 
   @override
@@ -102,13 +84,9 @@ class LocalUserRepository implements UserRepository {
         (id, raw) => MapEntry(id, MonsterProgress.fromMap(id, (raw as Map).cast<String, dynamic>())),
       );
     }
-    final user = await _findDummyUser(uid);
-    final monstersRaw = (user['monsters'] as Map?)?.cast<String, dynamic>() ?? const {};
-    final seeded = monstersRaw.map(
-      (id, raw) => MapEntry(id, MonsterProgress.fromMap(id, (raw as Map).cast<String, dynamic>())),
-    );
-    await saveMonsterProgress(uid, seeded);
-    return seeded;
+    const fresh = <String, MonsterProgress>{};
+    await saveMonsterProgress(uid, fresh);
+    return fresh;
   }
 
   @override
@@ -118,13 +96,13 @@ class LocalUserRepository implements UserRepository {
 
   @override
   Future<List<CheckIn>> getCheckIns(String uid) async {
-    final rows = await _db.allCheckIns();
+    final rows = await _db.allCheckIns(uid);
     return rows.map(_checkInFromRow).toList();
   }
 
   @override
   Future<CheckIn> saveCheckIn(String uid, CheckIn checkIn) async {
-    await _db.insertCheckIn({
+    await _db.insertCheckIn(uid, {
       'id': _uuid.v4(),
       'date': checkIn.toMap()[CheckIn.fDate],
       'mood': checkIn.mood,
@@ -140,7 +118,7 @@ class LocalUserRepository implements UserRepository {
   @override
   Future<bool> hasCheckedInToday(String uid) async {
     final todayIso = DateTime.now().toIso8601String().split('T').first;
-    final rows = await _db.allCheckIns();
+    final rows = await _db.allCheckIns(uid);
     return rows.any((r) => r['date'] == todayIso);
   }
 
@@ -158,17 +136,17 @@ class LocalUserRepository implements UserRepository {
 
   @override
   Future<List<JournalEntry>> getJournalEntries(String uid) async {
-    final rows = await _db.allJournalEntries();
+    final rows = await _db.allJournalEntries(uid);
     final entries = <JournalEntry>[];
     for (final row in rows) {
-      entries.add(await _journalEntryFromRow(row));
+      entries.add(await _journalEntryFromRow(uid, row));
     }
     return entries;
   }
 
-  Future<JournalEntry> _journalEntryFromRow(Map<String, Object?> row) async {
+  Future<JournalEntry> _journalEntryFromRow(String uid, Map<String, Object?> row) async {
     final encryptedText = row['text_encrypted'] as String;
-    final text = await _crypto.decryptText(encryptedText);
+    final text = await _crypto.decryptText(uid, encryptedText);
     final tagsRaw = row['tags'] as String?;
     return JournalEntry(
       entryId: row['id'] as String,
@@ -182,8 +160,8 @@ class LocalUserRepository implements UserRepository {
 
   @override
   Future<JournalEntry> saveJournalEntry(String uid, JournalEntry entry) async {
-    final encryptedText = await _crypto.encryptText(entry.text);
-    await _db.insertJournalEntry({
+    final encryptedText = await _crypto.encryptText(uid, entry.text);
+    await _db.insertJournalEntry(uid, {
       'id': entry.entryId,
       'date': entry.createdAt.toIso8601String().split('T').first,
       'prompt_id': entry.promptId,
@@ -198,7 +176,7 @@ class LocalUserRepository implements UserRepository {
   @override
   Future<int> journalEntryCountForDate(String uid, DateTime date) {
     final iso = date.toIso8601String().split('T').first;
-    return _db.journalEntryCountForDate(iso);
+    return _db.journalEntryCountForDate(uid, iso);
   }
 
   @override
@@ -238,7 +216,7 @@ class LocalUserRepository implements UserRepository {
   @override
   Future<void> deleteAllLocalData() async {
     await _db.deleteAll();
-    await _crypto.deleteKey();
+    await _crypto.deleteAllKeys();
     await _prefs.clearAll();
     KenaliResultRepository.instance.clearCache();
   }

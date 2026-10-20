@@ -37,6 +37,7 @@ void main() {
     'riung_appbeku_daily_json', 'riung_free_focus_date', 'riung_free_focus_used', 'riung_premium_daily_claim_date',
     'riung_purchased_coins_reserve', 'riung_missions_json', 'riung_waswas_stage_json',
     'riung_habit_stage_json', // urutan latihan peta monster kebiasaan
+    'riung_account_scope_v1_owner', // penanda migrasi data per akun (C-01)
   };
 
   test('semua kunci penyimpanan lokal diputuskan: diekspor atau dikecualikan', () {

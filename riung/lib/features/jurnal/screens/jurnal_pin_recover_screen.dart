@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/services/api/api_repositories.dart';
+import '../../../core/services/api/api_client.dart';
+import '../../../core/widgets/api_error_feedback.dart';
 
 import '../../../core/models/models.dart';
 import '../../../core/l10n/l10n.dart';
@@ -51,8 +54,19 @@ class _JurnalPinRecoverScreenState extends State<JurnalPinRecoverScreen> {
     setState(() => _checking = true);
     final scope = AppScope.of(context);
     final hash = scope.pinService.hashPin(_current, widget.backup.salt);
-    if (hash == widget.backup.hash) {
-      await scope.pinService.setPin(_current);
+    bool matches;
+    try {
+      final repository = scope.userRepository;
+      matches = repository is ApiUserRepository ? await repository.verifyJournalPin(hash) : hash == widget.backup.hash;
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      showApiError(context, e);
+      setState(() { _checking = false; _current = ''; });
+      return;
+    }
+    final uid = scope.auth.uid;
+    if (matches && uid != null) {
+      await scope.pinService.setPin(uid, _current);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } else {

@@ -6,6 +6,9 @@ import '../models/frozen_app_setting.dart';
 import '../services/app_usage_service.dart';
 import '../services/local_prefs_store.dart';
 import 'wallet_notifier.dart';
+import '../services/api/api_state.dart';
+import '../services/api/api_client.dart';
+
 
 /// Notifier global Aplikasi Beku — domain lintas layar sendiri (Setup,
 /// Permission, Interstitial, Rekap, Toko § "Buka Waktu Scroll" semua baca
@@ -21,9 +24,47 @@ import 'wallet_notifier.dart';
 enum UnlockResult { ok, notEnoughEarnedCoins, dailyCapReached }
 
 class AppBekuNotifier extends ChangeNotifier {
-  AppBekuNotifier({required LocalPrefsStore prefs, AppUsageService? usageService})
+  AppBekuNotifier({required LocalPrefsStore prefs, AppUsageService? usageService, this.apiState})
       : _prefs = prefs,
-        _usageService = usageService ?? AppUsageService();
+        _usageService = usageService ?? AppUsageService() { apiState?.addListener(_applyServer); }
+  final ApiState? apiState;
+  void _applyServer() {
+    _paidUnlocksToday = (apiState?.snapshot?.today['paidUnlocksUsed'] as num? ?? 0).toInt();
+    notifyListeners();
+  }
+  @override
+  void dispose() { apiState?.removeListener(_applyServer); super.dispose(); }
+
+  Future<UnlockResult> unlockBundle({required WalletNotifier wallet, required String bundleId, required int price, List<String>? appIds}) async {
+    if (apiState != null) return _serverUnlock(bundleId: bundleId, appIds: appIds, price: price);
+    final ids = appIds ?? [AppBekuCatalog.instagram.packageName, AppBekuCatalog.tiktok.packageName];
+    for (var i = 0; i < ids.length; i++) {
+      final result = await unlockMinutes(wallet: wallet, packageName: ids[i], minutes: bundleId == 'santai' ? 15 : 30, price: i == 0 ? price : 0, countsAsUnlock: i == 0);
+      if (result != UnlockResult.ok) return result;
+    }
+    return UnlockResult.ok;
+  }
+
+  Future<UnlockResult> _serverUnlock({String? appId, int? minutes, String? bundleId, List<String>? appIds, required int price}) async {
+    try {
+      final response = await apiState!.api.unlock(appId: appId, minutes: minutes, bundleId: bundleId, appIds: appIds, expectedPrice: effectiveUnlockPrice(price));
+      for (final grant in response.grants) {
+        _extraUnlockedMinutes[grant.appId] = (_extraUnlockedMinutes[grant.appId] ?? 0) + grant.minutes;
+        _notifiedThreshold[grant.appId] = effectiveLimitOf(grant.appId);
+      }
+      _paidUnlocksToday = response.paidUnlocksUsed;
+      _scrollCoinsToday += response.price;
+      await _persistDaily();
+      await _syncLock();
+      await apiState!.refresh();
+      notifyListeners();
+      return UnlockResult.ok;
+    } on ApiException catch (e) {
+      if (e.code == 'insufficient_coins') return UnlockResult.notEnoughEarnedCoins;
+      if (e.code == 'limit_reached') return UnlockResult.dailyCapReached;
+      rethrow;
+    }
+  }
 
   final LocalPrefsStore _prefs;
   final AppUsageService _usageService;
@@ -268,6 +309,7 @@ class AppBekuNotifier extends ChangeNotifier {
     required int price,
     bool countsAsUnlock = true,
   }) async {
+    if (apiState != null) return _serverUnlock(appId: packageName, minutes: minutes, price: price);
     if (countsAsUnlock && paidUnlockCapReached) return UnlockResult.dailyCapReached;
     final charged = countsAsUnlock && price > 0 ? effectiveUnlockPrice(price) : price;
     final berhasil = await wallet.spend(amount: charged, reason: 'scroll_unlock:$packageName:$minutes', earnedOnly: charged > 0);

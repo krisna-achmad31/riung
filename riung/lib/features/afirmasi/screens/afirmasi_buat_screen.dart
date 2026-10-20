@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
@@ -30,7 +31,12 @@ class _AfirmasiBuatScreenState extends State<AfirmasiBuatScreen> {
   }
 
   Future<void> _loadSaboteurs() async {
-    final saboteurs = await AppScope.of(context).contentRepository.getSaboteurs();
+    final List<Saboteur> saboteurs;
+    try {
+      saboteurs = await AppScope.of(context).contentRepository.getSaboteurs();
+    } catch (_) {
+      return; // Tag monster opsional — form tetap bisa dipakai tanpa tag.
+    }
     if (!mounted) return;
     // Si Hakim (bos) sengaja tidak bisa ditag di sini — afirmasi custom
     // cuma boleh menargetkan 6 anak buah, bukan bos.
@@ -163,6 +169,7 @@ class _PreviewCard extends StatelessWidget {
           const SizedBox(height: 10),
           TextField(
             controller: controller,
+            inputFormatters: InputLimits.formatters(InputLimits.afirmasi),
             maxLines: null,
             autofocus: true,
             textAlign: TextAlign.center,

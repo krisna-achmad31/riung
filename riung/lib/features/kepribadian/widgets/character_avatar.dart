@@ -112,6 +112,9 @@ class _ArtImage extends StatelessWidget {
       filterQuality: FilterQuality.medium,
       gaplessPlayback: true,
       excludeFromSemantics: true,
+      // File art hilang/rusak → layer kosong, bukan kotak merah/crash yang
+      // menjatuhkan seluruh layar (Beranda, Brankas, kartu ekspor).
+      errorBuilder: (_, _, _) => const SizedBox.shrink(),
     );
   }
 }

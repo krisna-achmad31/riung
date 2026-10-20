@@ -6,6 +6,8 @@ import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../../core/services/api/api_repositories.dart';
+import '../../../core/services/api/riung_api.dart';
 import '../../checkin/screens/checkin_mood_screen.dart';
 import '../../checkin/screens/checkin_riwayat_screen.dart';
 import '../../focus/screens/focus_mode_entry_screen.dart';
@@ -19,6 +21,7 @@ import '../widgets/kenali_home_card.dart';
 import '../widgets/home_top_bar.dart';
 import 'beranda_tiket_serangan_screen.dart';
 import 'koin_histori_screen.dart';
+import '../../onboarding/widgets/assessment_pending_card.dart';
 
 /// Dashboard utama. Implement persis `design/Home.dc.html` § Beranda.
 /// Kartu hero berganti ke [BerandaTiketSeranganScreen]-style saat user
@@ -35,6 +38,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
   List<Saboteur>? _saboteurs;
   Object? _loadError;
   Set<int> _missionsDone = {};
+  PublicContentItem? _researchFact;
 
   @override
   void initState() {
@@ -51,6 +55,11 @@ class _BerandaScreenState extends State<BerandaScreen> {
   /// Misi yang sudah dicentang hanya berlaku untuk hari ini — tanggal
   /// tersimpan beda dari hari ini berarti daftar mulai kosong lagi.
   void _loadMissions() {
+    final serverDone = AppScope.of(context).wallet.serverMissionsDone;
+    if (serverDone != null) {
+      _missionsDone = serverDone;
+      return;
+    }
     final saved = AppScope.of(context).prefs.missionsJson;
     if (saved['date'] != _todayKey()) return;
     final done = (saved['done'] as List?)?.whereType<int>().toSet() ?? <int>{};
@@ -64,43 +73,62 @@ class _BerandaScreenState extends State<BerandaScreen> {
     final scope = AppScope.of(context);
     final done = {..._missionsDone, index};
     setState(() => _missionsDone = done);
-    await scope.prefs.setMissionsJson({'date': _todayKey(), 'done': done.toList()});
-    await scope.wallet.earn(amount: EconomyEarn.misiHarian, reason: 'misi_harian:${_todayKey()}:$index');
+    await scope.prefs.setMissionsJson({
+      'date': _todayKey(),
+      'done': done.toList(),
+    });
+    await scope.wallet.earn(
+      amount: EconomyEarn.misiHarian,
+      reason: 'misi_harian:${_todayKey()}:$index',
+    );
   }
 
   Future<void> _loadSaboteurs() async {
+    if (_loadError != null) setState(() => _loadError = null);
     try {
-      final list = await AppScope.of(context).contentRepository.getSaboteurs();
+      final content = AppScope.of(context).contentRepository;
+      final list = await content.getSaboteurs();
       if (!mounted) return;
       setState(() => _saboteurs = list);
+      if (content is ApiContentRepository) _loadResearchFact(content);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loadError = e);
     }
   }
 
+  Future<void> _loadResearchFact(ApiContentRepository content) async {
+    try {
+      final facts = await content.getResearchFacts();
+      if (mounted && facts.isNotEmpty)
+        setState(() => _researchFact = facts.first);
+    } catch (_) {
+      // Optional content keeps its bundled text without blocking Beranda.
+    }
+  }
+
   void _mulaiCheckIn() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const CheckInMoodScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const CheckInMoodScreen()));
   }
 
   void _bukaRiwayat() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const CheckInRiwayatScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const CheckInRiwayatScreen()));
   }
 
   void _bukaKalender() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const KalenderLatihanScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const KalenderLatihanScreen()));
   }
 
   void _bukaHistoriKoin() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const KoinHistoriScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const KoinHistoriScreen()));
   }
 
   @override
@@ -110,29 +138,69 @@ class _BerandaScreenState extends State<BerandaScreen> {
       body: SafeArea(
         bottom: false,
         child: ListenableBuilder(
-          listenable: Listenable.merge([scope.wallet, scope.streak, scope.auth, scope.monsterProgress]),
-          builder: (context, _) => _buildBody(context, scope),
+          listenable: Listenable.merge([
+            scope.wallet,
+            scope.streak,
+            scope.auth,
+            scope.monsterProgress,
+          ]),
+          builder: (context, _) => RiungStateView(
+            status: RiungStateView.statusOf(
+              loading: scope.auth.profile == null || _saboteurs == null || scope.wallet.loading,
+              error: _loadError,
+            ),
+            errorMessage: context.s.home.loadError,
+            onRetry: _loadSaboteurs,
+            builder: (context) => _buildBody(context, scope, scope.auth.profile!, _saboteurs!),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, AppScope scope) {
-    if (_loadError != null) {
-      return _BerandaError(onRetry: () {
-        setState(() => _loadError = null);
-        _loadSaboteurs();
-      });
-    }
-    final profile = scope.auth.profile;
-    final saboteurs = _saboteurs;
-    if (profile == null || saboteurs == null || scope.wallet.loading) {
-      return const _BerandaLoading();
-    }
+  Widget _buildBody(BuildContext context, AppScope scope, UserProfile profile, List<Saboteur> saboteurs) {
 
+    if (profile.assessmentCompletedAt == null) {
+      return SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          AppSpacing.sm,
+          AppSpacing.xl,
+          AppSpacing.xxl + MediaQuery.paddingOf(context).bottom,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HomeTopBar(
+              userName: profile.displayName.isEmpty
+                  ? context.s.home.defaultUserName
+                  : profile.displayName,
+              streak: scope.streak.current,
+              coins: scope.wallet.coins,
+              onTapStreak: _bukaKalender,
+              onTapCoins: _bukaHistoriKoin,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            const AssessmentPendingCard(),
+            const SizedBox(height: AppSpacing.xl),
+            _CheckInCard(
+              sudahCheckin: scope.streak.sudahCheckinHariIni,
+              onCheckIn: _mulaiCheckIn,
+              onLihatRiwayat: _bukaRiwayat,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            const HomeQuickActionGrid(),
+            const SizedBox(height: AppSpacing.xl),
+            const KenaliHomeCard(),
+          ],
+        ),
+      );
+    }
     if (scope.wallet.tickets > 0) {
       return BerandaTiketSeranganBody(
-        userName: profile.displayName.isEmpty ? context.s.home.defaultUserName : profile.displayName,
+        userName: profile.displayName.isEmpty
+            ? context.s.home.defaultUserName
+            : profile.displayName,
         streak: scope.streak.current,
         coins: scope.wallet.coins,
         tickets: scope.wallet.tickets,
@@ -142,21 +210,34 @@ class _BerandaScreenState extends State<BerandaScreen> {
       );
     }
 
-    final hakimProgress = scope.monsterProgress.progressOf('hakim') ?? MonsterProgress.initial('hakim');
-    final dominantId = profile.dominantSaboteurs.isNotEmpty ? profile.dominantSaboteurs.first : 'waswas';
+    final hakimProgress =
+        scope.monsterProgress.progressOf('hakim') ??
+        MonsterProgress.initial('hakim');
+    final dominantId = profile.dominantSaboteurs.isNotEmpty
+        ? profile.dominantSaboteurs.first
+        : 'waswas';
     final dominant = saboteurs.firstWhere(
       (s) => s.id == dominantId,
       orElse: () => saboteurs.first,
     );
-    final dominantProgress = scope.monsterProgress.progressOf(dominant.id) ?? MonsterProgress.initial(dominant.id);
+    final dominantProgress =
+        scope.monsterProgress.progressOf(dominant.id) ??
+        MonsterProgress.initial(dominant.id);
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.sm,
+        AppSpacing.xl,
+        AppSpacing.xxl + MediaQuery.paddingOf(context).bottom,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HomeTopBar(
-            userName: profile.displayName.isEmpty ? context.s.home.defaultUserName : profile.displayName,
+            userName: profile.displayName.isEmpty
+                ? context.s.home.defaultUserName
+                : profile.displayName,
             streak: scope.streak.current,
             coins: scope.wallet.coins,
             onTapStreak: _bukaKalender,
@@ -177,7 +258,9 @@ class _BerandaScreenState extends State<BerandaScreen> {
             progress: dominantProgress,
             done: _missionsDone,
             onComplete: _completeMission,
-            onTapMonster: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const VaultScreen())),
+            onTapMonster: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const VaultScreen())),
           ),
           const SizedBox(height: AppSpacing.xl),
           _HakimActiveCard(
@@ -199,48 +282,10 @@ class _BerandaScreenState extends State<BerandaScreen> {
           ),
           const SizedBox(height: AppSpacing.xl),
           TahukahKamuCard(
-            text: context.s.home.tipText,
-            source: context.s.home.tipSource,
+            text: _researchFact?.text ?? context.s.home.tipText,
+            source: _researchFact?.source ?? context.s.home.tipSource,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _BerandaLoading extends StatelessWidget {
-  const _BerandaLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator(color: AppColors.primer));
-  }
-}
-
-class _BerandaError extends StatelessWidget {
-  const _BerandaError({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xxl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.wifi_off_rounded, size: 32, color: AppColors.teksRedup),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              context.s.home.loadError,
-              textAlign: TextAlign.center,
-              style: AppTextStyles.body,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            RiungButton(label: context.s.common.cobaLagi, onPressed: onRetry),
-          ],
-        ),
       ),
     );
   }
@@ -274,7 +319,11 @@ class _CheckInCard extends StatelessWidget {
             const Positioned(
               right: -26,
               top: -16,
-              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 170),
+              child: RiungMonster(
+                monsterId: 'kabut',
+                state: MonsterVisualState.jinak,
+                size: 170,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(right: 120),
@@ -283,12 +332,21 @@ class _CheckInCard extends StatelessWidget {
                 children: [
                   Text(
                     sudahCheckin ? t.checkinDone : t.checkinPrompt,
-                    style: AppTextStyles.title.copyWith(fontSize: 22, height: 1.15, color: AppColors.teksUtama),
+                    style: AppTextStyles.title.copyWith(
+                      fontSize: 22,
+                      height: 1.15,
+                      color: AppColors.teksUtama,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    sudahCheckin ? t.checkinDoneSub(EconomyEarn.checkinHarian) : t.checkinPromptSub(EconomyEarn.checkinHarian),
-                    style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder),
+                    sudahCheckin
+                        ? t.checkinDoneSub(EconomyEarn.checkinHarian)
+                        : t.checkinPromptSub(EconomyEarn.checkinHarian),
+                    style: AppTextStyles.caption.copyWith(
+                      fontSize: 13,
+                      color: AppColors.teksSekunder,
+                    ),
                   ),
                   if (!sudahCheckin) ...[
                     const SizedBox(height: 28),
@@ -318,9 +376,19 @@ class _InkPill extends StatelessWidget {
       child: Container(
         height: 46,
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(color: AppColors.tinta, borderRadius: BorderRadius.circular(AppRadius.pill), boxShadow: AppGlass.inkShadow),
+        decoration: BoxDecoration(
+          color: AppColors.tinta,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          boxShadow: AppGlass.inkShadow,
+        ),
         alignment: Alignment.center,
-        child: Text(label, style: AppTextStyles.buttonLabel.copyWith(fontSize: 15, color: AppColors.diAtasTinta)),
+        child: Text(
+          label,
+          style: AppTextStyles.buttonLabel.copyWith(
+            fontSize: 15,
+            color: AppColors.diAtasTinta,
+          ),
+        ),
       ),
     );
   }
@@ -337,13 +405,19 @@ class _GradientBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 8,
-      decoration: BoxDecoration(color: AppColors.permukaan, borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(
+        color: AppColors.permukaan,
+        borderRadius: BorderRadius.circular(4),
+      ),
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
         heightFactor: 1,
         widthFactor: value.clamp(0.0, 1.0),
         child: DecoratedBox(
-          decoration: BoxDecoration(gradient: LinearGradient(colors: colors), borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: colors),
+            borderRadius: BorderRadius.circular(4),
+          ),
         ),
       ),
     );
@@ -370,13 +444,20 @@ class _HakimActiveCard extends StatelessWidget {
             width: 96,
             height: 96,
             decoration: BoxDecoration(
-              gradient: RadialGradient(colors: [AppColors.sekunderLembut, AppColors.sekunderLembut.withValues(alpha: 0)]),
+              gradient: RadialGradient(
+                colors: [
+                  AppColors.sekunderLembut,
+                  AppColors.sekunderLembut.withValues(alpha: 0),
+                ],
+              ),
               borderRadius: BorderRadius.circular(28),
             ),
             alignment: Alignment.center,
             child: RiungMonster(
               monsterId: 'hakim',
-              state: isTamed ? MonsterVisualState.jinak : MonsterVisualState.liar,
+              state: isTamed
+                  ? MonsterVisualState.jinak
+                  : MonsterVisualState.liar,
               size: 92,
               applyBossScale: false,
             ),
@@ -388,21 +469,57 @@ class _HakimActiveCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Flexible(child: Text(context.s.common.monsterName('hakim'), style: AppTextStyles.title.copyWith(fontSize: 18, color: AppColors.teksUtama))),
+                    Flexible(
+                      child: Text(
+                        context.s.common.monsterName('hakim'),
+                        style: AppTextStyles.title.copyWith(
+                          fontSize: 18,
+                          color: AppColors.teksUtama,
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: AppSpacing.sm),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(color: AppColors.sekunderLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
-                      child: Text(t.bossBadge, style: AppTextStyles.caption.copyWith(color: AppColors.sekunder, fontWeight: FontWeight.w700, fontSize: 10)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.sekunderLembut,
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: Text(
+                        t.bossBadge,
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.sekunder,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 10,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(isTamed ? t.hakimTamed : t.hakimWild, style: AppTextStyles.caption.copyWith(color: AppColors.teksSekunder, fontSize: 12)),
+                Text(
+                  isTamed ? t.hakimTamed : t.hakimWild,
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.teksSekunder,
+                    fontSize: 12,
+                  ),
+                ),
                 const SizedBox(height: 10),
-                _GradientBar(value: progress.progress / 100, colors: const [AppColors.kabutLavender, AppColors.sekunder]),
+                _GradientBar(
+                  value: progress.progress / 100,
+                  colors: const [AppColors.kabutLavender, AppColors.sekunder],
+                ),
                 const SizedBox(height: 6),
-                Text(t.progressToTamed(progress.progress), style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                Text(
+                  t.progressToTamed(progress.progress),
+                  style: AppTextStyles.caption.copyWith(
+                    fontSize: 12,
+                    color: AppColors.teksSekunder,
+                  ),
+                ),
               ],
             ),
           ),
@@ -453,14 +570,19 @@ class _MonsterMissionCard extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [AppColors.aksenHangatLembut, AppColors.aksenHangatLembut.withValues(alpha: 0)],
+                      colors: [
+                        AppColors.aksenHangatLembut,
+                        AppColors.aksenHangatLembut.withValues(alpha: 0),
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(28),
                   ),
                   alignment: Alignment.bottomCenter,
                   child: RiungMonster(
                     monsterId: monsterId,
-                    state: tamed ? MonsterVisualState.jinak : MonsterVisualState.liar,
+                    state: tamed
+                        ? MonsterVisualState.jinak
+                        : MonsterVisualState.liar,
                     size: 104,
                     applyBossScale: false,
                   ),
@@ -472,14 +594,34 @@ class _MonsterMissionCard extends StatelessWidget {
                     children: [
                       Text(
                         context.s.kepribadian.homeMonsterLabel.toUpperCase(),
-                        style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.teksRedup),
+                        style: AppTextStyles.caption.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                          color: AppColors.teksRedup,
+                        ),
                       ),
                       const SizedBox(height: 4),
-                      Text(monsterName, style: AppTextStyles.title.copyWith(fontSize: 22, color: AppColors.teksUtama)),
+                      Text(
+                        monsterName,
+                        style: AppTextStyles.title.copyWith(
+                          fontSize: 22,
+                          color: AppColors.teksUtama,
+                        ),
+                      ),
                       const SizedBox(height: 8),
-                      _GradientBar(value: progress.progress / 100, colors: const [AppColors.emas, AppColors.aksenHangat]),
+                      _GradientBar(
+                        value: progress.progress / 100,
+                        colors: const [AppColors.emas, AppColors.aksenHangat],
+                      ),
                       const SizedBox(height: 6),
-                      Text(t.progressToTamed(progress.progress), style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
+                      Text(
+                        t.progressToTamed(progress.progress),
+                        style: AppTextStyles.caption.copyWith(
+                          fontSize: 12,
+                          color: AppColors.teksSekunder,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -490,12 +632,28 @@ class _MonsterMissionCard extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 14),
             child: Divider(color: AppColors.garis, height: 1),
           ),
-          Text(t.missionTitle(monsterName), style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama)),
+          Text(
+            t.missionTitle(monsterName),
+            style: AppTextStyles.chipLabel.copyWith(
+              fontSize: 14,
+              color: AppColors.teksUtama,
+            ),
+          ),
           const SizedBox(height: 6),
           for (var i = 0; i < missions.length; i++)
-            _MissionRow(text: missions[i], done: done.contains(i), onTap: () => onComplete(i)),
+            _MissionRow(
+              text: missions[i],
+              done: done.contains(i),
+              onTap: () => onComplete(i),
+            ),
           const SizedBox(height: 6),
-          Text(t.missionNote, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
+          Text(
+            t.missionNote,
+            style: AppTextStyles.caption.copyWith(
+              fontSize: 11,
+              color: AppColors.teksRedup,
+            ),
+          ),
         ],
       ),
     );
@@ -503,7 +661,11 @@ class _MonsterMissionCard extends StatelessWidget {
 }
 
 class _MissionRow extends StatelessWidget {
-  const _MissionRow({required this.text, required this.done, required this.onTap});
+  const _MissionRow({
+    required this.text,
+    required this.done,
+    required this.onTap,
+  });
 
   final String text;
   final bool done;
@@ -527,10 +689,19 @@ class _MissionRow extends StatelessWidget {
                 height: 22,
                 decoration: BoxDecoration(
                   color: done ? AppColors.primer : AppColors.permukaan,
-                  border: Border.all(color: done ? AppColors.primer : AppColors.teksRedup, width: 1.5),
+                  border: Border.all(
+                    color: done ? AppColors.primer : AppColors.teksRedup,
+                    width: 1.5,
+                  ),
                   shape: BoxShape.circle,
                 ),
-                child: done ? const Icon(Icons.check_rounded, size: 14, color: AppColors.diAtasTinta) : null,
+                child: done
+                    ? const Icon(
+                        Icons.check_rounded,
+                        size: 14,
+                        color: AppColors.diAtasTinta,
+                      )
+                    : null,
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -547,10 +718,17 @@ class _MissionRow extends StatelessWidget {
               const SizedBox(width: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: AppColors.aksenHangatLembut, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                decoration: BoxDecoration(
+                  color: AppColors.aksenHangatLembut,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
                 child: Text(
                   '+${EconomyEarn.misiHarian}',
-                  style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.aksenHangatGelap),
+                  style: AppTextStyles.caption.copyWith(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.aksenHangatGelap,
+                  ),
                 ),
               ),
             ],
@@ -581,13 +759,30 @@ class _FocusModeEntryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(context.s.home.focusTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 16, color: AppColors.teksUtama)),
+                Text(
+                  context.s.home.focusTitle,
+                  style: AppTextStyles.chipLabel.copyWith(
+                    fontSize: 16,
+                    color: AppColors.teksUtama,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(context.s.home.focusSub(EconomySpend.fokus25Menit), style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.teksSekunder)),
+                Text(
+                  context.s.home.focusSub(EconomySpend.fokus25Menit),
+                  style: AppTextStyles.caption.copyWith(
+                    fontSize: 12,
+                    height: 1.4,
+                    color: AppColors.teksSekunder,
+                  ),
+                ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.teksRedup),
+          const Icon(
+            Icons.chevron_right_rounded,
+            size: 20,
+            color: AppColors.teksRedup,
+          ),
         ],
       ),
     );

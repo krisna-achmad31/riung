@@ -51,17 +51,17 @@ class _BerandaTiketSeranganScreenState extends State<BerandaTiketSeranganScreen>
           listenable: Listenable.merge([scope.wallet, scope.streak, scope.auth]),
           builder: (context, _) {
             final profile = scope.auth.profile;
-            if (profile == null || scope.wallet.loading) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primer));
-            }
-            return BerandaTiketSeranganBody(
-              userName: profile.displayName.isEmpty ? context.s.home.defaultUserName : profile.displayName,
-              streak: scope.streak.current,
-              coins: scope.wallet.coins,
-              tickets: scope.wallet.tickets,
-              sudahCheckin: scope.streak.sudahCheckinHariIni,
-              onCheckIn: _mulaiCheckIn,
-              onLihatRiwayat: _bukaRiwayat,
+            return RiungStateView(
+              status: RiungStateView.statusOf(loading: profile == null || scope.wallet.loading),
+              builder: (context) => BerandaTiketSeranganBody(
+                userName: profile!.displayName.isEmpty ? context.s.home.defaultUserName : profile.displayName,
+                streak: scope.streak.current,
+                coins: scope.wallet.coins,
+                tickets: scope.wallet.tickets,
+                sudahCheckin: scope.streak.sudahCheckinHariIni,
+                onCheckIn: _mulaiCheckIn,
+                onLihatRiwayat: _bukaRiwayat,
+              ),
             );
           },
         ),

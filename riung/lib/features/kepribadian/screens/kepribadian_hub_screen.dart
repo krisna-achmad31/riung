@@ -46,7 +46,8 @@ class _KepribadianHubScreenState extends State<KepribadianHubScreen> {
     final scope = AppScope.of(context);
     setState(() => _loadingSignals = true);
     try {
-      if (await scope.pinService.hasPin) {
+      final pinUid = scope.auth.uid;
+      if (pinUid != null && await scope.pinService.hasPin(pinUid)) {
         if (!mounted) return;
         final ok = await Navigator.of(context).push<bool>(
           MaterialPageRoute(builder: (_) => const JurnalPinUnlockScreen(), fullscreenDialog: true),
@@ -57,6 +58,8 @@ class _KepribadianHubScreenState extends State<KepribadianHubScreen> {
       final entries = uid == null ? <JournalEntry>[] : await scope.userRepository.getJournalEntries(uid);
       if (!mounted) return;
       setState(() => _signals = JournalSignals.from(entries));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.s.common.loadFailed)));
     } finally {
       if (mounted) setState(() => _loadingSignals = false);
     }

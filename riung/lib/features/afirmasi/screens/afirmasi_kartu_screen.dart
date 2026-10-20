@@ -35,9 +35,13 @@ class _AfirmasiKartuScreenState extends State<AfirmasiKartuScreen> {
     final scope = AppScope.of(context);
     final uid = scope.auth.profile?.uid;
     if (uid == null) return;
-    final favorites = await scope.userRepository.getFavoriteAffirmationIds(uid);
-    if (!mounted) return;
-    setState(() => _favorites = favorites);
+    try {
+      final favorites = await scope.userRepository.getFavoriteAffirmationIds(uid);
+      if (!mounted) return;
+      setState(() => _favorites = favorites);
+    } catch (_) {
+      // Tanda favorit opsional — kartu tetap tampil tanpa tanda hati.
+    }
   }
 
   Future<void> _toggleFavorite(String affirmationId) async {

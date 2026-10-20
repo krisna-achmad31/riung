@@ -7,6 +7,7 @@
       "x": 0,
       "y": 0,
       "name": "REF Home — Beranda (asli, HP)",
+      "enabled": false,
       "fill": [
         "#ffffff",
         {
@@ -25,6 +26,7 @@
       "x": 1520,
       "y": 0,
       "name": "REF Kepribadian — Know yourself hub (asli, HP)",
+      "enabled": false,
       "fill": [
         "#ffffff",
         {
@@ -43,6 +45,7 @@
       "x": 2280,
       "y": 0,
       "name": "REF Kepribadian — Kartu hasil INFP (asli, HP)",
+      "enabled": false,
       "fill": [
         "#ffffff",
         {
@@ -61,6 +64,7 @@
       "x": 3040,
       "y": 0,
       "name": "REF Kepribadian — Kustomisasi & bundel (asli, HP)",
+      "enabled": false,
       "fill": [
         "#ffffff",
         {
@@ -79,6 +83,7 @@
       "x": 3800,
       "y": 0,
       "name": "REF Kepribadian — Gaya kartu & kekuatan (asli, HP)",
+      "enabled": false,
       "fill": [
         "#ffffff",
         {
@@ -97,6 +102,7 @@
       "x": 4560,
       "y": 0,
       "name": "REF Laporan — Reflection report (asli, HP)",
+      "enabled": false,
       "fill": [
         "#ffffff",
         {
@@ -115,6 +121,7 @@
       "x": 760,
       "y": 0,
       "name": "REF Home — Kunci scroll AppBeku (asli, HP)",
+      "enabled": false,
       "fill": [
         "#ffffff",
         {
@@ -133,6 +140,7 @@
       "x": 0,
       "y": 1704,
       "name": "Home — Beranda (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 830,
@@ -947,6 +955,7 @@
       "x": 456,
       "y": 1704,
       "name": "Kepribadian — Know yourself (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 1300,
@@ -1378,6 +1387,7 @@
       "x": 912,
       "y": 1704,
       "name": "Kepribadian — Hasil INFP (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 1960,
@@ -2696,6 +2706,7 @@
       "x": 1368,
       "y": 1704,
       "name": "Laporan — Reflection report (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 880,
@@ -3116,6 +3127,7 @@
       "x": 1368,
       "y": 2664,
       "name": "Focus — Mode Fokus (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 1300,
@@ -3438,6 +3450,7 @@
       "x": 1824,
       "y": 2664,
       "name": "Monster — Your monsters (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 1900,
@@ -4169,6 +4182,7 @@
       "x": 2280,
       "y": 2664,
       "name": "Toko — Shop (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 1510,
@@ -5482,6 +5496,7 @@
       "x": 2736,
       "y": 2664,
       "name": "Checkin — Mood (TERANG)",
+      "enabled": false,
       "clip": true,
       "width": 396,
       "height": 1500,
@@ -16063,7 +16078,7 @@
               "height": 56,
               "descendants": {
                 "nAqTC": {
-                  "content": "Mulai kenalan (2 menit)"
+                  "content": "Lanjut"
                 }
               }
             },
@@ -180533,6 +180548,1295 @@
                   ]
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "D5hLeE",
+      "x": 3274,
+      "y": 8500,
+      "name": "Glass — Onboarding · Kenali pola",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D5E6DA",
+          "#E5ECEA",
+          "#E4DEF3",
+          "#DCE8EE",
+          "#F3F1EC",
+          "#ECE4F2",
+          "#F7E4D8",
+          "#F2ECE6",
+          "#D9E4F2"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.4
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.4
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "WhFsE",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "eGPzb",
+          "name": "Atas",
+          "width": "fill_container",
+          "padding": [
+            4,
+            24
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "ztZtT",
+              "name": "Logo",
+              "fill": "#FFFFFFB3",
+              "cornerRadius": 999,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "strokeAlignment": "inner",
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 28
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "$g-shadow",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 36
+                }
+              ],
+              "gap": 6,
+              "padding": [
+                6,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "TV1SK",
+                  "name": "Titik",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 0,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#9DC2AE",
+                        "position": 0
+                      },
+                      {
+                        "color": "#8E86C8",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "width": 10,
+                  "height": 10
+                },
+                {
+                  "type": "text",
+                  "id": "jJL4j",
+                  "name": "v",
+                  "fill": "$g-ink",
+                  "content": "Riung",
+                  "fontFamily": "$g-font-display",
+                  "fontSize": 14,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "WXfjz",
+              "name": "Lewati",
+              "fill": "$g-ink-soft",
+              "content": "Lewati",
+              "fontFamily": "$g-font",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ANUeB",
+          "name": "Hero — kenali pola",
+          "width": "fill_container",
+          "height": 380,
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "dvbTX",
+              "x": 55,
+              "y": 55,
+              "name": "Cincin lembut",
+              "fill": "#FFFFFF33",
+              "width": 280,
+              "height": 280,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5
+            },
+            {
+              "id": "erXJT",
+              "type": "ref",
+              "ref": "ueIcw",
+              "name": "Si Waswas",
+              "x": 95,
+              "y": 100,
+              "width": 200,
+              "height": 200
+            },
+            {
+              "type": "frame",
+              "id": "B8ZMH",
+              "x": 195,
+              "y": 54,
+              "name": "Pola khawatir",
+              "width": 164,
+              "height": 48,
+              "fill": "$g-glass-strong",
+              "cornerRadius": 24,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "U4QMM",
+                  "name": "Pola khawatir label",
+                  "fill": "$g-ink-soft",
+                  "content": "Sering khawatir?",
+                  "fontFamily": "$g-font",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ml3AY",
+              "x": 24,
+              "y": 297,
+              "name": "Pola menunda",
+              "width": 164,
+              "height": 48,
+              "fill": "$g-glass-strong",
+              "cornerRadius": 24,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "UWwHM",
+                  "name": "Pola menunda label",
+                  "fill": "$g-ink-soft",
+                  "content": "Suka menunda?",
+                  "fontFamily": "$g-font",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "icon",
+              "id": "eQ11f",
+              "x": 55,
+              "y": 155,
+              "name": "Kilau",
+              "width": 24,
+              "height": 24,
+              "icon": "sparkle",
+              "library": "phosphor",
+              "fill": "$g-glass-edge"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "peEzs",
+          "name": "Bawah",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            24,
+            28,
+            24
+          ],
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "text",
+              "id": "x5YP96",
+              "name": "Judul",
+              "fill": "$g-ink",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Kenali pola yang\nsering datang.",
+              "lineHeight": 1.08,
+              "fontFamily": "$g-font-display",
+              "fontSize": 34,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "p4Etut",
+              "name": "Sub",
+              "fill": "$g-ink-soft",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Jawab beberapa pertanyaan tentang keseharianmu. Kenali monster yang paling sering muncul, tanpa jawaban benar atau salah.",
+              "lineHeight": 1.5,
+              "fontFamily": "$g-font",
+              "fontSize": 14,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "jUmbl",
+              "name": "Titik halaman",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "bnFOp",
+                  "name": "d0",
+                  "fill": "#FFFFFFCC",
+                  "width": 8,
+                  "height": 8
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "NXAfO",
+                  "name": "d1",
+                  "fill": "$g-primary",
+                  "width": 26,
+                  "height": 8
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "uNvZj",
+                  "name": "d2",
+                  "fill": "#FFFFFFCC",
+                  "width": 8,
+                  "height": 8
+                }
+              ]
+            },
+            {
+              "id": "rO77J",
+              "type": "ref",
+              "ref": "T6CMra",
+              "name": "Mulai",
+              "width": "fill_container",
+              "height": 56,
+              "descendants": {
+                "nAqTC": {
+                  "content": "Lanjut"
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "R9oBL",
+              "name": "Masuk",
+              "width": "fill_container",
+              "gap": 4,
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zKm2Z",
+                  "name": "a",
+                  "fill": "$g-ink-soft",
+                  "content": "Sudah punya akun?",
+                  "fontFamily": "$g-font",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "JBOFo",
+                  "name": "b",
+                  "fill": "$g-primary",
+                  "content": "Masuk",
+                  "fontFamily": "$g-font",
+                  "fontSize": 13,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "cd8si",
+      "x": 6074,
+      "y": 8500,
+      "name": "Glass — Onboarding · Langkah kecil",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D5E6DA",
+          "#E5ECEA",
+          "#E4DEF3",
+          "#DCE8EE",
+          "#F3F1EC",
+          "#ECE4F2",
+          "#F7E4D8",
+          "#F2ECE6",
+          "#D9E4F2"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.4
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.4
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "bgrt1",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "i008OC",
+          "name": "Atas",
+          "width": "fill_container",
+          "padding": [
+            4,
+            24
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "AYfWI",
+              "name": "Logo",
+              "fill": "#FFFFFFB3",
+              "cornerRadius": 999,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "strokeAlignment": "inner",
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 28
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "$g-shadow",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 36
+                }
+              ],
+              "gap": 6,
+              "padding": [
+                6,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "oTawA",
+                  "name": "Titik",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 0,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#9DC2AE",
+                        "position": 0
+                      },
+                      {
+                        "color": "#8E86C8",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "width": 10,
+                  "height": 10
+                },
+                {
+                  "type": "text",
+                  "id": "A40M7",
+                  "name": "v",
+                  "fill": "$g-ink",
+                  "content": "Riung",
+                  "fontFamily": "$g-font-display",
+                  "fontSize": 14,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "IHL7f",
+              "name": "Lewati",
+              "fill": "$g-ink-soft",
+              "content": "Lewati",
+              "fontFamily": "$g-font",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "AiEyE",
+          "name": "Hero — langkah kecil",
+          "width": "fill_container",
+          "height": 380,
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "YT99A",
+              "x": 55,
+              "y": 55,
+              "name": "Cincin lembut",
+              "fill": "#FFFFFF33",
+              "width": 280,
+              "height": 280,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5
+            },
+            {
+              "id": "JQK8X",
+              "type": "ref",
+              "ref": "J0ZeL",
+              "name": "Si Kabut tenang",
+              "x": 95,
+              "y": 48,
+              "width": 200,
+              "height": 200
+            },
+            {
+              "type": "frame",
+              "id": "rEWtB",
+              "x": 24,
+              "y": 260,
+              "name": "Bernapas",
+              "width": 110,
+              "height": 104,
+              "fill": "$g-glass",
+              "cornerRadius": 28,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "J24Q6",
+                  "type": "ref",
+                  "ref": "rAb9S",
+                  "name": "Ikon Bernapas",
+                  "width": 56,
+                  "height": 56
+                },
+                {
+                  "type": "text",
+                  "id": "S3SYqq",
+                  "name": "Label Bernapas",
+                  "fill": "$g-ink-soft",
+                  "content": "Bernapas",
+                  "fontFamily": "$g-font",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wFCtA",
+              "x": 140,
+              "y": 260,
+              "name": "Menulis",
+              "width": 110,
+              "height": 104,
+              "fill": "$g-glass",
+              "cornerRadius": 28,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "wXZmq",
+                  "type": "ref",
+                  "ref": "AsQFB",
+                  "name": "Ikon Menulis",
+                  "width": 56,
+                  "height": 56
+                },
+                {
+                  "type": "text",
+                  "id": "XOKTe",
+                  "name": "Label Menulis",
+                  "fill": "$g-ink-soft",
+                  "content": "Menulis",
+                  "fontFamily": "$g-font",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cEnxP",
+              "x": 256,
+              "y": 260,
+              "name": "Beristirahat",
+              "width": 110,
+              "height": 104,
+              "fill": "$g-glass",
+              "cornerRadius": 28,
+              "stroke": "$g-glass-edge",
+              "strokeWidth": 1.5,
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "PKxlX",
+                  "type": "ref",
+                  "ref": "B85sbR",
+                  "name": "Ikon Beristirahat",
+                  "width": 56,
+                  "height": 56
+                },
+                {
+                  "type": "text",
+                  "id": "LGPxK",
+                  "name": "Label Beristirahat",
+                  "fill": "$g-ink-soft",
+                  "content": "Beristirahat",
+                  "fontFamily": "$g-font",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bvBZI",
+          "name": "Bawah",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            24,
+            28,
+            24
+          ],
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "text",
+              "id": "PYVJq",
+              "name": "Judul",
+              "fill": "$g-ink",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Langkah kecil.\nPelan-pelan lebih tenang.",
+              "lineHeight": 1.08,
+              "fontFamily": "$g-font-display",
+              "fontSize": 34,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "RqfTI",
+              "name": "Sub",
+              "fill": "$g-ink-soft",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Luangkan waktu untuk bernapas, menulis, atau beristirahat. Riung menemanimu berlatih, satu langkah kecil setiap hari.",
+              "lineHeight": 1.5,
+              "fontFamily": "$g-font",
+              "fontSize": 14,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "l4htKh",
+              "name": "Titik halaman",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "AIdjB",
+                  "name": "d0",
+                  "fill": "#FFFFFFCC",
+                  "width": 8,
+                  "height": 8
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "GGgiM",
+                  "name": "d1",
+                  "fill": "#FFFFFFCC",
+                  "width": 8,
+                  "height": 8
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "JRiuc",
+                  "name": "d2",
+                  "fill": "$g-primary",
+                  "width": 26,
+                  "height": 8
+                }
+              ]
+            },
+            {
+              "id": "maPlk",
+              "type": "ref",
+              "ref": "T6CMra",
+              "name": "Mulai",
+              "width": "fill_container",
+              "height": 56,
+              "descendants": {
+                "nAqTC": {
+                  "content": "Mulai kenalan (2 menit)"
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "qObpz",
+              "name": "Masuk",
+              "width": "fill_container",
+              "gap": 4,
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "JP3iz",
+                  "name": "a",
+                  "fill": "$g-ink-soft",
+                  "content": "Sudah punya akun?",
+                  "fontFamily": "$g-font",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "A44MIH",
+                  "name": "b",
+                  "fill": "$g-primary",
+                  "content": "Masuk",
+                  "fontFamily": "$g-font",
+                  "fontSize": 13,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "fm2qp",
+      "x": 11280,
+      "y": 22100,
+      "name": "Glass — Monster · Latihan Si Nanti (node)",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": {
+        "type": "mesh_gradient",
+        "enabled": true,
+        "columns": 3,
+        "rows": 3,
+        "colors": [
+          "#D9E4F2",
+          "#E3E6F1",
+          "#E4DEF3",
+          "#D5E6DA",
+          "#EEF1EE",
+          "#E9E4F3",
+          "#E8EFE9",
+          "#F3F1EC",
+          "#F7E4D8"
+        ],
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0.5
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            0.5
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "ukuca",
+          "type": "ref",
+          "ref": "ooUT8",
+          "name": "Status Bar"
+        },
+        {
+          "type": "frame",
+          "id": "ihJI7",
+          "name": "Konten",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 18,
+          "padding": [
+            8,
+            20,
+            28,
+            20
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "jX3XX",
+              "name": "Header",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "DmSGT",
+                  "name": "Kembali",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "$g-glass-strong",
+                  "cornerRadius": 22,
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": [
+                    {
+                      "type": "background_blur",
+                      "radius": 28
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "$g-shadow",
+                      "offset": {
+                        "x": 0,
+                        "y": 12
+                      },
+                      "blur": 36
+                    }
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "hmwXY",
+                      "name": "i",
+                      "width": 20,
+                      "height": 20,
+                      "icon": "chevron-left",
+                      "library": "lucide",
+                      "fill": "$g-ink"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "mLt56",
+                  "name": "Judul",
+                  "fill": "$g-ink",
+                  "content": "Peta latihan Si Nanti",
+                  "fontFamily": "$g-font-display",
+                  "fontSize": 17,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "K1KNc",
+                  "name": "Spacer",
+                  "width": 44,
+                  "height": 44
+                }
+              ]
+            },
+            {
+              "id": "Ph2FC",
+              "type": "ref",
+              "ref": "xlRfp",
+              "name": "Ikon Fokus",
+              "width": 96,
+              "height": 96
+            },
+            {
+              "type": "text",
+              "id": "IXvtc",
+              "name": "Level",
+              "fill": "$g-ink-soft",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "LEVEL 1",
+              "textAlign": "center",
+              "fontFamily": "$g-font",
+              "fontSize": 12,
+              "fontWeight": "700",
+              "letterSpacing": 1.2
+            },
+            {
+              "type": "text",
+              "id": "N4HMn",
+              "name": "Judul langkah",
+              "fill": "$g-ink",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Mulai 2 menit saja",
+              "textAlign": "center",
+              "fontFamily": "$g-font",
+              "fontSize": 26,
+              "fontWeight": "800"
+            },
+            {
+              "id": "k9cHP",
+              "type": "ref",
+              "ref": "aP70n",
+              "name": "Cara",
+              "width": "fill_container",
+              "descendants": {
+                "DUPvF": {
+                  "content": "Pilih satu tugas yang kamu tunda. Nyalakan sesi Fokus dan kerjakan 2 menit pertamanya saja. Kalau mau lanjut, silakan. Kalau berhenti, itu juga sudah menang.",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "fontSize": 15,
+                  "fontWeight": "500",
+                  "lineHeight": 1.5
+                }
+              }
+            },
+            {
+              "id": "YcWrc",
+              "type": "ref",
+              "ref": "z07Poc",
+              "name": "Buka Fokus",
+              "width": "fill_container",
+              "descendants": {
+                "b77daT": {
+                  "content": "Buka Fokus"
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "R7ZuE",
+              "name": "Tip burung hantu",
+              "width": "fill_container",
+              "gap": 10,
+              "alignItems": "end",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "kr1YO",
+                  "name": "Avatar",
+                  "width": 44,
+                  "height": 44,
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": -135,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#D5E6DA",
+                        "position": 0
+                      },
+                      {
+                        "color": "#E4DEF3",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 22,
+                  "stroke": "#FFFFFF",
+                  "strokeWidth": 2,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "Y5iebr",
+                      "name": "i",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "bird",
+                      "library": "phosphor",
+                      "weight": 600,
+                      "fill": "$g-primary"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "toaOf",
+                  "name": "Gelembung",
+                  "width": "fill_container",
+                  "fill": "#FFFFFFCC",
+                  "cornerRadius": [
+                    20,
+                    20,
+                    20,
+                    6
+                  ],
+                  "stroke": "$g-glass-edge",
+                  "strokeWidth": 1.5,
+                  "strokeAlignment": "inner",
+                  "effect": [
+                    {
+                      "type": "background_blur",
+                      "radius": 28
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "$g-shadow",
+                      "offset": {
+                        "x": 0,
+                        "y": 12
+                      },
+                      "blur": 36
+                    }
+                  ],
+                  "padding": 14,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "mjEfW",
+                      "name": "v",
+                      "fill": "$g-ink",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Latihan kecil ini membuka langkah berikutnya di peta. Tidak perlu sempurna, yang penting dicoba.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "$g-font",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ewh0g",
+              "name": "Spacer",
+              "width": 10,
+              "height": "fill_container"
+            },
+            {
+              "id": "skweV",
+              "type": "ref",
+              "ref": "T6CMra",
+              "name": "Sudah kulakukan",
+              "width": "fill_container",
+              "descendants": {
+                "nAqTC": {
+                  "content": "Sudah kulakukan"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "nLid7",
+      "x": 3290,
+      "y": 28900,
+      "name": "Glass — Komponen · Lencana Pro",
+      "width": 390,
+      "fill": "$g-bg",
+      "cornerRadius": 28,
+      "layout": "vertical",
+      "gap": 20,
+      "padding": 24,
+      "children": [
+        {
+          "type": "text",
+          "id": "ezRJc",
+          "name": "Judul",
+          "fill": "$g-ink",
+          "content": "Lencana Pro",
+          "fontFamily": "$g-font-display",
+          "fontSize": 17,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "U8MS1d",
+          "name": "Keterangan",
+          "fill": "$g-ink-soft",
+          "textGrowth": "fixed-width",
+          "width": "fill_container",
+          "content": "Tampil hanya untuk pelanggan Riung Premium yang aktif — di samping nama (Profil) dan di header Langgananku. Bukan tombol, tidak bisa diketuk.",
+          "lineHeight": 1.4,
+          "fontFamily": "$g-font",
+          "fontSize": 12,
+          "fontWeight": "500"
+        },
+        {
+          "type": "frame",
+          "id": "Y21dYx",
+          "name": "Lencana Pro",
+          "reusable": true,
+          "fill": "$g-lav-soft",
+          "cornerRadius": 999,
+          "gap": 4,
+          "padding": [
+            3,
+            8,
+            3,
+            4
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "JJxyk",
+              "type": "ref",
+              "ref": "jELFS",
+              "name": "Ikon",
+              "width": 16,
+              "height": 16
+            },
+            {
+              "type": "text",
+              "id": "A3KtlF",
+              "name": "Label",
+              "fill": "$g-lav",
+              "content": "PRO",
+              "fontFamily": "$g-font",
+              "fontSize": 10,
+              "fontWeight": "800",
+              "letterSpacing": 0.6
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Gbe9R",
+          "name": "Contoh · Nama di Profil",
+          "width": "fill_container",
+          "fill": "$g-glass",
+          "cornerRadius": 24,
+          "stroke": "$g-glass-edge",
+          "strokeWidth": 1.5,
+          "effect": [
+            {
+              "type": "background_blur",
+              "radius": 28
+            },
+            {
+              "type": "shadow",
+              "shadowType": "outer",
+              "color": "$g-shadow",
+              "offset": {
+                "x": 0,
+                "y": 12
+              },
+              "blur": 36
+            }
+          ],
+          "gap": 8,
+          "padding": 16,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "iME52",
+              "name": "Nama",
+              "fill": "$g-ink",
+              "content": "Sindy",
+              "fontFamily": "$g-font-display",
+              "fontSize": 20,
+              "fontWeight": "700"
+            },
+            {
+              "id": "U6mEco",
+              "type": "ref",
+              "ref": "Y21dYx",
+              "name": "Lencana Pro"
             }
           ]
         }

@@ -40,9 +40,13 @@ class _KartuPemainScreenState extends State<KartuPemainScreen> {
     final scope = AppScope.of(context);
     final uid = scope.auth.uid;
     if (uid == null) return;
-    final entries = await scope.userRepository.getJournalEntries(uid);
-    if (!mounted) return;
-    setState(() => _journalCount = entries.length);
+    try {
+      final entries = await scope.userRepository.getJournalEntries(uid);
+      if (!mounted) return;
+      setState(() => _journalCount = entries.length);
+    } catch (_) {
+      // Statistik jurnal tetap "…" — kartu lain tidak ikut gagal.
+    }
   }
 
   Future<void> _simpan() async {

@@ -27,6 +27,7 @@ class _JurnalHomeScreenState extends State<JurnalHomeScreen> {
   bool _unlocked = false;
   bool _checking = true;
   List<JournalEntry> _entries = const [];
+  Object? _error;
 
   @override
   void initState() {
@@ -35,8 +36,17 @@ class _JurnalHomeScreenState extends State<JurnalHomeScreen> {
   }
 
   Future<void> _runGate() async {
+    try {
+      await _gate();
+    } catch (error) {
+      if (mounted) setState(() { _checking = false; _error = error; });
+    }
+  }
+
+  Future<void> _gate() async {
     final scope = AppScope.of(context);
-    final hasPin = await scope.pinService.hasPin;
+    final pinUid = scope.auth.uid;
+    final hasPin = pinUid != null && await scope.pinService.hasPin(pinUid);
     if (!mounted) return;
 
     Widget gateScreen;
@@ -112,9 +122,18 @@ class _JurnalHomeScreenState extends State<JurnalHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_checking) {
-      return const Scaffold(
-        body: SizedBox.shrink(),
+    if (_checking || _error != null) {
+      return Scaffold(
+        body: SafeArea(
+          child: RiungStateView(
+            status: RiungStateView.statusOf(loading: _checking, error: _error),
+            onRetry: () {
+              setState(() { _checking = true; _error = null; });
+              _runGate();
+            },
+            builder: (_) => const SizedBox.shrink(),
+          ),
+        ),
       );
     }
     if (!_unlocked) {

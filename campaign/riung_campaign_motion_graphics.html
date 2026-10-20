@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riung Glass — Motion Graphics Video Campaign</title>
+  <style>
+    :root {
+      --bg-space: #0E0F1A;
+      --card-bg: #171828;
+      --primary: #6C63E0;
+      --primary-soft: #E4E1FA;
+      --accent-warm: #FF9F5A;
+      --accent-soft: #FFE4CC;
+      --bg-paper: #FFF8EF;
+      --surface-lav: #F1EDFC;
+      --text-main: #FDFDFF;
+      --text-muted: #9496B8;
+      --border: rgba(255, 255, 255, 0.08);
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-space);
+      color: var(--text-main);
+      font-family: var(--font);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 980px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    header {
+      text-align: center;
+      max-width: 640px;
+    }
+
+    .badge-glass {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #D1CCFC;
+      background: rgba(108, 99, 224, 0.2);
+      border: 1px solid rgba(108, 99, 224, 0.4);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+      backdrop-filter: blur(8px);
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #FFF8EF, #FF9F5A, #6C63E0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .workspace {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+      width: 100%;
+    }
+
+    /* Video Player Viewport (9:16 Mobile Format) */
+    .player-card {
+      background: #080911;
+      border-radius: 32px;
+      padding: 12px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(108, 99, 224, 0.25);
+      position: relative;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 340px;
+      height: 604px; /* 9:16 ratio */
+      border-radius: 24px;
+      overflow: hidden;
+      background: #0E0F1A;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .recording-badge {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      background: rgba(239, 68, 68, 0.95);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.5);
+      z-index: 10;
+      animation: pulse 1s infinite;
+    }
+
+    .recording-dot {
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Controls Panel */
+    .control-panel {
+      flex: 1;
+      min-width: 320px;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .playback-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .timeline-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timeline-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      min-width: 38px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6C63E0, #FF9F5A);
+      width: 0%;
+      border-radius: 3px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6C63E0, #4F46E5);
+      color: #fff;
+      padding: 12px 20px;
+      flex: 1;
+      box-shadow: 0 4px 14px rgba(108, 99, 224, 0.4);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-export {
+      background: linear-gradient(135deg, #FF9F5A, #EA580C);
+      color: #fff;
+      padding: 14px 20px;
+      width: 100%;
+      font-size: 14px;
+      box-shadow: 0 6px 20px rgba(255, 159, 90, 0.35);
+    }
+
+    .btn-export:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .scene-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .scene-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .scene-item:hover, .scene-item.active {
+      background: rgba(108, 99, 224, 0.15);
+      border-color: rgba(108, 99, 224, 0.4);
+      color: #E4E1FA;
+    }
+
+    .scene-tag {
+      font-size: 10px;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .assets-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .asset-pill {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #D1D5DB;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <span class="badge-glass">✨ RIUNG GLASS DESIGN SYSTEM</span>
+      <h1>Riung — 3D Motion Graphics Ad</h1>
+      <p>Menggunakan aset asli 3D Render dari <code>riung.pen</code>: Si Waswas Liar, Si Waswas Jinak, Si Hakim, dan Ikon 3D Aplikasi Beku.</p>
+    </header>
+
+    <div class="workspace">
+      <!-- Phone Viewport Video Canvas -->
+      <div class="player-card">
+        <div class="recording-badge" id="recordingBadge">
+          <div class="recording-dot"></div>
+          <span>MEREKAM VIDEO...</span>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="adCanvas" width="720" height="1280"></canvas>
+        </div>
+      </div>
+
+      <!-- Controls & Export Panel -->
+      <div class="control-panel">
+        
+        <div class="card playback-bar">
+          <div class="timeline-container">
+            <span class="timeline-time" id="currentTimeText">00:00</span>
+            <div class="progress-bar" id="timelineBar">
+              <div class="progress-fill" id="timelineFill"></div>
+            </div>
+            <span class="timeline-time">00:16</span>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-primary" id="playBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <span>Play Video</span>
+            </button>
+            <button class="btn-secondary" id="soundBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+              <span>Audio: ON</span>
+            </button>
+            <button class="btn-secondary" id="restartBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 14px; margin-bottom: 8px; color: #E4E1FA;">Alur Scene Animasi (16 Detik)</h3>
+          <div class="scene-list">
+            <div class="scene-item" data-time="0">
+              <span><strong>Scene 1:</strong> Midnight Doomscroll (3D Waswas Liar)</span>
+              <span class="scene-tag">00:00 - 00:04</span>
+            </div>
+            <div class="scene-item" data-time="4">
+              <span><strong>Scene 2:</strong> Riung Glass Reframe (Lavender Glow)</span>
+              <span class="scene-tag">00:04 - 00:08</span>
+            </div>
+            <div class="scene-item" data-time="8">
+              <span><strong>Scene 3:</strong> Tarik Napas & Transformasi 3D Jinak</span>
+              <span class="scene-tag">00:08 - 00:13</span>
+            </div>
+            <div class="scene-item" data-time="13">
+              <span><strong>Scene 4:</strong> Riung Brand & CTA (Coral Button)</span>
+              <span class="scene-tag">00:13 - 00:16</span>
+            </div>
+          </div>
+
+          <div class="assets-pill-row">
+            <span class="asset-pill">🎨 #6C63E0 Primary</span>
+            <span class="asset-pill">🍊 #FF9F5A Warm Coral</span>
+            <span class="asset-pill">📜 #FFF8EF Paper</span>
+            <span class="asset-pill">🧸 Real 3D Assets (riung.pen)</span>
+          </div>
+        </div>
+
+        <button class="btn-export" id="exportBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          <span>Download Rekaman Video (.webm / .mp4)</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Canvas & Core Setup ---
+    const canvas = document.getElementById('adCanvas');
+    const ctx = canvas.getContext('2d');
+    const playBtn = document.getElementById('playBtn');
+    const soundBtn = document.getElementById('soundBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const timelineBar = document.getElementById('timelineBar');
+    const timelineFill = document.getElementById('timelineFill');
+    const currentTimeText = document.getElementById('currentTimeText');
+    const recordingBadge = document.getElementById('recordingBadge');
+    const sceneItems = document.querySelectorAll('.scene-item');
+
+    const TOTAL_DURATION = 16.0;
+    let currentTime = 0;
+    let isPlaying = false;
+    let isSoundOn = true;
+    let lastTimestamp = 0;
+    let audioCtx = null;
+
+    // --- Web Audio Synthesizer (Zero Dependencies) ---
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playChime(freq = 440, duration = 0.8, type = 'sine') {
+      if (!isSoundOn || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    let playedChimes = {};
+
+    // --- Load Real 3D PNG Assets from riung.pen ---
+    const waswasLiar3D = new Image();
+    waswasLiar3D.src = 'si_waswas_liar.png';
+
+    const waswasJinak3D = new Image();
+    waswasJinak3D.src = 'si_waswas.png';
+
+    const hakimLiar3D = new Image();
+    hakimLiar3D.src = 'si_hakim_liar.png';
+
+    const ikonBeku3D = new Image();
+    ikonBeku3D.src = 'ikon_aplikasi_beku.png';
+
+    const ikonFokus3D = new Image();
+    ikonFokus3D.src = 'ikon_fokus.png';
+
+    // --- Render Loop & Animation Timeline ---
+    function render(time) {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // --- SCENE 1: (0.0s - 4.0s) Midnight Doomscroll with 3D Waswas Liar ---
+      if (time >= 0 && time < 4.0) {
+        const p = time / 4.0;
+        
+        // Deep obsidian violet gradient
+        const bgGrad = ctx.createRadialGradient(w/2, h/2, 60, w/2, h/2, h/1.1);
+        bgGrad.addColorStop(0, '#161726');
+        bgGrad.addColorStop(1, '#090A12');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        if (time > 0.1 && !playedChimes['s1']) {
+          playChime(140, 1.4, 'triangle');
+          playedChimes['s1'] = true;
+        }
+
+        // Stress vibration particles
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
+        for (let i = 0; i < 22; i++) {
+          const px = (Math.sin(i * 88 + time * 3.5) * 0.5 + 0.5) * w;
+          const py = (Math.cos(i * 44 + time * 2.5) * 0.5 + 0.5) * h;
+          ctx.beginPath();
+          ctx.arc(px, py, (i % 3) + 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Clock & Headline
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#EF4444';
+        ctx.font = '700 28px sans-serif';
+        ctx.fillText('02:14 PAGI', w/2, 210);
+
+        ctx.fillStyle = '#FDFDFF';
+        ctx.font = '800 44px sans-serif';
+        ctx.fillText('Masih doomscroll...', w/2, 275);
+        ctx.fillStyle = '#9496B8';
+        ctx.font = '400 30px sans-serif';
+        ctx.fillText('Tapi kepalamu gak bisa tenang.', w/2, 325);
+
+        // Shake / jitter effect on 3D Monster Si Waswas Liar
+        const shakeX = Math.sin(time * 38) * 5;
+        const shakeY = Math.cos(time * 32) * 5;
+
+        // Shadow under 3D monster
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.beginPath();
+        ctx.ellipse(w/2 + shakeX, 690, 110, 24, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(w/2 + shakeX, 550 + shakeY);
+        ctx.drawImage(waswasLiar3D, -135, -135, 270, 270);
+        ctx.restore();
+
+        // Dialogue Bubble (Riung Glass Dark Card)
+        if (time > 1.2) {
+          const bubbleAlpha = Math.min((time - 1.2) * 2, 1);
+          ctx.save();
+          ctx.globalAlpha = bubbleAlpha;
+          
+          // Glass card
+          ctx.fillStyle = 'rgba(23, 24, 40, 0.9)';
+          ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+          ctx.lineWidth = 2;
+          roundRect(ctx, w/2 - 250, 770, 500, 115, 22);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#FCA5A5';
+          ctx.font = '700 22px sans-serif';
+          ctx.fillText('Si Waswas (Catastrophizing):', w/2, 815);
+          ctx.fillStyle = '#FDFDFF';
+          ctx.font = 'italic 500 24px sans-serif';
+          ctx.fillText('"Gimana kalau besok semuanya hancur?"', w/2, 855);
+          ctx.restore();
+        }
+      }
+
+      // --- SCENE 2: (4.0s - 8.0s) Riung Glass Reframe (Lavender & Soft Glow) ---
+      else if (time >= 4.0 && time < 8.0) {
+        const p = (time - 4.0) / 4.0;
+
+        if (!playedChimes['s2']) {
+          playChime(330, 1.6, 'sine');
+          playChime(495, 1.6, 'sine');
+          playedChimes['s2'] = true;
+        }
+
+        // Lavender gradient transition (palette: surface-lav #F1EDFC to primary #6C63E0)
+        const bgGrad = ctx.createRadialGradient(w/2, h/2, 80, w/2, h/2, h);
+        bgGrad.addColorStop(0, '#221F45');
+        bgGrad.addColorStop(1, '#0F0E1E');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Expanding breathing aura
+        const waveR = (p * 500) % 360 + 90;
+        ctx.strokeStyle = 'rgba(108, 99, 224, 0.35)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(w/2, 530, waveR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#D1CCFC';
+        ctx.font = '700 24px sans-serif';
+        ctx.fillText('EKSTERNALISASI CBT RIUNG', w/2, 210);
+
+        ctx.fillStyle = '#FDFDFF';
+        ctx.font = '800 48px sans-serif';
+        ctx.fillText('Kamu Nggak Lemah.', w/2, 275);
+
+        ctx.fillStyle = '#C4B5FD';
+        ctx.font = '400 30px sans-serif';
+        ctx.fillText('Itu cuma monster batinmu', w/2, 330);
+        ctx.fillStyle = '#FF9F5A';
+        ctx.font = '700 32px sans-serif';
+        ctx.fillText('yang lagi mampir.', w/2, 375);
+
+        // Floating 3D Monster with soft purple aura
+        ctx.save();
+        ctx.translate(w/2, 550);
+        const floatY = Math.sin(time * 3) * 8;
+        
+        // Aura
+        ctx.fillStyle = 'rgba(108, 99, 224, 0.2)';
+        ctx.beginPath();
+        ctx.arc(0, floatY, 130, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.drawImage(waswasLiar3D, -110, -110 + floatY, 220, 220);
+        ctx.restore();
+
+        // Riung Glass Card
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, w/2 - 230, 770, 460, 75, 20);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#FFF';
+        ctx.font = '600 24px sans-serif';
+        ctx.fillText('Kenali. Hadapi. Duduk bersama.', w/2, 816);
+      }
+
+      // --- SCENE 3: (8.0s - 13.0s) Riung Glass In Action: Tarik Napas & Transformasi 3D Jinak ---
+      else if (time >= 8.0 && time < 13.0) {
+        const p = (time - 8.0) / 5.0;
+
+        if (!playedChimes['s3']) {
+          playChime(528, 2.2, 'sine');
+          playedChimes['s3'] = true;
+        }
+
+        // Soft warm paper & coral gradient (#FFF8EF + #FF9F5A mood)
+        const bgGrad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, h);
+        bgGrad.addColorStop(0, '#261C14');
+        bgGrad.addColorStop(1, '#110D09');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#FF9F5A';
+        ctx.font = '700 24px sans-serif';
+        ctx.fillText('APLIKASI BEKU · TARIK NAPAS 1 MENIT', w/2, 175);
+
+        // Breathing Circle Animation
+        const breathCycle = (Math.sin(time * 2.2) + 1) / 2;
+        const breathRadius = 95 + breathCycle * 42;
+
+        ctx.fillStyle = 'rgba(255, 159, 90, 0.14)';
+        ctx.beginPath();
+        ctx.arc(w/2, 450, breathRadius + 45, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#FF9F5A';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(w/2, 450, breathRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#FFF';
+        ctx.font = '700 26px sans-serif';
+        ctx.fillText(breathCycle > 0.5 ? 'Tarik Napas...' : 'Hembuskan...', w/2, 310);
+
+        // Floating 3D Icons from riung.pen
+        const iconY = Math.sin(time * 3) * 6;
+        ctx.drawImage(ikonBeku3D, w/2 - 240, 420 + iconY, 70, 70);
+        ctx.drawImage(ikonFokus3D, w/2 + 170, 420 - iconY, 70, 70);
+
+        // Real 3D Morph: Fade from si_waswas_liar.png to si_waswas.png (Jinak)
+        ctx.save();
+        ctx.translate(w/2, 450);
+        
+        if (p < 0.45) {
+          ctx.drawImage(waswasLiar3D, -115, -115, 230, 230);
+        } else {
+          const jinakAlpha = Math.min((p - 0.45) * 3, 1);
+          ctx.globalAlpha = 1 - jinakAlpha;
+          ctx.drawImage(waswasLiar3D, -115, -115, 230, 230);
+          ctx.globalAlpha = jinakAlpha;
+          ctx.drawImage(waswasJinak3D, -115, -115, 230, 230);
+        }
+        ctx.restore();
+
+        // Progress Bar
+        const progressFillW = Math.min(p * 1.6, 1) * 380;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        roundRect(ctx, w/2 - 200, 665, 400, 56, 28);
+        ctx.fill();
+
+        ctx.fillStyle = 'linear-gradient(90deg, #6C63E0, #FF9F5A)';
+        ctx.fillStyle = '#FF9F5A';
+        roundRect(ctx, w/2 - 190, 673, progressFillW, 40, 20);
+        ctx.fill();
+
+        if (p > 0.55) {
+          ctx.fillStyle = '#FFF';
+          ctx.font = '800 20px sans-serif';
+          ctx.fillText('✨ Si Waswas Berhasil Dijinakkan (+4%)', w/2, 755);
+        }
+
+        // Glass Fact Card
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.strokeStyle = 'rgba(255, 159, 90, 0.4)';
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, w/2 - 240, 810, 480, 115, 20);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#FFE4CC';
+        ctx.font = '700 22px sans-serif';
+        ctx.fillText('Faktanya (CBT Reframe):', w/2, 850);
+        ctx.fillStyle = '#FDFDFF';
+        ctx.font = '500 21px sans-serif';
+        ctx.fillText('"Khawatir tidak mencegah hal buruk,', w/2, 885);
+        ctx.fillText('hanya merampas tenagamu hari ini."', w/2, 915);
+      }
+
+      // --- SCENE 4: (13.0s - 16.0s) Riung Glass Brand & Call To Action ---
+      else {
+        const p = (time - 13.0) / 3.0;
+
+        if (!playedChimes['s4']) {
+          playChime(660, 2.2, 'sine');
+          playedChimes['s4'] = true;
+        }
+
+        // Deep Brand Canvas
+        ctx.fillStyle = '#0E0F1A';
+        ctx.fillRect(0, 0, w, h);
+
+        // Golden aura
+        const aura = ctx.createRadialGradient(w/2, 380, 20, w/2, 380, 360);
+        aura.addColorStop(0, 'rgba(108, 99, 224, 0.3)');
+        aura.addColorStop(0.5, 'rgba(255, 159, 90, 0.15)');
+        aura.addColorStop(1, 'transparent');
+        ctx.fillStyle = aura;
+        ctx.fillRect(0, 0, w, h);
+
+        // Cute 3D Jinak Mascot proudly smiling
+        ctx.save();
+        ctx.translate(w/2, 370);
+        const bob = Math.sin(time * 4) * 7;
+        ctx.drawImage(waswasJinak3D, -125, -125 + bob, 250, 250);
+        ctx.restore();
+
+        // Brand Name (Riung Glass Typography)
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#FFF8EF';
+        ctx.font = '900 70px sans-serif';
+        ctx.fillText('RIUNG', w/2, 575);
+
+        ctx.fillStyle = '#D1CCFC';
+        ctx.font = '500 28px sans-serif';
+        ctx.fillText('Duduk bersama pikiranmu.', w/2, 625);
+
+        // Riung Glass Feature Pill
+        ctx.fillStyle = 'rgba(108, 99, 224, 0.2)';
+        ctx.strokeStyle = '#6C63E0';
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, w/2 - 240, 695, 480, 52, 26);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#E4E1FA';
+        ctx.font = '600 20px sans-serif';
+        ctx.fillText('7 Monster Batin • Mikro-CBT • Anti-Scroll', w/2, 728);
+
+        // CTA Button (Warm Coral #FF9F5A)
+        const ctaScale = 1 + Math.sin(time * 6) * 0.02;
+        ctx.save();
+        ctx.translate(w/2, 835);
+        ctx.scale(ctaScale, ctaScale);
+
+        const btnGrad = ctx.createLinearGradient(-220, 0, 220, 0);
+        btnGrad.addColorStop(0, '#FF9F5A');
+        btnGrad.addColorStop(1, '#EA580C');
+        ctx.fillStyle = btnGrad;
+        roundRect(ctx, -220, -35, 440, 70, 35);
+        ctx.fill();
+
+        ctx.fillStyle = '#FFF';
+        ctx.font = '800 26px sans-serif';
+        ctx.fillText('Jinakkan Monstermu Sekarang', 0, 8);
+        ctx.restore();
+
+        ctx.fillStyle = '#8E9BAE';
+        ctx.font = '500 20px sans-serif';
+        ctx.fillText('Tersedia Gratis di Google Play Store', w/2, 925);
+      }
+
+      // Update UI bar
+      const progressPercent = (currentTime / TOTAL_DURATION) * 100;
+      timelineFill.style.width = `${progressPercent}%`;
+      
+      const secs = Math.floor(currentTime);
+      const ms = Math.floor((currentTime % 1) * 10);
+      currentTimeText.textContent = `00:${secs.toString().padStart(2, '0')}.${ms}`;
+
+      // Update active scene highlight in UI
+      sceneItems.forEach(item => {
+        const t = parseFloat(item.dataset.time);
+        if (currentTime >= t && currentTime < t + 4.5) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // --- Helper: Rounded Rectangle for Canvas ---
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // --- Animation Controller ---
+    function step(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        currentTime += delta;
+        if (currentTime >= TOTAL_DURATION) {
+          currentTime = 0;
+          playedChimes = {};
+        }
+      }
+
+      render(currentTime);
+      requestAnimationFrame(step);
+    }
+
+    // --- Event Listeners ---
+    playBtn.addEventListener('click', () => {
+      initAudio();
+      isPlaying = !isPlaying;
+      playBtn.querySelector('span').textContent = isPlaying ? 'Pause Video' : 'Play Video';
+    });
+
+    restartBtn.addEventListener('click', () => {
+      currentTime = 0;
+      playedChimes = {};
+      render(0);
+    });
+
+    soundBtn.addEventListener('click', () => {
+      initAudio();
+      isSoundOn = !isSoundOn;
+      soundBtn.querySelector('span').textContent = isSoundOn ? 'Audio: ON' : 'Audio: MUTE';
+    });
+
+    timelineBar.addEventListener('click', (e) => {
+      const rect = timelineBar.getBoundingClientRect();
+      const clickRatio = (e.clientX - rect.left) / rect.width;
+      currentTime = clickRatio * TOTAL_DURATION;
+      playedChimes = {};
+      render(currentTime);
+    });
+
+    sceneItems.forEach(item => {
+      item.addEventListener('click', () => {
+        initAudio();
+        currentTime = parseFloat(item.dataset.time);
+        playedChimes = {};
+        render(currentTime);
+      });
+    });
+
+    // --- 1-Click Video Recording & Download (MediaRecorder) ---
+    exportBtn.addEventListener('click', () => {
+      initAudio();
+      if (typeof MediaRecorder === 'undefined') {
+        alert('Browser Anda belum mendukung MediaRecorder. Coba gunakan Google Chrome.');
+        return;
+      }
+
+      // Reset to start
+      currentTime = 0;
+      playedChimes = {};
+      isPlaying = true;
+      recordingBadge.style.display = 'flex';
+      exportBtn.disabled = true;
+      exportBtn.querySelector('span').textContent = 'Sedang Merekam (Tunggu 16 Detik)...';
+
+      const stream = canvas.captureStream(60);
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'riung_glass_campaign.webm';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        recordingBadge.style.display = 'none';
+        exportBtn.disabled = false;
+        exportBtn.querySelector('span').textContent = 'Download Rekaman Video (.webm / .mp4)';
+        alert('✅ Video promo Riung Glass 3D berhasil direkam dan diunduh!');
+      };
+
+      recorder.start();
+
+      setTimeout(() => {
+        recorder.stop();
+        isPlaying = false;
+        playBtn.querySelector('span').textContent = 'Play Video';
+      }, (TOTAL_DURATION + 0.5) * 1000);
+    });
+
+    // Start render loop
+    requestAnimationFrame(step);
+  </script>
+</body>
+</html>

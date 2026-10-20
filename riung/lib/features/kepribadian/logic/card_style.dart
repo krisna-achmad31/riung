@@ -1,4 +1,5 @@
 import '../../../core/config/economy.dart';
+import '../../../core/services/api/api_config_store.dart';
 
 /// Gaya tampilan kartu karakter (add-on kosmetik). Hanya tampilan: tidak
 /// mengubah hasil tes, progres monster, atau ekonomi apa pun (CLAUDE.md
@@ -24,10 +25,10 @@ enum CardStyle {
         return null;
       case CardStyle.taman:
       case CardStyle.arkade:
-        return EconomySpend.skinCommon;
+        return ApiConfigStore.instance.itemPrice('cardStyles', id, EconomySpend.skinCommon);
       case CardStyle.galaksi:
       case CardStyle.aurora:
-        return EconomySpend.skinEpic;
+        return ApiConfigStore.instance.itemPrice('cardStyles', id, EconomySpend.skinEpic);
     }
   }
 

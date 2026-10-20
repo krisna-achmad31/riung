@@ -1,13 +1,25 @@
 import 'package:flutter/foundation.dart';
 
 import '../services/user_repository.dart';
+import '../services/api/api_state.dart';
+import '../services/api/riung_api.dart';
 
 /// Notifier global streak check-in harian. Hanya mengurus state streak —
 /// mutasi koin check-in dilakukan lewat [WalletNotifier.earn] oleh
 /// pemanggil (lihat `BerandaScreen`), supaya saldo koin selalu punya SATU
 /// sumber kebenaran (WalletNotifier) yang bisa dipercaya UI mana pun.
 class StreakNotifier extends ChangeNotifier {
-  StreakNotifier({required UserRepository userRepository}) : _userRepository = userRepository;
+  StreakNotifier({required UserRepository userRepository, this.apiState}) : _userRepository = userRepository { apiState?.addListener(_applyServer); }
+  final ApiState? apiState;
+  void _applyServer() {
+    final raw = jsonObject(apiState?.snapshot?.raw['streak']);
+    _current = (raw['current'] as num? ?? 0).toInt();
+    _longest = (raw['longest'] as num? ?? 0).toInt();
+    _lastCheckinDate = DateTime.tryParse(raw['lastCheckinDate'] as String? ?? '');
+    notifyListeners();
+  }
+  @override
+  void dispose() { apiState?.removeListener(_applyServer); super.dispose(); }
 
   final UserRepository _userRepository;
 
@@ -36,11 +48,21 @@ class StreakNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Akun berganti/keluar: lupakan streak akun lama (audit C-01).
+  void clearSession() {
+    _uid = null;
+    _current = 0;
+    _longest = 0;
+    _lastCheckinDate = null;
+    notifyListeners();
+  }
+
   /// Menandai check-in hari ini selesai. Koin check-in TIDAK ditambahkan
   /// di sini — pemanggil bertanggung jawab memanggil
   /// `WalletNotifier.earn(...)` juga (lihat [sudahCheckinHariIni] untuk
   /// mencegah panggil dobel).
   void checkInHariIni() {
+    if (apiState != null) { _applyServer(); return; }
     if (_uid == null || sudahCheckinHariIni) return;
     _current += 1;
     if (_current > _longest) _longest = _current;

@@ -3,14 +3,24 @@ import 'package:flutter/foundation.dart';
 import '../models/monster_progress.dart';
 import '../services/user_repository.dart';
 import '../services/wallet_functions_service.dart';
+import '../services/api/api_state.dart';
+import '../services/api/riung_api.dart';
 
 /// Notifier global progres penjinakan ke-7 monster milik user saat ini.
 class MonsterProgressNotifier extends ChangeNotifier {
   MonsterProgressNotifier({
     required UserRepository userRepository,
     required WalletFunctionsService walletFunctions,
+    this.apiState,
   })  : _userRepository = userRepository,
-        _walletFunctions = walletFunctions;
+        _walletFunctions = walletFunctions { apiState?.addListener(_applyServer); }
+  final ApiState? apiState;
+  void _applyServer() {
+    _progress = jsonObject(apiState?.snapshot?.raw['monsters']).map((id, raw) => MapEntry(id, MonsterProgress.fromMap(id, jsonObject(raw))));
+    notifyListeners();
+  }
+  @override
+  void dispose() { apiState?.removeListener(_applyServer); super.dispose(); }
 
   final UserRepository _userRepository;
   final WalletFunctionsService _walletFunctions;
@@ -25,6 +35,13 @@ class MonsterProgressNotifier extends ChangeNotifier {
   Future<void> load(String uid) async {
     _uid = uid;
     _progress = await _userRepository.getMonsterProgress(uid);
+    notifyListeners();
+  }
+
+  /// Akun berganti/keluar: lupakan progres monster akun lama (audit C-01).
+  void clearSession() {
+    _uid = null;
+    _progress = {};
     notifyListeners();
   }
 

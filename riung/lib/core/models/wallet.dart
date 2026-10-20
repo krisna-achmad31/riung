@@ -8,6 +8,9 @@ class Wallet {
     required this.coins,
     required this.lifetimeEarned,
     required this.lifetimeSpent,
+    this.earnedCoins = 0,
+    this.purchasedCoins = 0,
+    this.debtCoins = 0,
   });
 
   factory Wallet.zero() =>
@@ -18,6 +21,9 @@ class Wallet {
       coins: parseInt(map[fCoins]),
       lifetimeEarned: parseInt(map[fLifetimeEarned]),
       lifetimeSpent: parseInt(map[fLifetimeSpent]),
+      earnedCoins: parseInt(map['earnedCoins']),
+      purchasedCoins: parseInt(map['purchasedCoins']),
+      debtCoins: parseInt(map['debtCoins']),
     );
   }
 
@@ -28,11 +34,17 @@ class Wallet {
   final int coins;
   final int lifetimeEarned;
   final int lifetimeSpent;
+  final int earnedCoins;
+  final int purchasedCoins;
+  final int debtCoins;
 
   Map<String, dynamic> toMap() => {
         fCoins: coins,
         fLifetimeEarned: lifetimeEarned,
         fLifetimeSpent: lifetimeSpent,
+        'earnedCoins': earnedCoins,
+        'purchasedCoins': purchasedCoins,
+        'debtCoins': debtCoins,
       };
 
   Wallet copyWith({int? coins, int? lifetimeEarned, int? lifetimeSpent}) {
@@ -40,6 +52,9 @@ class Wallet {
       coins: coins ?? this.coins,
       lifetimeEarned: lifetimeEarned ?? this.lifetimeEarned,
       lifetimeSpent: lifetimeSpent ?? this.lifetimeSpent,
+      earnedCoins: earnedCoins,
+      purchasedCoins: purchasedCoins,
+      debtCoins: debtCoins,
     );
   }
 }

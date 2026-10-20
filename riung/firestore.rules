@@ -1,36 +1,30 @@
 rules_version = '2';
 
-// Riung — Firestore Security Rules (Spark plan, TANPA Cloud Functions).
+// Riung — Firestore Security Rules.
 //
-// PENTING soal wallet: CLAUDE.md aturan #5 aslinya mensyaratkan koin
-// "HANYA dimutasi Cloud Functions". Spark plan tidak punya Cloud Functions,
-// jadi tidak ada backend yang bisa memproses "coinRequest" jadi mutasi
-// wallet secara mandiri — client tetap yang menghitung saldo baru
-// (lihat lib/core/services/firebase/firestore_wallet_functions_service.dart).
-// Sebagai gantinya, isValidWalletDelta() di bawah memastikan setiap
-// perubahan wallet.coins HARUS berupa salah satu nilai earn/spend yang sah
-// (daftar di bawah, mirror lib/core/config/economy.dart) — client tidak
-// bisa menulis saldo sembarangan lewat, misalnya, DevTools atau HTTP
-// langsung ke Firestore. ISI YANG PERLU KAMU TAHU: ini bukan jaminan
-// keamanan setingkat Cloud Functions — client yang dimodifikasi (rooted
-// device, dsb) masih bisa memutar ulang (replay) permintaan yang
-// "bentuknya sah" berkali-kali. Kalau nanti upgrade ke Blaze plan, ganti
-// pola ini dengan Cloud Functions callable + Firestore trigger yang
-// memvalidasi & memproses coinRequests di server, baru pangkas allow
-// write langsung ke wallet dari sini.
+// Wallet & Premium = SERVER-ONLY (CLAUDE.md aturan #5 & #6). Produksi
+// memakai REST API Riung (riung.e55techlab.com) untuk semua mutasi koin &
+// verifikasi pembelian; jalur Firestore (FirestoreWalletFunctionsService /
+// FirestoreUserRepository) hanya cadangan lama dan TIDAK dipakai di build
+// rilis (dijaga di main.dart). Karena itu client tidak boleh mengubah
+// `wallet` sama sekali, dan tidak boleh menyalakan `premium.active`.
+// Dulu (Spark plan) client boleh menulis delta wallet yang "bentuknya sah"
+// lewat isValidWalletDelta() — itu bisa di-replay oleh client modifikasi
+// (koin duplikat, termasuk +80/330/820 tanpa receipt), jadi dihapus.
+// Kalau jalur Firestore diaktifkan lagi, mutasi wallet wajib lewat Cloud
+// Functions (Admin SDK melewati rules ini), bukan dengan melonggarkan rules.
 service cloud.firestore {
   match /databases/{database}/documents {
 
     match /users/{uid} {
       allow read: if isOwner(uid);
       allow create: if isOwner(uid) && isValidNewUserDoc();
-      allow update: if isOwner(uid) && isValidWalletDelta();
+      allow update: if isOwner(uid) && serverFieldsUntouched();
       // Pemilik boleh menghapus datanya sendiri (hapus akun).
       allow delete: if isOwner(uid);
 
-      // Jejak audit tiap mutasi wallet (ditulis dalam transaksi yang sama
-      // dengan update dokumen /users/{uid} di atas) — bukan mekanisme
-      // approval, cuma catatan untuk migrasi ke Cloud Functions nanti.
+      // Permintaan mutasi koin dari client — hanya catatan/antrian untuk
+      // diproses server; tidak pernah mengubah wallet dengan sendirinya.
       match /coinRequests/{reqId} {
         allow read: if isOwner(uid);
         allow create: if isOwner(uid);
@@ -62,55 +56,28 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == uid;
     }
 
-    function isValidNewUserDoc() {
-      // Poin 4 (lokal-dulu, cloud-setelah-login): dulu wallet harus PERSIS
-      // nol di sini, karena dokumen /users/{uid} dibuat saat anonim
-      // pertama kali sign-in. Sekarang SELAMA ANONIM wallet sepenuhnya
-      // lokal (tidak menyentuh Firestore sama sekali) — dokumen ini baru
-      // pertama kali dibuat tepat saat migrasi anon→akun permanen (lihat
-      // AuthNotifier._linkAndMigrate & UserRepository.migrateAnonymousSnapshot),
-      // jadi wallet awal BOLEH sudah berisi progres yang terkumpul selama
-      // anonim. Syaratnya diperlonggar jadi konsistensi internal saja:
-      // saldo memang hasil earn (lifetimeEarned) dikurangi spend
-      // (lifetimeSpent), bukan angka sembarang yang di-inject langsung.
-      let wallet = request.resource.data.get('wallet', {'coins': 0, 'lifetimeEarned': 0, 'lifetimeSpent': 0});
-      return wallet.coins >= 0 && wallet.lifetimeEarned >= 0 && wallet.lifetimeSpent >= 0
-        && wallet.coins == wallet.lifetimeEarned - wallet.lifetimeSpent;
+    function zeroWallet() {
+      return {'coins': 0, 'lifetimeEarned': 0, 'lifetimeSpent': 0};
     }
 
-    function isValidWalletDelta() {
-      let zero = {'coins': 0, 'lifetimeEarned': 0, 'lifetimeSpent': 0};
-      let before = resource.data.get('wallet', zero);
-      let after = request.resource.data.get('wallet', before);
-      let coinDelta = after.coins - before.coins;
-      let earnedDelta = after.lifetimeEarned - before.lifetimeEarned;
-      let spentDelta = after.lifetimeSpent - before.lifetimeSpent;
+    // Dokumen baru: wallet nol (atau belum ada) dan premium tidak aktif.
+    // Saldo/premium hasil migrasi anon→akun dipulihkan oleh server.
+    function isValidNewUserDoc() {
+      let wallet = request.resource.data.get('wallet', zeroWallet());
+      return wallet.get('coins', 0) == 0
+        && wallet.get('lifetimeEarned', 0) == 0
+        && wallet.get('lifetimeSpent', 0) == 0
+        && request.resource.data.get('premium', {}).get('active', false) == false;
+    }
 
-      // Update yang sama sekali tidak menyentuh wallet (ganti profil,
-      // streak, progres monster tanpa monster baru jinak, dst) selalu boleh.
-      let noWalletChange = coinDelta == 0 && earnedDelta == 0 && spentDelta == 0;
-
-      // Earn: lifetimeEarned harus naik persis sebesar coinDelta, dan
-      // besarnya harus salah satu reward/pembelian koin yang sah (mirror
-      // economy.dart EconomyEarn — checkin 5, jurnal 4, meditasi 3, misi 3,
-      // menang game 8, monster jinak 50, betterme 10, streak7 20,
-      // streak30 100, koin harian Premium tahunan 2 — plus total koin paket
-      // beli: Kantong 80, Peti 330, Brankas 820, lihat EconomyCoinPacks).
-      let validEarn = coinDelta > 0 && coinDelta == earnedDelta && spentDelta == 0
-        && coinDelta in [2, 3, 4, 5, 8, 10, 20, 50, 80, 100, 330, 820];
-
-      // Spend: lifetimeSpent harus naik persis sebesar -coinDelta, dan
-      // besarnya harus salah satu harga yang sah (mirror EconomySpend —
-      // fokus 25/40/50, pelindung streak 20, tiket tambahan 30, skin
-      // 100/300/500, scroll unlock mulai 15 + kenaikan bertingkat 10 koin per buka-berbayar
-      // hari itu, lihat EconomyScroll). Kalau ada harga baru, tambahkan di sini.
-      let validSpend = coinDelta < 0 && spentDelta == -coinDelta && earnedDelta == 0
-        && (-coinDelta in [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 75, 80, 85, 95, 100, 300, 500]
-            // Paket aksesori: harga dinamis (jumlah item belum dimiliki x diskon),
-            // dibulatkan ke kelipatan 5 — lihat EconomySpend.aksesorisBundel*.
-            || (-coinDelta % 5 == 0 && -coinDelta >= 40 && -coinDelta <= 1500));
-
-      return noWalletChange || validEarn || validSpend;
+    // Update profil/streak/progres boleh, asalkan wallet tidak berubah
+    // (dokumen tanpa wallet dianggap wallet nol) dan premium tidak
+    // dinyalakan dari client.
+    function serverFieldsUntouched() {
+      let walletSame = request.resource.data.get('wallet', zeroWallet()) == resource.data.get('wallet', zeroWallet());
+      let premiumAfter = request.resource.data.get('premium', {});
+      let premiumSame = premiumAfter == resource.data.get('premium', {});
+      return walletSame && (premiumSame || premiumAfter.get('active', false) == false);
     }
   }
 }

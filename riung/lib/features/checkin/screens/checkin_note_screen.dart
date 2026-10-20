@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/check_in.dart';
@@ -86,6 +87,7 @@ class _CheckInNoteScreenState extends State<CheckInNoteScreen> {
                     decoration: AppGlass.card(radius: 28, color: AppColors.permukaan),
                     child: TextField(
                       controller: _controller,
+                      inputFormatters: InputLimits.formatters(InputLimits.checkinCatatan),
                       maxLines: null,
                       cursorColor: AppColors.primer,
                       style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15, height: 1.55, fontWeight: FontWeight.w500),

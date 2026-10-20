@@ -59,7 +59,9 @@ class _JurnalPinUnlockScreenState extends State<JurnalPinUnlockScreen> {
 
   Future<void> _verify() async {
     setState(() => _checking = true);
-    final ok = await AppScope.of(context).pinService.verifyPin(_current);
+    final scope = AppScope.of(context);
+    final uid = scope.auth.uid;
+    final ok = uid != null && await scope.pinService.verifyPin(uid, _current);
     if (!mounted) return;
     if (ok) {
       Navigator.of(context).pop(true);

@@ -26,9 +26,9 @@ class HakimDetailScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: FutureBuilder<List<Saboteur>>(
-          future: scope.contentRepository.getSaboteurs(),
-          builder: (context, snapshot) {
+        child: RiungAsyncView<Saboteur?>(
+          load: () async => (await scope.contentRepository.getSaboteurs()).where((s) => s.id == 'hakim').firstOrNull,
+          builder: (context, hakim) {
             return ListenableBuilder(
               listenable: scope.monsterProgress,
               builder: (context, _) {
@@ -179,10 +179,10 @@ class HakimDetailScreen extends StatelessWidget {
                           Expanded(
                             child: RiungButton(
                               label: t.attack,
-                              onPressed: snapshot.data == null
+                              onPressed: hakim == null
                                   ? null
                                   : () => Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: snapshot.data!.firstWhere((s) => s.id == 'hakim'))),
+                                        MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: hakim)),
                                       ),
                             ),
                           ),

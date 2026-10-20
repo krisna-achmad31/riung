@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../theme/theme.dart';
+import '../services/api/api_state.dart';
+import '../l10n/api_strings.dart';
 
 /// Bungkus seluruh app (dipasang lewat `MaterialApp.builder` di
 /// `main.dart`) — pita tipis muncul otomatis di atas layar kalau
@@ -12,7 +14,8 @@ import '../theme/theme.dart';
 /// (jurnal/check-in/progres) tetap jalan penuh saat offline (CLAUDE.md
 /// aturan #5) — ini cuma pemberitahuan, bukan blokir.
 class RiungOfflineBanner extends StatefulWidget {
-  const RiungOfflineBanner({super.key, required this.child});
+  const RiungOfflineBanner({super.key, required this.child, this.apiState});
+  final ApiState? apiState;
 
   final Widget child;
 
@@ -29,7 +32,9 @@ class _RiungOfflineBannerState extends State<RiungOfflineBanner> {
     super.initState();
     Connectivity().checkConnectivity().then(_apply);
     _sub = Connectivity().onConnectivityChanged.listen(_apply);
+    widget.apiState?.addListener(_syncChanged);
   }
+  void _syncChanged() { if (mounted) setState(() {}); }
 
   void _apply(List<ConnectivityResult> results) {
     if (!mounted) return;
@@ -39,6 +44,7 @@ class _RiungOfflineBannerState extends State<RiungOfflineBanner> {
   @override
   void dispose() {
     _sub?.cancel();
+    widget.apiState?.removeListener(_syncChanged);
     super.dispose();
   }
 
@@ -48,7 +54,7 @@ class _RiungOfflineBannerState extends State<RiungOfflineBanner> {
       children: [
         AnimatedSize(
           duration: const Duration(milliseconds: 200),
-          child: _offline
+          child: _offline || widget.apiState?.pendingSync == true || widget.apiState?.lastCapReason != null
               ? Container(
                   width: double.infinity,
                   color: AppColors.tinta,
@@ -56,7 +62,7 @@ class _RiungOfflineBannerState extends State<RiungOfflineBanner> {
                   child: SafeArea(
                     bottom: false,
                     child: Text(
-                      context.s.common.offlineBanner,
+                      widget.apiState?.pendingSync == true ? pendingSyncText(Localizations.localeOf(context).languageCode == 'en') : _offline ? context.s.common.offlineBanner : practiceCappedText(Localizations.localeOf(context).languageCode == 'en'),
                       textAlign: TextAlign.center,
                       style: AppTextStyles.caption.copyWith(color: AppColors.diAtasTinta, fontWeight: FontWeight.w700, fontSize: 11),
                     ),
@@ -64,7 +70,7 @@ class _RiungOfflineBannerState extends State<RiungOfflineBanner> {
                 )
               : const SizedBox.shrink(),
         ),
-        Expanded(child: widget.child),
+        Expanded(child: widget.apiState?.lastError?.status == 426 ? Scaffold(body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(apiErrorText('upgrade_required', english: Localizations.localeOf(context).languageCode == 'en'), textAlign: TextAlign.center)))) : widget.child),
       ],
     );
   }

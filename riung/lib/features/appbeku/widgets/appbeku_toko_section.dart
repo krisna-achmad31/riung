@@ -124,10 +124,7 @@ class AppBekuTokoSection extends StatelessWidget {
     if (!_boleh(context, charged)) return;
     final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: t.appbeku.itemRelaxed, price: charged);
     if (!konfirmasi || !context.mounted) return;
-    // Bundel dihitung SATU buka-berbayar: langkah pertama gratis & tidak
-    // dihitung, langkah kedua yang memotong koin dan menambah hitungan.
-    await scope.appBeku.unlockMinutes(wallet: wallet, packageName: AppBekuCatalog.instagram.packageName, minutes: 15, price: 0, countsAsUnlock: false);
-    final result = await scope.appBeku.unlockMinutes(wallet: wallet, packageName: AppBekuCatalog.tiktok.packageName, minutes: 15, price: price);
+    final result = await scope.appBeku.unlockBundle(wallet: wallet, bundleId: 'santai', price: price);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(result == UnlockResult.ok ? t.appbeku.relaxedUnlocked : _pesan(t.appbeku, result))),
@@ -151,18 +148,7 @@ class AppBekuTokoSection extends StatelessWidget {
     if (!_boleh(context, charged)) return;
     final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: t.appbeku.itemAllSocial, price: charged);
     if (!konfirmasi || !context.mounted) return;
-    var result = UnlockResult.ok;
-    for (var i = 0; i < sosmedAktif.length; i++) {
-      // Hanya langkah pertama yang memotong koin & dihitung sebagai satu buka-berbayar.
-      result = await scope.appBeku.unlockMinutes(
-        wallet: wallet,
-        packageName: sosmedAktif[i].packageName,
-        minutes: 30,
-        price: i == 0 ? price : 0,
-        countsAsUnlock: i == 0,
-      );
-      if (result != UnlockResult.ok) break;
-    }
+    final result = await scope.appBeku.unlockBundle(wallet: wallet, bundleId: 'sosmed', price: price, appIds: sosmedAktif.map((a) => a.packageName).toList());
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(result == UnlockResult.ok ? t.appbeku.socialUnlocked : _pesan(t.appbeku, result))),

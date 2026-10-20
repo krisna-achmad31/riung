@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
@@ -77,6 +78,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                           Text(t.nicknameLabel, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.teksRedup)),
                           TextField(
                             controller: _namaController,
+                            inputFormatters: InputLimits.formatters(InputLimits.nama, multiline: false),
                             onChanged: (_) => setState(() {}),
                             cursorColor: AppColors.primer,
                             style: AppTextStyles.chipLabel.copyWith(fontSize: 16, color: AppColors.teksUtama),

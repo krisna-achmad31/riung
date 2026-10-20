@@ -5,7 +5,9 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
-import '../../home/screens/root_shell_screen.dart';
+import '../../../core/widgets/api_error_feedback.dart';
+import 'splash_screen.dart';
+import '../../../core/services/api/api_client.dart';
 import '../widgets/auth_divider.dart';
 import '../widgets/auth_footer_link.dart';
 import '../widgets/auth_text_field.dart';
@@ -48,12 +50,16 @@ class _MasukScreenState extends State<MasukScreen> {
       _submitting = true;
     });
     try {
-      await AppScope.of(context).auth.masukEmailPassword(email: email, password: password);
+      await AppScope.of(
+        context,
+      ).auth.masukEmailPassword(email: email, password: password);
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const RootShellScreen()),
+        MaterialPageRoute(builder: (_) => const SplashScreen()),
         (route) => false,
       );
+    } on ApiException catch (e) {
+      if (mounted) showApiError(context, e);
     } on AuthServiceException catch (e) {
       if (!mounted) return;
       setState(() => _formError = context.s.launch.authError(e.error, e.code));
@@ -68,12 +74,16 @@ class _MasukScreenState extends State<MasukScreen> {
       await AppScope.of(context).auth.masukGoogle();
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const RootShellScreen()),
+        MaterialPageRoute(builder: (_) => const SplashScreen()),
         (route) => false,
       );
+    } on ApiException catch (e) {
+      if (mounted) showApiError(context, e);
     } on AuthServiceException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.s.launch.authError(e.error, e.code))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.s.launch.authError(e.error, e.code))),
+      );
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -85,13 +95,32 @@ class _MasukScreenState extends State<MasukScreen> {
     return Scaffold(
       body: SafeArea(
         child: RiungBleedListView(
-          padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            24,
+            AppSpacing.sm,
+            24,
+            AppSpacing.lg,
+          ),
           children: [
-            const LaunchHero(left: 'meronta', center: 'hakim', right: 'mengelak'),
+            const LaunchHero(
+              left: 'meronta',
+              center: 'hakim',
+              right: 'mengelak',
+            ),
             const SizedBox(height: AppSpacing.lg),
-            Text(t.welcomeBack, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
+            Text(
+              t.welcomeBack,
+              style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2),
+            ),
             const SizedBox(height: AppSpacing.md),
-            Text(t.monstersWaiting, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+            Text(
+              t.monstersWaiting,
+              style: AppTextStyles.body.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.teksSekunder,
+              ),
+            ),
             const SizedBox(height: AppSpacing.md),
             AuthTextField(
               label: t.emailLabel,
@@ -110,18 +139,35 @@ class _MasukScreenState extends State<MasukScreen> {
             ),
             if (_formError != null) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text(_formError!, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangatGelap)),
+              Text(
+                _formError!,
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.aksenHangatGelap,
+                ),
+              ),
             ],
             const SizedBox(height: 14),
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LupaSandiScreen())),
-                child: Text(t.forgotPassword, style: AppTextStyles.caption.copyWith(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primer)),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const LupaSandiScreen()),
+                ),
+                child: Text(
+                  t.forgotPassword,
+                  style: AppTextStyles.caption.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primer,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 14),
-            RiungButton(label: _submitting ? context.s.common.memproses : t.signIn, onPressed: _submitting ? null : _submit),
+            RiungButton(
+              label: _submitting ? context.s.common.memproses : t.signIn,
+              onPressed: _submitting ? null : _submit,
+            ),
             const SizedBox(height: 14),
             const AuthDivider(),
             const SizedBox(height: 14),
@@ -129,7 +175,9 @@ class _MasukScreenState extends State<MasukScreen> {
             AuthFooterLink(
               text: t.noAccount,
               actionLabel: t.signUp,
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DaftarScreen())),
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const DaftarScreen())),
             ),
           ],
         ),

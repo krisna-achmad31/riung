@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/services/api/riung_api.dart';
 
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
@@ -14,7 +15,9 @@ import 'kartu_pemain_screen.dart';
 /// bukan dinamis per user) — progresnya naik
 /// [EconomyEarn.fokusProgressPercent]% begitu layar ini muncul.
 class SesiSelesaiScreen extends StatefulWidget {
-  const SesiSelesaiScreen({super.key, this.duration = const Duration(minutes: 25)});
+  const SesiSelesaiScreen({super.key, this.duration = const Duration(minutes: 25), this.ticketId, this.saboteurId = 'waswas'});
+  final String? ticketId;
+  final String saboteurId;
 
   final Duration duration;
 
@@ -28,6 +31,13 @@ class _SesiSelesaiScreenState extends State<SesiSelesaiScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      final state = AppScope.of(context).wallet.apiState;
+      if (state != null) {
+        if (widget.ticketId != null) {
+          state.record(ActivityEvent(ActivityType.focusCompleted, occurredAt: DateTime.now(), ticketId: widget.ticketId, saboteurId: widget.saboteurId), stableId: 'focus:${widget.ticketId}');
+        }
+        return;
+      }
       AppScope.of(context).monsterProgress.tambahProgres(
             saboteurId: 'waswas',
             delta: EconomyEarn.fokusProgressPercent,

@@ -21,6 +21,7 @@ class EksporDataScreen extends StatefulWidget {
 
 class _EksporDataScreenState extends State<EksporDataScreen> {
   String? _json;
+  Object? _error;
 
   @override
   void initState() {
@@ -29,13 +30,18 @@ class _EksporDataScreenState extends State<EksporDataScreen> {
   }
 
   Future<void> _susun() async {
+    if (_error != null) setState(() => _error = null);
     final scope = AppScope.of(context);
-    final uid = scope.auth.uid;
-    if (uid == null) return;
-    final data = await DataExportBuilder(userRepository: scope.userRepository, prefs: scope.prefs)
-        .build(uid: uid, note: AppStrings.of(scope.language.language).profil.exportNote);
-    if (!mounted) return;
-    setState(() => _json = const JsonEncoder.withIndent('  ').convert(data));
+    try {
+      final uid = scope.auth.uid;
+      if (uid == null) throw StateError('belum ada akun');
+      final data = await DataExportBuilder(userRepository: scope.userRepository, prefs: scope.prefs)
+          .build(uid: uid, note: AppStrings.of(scope.language.language).profil.exportNote);
+      if (!mounted) return;
+      setState(() => _json = const JsonEncoder.withIndent('  ').convert(data));
+    } catch (error) {
+      if (mounted) setState(() => _error = error);
+    }
   }
 
   @override
@@ -49,9 +55,10 @@ class _EksporDataScreenState extends State<EksporDataScreen> {
             children: [
               RiungGlassHeader(title: t.downloadData),
               Expanded(
-                child: _json == null
-                    ? const Center(child: CircularProgressIndicator(color: AppColors.primer))
-                    : RiungBleedListView(
+                child: RiungStateView(
+                  status: RiungStateView.statusOf(loading: _json == null, error: _error),
+                  onRetry: _susun,
+                  builder: (context) => RiungBleedListView(
                         padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
                         children: [
                           Text(t.exportIntro, style: AppTextStyles.body.copyWith(fontSize: 13, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
@@ -71,6 +78,7 @@ class _EksporDataScreenState extends State<EksporDataScreen> {
                           ),
                         ],
                       ),
+                ),
               ),
               if (_json != null) ...[
                 const SizedBox(height: AppSpacing.sm),

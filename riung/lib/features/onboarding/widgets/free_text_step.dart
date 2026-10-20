@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
@@ -77,6 +78,7 @@ class _FreeTextStepState extends State<FreeTextStep> {
                 ),
                 child: TextField(
                   controller: _textController,
+                  inputFormatters: InputLimits.formatters(InputLimits.onboardingCerita),
                   maxLines: null,
                   expands: true,
                   textAlignVertical: TextAlignVertical.top,

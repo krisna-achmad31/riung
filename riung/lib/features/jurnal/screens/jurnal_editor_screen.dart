@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/config/input_limits.dart';
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/journal_entry.dart';
+import '../../../core/services/api/riung_api.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
@@ -42,6 +44,7 @@ class _JurnalEditorScreenState extends State<JurnalEditorScreen> {
   final _createdAt = DateTime.now();
   String _mood = 'datar';
   static const _uuid = Uuid();
+  final String _entryId = _uuid.v4();
 
   bool get _isCbt => widget.prompt != null;
 
@@ -60,7 +63,7 @@ class _JurnalEditorScreenState extends State<JurnalEditorScreen> {
     if (uid == null) return;
 
     final entry = JournalEntry(
-      entryId: _uuid.v4(),
+      entryId: _entryId,
       promptId: widget.prompt?.id ?? '',
       mood: _mood,
       text: text,
@@ -70,7 +73,12 @@ class _JurnalEditorScreenState extends State<JurnalEditorScreen> {
 
     try {
       await scope.userRepository.saveJournalEntry(uid, entry);
-      await scope.wallet.earn(amount: EconomyEarn.jurnal, reason: 'jurnal:${entry.entryId}');
+      if (scope.wallet.apiState != null) {
+        await scope.wallet.apiState!.record(ActivityEvent(ActivityType.journalSaved, occurredAt: entry.createdAt,
+          entryId: entry.entryId, promptId: widget.prompt?.id), stableId: 'journal:${entry.entryId}');
+      } else {
+        await scope.wallet.earn(amount: EconomyEarn.jurnal, reason: 'jurnal:${entry.entryId}');
+      }
       await scope.wallet.addTickets(1);
       if (_isCbt) {
         await scope.monsterProgress.tambahProgres(saboteurId: widget.prompt!.monsterId, delta: 2);
@@ -234,6 +242,7 @@ class _JurnalEditorScreenState extends State<JurnalEditorScreen> {
                       Expanded(
                         child: TextField(
                           controller: _controller,
+                          inputFormatters: InputLimits.formatters(InputLimits.jurnal),
                           maxLines: null,
                           expands: true,
                           autofocus: true,

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../config/economy.dart';
 import '../l10n/strings/notif_strings.dart';
+import 'device_time_zone.dart';
 
 /// Wrapper `flutter_local_notifications` + `timezone` — satu-satunya
 /// tempat yang tahu soal channel Android & id notifikasi lokal Riung.
 /// Singleton (pola sama seperti [MonsterAnchorRegistry]), diinisialisasi
 /// sekali di `main.dart` sebelum `runApp`.
 ///
-/// Zona waktu di-hardcode ke Asia/Jakarta (WIB) alih-alih deteksi otomatis
-/// (butuh package tambahan `flutter_timezone`) — app ini Indonesia-only
-/// (copy Bahasa Indonesia, harga IDR, lihat CLAUDE.md), jadi asumsi ini aman.
+/// Zona waktu mengikuti perangkat ([DeviceTimeZone]) — user di WITA/WIT
+/// atau luar negeri tetap dapat pengingat di jam lokalnya.
 class LocalNotificationService {
   LocalNotificationService._();
   static final LocalNotificationService instance = LocalNotificationService._();
@@ -51,8 +50,7 @@ class LocalNotificationService {
   /// kalau ada — dipakai `main.dart` buat rute cold-start.
   Future<String?> init({required void Function(String? payload) onTap}) async {
     if (_initialized) return null;
-    tz_data.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
+    tz.setLocalLocation(DeviceTimeZone.location());
 
     // Nama mipmap ikut `flutter_launcher_icons` config (pubspec.yaml
     // `flutter_launcher_icons.android: "launcher_icon"`) — BUKAN

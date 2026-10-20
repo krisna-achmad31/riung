@@ -14,38 +14,73 @@ import 'onboarding_tag.dart';
 /// banyak opsi menggulir wajar lewat `SingleChildScrollView`).
 /// Implement persis `design/Onboarding.dc.html` § Asesmen.
 class QuestionStep extends StatelessWidget {
-  const QuestionStep({super.key, required this.controller, required this.question});
+  const QuestionStep({
+    super.key,
+    required this.controller,
+    required this.question,
+    this.onBack,
+  });
 
   final OnboardingController controller;
   final OnboardingQuestion question;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
     final text = context.s.onboarding.questions[question.number - 1];
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.md),
+        padding: const EdgeInsets.fromLTRB(
+          24,
+          AppSpacing.sm,
+          24,
+          AppSpacing.md,
+        ),
         child: Column(
           children: [
             OnboardingHeader(
               progress: question.number / onboardingQuestions.length,
-              onBack: controller.canGoBack ? controller.back : null,
+              onBack: onBack ?? (controller.canGoBack ? controller.back : null),
               trailing: '${question.number}/${onboardingQuestions.length}',
             ),
             Expanded(
               child: RiungBleedListView(
-                padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.md),
+                padding: const EdgeInsets.only(
+                  top: AppSpacing.md,
+                  bottom: AppSpacing.md,
+                ),
                 children: [
-                  Align(alignment: Alignment.centerLeft, child: OnboardingTag(text.tag)),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OnboardingTag(text.tag),
+                  ),
                   const SizedBox(height: AppSpacing.md),
-                  Text(text.question, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.15)),
+                  Text(
+                    text.question,
+                    style: AppTextStyles.display.copyWith(
+                      fontSize: 26,
+                      height: 1.15,
+                    ),
+                  ),
                   const SizedBox(height: 6),
-                  Text(text.sub, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
+                  Text(
+                    text.sub,
+                    style: AppTextStyles.body.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.teksSekunder,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.md),
                   if (!question.isMulti) ...[
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: RiungMonster(monsterId: _monsterFor(question.number), state: MonsterVisualState.jinak, size: 110, applyBossScale: false),
+                      child: RiungMonster(
+                        monsterId: _monsterFor(question.number),
+                        state: MonsterVisualState.jinak,
+                        size: 110,
+                        applyBossScale: false,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
                   ],
@@ -67,7 +102,9 @@ class QuestionStep extends StatelessWidget {
               label: context.s.common.lanjut,
               onPressed: controller.canProceed
                   ? () {
-                      AppScope.of(context).analytics.qAnswered(questionNumber: question.number);
+                      AppScope.of(
+                        context,
+                      ).analytics.qAnswered(questionNumber: question.number);
                       controller.next();
                     }
                   : null,
@@ -80,13 +117,25 @@ class QuestionStep extends StatelessWidget {
 
   /// Monster penemani pertanyaan pilihan tunggal — bergilir supaya tiap
   /// pertanyaan terasa berbeda (frame Kuis pilihan memakai Si Waswas).
-  static String _monsterFor(int number) => const ['waswas', 'kabut', 'cermin', 'meronta', 'sempurna', 'mengelak'][(number - 1) % 6];
+  static String _monsterFor(int number) => const [
+    'waswas',
+    'kabut',
+    'cermin',
+    'meronta',
+    'sempurna',
+    'mengelak',
+  ][(number - 1) % 6];
 }
 
 /// Opsi jawaban (frame `Opsi …`): kaca, tebal + bingkai primer saat dipilih;
 /// tanda bulat (pilihan tunggal) atau kotak (multi).
 class _OptionRow extends StatelessWidget {
-  const _OptionRow({required this.label, required this.selected, required this.multi, required this.onTap});
+  const _OptionRow({
+    required this.label,
+    required this.selected,
+    required this.multi,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -102,14 +151,27 @@ class _OptionRow extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 56),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.permukaanPadat.withValues(alpha: 0.9) : AppColors.kartu,
-          border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2 : AppGlass.edgeWidth),
+          color: selected
+              ? AppColors.permukaanPadat.withValues(alpha: 0.9)
+              : AppColors.kartu,
+          border: Border.all(
+            color: selected ? AppColors.primer : AppColors.garis,
+            width: selected ? 2 : AppGlass.edgeWidth,
+          ),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           children: [
             Expanded(
-              child: Text(label, style: AppTextStyles.body.copyWith(color: AppColors.teksUtama, fontSize: 15, height: 1.3, fontWeight: selected ? FontWeight.w700 : FontWeight.w500)),
+              child: Text(
+                label,
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.teksUtama,
+                  fontSize: 15,
+                  height: 1.3,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Container(
@@ -117,10 +179,19 @@ class _OptionRow extends StatelessWidget {
               height: 24,
               decoration: BoxDecoration(
                 color: selected ? AppColors.primer : Colors.transparent,
-                border: Border.all(color: selected ? AppColors.primer : AppColors.teksRedup, width: 1.5),
+                border: Border.all(
+                  color: selected ? AppColors.primer : AppColors.teksRedup,
+                  width: 1.5,
+                ),
                 borderRadius: BorderRadius.circular(multi ? 8 : 12),
               ),
-              child: selected ? const Icon(Icons.check_rounded, size: 14, color: AppColors.diAtasTinta) : null,
+              child: selected
+                  ? const Icon(
+                      Icons.check_rounded,
+                      size: 14,
+                      color: AppColors.diAtasTinta,
+                    )
+                  : null,
             ),
           ],
         ),

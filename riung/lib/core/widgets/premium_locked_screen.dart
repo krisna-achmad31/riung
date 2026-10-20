@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../features/toko/logic/premium_offer.dart';
 import '../../features/toko/screens/paywall_premium_screen.dart';
-import '../config/economy.dart';
 import '../l10n/l10n.dart';
+import '../services/billing_service.dart';
+import '../state/state.dart';
 import '../theme/theme.dart';
 import 'riung_button.dart';
 import 'riung_glass_icon_button.dart';
 import 'riung_icon_3d.dart';
+import 'riung_skeleton.dart';
 import 'riung_sparkle_hero.dart';
 
 /// Konten premium terkunci — upsell ringan, dipakai lintas fitur (Meditasi,
@@ -44,10 +47,7 @@ class PremiumLockedScreen extends StatelessWidget {
                       style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, fontWeight: FontWeight.w500, color: AppColors.teksSekunder),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      context.s.common.premiumPriceLine(EconomyPremium.hargaBulananIdr, EconomyPremium.trialHari),
-                      style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.primer, fontWeight: FontWeight.w700),
-                    ),
+                    const _HargaPremium(),
                   ],
                 ),
               ),
@@ -66,6 +66,36 @@ class PremiumLockedScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Harga bulanan & trial dari Play (bukan Rupiah dari config) — user di luar
+/// Indonesia melihat mata uangnya sendiri; trial hanya disebut bila offer
+/// trial memang tersedia untuknya.
+class _HargaPremium extends StatefulWidget {
+  const _HargaPremium();
+
+  @override
+  State<_HargaPremium> createState() => _HargaPremiumState();
+}
+
+class _HargaPremiumState extends State<_HargaPremium> {
+  late final Future<Map<String, PremiumOffer>> _offers = PremiumOffer.load(AppScope.of(context).billing);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, PremiumOffer>>(
+      future: _offers,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const RiungSkeleton(width: 160, height: 14);
+        final monthly = snapshot.data![PremiumSku.monthly.productId];
+        return Text(
+          monthly == null ? context.s.toko.priceOnPlay : context.s.common.premiumPriceLine(monthly.recurringPrice, monthly.trialDays),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.primer, fontWeight: FontWeight.w700),
+        );
+      },
     );
   }
 }

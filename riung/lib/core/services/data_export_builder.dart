@@ -2,6 +2,7 @@ import '../models/personality_result.dart';
 import 'kenali_result_repository.dart';
 import 'local_prefs_store.dart';
 import 'user_repository.dart';
+import 'api/api_repositories.dart';
 
 /// Menyusun ekspor "Unduh semua dataku". Satu tempat yang tahu seluruh data
 /// pengguna, supaya fitur baru yang menyimpan data pribadi tinggal
@@ -27,6 +28,7 @@ class DataExportBuilder {
     final buatanSendiri = await userRepository.getCustomAffirmations(uid);
 
     return {
+      if (userRepository is ApiUserRepository) 'server': await (userRepository as ApiUserRepository).state.api.export(),
       'profil': {
         'nama': profile.displayName,
         'bergabung': profile.createdAt.toIso8601String(),

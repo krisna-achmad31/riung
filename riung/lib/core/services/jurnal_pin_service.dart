@@ -8,7 +8,9 @@ import 'package:local_auth/local_auth.dart';
 /// PIN 6 digit + biometrik untuk kunci Jurnal. PIN disimpan di
 /// `flutter_secure_storage` (bukan sqflite) — gerbang lokal, bukan kredensial
 /// server, jadi disimpan langsung (bukan hash) sudah memadai di penyimpanan
-/// aman OS (Android Keystore / iOS Keychain).
+/// aman OS (Android Keystore / iOS Keychain). PIN disimpan PER uid
+/// (`riung_jurnal_pin_v1_<uid>`) supaya akun lain di HP yang sama tidak
+/// mewarisi (atau terkunci oleh) PIN akun sebelumnya (audit C-01).
 class JurnalPinService {
   JurnalPinService({FlutterSecureStorage? secureStorage, LocalAuthentication? localAuth})
       : _secureStorage = secureStorage ?? const FlutterSecureStorage(),
@@ -17,18 +19,28 @@ class JurnalPinService {
   final FlutterSecureStorage _secureStorage;
   final LocalAuthentication _localAuth;
 
-  static const _pinStorageKey = 'riung_jurnal_pin_v1';
+  static const _legacyPinStorageKey = 'riung_jurnal_pin_v1';
+  static String _pinStorageKey(String uid) => '${_legacyPinStorageKey}_$uid';
 
-  Future<bool> get hasPin async => (await _secureStorage.read(key: _pinStorageKey)) != null;
+  Future<bool> hasPin(String uid) async => (await _secureStorage.read(key: _pinStorageKey(uid))) != null;
 
-  Future<void> setPin(String pin) => _secureStorage.write(key: _pinStorageKey, value: pin);
+  Future<void> setPin(String uid, String pin) => _secureStorage.write(key: _pinStorageKey(uid), value: pin);
 
-  Future<bool> verifyPin(String pin) async {
-    final stored = await _secureStorage.read(key: _pinStorageKey);
+  Future<bool> verifyPin(String uid, String pin) async {
+    final stored = await _secureStorage.read(key: _pinStorageKey(uid));
     return stored != null && stored == pin;
   }
 
-  Future<void> clearPin() => _secureStorage.delete(key: _pinStorageKey);
+  Future<void> clearPin(String uid) => _secureStorage.delete(key: _pinStorageKey(uid));
+
+  /// Serahkan PIN lama (seluruh perangkat) ke [uid] — pemilik terakhir.
+  /// Dipanggil sekali oleh [LegacyAccountMigration].
+  Future<void> adoptLegacyPin(String uid) async {
+    final legacy = await _secureStorage.read(key: _legacyPinStorageKey);
+    if (legacy == null) return;
+    if (!await hasPin(uid)) await setPin(uid, legacy);
+    await _secureStorage.delete(key: _legacyPinStorageKey);
+  }
 
   /// Salt acak buat backup PIN ke cloud (lihat [JournalPinBackup]) — beda
   /// per user, supaya hash yang sama tidak bisa dicocokkan lintas akun.

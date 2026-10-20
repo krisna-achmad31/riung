@@ -35,7 +35,7 @@ wallet di `firestore.rules`.
 ## 1. Project Firebase
 
 1. Buka [Firebase Console](https://console.firebase.google.com) → buat/pakai project (proyek ini pakai `riung-5e979`).
-2. **Tambah Android app** dengan package name **persis** `com.riung.riung`
+2. **Tambah Android app** dengan package name **persis** `id.riung.riung`
    (harus sama dengan `applicationId` di `android/app/build.gradle.kts` —
    jangan pernah diubah, lihat catatan di file itu).
 3. Download `google-services.json`, taruh di `android/app/google-services.json`.

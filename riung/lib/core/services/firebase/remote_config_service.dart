@@ -4,6 +4,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../../config/economy.dart';
+import '../api/api_config_store.dart';
 
 /// Nilai ekonomi dari Firebase Remote Config — dipakai supaya harga/reward
 /// bisa diubah dari Console tanpa rilis ulang app. Default-nya dimuat dari
@@ -21,8 +22,8 @@ class RemoteConfigService {
   // Ditunda ke dalam try/catch di init() supaya RemoteConfigService selalu
   // aman dibuat di mana pun; kalau init() tidak pernah dipanggil/gagal,
   // semua getter di bawah diam-diam jatuh balik ke economy.dart.
-  FirebaseRemoteConfig? _rc;
-  bool _ready = false;
+
+
 
   Future<void> init() async {
     try {
@@ -37,8 +38,8 @@ class RemoteConfigService {
       final defaults = (jsonDecode(raw) as Map<String, dynamic>).map((k, v) => MapEntry(k, v as Object));
       await rc.setDefaults(defaults);
       await rc.fetchAndActivate();
-      _rc = rc;
-      _ready = true;
+
+
     } catch (_) {
       // Offline saat startup atau proyek belum di-setup — diam-diam pakai
       // default lokal (yang sudah = economy.dart) lewat getter di bawah.
@@ -46,10 +47,29 @@ class RemoteConfigService {
   }
 
   int _int(String key, int fallback) {
-    final rc = _rc;
-    if (!_ready || rc == null) return fallback;
-    final value = rc.getInt(key);
-    return value == 0 && fallback != 0 ? fallback : value;
+    // Economic values are owned by REST config; Firebase only hosts flags.
+    const paths = <String, (String, String)>{
+      'earn_checkin_harian': ('earn', 'checkin'), 'earn_jurnal': ('earn', 'journal'),
+      'earn_meditasi': ('earn', 'meditation'), 'earn_misi_harian': ('earn', 'mission'),
+      'earn_menang_game': ('earn', 'minigameWin'), 'earn_monster_jinak': ('earn', 'monsterTamed'),
+      'earn_betterme_lesson': ('earn', 'bettermeLesson'), 'earn_streak_7_hari': ('earn', 'streak7'),
+      'earn_streak_30_hari': ('earn', 'streak30'), 'earn_fokus_progress_percent': ('monsterProgress', 'focus'),
+      'earn_minigame_win_progress_percent': ('monsterProgress', 'minigameWin'), 'earn_minigame_lose_progress_percent': ('monsterProgress', 'minigameLose'),
+      'spend_fokus_25_menit': ('spend', 'focus25'), 'spend_fokus_45_menit': ('spend', 'focus45'),
+      'spend_fokus_60_menit': ('spend', 'focus60'), 'spend_pelindung_streak': ('spend', 'streakShield'),
+      'spend_skin_common': ('spend', 'cosmeticCommon'), 'spend_skin_epic': ('spend', 'cosmeticEpic'),
+      'spend_skin_legendary': ('spend', 'cosmeticLegendary'), 'spend_scroll_unlock_mulai': ('appbeku', 'unlock10'),
+      'spend_fokus_bundle_5_sesi': ('spend', 'focusBundle5'), 'scroll_unlock_20_menit': ('appbeku', 'unlock20'),
+      'scroll_unlock_30_menit': ('appbeku', 'unlock30'), 'scroll_unlock_60_menit': ('appbeku', 'unlock60'),
+      'scroll_bundle_santai': ('appbeku', 'bundleSantai'), 'scroll_bundle_sosmed': ('appbeku', 'bundleSosmed'),
+      'tiket_gratis_per_hari': ('tickets', 'freePerDay'), 'tiket_max_dari_latihan_per_hari': ('tickets', 'maxFromPracticePerDay'),
+      'tiket_max_fight_per_hari': ('tickets', 'maxFightsPerDay'), 'free_tier_meditasi': ('freeTier', 'meditations'),
+      'free_tier_cerita_tidur': ('freeTier', 'sleepStories'), 'free_tier_jurnal_per_hari': ('freeTier', 'journalPerDay'),
+      'free_tier_minigame_per_hari': ('freeTier', 'minigamePerDay'), 'premium_harga_bulanan_idr': ('premium', 'monthlyPriceIdr'),
+      'premium_harga_tahunan_idr': ('premium', 'yearlyPriceIdr'), 'premium_trial_hari': ('premium', 'trialDays'),
+    };
+    final path = paths[key];
+    return path == null ? fallback : ApiConfigStore.instance.value(path.$1, path.$2, fallback);
   }
 
   // Earn

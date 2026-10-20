@@ -38,7 +38,7 @@ abstract class TokoStrings {
   String get rarityCommon;
   String get alreadyOwned;
   String coinsPrice(int price);
-  String priceShort(int idr);
+  String get priceOnPlayShort;
   String lemariTitle(String monster);
   String get wardrobe;
   String get slotAll;
@@ -109,19 +109,26 @@ abstract class TokoStrings {
   String get saveYearly;
   String annualPerk(int coins);
   String yearlyWithPrice(String price);
-  String yearlyFallback(String price, String perMonth);
   String monthlyWithPrice(String price);
-  String monthlyFallback(String price);
-  String premiumNote(int days);
+  String get premiumNote;
   String tryFree(int days);
   String get processing;
   String get restore;
   String get terms;
   String get planUnavailable;
+  String get subscribeNow;
+  String get activePlan;
+  String get priceOnPlay;
+  String get pendingPayment;
+  String get restoreNone;
+  String get restoreFailed;
+  String get restoreDone;
+  String get restoreOtherAccount;
 
   // ── Paywall onboarding ──
   String onboardingTitle(String name);
   String onboardingSub(int days);
+  String get onboardingSubNoTrial;
   List<String> get onboardingBenefits;
   String trialTrailing(int days);
   String get monthlySimple;
@@ -129,8 +136,6 @@ abstract class TokoStrings {
   String get continueFree;
   String monthlyPrice(String price);
   String yearlyPrice(String price);
-  String onboardingYearlyFallback(String price, String perMonth);
-  String onboardingMonthlyFallback(String price);
 
   // ── Ketentuan langganan ──
   String get termsTitle;
@@ -262,7 +267,7 @@ class TokoStringsId extends TokoStrings {
   @override
   String coinsPrice(int price) => '$price koin';
   @override
-  String priceShort(int idr) => 'Rp${idr ~/ 1000}rb';
+  String get priceOnPlayShort => 'Harga di Play';
   @override
   String lemariTitle(String monster) => 'Lemari $monster';
   @override
@@ -384,12 +389,10 @@ class TokoStringsId extends TokoStrings {
   String get premiumSub => 'Buka semua latihan buat menjinakkan ketujuh monstermu.';
   @override
   List<String> get premiumBenefits => const [
-        'Semua meditasi & cerita tidur',
-        'Semua panduan jurnal CBT, tanpa batas per hari',
-        'Semua level Better Me',
-        '3 sesi Fokus gratis per hari (biasanya 1)',
-        'Semua gaya kartu karakter terbuka',
-        'Laporan bulanan & pola faktor dengan suasana hatimu',
+        'Semua konten meditasi, tidur, jurnal CBT & Better Me',
+        '3 sesi Fokus gratis per hari',
+        'Semua gaya kartu karakter',
+        'Laporan bulanan + pola faktor ↔ suasana hati',
       ];
   @override
   String get planYearly => 'Tahunan';
@@ -402,14 +405,9 @@ class TokoStringsId extends TokoStrings {
   @override
   String yearlyWithPrice(String price) => '$price/tahun';
   @override
-  String yearlyFallback(String price, String perMonth) => 'Rp$price/tahun · ≈ Rp$perMonth/bulan';
-  @override
   String monthlyWithPrice(String price) => '$price/bulan · berhenti kapan saja';
   @override
-  String monthlyFallback(String price) => 'Rp$price/bulan · berhenti kapan saja';
-  @override
-  String premiumNote(int days) =>
-      'Gratis $days hari dulu — diingatkan sebelum tagihan pertama. Fitur inti (check-in, jurnal, monster) tetap gratis selamanya.';
+  String get premiumNote => 'Fitur inti (check-in, jurnal, monster) tetap gratis selamanya.';
   @override
   String tryFree(int days) => 'Coba gratis $days hari';
   @override
@@ -420,11 +418,29 @@ class TokoStringsId extends TokoStrings {
   String get terms => 'Ketentuan';
   @override
   String get planUnavailable => 'Paket belum tersedia di Play Store. Coba lagi nanti.';
+  @override
+  String get subscribeNow => 'Langganan sekarang';
+  @override
+  String get activePlan => 'Paket aktif';
+  @override
+  String get priceOnPlay => 'Harga tampil di Google Play';
+  @override
+  String get pendingPayment => 'Pembayaranmu sedang menunggu. Premium aktif otomatis begitu lunas.';
+  @override
+  String get restoreNone => 'Belum ada pembelian untuk dipulihkan.';
+  @override
+  String get restoreFailed => 'Pembelian belum bisa dipulihkan. Coba lagi sebentar lagi, ya.';
+  @override
+  String get restoreDone => 'Pembelianmu sudah dipulihkan.';
+  @override
+  String get restoreOtherAccount => 'Langganan ini terhubung ke akun Riung lain. Masuk dengan akun itu untuk memakainya.';
 
   @override
   String onboardingTitle(String name) => 'Rencana penjinakanmu sudah siap${name.isEmpty ? '' : ', $name'}';
   @override
   String onboardingSub(int days) => 'Coba gratis $days hari, batalkan kapan saja';
+  @override
+  String get onboardingSubNoTrial => 'Batalkan kapan saja lewat Google Play';
   @override
   List<String> get onboardingBenefits => const [
         'Semua meditasi, cerita tidur & jurnal tanpa batas',
@@ -444,10 +460,6 @@ class TokoStringsId extends TokoStrings {
   String monthlyPrice(String price) => '$price/bulan';
   @override
   String yearlyPrice(String price) => '$price/tahun';
-  @override
-  String onboardingYearlyFallback(String price, String perMonth) => 'Rp$price/tahun · ≈Rp$perMonth/bulan';
-  @override
-  String onboardingMonthlyFallback(String price) => 'Rp$price/bulan';
 
   @override
   String get termsTitle => 'Ketentuan langganan';
@@ -476,6 +488,7 @@ class TokoStringsId extends TokoStrings {
     if (kind == BillingErrorKind.deliveryFailed) {
       return 'Pembayaran berhasil tapi koin/Premium gagal masuk. Coba "Pulihkan pembelian".';
     }
+    if (kind == BillingErrorKind.otherAccount) return restoreOtherAccount;
     return (detail == null || detail.isEmpty) ? 'Pembelian gagal.' : detail;
   }
 }
@@ -593,7 +606,7 @@ class TokoStringsEn extends TokoStrings {
   @override
   String coinsPrice(int price) => '$price coins';
   @override
-  String priceShort(int idr) => 'Rp${idr ~/ 1000}k';
+  String get priceOnPlayShort => 'Price on Play';
   @override
   String lemariTitle(String monster) => "$monster's wardrobe";
   @override
@@ -715,12 +728,10 @@ class TokoStringsEn extends TokoStrings {
   String get premiumSub => 'Unlock all exercises to tame your seven monsters.';
   @override
   List<String> get premiumBenefits => const [
-        'All meditations & sleep stories',
-        'All CBT journal guides, no daily limit',
-        'All Better Me levels',
-        '3 free Focus sessions a day (usually 1)',
-        'All character card styles unlocked',
-        'Monthly report & patterns between what you mention and your mood',
+        'All meditation, sleep, CBT journal & Better Me content',
+        '3 free Focus sessions a day',
+        'All character card styles',
+        'Monthly report + factor ↔ mood patterns',
       ];
   @override
   String get planYearly => 'Yearly';
@@ -733,14 +744,9 @@ class TokoStringsEn extends TokoStrings {
   @override
   String yearlyWithPrice(String price) => '$price/year';
   @override
-  String yearlyFallback(String price, String perMonth) => 'Rp$price/year · ≈ Rp$perMonth/month';
-  @override
   String monthlyWithPrice(String price) => '$price/month · cancel anytime';
   @override
-  String monthlyFallback(String price) => 'Rp$price/month · cancel anytime';
-  @override
-  String premiumNote(int days) =>
-      'Free for $days days first — you will be reminded before the first charge. Core features (check-in, journal, monsters) stay free forever.';
+  String get premiumNote => 'Core features (check-in, journal, monsters) stay free forever.';
   @override
   String tryFree(int days) => 'Try free for $days days';
   @override
@@ -751,11 +757,29 @@ class TokoStringsEn extends TokoStrings {
   String get terms => 'Terms';
   @override
   String get planUnavailable => 'This plan is not available on the Play Store yet. Please try again later.';
+  @override
+  String get subscribeNow => 'Subscribe now';
+  @override
+  String get activePlan => 'Current plan';
+  @override
+  String get priceOnPlay => 'Price shown on Google Play';
+  @override
+  String get pendingPayment => 'Your payment is pending. Premium turns on automatically once it is paid.';
+  @override
+  String get restoreNone => 'No purchases to restore yet.';
+  @override
+  String get restoreFailed => 'Your purchases could not be restored. Please try again in a moment.';
+  @override
+  String get restoreDone => 'Your purchases have been restored.';
+  @override
+  String get restoreOtherAccount => 'This subscription is linked to another Riung account. Sign in with that account to use it.';
 
   @override
   String onboardingTitle(String name) => 'Your taming plan is ready${name.isEmpty ? '' : ', $name'}';
   @override
   String onboardingSub(int days) => 'Try free for $days days, cancel anytime';
+  @override
+  String get onboardingSubNoTrial => 'Cancel anytime on Google Play';
   @override
   List<String> get onboardingBenefits => const [
         'All meditations, sleep stories & journals, unlimited',
@@ -775,10 +799,6 @@ class TokoStringsEn extends TokoStrings {
   String monthlyPrice(String price) => '$price/month';
   @override
   String yearlyPrice(String price) => '$price/year';
-  @override
-  String onboardingYearlyFallback(String price, String perMonth) => 'Rp$price/year · ≈Rp$perMonth/month';
-  @override
-  String onboardingMonthlyFallback(String price) => 'Rp$price/month';
 
   @override
   String get termsTitle => 'Subscription terms';
@@ -807,6 +827,7 @@ class TokoStringsEn extends TokoStrings {
     if (kind == BillingErrorKind.deliveryFailed) {
       return 'Payment succeeded but the coins/Premium did not come through. Try "Restore purchases".';
     }
+    if (kind == BillingErrorKind.otherAccount) return restoreOtherAccount;
     return (detail == null || detail.isEmpty) ? 'Purchase failed.' : detail;
   }
 }

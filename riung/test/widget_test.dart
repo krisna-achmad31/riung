@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,12 +17,18 @@ Future<Widget> _galleryApp() async {
   final prefs = await LocalPrefsStore.init();
   return LanguageScope(
     notifier: LanguageNotifier(prefs: prefs),
-    child: MaterialApp(theme: AppTheme.light, home: const ComponentGalleryScreen()),
+    child: MaterialApp(
+      theme: AppTheme.light,
+      home: const ComponentGalleryScreen(),
+    ),
   );
 }
 
 void main() {
-  testWidgets('RiungApp boot ke Splash lalu auto-navigate tanpa error', (WidgetTester tester) async {
+  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
+  testWidgets('RiungApp boot ke Splash lalu auto-navigate tanpa error', (
+    WidgetTester tester,
+  ) async {
     // shared_preferences butuh mock store di lingkungan test — tanpa ini
     // getInstance() menunggu platform channel yang tidak ada di flutter test.
     SharedPreferences.setMockInitialValues({});
@@ -33,14 +40,19 @@ void main() {
       db: LocalDatabaseService(),
       crypto: JournalCryptoService(),
     );
-    await tester.pumpWidget(RiungApp(
-      prefs: prefs,
-      remoteConfig: RemoteConfigService(),
-      authService: StubAuthService(),
-      userRepository: userRepository,
-      contentRepository: StubContentRepository(),
-      walletFunctions: LocalWalletFunctionsService(prefs: prefs, userRepository: userRepository),
-    ));
+    await tester.pumpWidget(
+      RiungApp(
+        prefs: prefs,
+        remoteConfig: RemoteConfigService(),
+        authService: StubAuthService(),
+        userRepository: userRepository,
+        contentRepository: StubContentRepository(),
+        walletFunctions: LocalWalletFunctionsService(
+          prefs: prefs,
+          userRepository: userRepository,
+        ),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.text('Riung'), findsOneWidget);
@@ -56,11 +68,13 @@ void main() {
 
     // Tagline splash hilang (logo "Riung" kini juga ada di sambutan onboarding).
     expect(find.text('Jinakkan monster dalam pikiranmu'), findsNothing);
-    expect(find.text('Mulai kenalan (2 menit)'), findsOneWidget);
+    expect(find.text('Lanjut'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Galeri komponen render tanpa error', (WidgetTester tester) async {
+  testWidgets('Galeri komponen render tanpa error', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(await _galleryApp());
     await tester.pumpAndSettle();
 
@@ -71,7 +85,9 @@ void main() {
     expect(find.text('Mulai sekarang'), findsOneWidget);
   });
 
-  testWidgets('Galeri monster tidak overflow di layar 360dp', (WidgetTester tester) async {
+  testWidgets('Galeri monster tidak overflow di layar 360dp', (
+    WidgetTester tester,
+  ) async {
     // Lebar minimum yang wajib lolos per CLAUDE.md ("lolos di layar 360dp").
     tester.view.physicalSize = const Size(360, 1200);
     tester.view.devicePixelRatio = 1.0;
