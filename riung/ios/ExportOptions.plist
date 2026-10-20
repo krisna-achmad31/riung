@@ -19,5 +19,8 @@
 	</dict>
 	<key>uploadSymbols</key>
 	<true/>
+	<!-- The workflow sets the build number (1000 + run number); Xcode must not change it. -->
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
 </dict>
 </plist>
