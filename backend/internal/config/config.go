@@ -120,6 +120,12 @@ type Config struct {
 	// AppStoreAppAppleID, when set, must match appAppleId on production
 	// notifications (the numeric Apple ID of the app).
 	AppStoreAppAppleID int64
+
+	// Telegram alarms (ERROR logs, refunds, start-up, watchdog). Off when the
+	// token is empty. AlertLabel prefixes messages (default "riung <env>").
+	AlertTelegramToken  string
+	AlertTelegramChatID string
+	AlertLabel          string
 }
 
 // BillingEnabled reports whether purchase verification is configured.
@@ -289,6 +295,12 @@ func Load(getenv func(string) string) (Config, error) {
 	if c.AppStoreBundleID != "" && !c.DevBilling &&
 		(c.AppStoreIssuerID == "" || c.AppStoreKeyID == "" || c.AppStorePrivateKeyFile == "") {
 		errs = append(errs, errors.New("APPSTORE_ISSUER_ID, APPSTORE_KEY_ID and APPSTORE_PRIVATE_KEY_FILE are required with APPSTORE_BUNDLE_ID"))
+	}
+	c.AlertTelegramToken = strings.TrimSpace(getenv("ALERT_TELEGRAM_BOT_TOKEN"))
+	c.AlertTelegramChatID = strings.TrimSpace(getenv("ALERT_TELEGRAM_CHAT_ID"))
+	c.AlertLabel = orDefault(strings.TrimSpace(getenv("ALERT_LABEL")), "riung "+c.Env)
+	if (c.AlertTelegramToken == "") != (c.AlertTelegramChatID == "") {
+		errs = append(errs, errors.New("ALERT_TELEGRAM_BOT_TOKEN and ALERT_TELEGRAM_CHAT_ID go together"))
 	}
 	c.MinAppVersion = orDefault(getenv("MIN_APP_VERSION"), "0.0.0")
 	if _, ok := ParseVersion(c.MinAppVersion); !ok {

@@ -11,6 +11,8 @@
 //	riung reapply-deletions       re-delete deleted accounts after a backup restore
 //	riung admin grant|revoke      give/remove Admin API access (needs Firebase credentials)
 //	riung appstore-check [--notify] prove the App Store key; --notify: Apple sends TEST notifications
+//	riung watchdog                check API, Loki error rate/latency, cron jobs, backups (host cron)
+//	riung alert-test              send one Telegram test message (ALERT_TELEGRAM_*)
 //	riung healthcheck             probe the local /healthz (Docker HEALTHCHECK)
 //	riung version                 print the build version
 package main
@@ -29,6 +31,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/krisna-achmad31/riung/backend/internal/alert"
 	"github.com/krisna-achmad31/riung/backend/internal/api"
 	"github.com/krisna-achmad31/riung/backend/internal/authn"
 	"github.com/krisna-achmad31/riung/backend/internal/catalog"
@@ -55,6 +58,8 @@ const usage = `usage:
   riung settings reset <key> <reason...>
   riung admin grant|revoke <email> <reason...>
   riung appstore-check [--notify]
+  riung watchdog
+  riung alert-test
   riung cleanup
   riung billing-sync
   riung reconcile
@@ -62,6 +67,12 @@ const usage = `usage:
   riung reapply-deletions
   riung healthcheck
   riung version`
+
+// alerts sends alarms to Telegram when ALERT_TELEGRAM_* is set (nil = off).
+var alerts *alert.Notifier
+
+// alertEvents are sent below ERROR too: money moving back, and the watchdog.
+var alertEvents = []string{"refund_applied", "watchdog_alert"}
 
 func main() {
 	os.Exit(run(os.Args[1:]))
@@ -85,6 +96,12 @@ func run(args []string) int {
 	if err != nil {
 		logger.Error("invalid configuration", logx.KeyEvent, logx.EventCommandError, "error", err.Error())
 		return 1
+	}
+	if cfg.AlertTelegramToken != "" {
+		alerts = alert.New(&alert.Telegram{Token: cfg.AlertTelegramToken, ChatID: cfg.AlertTelegramChatID},
+			alert.Options{Label: cfg.AlertLabel, OnError: func(err error) { fmt.Fprintln(os.Stderr, "alert:", err) }})
+		defer alerts.Close(5 * time.Second)
+		logger = slog.New(alert.NewHandler(logger.Handler(), alerts, alertEvents...))
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -113,6 +130,10 @@ func run(args []string) int {
 		err = runReapplyDeletions(ctx, cfg, logger)
 	case "admin":
 		err = runAdmin(ctx, cfg, args[1:], logger)
+	case "alert-test":
+		err = runAlertTest(ctx, cfg, logger)
+	case "watchdog":
+		err = runWatchdog(ctx, cfg, logger)
 	case "appstore-check":
 		err = runAppStoreCheck(ctx, cfg, args[1:], logger)
 	case "seed-content":
@@ -247,6 +268,9 @@ func runAPI(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 			}
 		}(srv, name)
 	}
+	// One message per start: deploys and crash restarts both show up.
+	alerts.Notify("startup", fmt.Sprintf("🟢 riung-api start · versi %s · appStore=%t · billingPlay=%t",
+		version, cfg.AppStoreEnabled(), cfg.BillingEnabled()))
 
 	var runErr error
 	select {
