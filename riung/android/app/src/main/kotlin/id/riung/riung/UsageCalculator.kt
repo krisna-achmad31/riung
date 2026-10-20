@@ -1,4 +1,4 @@
-package com.riung.riung
+package id.riung.riung
 
 import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager

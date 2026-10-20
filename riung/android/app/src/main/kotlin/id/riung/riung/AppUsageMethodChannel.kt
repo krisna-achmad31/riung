@@ -1,4 +1,4 @@
-package com.riung.riung
+package id.riung.riung
 
 import android.app.AppOpsManager
 import android.app.usage.UsageStatsManager
@@ -22,7 +22,7 @@ import java.util.Calendar
  */
 class AppUsageMethodChannel(private val context: Context, private val activity: android.app.Activity? = null) : MethodCallHandler {
     companion object {
-        const val CHANNEL = "com.riung.riung/app_usage"
+        const val CHANNEL = "id.riung.riung/app_usage"
     }
 
     private var channel: MethodChannel? = null

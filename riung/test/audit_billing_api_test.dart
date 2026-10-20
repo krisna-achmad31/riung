@@ -109,7 +109,7 @@ PurchaseDetails _purchase(
 GooglePlayPurchaseDetails _playPurchase(String product, PurchaseStatus status, {required String token}) =>
     GooglePlayPurchaseDetails.fromPurchase(PurchaseWrapper(
       orderId: 'order-$token',
-      packageName: 'com.riung.riung',
+      packageName: 'id.riung.riung',
       purchaseTime: 0,
       purchaseToken: token,
       signature: '',

@@ -1,4 +1,4 @@
-package com.riung.riung
+package id.riung.riung
 
 import android.app.Notification
 import android.app.NotificationChannel

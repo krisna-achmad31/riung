@@ -42,7 +42,7 @@ hadiah/progres tetap dari `economy.dart`.
 
 - Saklar "Kunci saat batas tercapai" di Pengaturan > Aplikasi Beku (default nyala, bisa
   dimatikan kapan saja). Mati = Riung hanya mengingatkan.
-- Native (`android/.../kotlin/com/riung/riung/`): `AppLockService` (foreground service,
+- Native (`android/.../kotlin/id/riung/riung/`): `AppLockService` (foreground service,
   tipe `specialUse`) memantau aplikasi di depan tiap detik lewat event UsageStats
   (`UsageCalculator`). Kalau aplikasi beku melewati batas efektif (batas harian + menit
   ekstra hari ini), Riung dibuka di depannya lewat `startActivity`, yang di Android 10+

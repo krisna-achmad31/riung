@@ -22,10 +22,29 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.809457116609-m7gos9bd7hl51t00u1rq3r3ibfug5v4d</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Riung memakai Face ID supaya hanya kamu yang bisa membuka jurnalmu yang terkunci.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Riung hanya membaca durasi tidur dari Apple Health untuk laporan refleksimu. Datanya dibaca di HP-mu, tidak disimpan, dan tidak dikirim ke mana pun.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Riung tidak menulis data apa pun ke Apple Health. Riung hanya membaca durasi tidur untuk laporan refleksimu.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Riung menyimpan kartu karaktermu ke galeri foto supaya bisa kamu bagikan.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

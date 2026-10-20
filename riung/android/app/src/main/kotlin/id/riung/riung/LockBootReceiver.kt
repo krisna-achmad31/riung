@@ -1,4 +1,4 @@
-package com.riung.riung
+package id.riung.riung
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,7 +11,7 @@ import android.provider.Settings
  */
 class LockBootReceiver : BroadcastReceiver() {
     companion object {
-        const val ACTION_RESTART = "com.riung.riung.action.RESTART_LOCK"
+        const val ACTION_RESTART = "id.riung.riung.action.RESTART_LOCK"
     }
 
     override fun onReceive(context: Context, intent: Intent) {

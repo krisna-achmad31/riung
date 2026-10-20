@@ -10,6 +10,19 @@ Kategori: **Ditambahkan** (fitur baru) · **Diubah** · **Diperbaiki** · **Keam
 
 ---
 
+## [1.0.3+4] — 2026-10-20
+
+**Committer:** Achmad Yukrisna · **Branch:** `fixing_ios_target_and_version` · **Commit:** commit rilis ini
+
+### Diubah
+- **Package/bundle ID `com.riung.riung` → `id.riung.riung`** (Android `applicationId`/`namespace` + paket Kotlin, iOS bundle ID, MethodChannel `id.riung.riung/app_usage`, action `RESTART_LOCK`, link Play & kelola langganan). App Firebase baru di `riung-5e979`: iOS `1:809457116609:ios:ea6a284f9d37cee947fb40`, Android `1:809457116609:android:c80834d6e5664f1247fb40` (SHA rilis + debug sudah didaftarkan). Secret CI `GOOGLE_SERVICES_JSON` / `GOOGLE_SERVICE_INFO_PLIST` / `FIREBASE_APP_ID_ANDROID` perlu diperbarui.
+- iOS: `GoogleService-Info.plist` kini masuk target Runner (Copy Bundle Resources) dan `Info.plist` punya URL scheme `REVERSED_CLIENT_ID` untuk Google Sign-In — tanpa keduanya app crash saat start / saat login Google.
+- iOS: minimum iOS dinaikkan 13.0 → 15.5, disamakan di Podfile (`platform` + `post_install` untuk semua pod) dan `Runner.xcodeproj` (dibutuhkan `cloud_firestore`, sekaligus persiapan iOS 27).
+- iOS: `Debug/Release.xcconfig` meng-include xcconfig CocoaPods; `Podfile` kini ikut di-commit.
+- iOS: project & scheme di-upgrade Flutter 3.44 (`objectVersion` 60, `customLLDBInitFile` di scheme). AppDelegate (`FlutterImplicitEngineDelegate`) & scene manifest (`UISceneStoryboardFile = Main`) sudah sesuai lifecycle UIScene.
+
+---
+
 ## [1.0.2+3] — 2026-10-17
 
 **Committer:** Achmad Yukrisna · **Branch:** `fix/audit-hardening` · **Commit:** commit rilis ini (tindak lanjut re-audit)

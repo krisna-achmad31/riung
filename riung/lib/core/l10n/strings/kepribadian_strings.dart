@@ -373,7 +373,7 @@ class KepribadianStringsId extends KepribadianStrings {
   @override
   String get imageShareFailed => 'Belum bisa membagikan kartu. Coba lagi.';
   @override
-  String shareText(String name) => 'Aku $name di Riung 🌙 Kenali karakter dirimu juga: https://play.google.com/store/apps/details?id=com.riung.riung #Riung #KenaliDirimu';
+  String shareText(String name) => 'Aku $name di Riung 🌙 Kenali karakter dirimu juga: https://play.google.com/store/apps/details?id=id.riung.riung #Riung #KenaliDirimu';
   @override
   String cardTagline(PersonalityTest test) => 'Kenali dirimu di Riung';
 
@@ -812,7 +812,7 @@ class KepribadianStringsEn extends KepribadianStrings {
   @override
   String get imageShareFailed => 'Could not share the card. Please try again.';
   @override
-  String shareText(String name) => 'I am $name on Riung 🌙 Find your own character too: https://play.google.com/store/apps/details?id=com.riung.riung #Riung #KnowYourself';
+  String shareText(String name) => 'I am $name on Riung 🌙 Find your own character too: https://play.google.com/store/apps/details?id=id.riung.riung #Riung #KnowYourself';
   @override
   String cardTagline(PersonalityTest test) => 'Know yourself on Riung';
 

@@ -125,7 +125,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-                <action android:name="com.riung.riung.action.RESTART_LOCK"/>
+                <action android:name="id.riung.riung.action.RESTART_LOCK"/>
             </intent-filter>
         </receiver>
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />

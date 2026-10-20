@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 /// `AppUsageMethodChannel.kt`: data ini nggak pernah meninggalkan
 /// perangkat, cuma dipakai untuk gerbang lokal Aplikasi Beku.
 class AppUsageService {
-  static const _channel = MethodChannel('com.riung.riung/app_usage');
+  static const _channel = MethodChannel('id.riung.riung/app_usage');
 
   Future<bool> hasUsageAccess() async {
     try {

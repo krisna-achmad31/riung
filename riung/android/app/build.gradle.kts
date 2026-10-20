@@ -20,7 +20,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.riung.riung"
+    namespace = "id.riung.riung"
     // M7 Task 3: dipatok manual (bukan flutter.compileSdkVersion) supaya
     // versi rilis stabil & tidak diam-diam berubah tiap Flutter SDK di-update.
     // compileSdk = 36, BUKAN 34 seperti diminta — beberapa plugin (Firebase,
@@ -43,7 +43,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.riung.riung"
+        applicationId = "id.riung.riung"
         // M7 Task 3: targetSdk 34, versionCode/Name mengikuti rilis pertama Play Store.
         // minSdk 26: syarat Health Connect (data tidur dari jam tangan).
         minSdk = 26

@@ -1,4 +1,4 @@
-package com.riung.riung
+package id.riung.riung
 
 import android.content.Context
 import android.content.Intent

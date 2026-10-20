@@ -1,4 +1,4 @@
-package com.riung.riung
+package id.riung.riung
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine

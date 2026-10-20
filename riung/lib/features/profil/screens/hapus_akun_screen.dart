@@ -277,7 +277,7 @@ class _LanggananPlayWarning extends StatelessWidget {
     final productId = premiumPlan;
     final uri = Uri.parse(
       'https://play.google.com/store/account/subscriptions'
-      '${productId != null ? '?sku=$productId&package=com.riung.riung' : ''}',
+      '${productId != null ? '?sku=$productId&package=id.riung.riung' : ''}',
     );
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
