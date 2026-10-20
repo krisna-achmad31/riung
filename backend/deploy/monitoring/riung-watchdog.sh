@@ -20,12 +20,16 @@ else
   img="$(cat "$STATE/image" 2>/dev/null || true)"
 fi
 
+# Newest dump as "<name> <mtime> <bytes>": the container never sees the dumps.
+newest="$(find /var/backups/riung -maxdepth 1 -name '*.dump' -printf '%T@ %f %s\n' 2>/dev/null |
+  sort -rn | head -1 | awk '{printf "%s %d %s", $2, $1, $3}')"
+
 rc=1
 if [ -n "$img" ]; then
   timeout 90 docker run --rm --name riung-watchdog --read-only --cap-drop ALL --user 65532:65532 \
     --memory 64m --pids-limit 50 --network vps-shared-net \
     --env-file "$DIR/.env" --env-file "$DIR/.env.watchdog" \
-    -v /var/backups/riung:/backups:ro -v "$STATE:/state" \
+    -e WATCHDOG_BACKUP_NEWEST="${newest:-none}" -v "$STATE:/state" \
     "$img" watchdog
   rc=$?
 fi

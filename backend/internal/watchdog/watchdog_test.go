@@ -127,6 +127,17 @@ func TestRunQuietTrafficAndBrokenLoki(t *testing.T) {
 	if r := byName(watchdog.Run(context.Background(), watchdog.Config{BackupDir: backupDir(t, time.Hour, 10), Now: func() time.Time { return now }}))["backup"]; r.OK {
 		t.Fatal("a 10-byte dump is not a backup")
 	}
+	// Info from the host script (the container cannot read the dumps).
+	for info, want := range map[string]bool{
+		fmt.Sprintf("riung_2026-10-20.dump %d 71607", now.Add(-5*time.Hour).Unix()):  true,
+		fmt.Sprintf("riung_2026-10-18.dump %d 71607", now.Add(-50*time.Hour).Unix()): false,
+		"none": false, "garbage x y": false,
+	} {
+		r := byName(watchdog.Run(context.Background(), watchdog.Config{BackupNewest: info, BackupDir: "/ignored", Now: func() time.Time { return now }}))["backup"]
+		if r.OK != want {
+			t.Errorf("%q: %+v", info, r)
+		}
+	}
 }
 
 func TestEvaluateAlertsOnceRemindsAndRecovers(t *testing.T) {

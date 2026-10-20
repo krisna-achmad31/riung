@@ -23,6 +23,7 @@ import (
 //	WATCHDOG_LOKI_URL    []                       e.g. http://shared-loki:3100 (5xx, p95, cron jobs)
 //	WATCHDOG_CONTAINER   [riung-api]              Loki container label
 //	WATCHDOG_BACKUP_DIR  []                       e.g. /backups (newest *.dump < 26 h)
+//	WATCHDOG_BACKUP_NEWEST []                     "<name> <unix mtime> <bytes>" from the host script (wins over the dir)
 //	WATCHDOG_STATE_FILE  [/state/watchdog.json]
 //
 // Failures are reported through Telegram (event watchdog_alert), not the exit
@@ -35,12 +36,13 @@ func runWatchdog(ctx context.Context, _ config.Config, logger *slog.Logger) erro
 		return def
 	}
 	c := watchdog.Config{
-		APIURL:    env("WATCHDOG_API_URL", "http://riung-api:8080"),
-		PublicURL: env("WATCHDOG_PUBLIC_URL", ""),
-		LokiURL:   env("WATCHDOG_LOKI_URL", ""),
-		Container: env("WATCHDOG_CONTAINER", "riung-api"),
-		BackupDir: env("WATCHDOG_BACKUP_DIR", ""),
-		Now:       nowFunc,
+		APIURL:       env("WATCHDOG_API_URL", "http://riung-api:8080"),
+		PublicURL:    env("WATCHDOG_PUBLIC_URL", ""),
+		LokiURL:      env("WATCHDOG_LOKI_URL", ""),
+		Container:    env("WATCHDOG_CONTAINER", "riung-api"),
+		BackupDir:    env("WATCHDOG_BACKUP_DIR", ""),
+		BackupNewest: env("WATCHDOG_BACKUP_NEWEST", ""),
+		Now:          nowFunc,
 	}
 	statePath := env("WATCHDOG_STATE_FILE", "/state/watchdog.json")
 	prev, err := watchdog.LoadState(statePath)

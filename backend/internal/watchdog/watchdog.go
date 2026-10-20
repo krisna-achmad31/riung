@@ -8,6 +8,7 @@ package watchdog
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -26,8 +27,12 @@ type Config struct {
 	LokiURL   string // e.g. http://shared-loki:3100
 	Container string // Loki container label, e.g. riung-api
 	BackupDir string // directory with pg_dump *.dump files
-	HTTP      *http.Client
-	Now       func() time.Time
+	// BackupNewest describes the newest dump as "<name> <unix mtime> <bytes>"
+	// ("none" = no file). The host script fills it so the container never
+	// needs access to the dumps; it takes precedence over BackupDir.
+	BackupNewest string
+	HTTP         *http.Client
+	Now          func() time.Time
 }
 
 // Thresholds (docs/backend-api-spec.md §6.6).
@@ -74,7 +79,7 @@ func Run(ctx context.Context, c Config) []Result {
 	if c.LokiURL != "" {
 		out = append(out, c.lokiChecks(ctx)...)
 	}
-	if c.BackupDir != "" {
+	if c.BackupNewest != "" || c.BackupDir != "" {
 		out = append(out, c.backupCheck())
 	}
 	return out
@@ -193,9 +198,31 @@ func (c Config) lokiScalar(ctx context.Context, query string) (float64, error) {
 }
 
 func (c Config) backupCheck() Result {
+	name, mtime, size, err := c.newestBackup()
+	if err != nil {
+		return Result{"backup", false, err.Error()}
+	}
+	age := c.Now().Sub(mtime)
+	detail := fmt.Sprintf("%s, %d byte, umur %s", name, size, age.Round(time.Minute))
+	return Result{"backup", age <= maxBackupAge && size >= minBackupBytes, detail}
+}
+
+func (c Config) newestBackup() (string, time.Time, int64, error) {
+	if c.BackupNewest != "" {
+		f := strings.Fields(c.BackupNewest)
+		if len(f) != 3 {
+			return "", time.Time{}, 0, errors.New("tidak ada file backup")
+		}
+		sec, err1 := strconv.ParseInt(f[1], 10, 64)
+		size, err2 := strconv.ParseInt(f[2], 10, 64)
+		if err1 != nil || err2 != nil {
+			return "", time.Time{}, 0, fmt.Errorf("info backup tidak valid: %q", c.BackupNewest)
+		}
+		return f[0], time.Unix(sec, 0), size, nil
+	}
 	files, err := filepath.Glob(filepath.Join(c.BackupDir, "*.dump"))
 	if err != nil || len(files) == 0 {
-		return Result{"backup", false, "tidak ada file backup di " + c.BackupDir}
+		return "", time.Time{}, 0, errors.New("tidak ada file backup di " + c.BackupDir)
 	}
 	var newest os.FileInfo
 	for _, f := range files {
@@ -205,11 +232,9 @@ func (c Config) backupCheck() Result {
 		}
 	}
 	if newest == nil {
-		return Result{"backup", false, "file backup tidak terbaca"}
+		return "", time.Time{}, 0, errors.New("file backup tidak terbaca")
 	}
-	age := c.Now().Sub(newest.ModTime())
-	detail := fmt.Sprintf("%s, %d byte, umur %s", newest.Name(), newest.Size(), age.Round(time.Minute))
-	return Result{"backup", age <= maxBackupAge && newest.Size() >= minBackupBytes, detail}
+	return newest.Name(), newest.ModTime(), newest.Size(), nil
 }
 
 func shortErr(err error) string {
