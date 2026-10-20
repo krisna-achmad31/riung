@@ -45,6 +45,8 @@
 	<string>Riung tidak menulis data apa pun ke Apple Health. Riung hanya membaca durasi tidur untuk laporan refleksimu.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Riung menyimpan kartu karaktermu ke galeri foto supaya bisa kamu bagikan.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Riung butuh akses ke galeri foto hanya untuk menyimpan kartu karaktermu supaya bisa kamu bagikan. Riung tidak membaca atau mengunggah fotomu.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
