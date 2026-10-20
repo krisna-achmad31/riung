@@ -67,9 +67,19 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
 - [x] **P1 — Isi konten**: seed `dummy-data-seed.json` 2026-10-13 (ulangi bila konten berubah).
 - [ ] **P1 — Admin**: tentukan email admin; pastikan admin punya akses VPN OpenVPN; jalankan
       `riung admin grant <email> <alasan>` setelah deploy.
-- [ ] **P1 — Alert Telegram**: buat bot + grup Telegram tim (atau pakai bot yang sudah dipakai app lain),
-      lalu pasang `backend/deploy/monitoring/grafana-alerting-riung.yml` (runbook langkah 8b). Konvensi
-      `core-shared`: Grafana alerting sengaja kosong — sepakati dulu dengan pengelola `core-shared`.
+- [x] **P1 — Alarm Telegram** (2026-10-20, runbook 8b): dikirim aplikasi sendiri sesuai konvensi `core-shared`
+      (log ERROR, refund, start API) + `riung watchdog` tiap 2 menit (API, 5xx/p95, job cron, backup). Bot
+      `@Riung_bot`, chat `408667565` — **penerima harus menekan Start di bot** (sebelum itu Telegram menjawab
+      `chat not found`). Token bot sempat ditulis di chat → rotasi lewat @BotFather bersama pekerjaan keamanan.
+- [x] **P1 — Dashboard Grafana** (2026-10-20, runbook 8c): **Riung — Teknis** (Loki) & **Riung — Bisnis** (view
+      `metrics`, role baca-saja `riung_metrics`).
+- [ ] **P1 — Staging** (runbook §H): stack, Postgres sendiri, nginx bootstrap, CI, Postman siap; **sisa: DNS
+      `A riung-staging → 76.13.20.72` (DNS only)** → certbot → config nginx dengan kunci → `RIUNG_STAGING_ENABLED`.
+      Kunci staging dibagikan ke tim app lewat kanal privat.
+- [ ] **P2 — Pemantau dari luar VPS**: watchdog berjalan di VPS yang sama; VPS/Docker mati total tidak terdeteksi.
+      Opsi: UptimeRobot/healthchecks.io ke `https://riung.e55techlab.com/healthz`.
+- [ ] **P2 — Staging dengan Firebase sungguhan** (project `riung-staging`) bila login asli/App Check/billing
+      sandbox perlu diuji sebelum produksi; sekarang staging memakai token dev.
 - [ ] **P1 — App Check `enforce`** setelah app mengirim token: kriteria di `docs/backend-b6-review.md` §4.
 - [ ] **P2 — Uji beban di VPS** saat beta (token Firebase sungguhan), pantau p95 dari Loki.
 - [x] **P2 — Backend menunggu DB saat start** (2026-10-19): `riung api` mencoba ulang koneksi DB sampai 60 detik

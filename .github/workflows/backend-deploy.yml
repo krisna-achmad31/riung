@@ -1,7 +1,8 @@
 name: Backend deploy
 
 # Deploys one riung-api image (ghcr.io/krisna-achmad31/riung-api:<tag>) to the
-# VPS. Called by backend.yml: after a build (deploy ✓) or with rollback_tag.
+# VPS — production (/var/www/riung) or staging (/var/www/riung-staging).
+# Called by backend.yml: after a build (deploy ✓ / staging) or with rollback_tag.
 # Images on the VPS are pruned after 24 h (cron), so a rollback pulls from
 # GHCR: only tags pushed by CI exist there.
 #
@@ -15,6 +16,10 @@ on:
       tag:
         type: string
         required: true
+      environment:
+        description: "production or staging"
+        type: string
+        default: production
 
 permissions:
   contents: read
@@ -24,9 +29,9 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    environment: production
+    environment: ${{ inputs.environment }}
     concurrency:
-      group: deploy-production
+      group: deploy-${{ inputs.environment }}
       cancel-in-progress: false
     defaults:
       run:
@@ -34,14 +39,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check tag
+      - name: Check inputs
         env:
           TAG: ${{ inputs.tag }}
+          TARGET: ${{ inputs.environment }}
         run: |
           if ! printf '%s' "$TAG" | grep -Eq '^[0-9a-f]{7,40}$'; then
             echo "::error::tag must be a hex git sha (7–40 characters), got '$TAG'"
             exit 1
           fi
+          case "$TARGET" in
+          production) echo "SSH_SUFFIX=" >> "$GITHUB_ENV"; echo "COMPOSE_FILE=docker-compose.prod.yml" >> "$GITHUB_ENV"
+                      echo "BASE_URL=https://riung.e55techlab.com" >> "$GITHUB_ENV" ;;
+          staging)    echo "SSH_SUFFIX= staging" >> "$GITHUB_ENV"; echo "COMPOSE_FILE=docker-compose.staging.yml" >> "$GITHUB_ENV"
+                      echo "BASE_URL=https://riung-staging.e55techlab.com" >> "$GITHUB_ENV" ;;
+          *) echo "::error::environment must be production or staging"; exit 1 ;;
+          esac
 
       - name: Configure SSH
         env:
@@ -59,10 +72,10 @@ jobs:
           HOST: ${{ secrets.VPS_HOST }}
           PORT: ${{ secrets.VPS_SSH_PORT }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" check > vps.sha256
-          sha256sum deploy/deploy.sh deploy/docker-compose.prod.yml | sed 's|deploy/||' > repo.sha256
+          ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" "check$SSH_SUFFIX" > vps.sha256
+          sha256sum deploy/deploy.sh "deploy/$COMPOSE_FILE" | sed 's|deploy/||' > repo.sha256
           if ! diff -u vps.sha256 repo.sha256; then
-            echo "::error::deploy.sh / docker-compose.prod.yml on the VPS differ from this commit. Copy them first (backend/deploy/README.md, step A.2), then rerun."
+            echo "::error::deploy.sh / $COMPOSE_FILE on the VPS differ from this commit. Copy them first (backend/deploy/README.md, step A.2 / §H), then rerun."
             exit 1
           fi
 
@@ -73,12 +86,14 @@ jobs:
           TAG: ${{ inputs.tag }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          printf '%s' "$TOKEN" | ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" deploy "$TAG"
+          printf '%s' "$TOKEN" | ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes "deploy@$HOST" "deploy $TAG$SSH_SUFFIX"
 
       - name: Smoke test
+        env:
+          STAGING_KEY: ${{ secrets.RIUNG_STAGING_KEY }}
         run: |
           for path in /healthz /v1/config; do
-            code="$(curl -s -o /dev/null -w '%{http_code}' "https://riung.e55techlab.com$path")"
+            code="$(curl -s -o /dev/null -w '%{http_code}' -H "X-Riung-Staging-Key: $STAGING_KEY" "$BASE_URL$path")"
             echo "$path $code"
             [ "$code" = 200 ] || exit 1
           done

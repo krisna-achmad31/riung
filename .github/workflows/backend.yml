@@ -18,8 +18,12 @@ on:
         description: "Deploy this commit to production after the image is pushed"
         type: boolean
         default: false
+      deploy_staging:
+        description: "Deploy this commit to staging after the image is pushed"
+        type: boolean
+        default: false
       rollback_tag:
-        description: "Rollback only: deploy this existing image tag (7-char sha) without building"
+        description: "Rollback only: deploy this existing image tag (7-char sha) to production without building"
         type: string
         default: ""
 
@@ -155,6 +159,22 @@ jobs:
     uses: ./.github/workflows/backend-deploy.yml
     with:
       tag: ${{ needs.image.outputs.tag }}
+    secrets: inherit
+
+  # Staging: every push to feat/go-backend (vars.RIUNG_STAGING_ENABLED ==
+  # 'true'), or Run workflow → deploy_staging ✓. Fake auth/billing, own DB.
+  deploy-staging:
+    needs: image
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && !inputs.rollback_tag) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/feat/go-backend' && vars.RIUNG_STAGING_ENABLED == 'true')
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/backend-deploy.yml
+    with:
+      tag: ${{ needs.image.outputs.tag }}
+      environment: staging
     secrets: inherit
 
   # Rollback: `gh workflow run Backend --ref <branch> -f rollback_tag=<sha7>`

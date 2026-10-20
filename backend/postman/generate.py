@@ -142,6 +142,9 @@ collection_pre = [
     "pm.request.headers.upsert({ key: 'X-Platform', value: 'android' });",
     "const appCheck = pm.variables.get('appCheckToken');",
     "if (appCheck) pm.request.headers.upsert({ key: 'X-Firebase-AppCheck', value: appCheck });",
+    "// Staging (riung-staging.e55techlab.com) hanya menjawab request dengan kunci ini.",
+    "const stagingKey = pm.variables.get('stagingKey');",
+    "if (stagingKey) pm.request.headers.upsert({ key: 'X-Riung-Staging-Key', value: stagingKey });",
     "// Satu Idempotency-Key baru per kirim. Untuk menguji replay, isi header Idempotency-Key sendiri di request-nya.",
     "if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(pm.request.method) && !pm.request.headers.has('Idempotency-Key')) {",
     "  pm.request.headers.add({ key: 'Idempotency-Key', value: pm.variables.replaceIn('{{$guid}}') });",
@@ -297,6 +300,7 @@ desc = """Koleksi semua endpoint backend Riung (`/v1`). Panduan: `docs/panduan-i
 **Pakai**
 1. Import koleksi ini + salah satu environment (`riung-local` atau `riung-prod`).
 2. Lokal: `cd backend && make dev-up` lalu seed konten. Token sudah terisi (`dev:postman:google.com`, App Check `dev`).
+   Staging (`riung-staging`): sama dengan lokal (token dev, billing palsu), isi `stagingKey` dengan kunci staging.
 3. Produksi: isi `idToken` dengan ID token Firebase (berlaku 1 jam) dan `appCheckToken` bila ada (App Check masih `monitor`).
 4. Jalankan **2. Akun → Me** dulu: menyimpan `userId` dan `billingAccountId`.
 
@@ -327,6 +331,19 @@ local = env("riung-local", [
     ("devBilling", "true", "default"), ("coinToken", "", "default"), ("subToken", "", "default"),
     ("appAccountToken", "", "default"), ("appleCoinTx", "", "default"), ("appleSubTx", "", "default"),
 ])
+staging = env("riung-staging", [
+    ("baseUrl", "https://riung-staging.e55techlab.com", "default"),
+    ("adminBaseUrl", "", "default"),
+    ("stagingKey", "", "secret"),
+    ("idToken", "dev:postman:google.com", "default"),
+    ("appCheckToken", "dev", "default"),
+    ("adminToken", "", "default"),
+    ("pubsubToken", "dev-pubsub", "default"),
+    ("appVersion", "1.0.0", "default"),
+    ("userId", "", "default"), ("billingAccountId", "", "default"), ("ticketId", "", "default"), ("configEtag", "", "default"),
+    ("devBilling", "true", "default"), ("coinToken", "", "default"), ("subToken", "", "default"),
+    ("appAccountToken", "", "default"), ("appleCoinTx", "", "default"), ("appleSubTx", "", "default"),
+])
 prod = env("riung-prod", [
     ("baseUrl", "https://riung.e55techlab.com", "default"),
     ("adminBaseUrl", "http://172.19.0.16:8081", "default"),
@@ -341,7 +358,7 @@ prod = env("riung-prod", [
 ])
 
 for fname, obj in [("riung-api.postman_collection.json", collection), ("riung-local.postman_environment.json", local),
-                   ("riung-prod.postman_environment.json", prod)]:
+                   ("riung-staging.postman_environment.json", staging), ("riung-prod.postman_environment.json", prod)]:
     with open(f"{OUT}/{fname}", "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, ensure_ascii=False)
         f.write("\n")

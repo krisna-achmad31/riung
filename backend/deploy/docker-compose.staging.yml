@@ -1,0 +1,83 @@
+# Staging stack on the VPS (/var/www/riung-staging, runbook §H):
+# riung-staging.e55techlab.com, reachable only with the X-Riung-Staging-Key
+# header (nginx). Fake login and billing (RIUNG_ENV=dev, DEV_AUTH, DEV_BILLING)
+# and its OWN Postgres: the migrations grant to the role names riung_app /
+# riung_migrator, so staging must not share a server with production.
+#
+# Deploy with deploy.sh like production, with
+#   RIUNG_COMPOSE_FILE=docker-compose.staging.yml RIUNG_CONTAINER=riung-staging-api
+# (the CI forced command sets both). Start Postgres once: see runbook §H.
+name: riung-staging
+
+x-hardening: &hardening
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  environment:
+    TZ: Asia/Jakarta
+
+services:
+  riung-postgres:
+    image: postgres:16-alpine
+    container_name: riung-staging-postgres
+    restart: unless-stopped
+    env_file: .env.postgres # POSTGRES_PASSWORD (superuser, setup only)
+    mem_limit: 256m
+    shm_size: 64m
+    volumes:
+      - riung-staging-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - internal
+
+  riung-migrate:
+    <<: *hardening
+    image: ${RIUNG_IMAGE:?set RIUNG_IMAGE, e.g. ghcr.io/krisna-achmad31/riung-api:<sha>}
+    container_name: riung-staging-migrate
+    command: ["migrate", "up"]
+    env_file: .env.migrate
+    restart: "no"
+    profiles: ["migrate"]
+    networks:
+      - internal
+
+  riung-api:
+    <<: *hardening
+    image: ${RIUNG_IMAGE:?set RIUNG_IMAGE, e.g. ghcr.io/krisna-achmad31/riung-api:<sha>}
+    container_name: riung-staging-api
+    command: ["api"]
+    env_file: .env
+    restart: unless-stopped
+    mem_limit: 192m
+    cpus: 0.5
+    pids_limit: 200
+    healthcheck:
+      test: ["CMD", "/riung", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      internal: {}
+      shared-net:
+        ipv4_address: 172.19.0.18
+
+volumes:
+  riung-staging-pgdata:
+    name: riung-staging-pgdata
+
+networks:
+  internal:
+    name: riung-staging-internal
+    internal: true
+  shared-net:
+    external: true
+    name: vps-shared-net

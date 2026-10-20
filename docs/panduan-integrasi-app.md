@@ -18,9 +18,15 @@ dipetakan: `docs/todo-luar-backend.md` §B–C.
 | | URL | Login | App Check |
 |---|---|---|---|
 | Produksi | `https://riung.e55techlab.com/v1` | ID token Firebase (`riung-5e979`) | `monitor` (belum menolak) |
+| Staging | `https://riung-staging.e55techlab.com/v1` + header `X-Riung-Staging-Key` (kunci dari admin) | token dev `dev:<uid>:<provider>` | mati |
 | Lokal | `http://localhost:8080/v1` (`cd backend && make dev-up`) | token dev `dev:<uid>:<provider>` | mati |
 
-Lokal memakai `DEV_AUTH`: token `Bearer dev:rani:anonymous` (atau `:password`, `:google.com`, `:apple.com`) menggantikan ID
+**Staging** = server bersama untuk tim app: database sendiri (bukan data produksi), login & billing palsu
+seperti lokal, versi backend terbaru dari branch `feat/go-backend`. Tanpa header `X-Riung-Staging-Key` semua
+request dijawab `404`; simpan kuncinya di konfigurasi build staging (`--dart-define`), jangan di repo. Data staging
+boleh dihapus kapan saja.
+
+Lokal dan staging memakai `DEV_AUTH`: token `Bearer dev:rani:anonymous` (atau `:password`, `:google.com`, `:apple.com`) menggantikan ID
 token Firebase, App Check cukup `dev`, dan Google Play dipalsukan (§11.5). Di Android emulator, host laptop =
 `http://10.0.2.2:8080`. Untuk build debug yang menembak stack lokal, ID token Firebase sungguhan tidak
 dikenali — pakai token dev lewat konfigurasi build (`--dart-define`).

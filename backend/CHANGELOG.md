@@ -11,6 +11,26 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+### Operasional
+- **Staging** `riung-staging.e55techlab.com` (runbook §H): `docker-compose.staging.yml` dengan Postgres sendiri,
+  login & billing palsu, akses hanya dengan header `X-Riung-Staging-Key`; `deploy.sh` menerima
+  `RIUNG_COMPOSE_FILE`/`RIUNG_CONTAINER` (default = produksi); forced command `check|deploy … staging`; CI deploy
+  staging tiap push ke `feat/go-backend` bila `vars.RIUNG_STAGING_ENABLED` atau `deploy_staging` ✓.
+- Postman: environment `riung-staging` dan header kunci staging otomatis.
+
+---
+
+## [25e4266] — 2026-10-20 · produksi (alarm, watchdog, dashboard)
+
+### Ditambahkan
+- Alarm Telegram dari aplikasi (`ALERT_TELEGRAM_*`): log ERROR, `refund_applied`, pesan saat API start; dedupe
+  10 menit, maks 30/jam. `riung alert-test`.
+- `riung watchdog` + `deploy/monitoring/riung-watchdog.sh` (cron host tiap 2 menit): API, 5xx/p95 dari Loki, job
+  cron, umur backup; alarm, pengingat 6 jam, pesan pulih.
+- Migrasi `00004`: view agregat `metrics.*` untuk dashboard bisnis; role baca-saja `riung_metrics`
+  (`deploy/sql/create-riung-metrics-role.sql`). Dashboard Grafana Riung — Teknis & Riung — Bisnis
+  (`deploy/monitoring/dashboards.py`).
+
 ### Diperbaiki
 - Notifikasi App Store tanpa objek `data` (mis. ringkasan `RENEWAL_EXTENSION`) dicatat `action=no_data`, bukan
   `other_bundle`. Hanya label log.

@@ -173,14 +173,40 @@ lalu `docker compose up -d --force-recreate loki promtail` di core-shared. Reten
 `riung-api`/`riung-migrate` terpasang 2026-10-19 (`-verify-config` dulu, cadangan
 `config.yml.bak-2026-10-19`, `docker restart shared-loki`); stage `json` Promtail belum.
 
-**8b. Alert Telegram** (opsional sampai ada bot; lihat `docs/backend-b6-review.md` §3)
+**8b. Alarm Telegram & watchdog** (terpasang 2026-10-20; konvensi `core-shared`: aplikasi mengirim alarm
+sendiri, Grafana alerting tetap kosong — spec §6.6)
 
-1. Tulis chat id di `monitoring/grafana-alerting-riung.yml` (`chatid: "-100…"`, pakai tanda kutip).
-2. **Uji lokal dulu** — file yang salah menghentikan seluruh provisioning Grafana bersama: jalankan
-   `grafana/grafana:11.6.1` dengan folder provisioning berisi datasource Loki + file ini, pastikan tidak ada
-   `Failed to provision alerting` di log dan `GET /api/v1/provisioning/alert-rules` berisi 12 aturan.
-3. Salin ke `core-shared/monitoring/grafana/provisioning/alerting/riung.yml`, tambahkan
-   `RIUNG_TELEGRAM_BOT_TOKEN` ke environment service `grafana` (container `shared-grafana`), lalu `docker compose up -d grafana`.
+1. Bot Telegram (@BotFather) + chat penerima. Penerima **wajib** membuka bot dan menekan *Start* sekali; tanpa
+   itu Telegram menjawab `400 chat not found`.
+2. `.env`: `ALERT_TELEGRAM_BOT_TOKEN`, `ALERT_TELEGRAM_CHAT_ID`, `ALERT_LABEL=riung prod` (cadangan `.env`
+   dulu), deploy ulang → pesan 🟢 saat API start. Uji: `docker exec riung-api /riung alert-test` (menunggu
+   jawaban Telegram, gagal = exit 1 dengan status Telegram).
+3. Watchdog (cek dari luar API — tetap jalan saat `riung-api` mati):
+   ```sh
+   install -m 755 monitoring/riung-watchdog.sh /usr/local/bin/riung-watchdog
+   install -m 600 monitoring/env.watchdog.example /var/www/riung/.env.watchdog
+   install -d -m 700 -o 65532 -g 65532 /var/lib/riung-watchdog
+   /usr/local/bin/riung-watchdog            # sekali manual: log "watchdog done" ok=true, checks=10
+   ```
+   Cron (langkah 9): `*/2 * * * * /usr/local/bin/riung-watchdog >/dev/null 2>&1`. State di
+   `/var/lib/riung-watchdog/watchdog.json` (hapus untuk mulai ulang). Container watchdog tidak bisa membaca
+   `/var/backups/riung`; skrip host mengirim nama/umur/ukuran dump terbaru lewat env.
+4. `monitoring/grafana-alerting-riung.yml` (12 aturan Grafana) tidak dipasang — rujukan bila konvensi berubah.
+
+**8c. Dashboard Grafana** (terpasang 2026-10-20; folder *VPS*: **Riung — Teknis** dari Loki, **Riung — Bisnis**
+dari view `metrics`)
+
+1. Role baca-saja (setelah migrasi `00004`): `docker exec -i -e RIUNG_METRICS_PASSWORD="$(openssl rand -hex 24)"
+   shared-postgres psql -U n8n -d riung -v ON_ERROR_STOP=1 < sql/create-riung-metrics-role.sql` (aman diulang =
+   ganti password).
+2. Datasource lewat API Grafana (password tersimpan terenkripsi di Grafana, tidak di file): `POST /api/datasources`
+   dengan `uid=riung-postgres`, `type=grafana-postgresql-datasource`, `url=shared-postgres:5432`,
+   `user=riung_metrics`, `database=riung`, `sslmode=disable`, `maxOpenConns=2`. Kredensial admin Grafana =
+   env `GF_SECURITY_ADMIN_*` container `shared-grafana`. Ganti password = ulangi 1 lalu `PUT
+   /api/datasources/uid/riung-postgres`.
+3. Dashboard: `python3 monitoring/dashboards.py monitoring` (sumber; jangan edit JSON), salin
+   `grafana-dashboard-riung-*.json` ke `core-shared/monitoring/grafana/provisioning/dashboards/` (termuat dalam
+   30 detik). File itu dikecualikan di `core-shared/.git/info/exclude` — sumbernya repo ini.
 
 **9. Cron** (root, `crontab -e`). Job dijalankan di dalam `riung-api`; `LOG_TEE=/proc/1/fd/1` membuat
 baris `job_run` ikut masuk log container → Loki (output `docker exec` sendiri tidak ditangkap Promtail).
@@ -195,6 +221,8 @@ baris `job_run` ikut masuk log container → Loki (output `docker exec` sendiri 
 5 * * * * docker exec -e LOG_TEE=/proc/1/fd/1 riung-api /riung billing-sync >/dev/null
 # Cocokkan saldo dompet dengan ledger; gagal = ada ledger_mismatch di log
 45 2 * * * docker exec -e LOG_TEE=/proc/1/fd/1 riung-api /riung reconcile >/dev/null
+# Watchdog: API, 5xx/p95 (Loki), job cron, umur backup → Telegram (langkah 8b)
+*/2 * * * * /usr/local/bin/riung-watchdog >/dev/null 2>&1
 # Backup harian, retensi 14 hari (mkdir -p /var/backups/riung && chmod 700 /var/backups/riung)
 30 2 * * * docker exec shared-postgres pg_dump -Fc -U riung_migrator riung > /var/backups/riung/riung_$(date +\%F).dump && find /var/backups/riung -name '*.dump' -mtime +14 -delete
 ```
@@ -307,6 +335,8 @@ nullable/default) dan baru dihapus di rilis berikutnya setelah tidak dipakai (ex
 | API tidak start: `read APPSTORE_PRIVATE_KEY_FILE` / `app store: private key …` | file `.p8` tidak ada/terbaca uid 65532 di `secrets/` (`chown 65532:65532`, `chmod 400`) atau bukan key EC P-256. Selalu uji dulu dengan `appstore-check` di container sementara (langkah 4d.6). |
 | Verifikasi iOS `500`, log `app store: API key rejected` | key dicabut/salah: `docker exec riung-api /riung appstore-check`. Production `401` saja (sandbox lolos) normal sampai app rilis. |
 | `appstore-check --notify` bukan `SUCCESS` | URL Server Notifications di App Store Connect salah / bukan Version 2, atau webhook ditolak — cek log `rtdn_rejected` `store=app_store`. |
+| Alarm tidak sampai, log `alert: telegram: status 400` | penerima belum menekan *Start* di bot, atau chat id salah (`docker exec riung-api /riung alert-test`). Status `401` = token bot dicabut. |
+| Pesan "riung watchdog tidak bisa jalan" | container watchdog gagal start (image tidak ada, Docker bermasalah) — `/usr/local/bin/riung-watchdog` manual untuk melihat errornya. |
 | Restart berulang setelah reboot | API menunggu Postgres ±60 detik (`database not ready, retrying`, WARN); lebih dari itu = `shared-postgres` mati. |
 
 ## F. Gladi resik lokal (2026-10-11)
@@ -358,5 +388,42 @@ Dijalankan sebagai root lewat SSH, image `ghcr.io/krisna-achmad31/riung-api:8250
   `appstore-check` di container sementara lolos (sandbox; production 401 karena app belum rilis). Sesudah:
   `"appStore":true`, `appstore-check --notify` → notifikasi TEST sandbox `SUCCESS`, diterima API 200 dan lolos
   verifikasi Apple Root CA G3; JWS palsu → 400. Situs lain normal.
+- 2026-10-20: alarm Telegram dari aplikasi + watchdog (`7e63bf3`, `25e4266`; cron tiap 2 menit; 10 cek lolos),
+  migrasi `00004` (view `metrics`), role `riung_metrics`, datasource `riung-postgres`, dashboard **Riung — Teknis**
+  & **Riung — Bisnis** (36 query diuji lewat API Grafana, 0 error). Staging berdiri (§H), menunggu DNS.
+  Cadangan: `/root/riung.env.before-alert.2026-10-20`, `/root/riung.deploy.sh.before-staging.2026-10-20`,
+  `/root/crontab.before-watchdog.2026-10-20`.
 - Catatan 2026-10-17: VPS reboot 09:40 WIB; `riung-api` gagal 4× dalam 2 detik karena `shared-postgres` belum
   menyala (nama host belum bisa di-resolve), lalu jalan normal — `restart: unless-stopped` menanganinya.
+
+## H. Staging (`riung-staging.e55techlab.com`)
+
+Server bersama untuk tim app dan uji rilis sebelum produksi (dibuat 2026-10-20):
+- `/var/www/riung-staging`: `docker-compose.staging.yml` + `deploy.sh` yang sama (`RIUNG_COMPOSE_FILE`,
+  `RIUNG_CONTAINER`), `.env` (`RIUNG_ENV=dev`, `DEV_AUTH`, `DEV_BILLING`, App Check mati, secret acak sendiri),
+  `.env.migrate`, `.env.postgres` (semua `root:deploy 640`).
+- **Postgres sendiri** (`riung-staging-postgres`, volume `riung-staging-pgdata`, hanya di jaringan
+  `riung-staging-internal`): migrasi memberi hak ke nama role `riung_app`/`riung_migrator`, jadi staging tidak
+  boleh berbagi server dengan produksi. Role dibuat dengan `sql/create-riung-db.sql` (superuser `postgres`).
+- `riung-staging-api` `172.19.0.18`, 192 MB, 0,5 CPU. Tanpa Admin API, tanpa cron, tanpa alarm, tidak dipantau
+  watchdog. Log masuk Loki (retensi 7 hari).
+- Akses hanya dengan header `X-Riung-Staging-Key` (nginx; tanpa itu 404). Kunci: `/root/riung-staging.key` di VPS
+  dan secret GitHub `RIUNG_STAGING_KEY`; nilainya hanya di config nginx VPS (dikecualikan dari git `core-shared`).
+
+Setup yang tersisa setelah DNS `A riung-staging → 76.13.20.72` (DNS only) ada:
+```sh
+cd /var/www/core-shared        # bootstrap HTTP sudah terpasang
+docker compose run --rm certbot certonly --webroot --webroot-path=/var/www_certbot \
+  --email admin@e55techlab.com --agree-tos --non-interactive -d riung-staging.e55techlab.com --dry-run   # lalu tanpa --dry-run
+sed "s/CHANGE_ME_STAGING_KEY/$(cat /root/riung-staging.key)/" /var/www/riung/nginx/riung-staging.e55techlab.com.conf \
+  > nginx/conf.d/riung-staging.e55techlab.com.conf      # salin file dari repo ke /var/www/riung/nginx dulu
+docker exec shared-nginx nginx -t && docker exec shared-nginx nginx -s reload
+gh variable set RIUNG_STAGING_ENABLED --body true     # dari laptop: push ke feat/go-backend → deploy staging
+```
+
+Deploy: otomatis tiap push ke `feat/go-backend` (bila variable di atas `true`), atau `gh workflow run Backend
+--ref feat/go-backend -f deploy_staging=true`. Manual: `ssh -p 8443 deploy@76.13.20.72 'cd /var/www/riung-staging
+&& RIUNG_COMPOSE_FILE=docker-compose.staging.yml RIUNG_CONTAINER=riung-staging-api ./deploy.sh <image>'`.
+Konten: `docker exec -i riung-staging-api /riung seed-content - < dummy-data-seed.json`. Reset data:
+`docker compose -f docker-compose.staging.yml down` + `docker volume rm riung-staging-pgdata`, lalu buat ulang
+role (langkah 3 produksi, terhadap `riung-staging-postgres`) dan deploy.

@@ -68,8 +68,11 @@ Compose di VPS (`riung.e55techlab.com`, di belakang `shared-nginx`).
   forced command) dengan rollback dari GHCR. `riung api` menunggu Postgres sampai 60 detik saat start.
 - **B6 — kesiapan produksi** ✅ ([`docs/backend-b6-review.md`](../docs/backend-b6-review.md)): uji beban
   k6 ([`loadtest/`](loadtest/README.md), p95 11,9 ms di 200 pengguna aktif), review keamanan (cek pencabutan
-  token setelah rate limit, CSP, TLS AEAD, field `appCheck` di access log), 12 aturan alert Grafana (Telegram),
-  kriteria App Check `enforce`.
+  token setelah rate limit, CSP, TLS AEAD, field `appCheck` di access log), kriteria App Check `enforce`.
+  Sejak 2026-10-20: alarm Telegram dari aplikasi (log ERROR, refund, start), `riung watchdog` (cron host:
+  API, 5xx/p95 dari Loki, job cron, umur backup), dashboard Grafana **Riung — Teknis** & **Riung — Bisnis**
+  (view `metrics`, role baca-saja `riung_metrics`), dan staging `riung-staging.e55techlab.com`
+  ([`deploy/README.md`](deploy/README.md) §8b, §8c, §H).
 - **B7 — App Store (iOS)** ✅ (aktif 2026-10-20, bundle `id.riung.riung`): verifikasi lewat App Store Server API,
   semua JWS Apple diverifikasi sampai Apple Root CA - G3 yang tertanam, pembeli terikat lewat `appAccountToken`
   (UUID di `GET /v1/me`), tanpa migrasi DB:
@@ -151,6 +154,9 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `APPSTORE_ISSUER_ID`, `APPSTORE_KEY_ID` | — | wajib bila App Store aktif: Issuer ID & Key ID In-App Purchase key |
 | `APPSTORE_PRIVATE_KEY_FILE` | — | file `.p8` In-App Purchase key (prod `/run/secrets/appstore-iap-key.p8`) |
 | `APPSTORE_APP_APPLE_ID` | kosong | Apple ID numerik app (`6824618033`); notifikasi production untuk app lain diabaikan |
+| `ALERT_TELEGRAM_BOT_TOKEN`, `ALERT_TELEGRAM_CHAT_ID` | kosong (alarm mati) | bot & chat Telegram untuk alarm (log ERROR, `refund_applied`, start API, watchdog); keduanya wajib bersama. Uji: `riung alert-test` |
+| `ALERT_LABEL` | `riung <RIUNG_ENV>` | awalan setiap pesan, mis. `riung prod` |
+| `WATCHDOG_*` | lihat `cmd/riung/watchdog.go` | hanya untuk `riung watchdog` (`deploy/monitoring/env.watchdog.example`) |
 | `CORS_LANDING_ORIGIN` | kosong | satu-satunya origin browser untuk `POST /v1/waitlist` |
 | `MIN_APP_VERSION` | `0.0.0` | app di bawah versi ini mendapat `426 upgrade_required` |
 | `ADMIN_LISTEN_ADDR` | kosong (mati) | port Admin API, mis. `:8081`; tidak pernah dipasang di nginx |

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "d8732967-fe72-5a63-a8e8-1dca7acae3a0",
     "name": "Riung API v1",
-    "description": "Koleksi semua endpoint backend Riung (`/v1`). Panduan: `docs/panduan-integrasi-app.md`; kontrak lengkap: `docs/backend-api-spec.md`.\n\n**Pakai**\n1. Import koleksi ini + salah satu environment (`riung-local` atau `riung-prod`).\n2. Lokal: `cd backend && make dev-up` lalu seed konten. Token sudah terisi (`dev:postman:google.com`, App Check `dev`).\n3. Produksi: isi `idToken` dengan ID token Firebase (berlaku 1 jam) dan `appCheckToken` bila ada (App Check masih `monitor`).\n4. Jalankan **2. Akun → Me** dulu: menyimpan `userId` dan `billingAccountId`.\n\nScript koleksi menambah `X-App-Version`, `X-Platform`, `X-Firebase-AppCheck`, dan `Idempotency-Key` (baru tiap kirim) otomatis, serta mengisi `{{now}}` dan `{{today}}` (Asia/Jakarta). Error ditampilkan di Postman Console beserta `requestId`.\n",
+    "description": "Koleksi semua endpoint backend Riung (`/v1`). Panduan: `docs/panduan-integrasi-app.md`; kontrak lengkap: `docs/backend-api-spec.md`.\n\n**Pakai**\n1. Import koleksi ini + salah satu environment (`riung-local` atau `riung-prod`).\n2. Lokal: `cd backend && make dev-up` lalu seed konten. Token sudah terisi (`dev:postman:google.com`, App Check `dev`).\n   Staging (`riung-staging`): sama dengan lokal (token dev, billing palsu), isi `stagingKey` dengan kunci staging.\n3. Produksi: isi `idToken` dengan ID token Firebase (berlaku 1 jam) dan `appCheckToken` bila ada (App Check masih `monitor`).\n4. Jalankan **2. Akun → Me** dulu: menyimpan `userId` dan `billingAccountId`.\n\nScript koleksi menambah `X-App-Version`, `X-Platform`, `X-Firebase-AppCheck`, dan `Idempotency-Key` (baru tiap kirim) otomatis, serta mengisi `{{now}}` dan `{{today}}` (Asia/Jakarta). Error ditampilkan di Postman Console beserta `requestId`.\n",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -26,6 +26,9 @@
           "pm.request.headers.upsert({ key: 'X-Platform', value: 'android' });",
           "const appCheck = pm.variables.get('appCheckToken');",
           "if (appCheck) pm.request.headers.upsert({ key: 'X-Firebase-AppCheck', value: appCheck });",
+          "// Staging (riung-staging.e55techlab.com) hanya menjawab request dengan kunci ini.",
+          "const stagingKey = pm.variables.get('stagingKey');",
+          "if (stagingKey) pm.request.headers.upsert({ key: 'X-Riung-Staging-Key', value: stagingKey });",
           "// Satu Idempotency-Key baru per kirim. Untuk menguji replay, isi header Idempotency-Key sendiri di request-nya.",
           "if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(pm.request.method) && !pm.request.headers.has('Idempotency-Key')) {",
           "  pm.request.headers.add({ key: 'Idempotency-Key', value: pm.variables.replaceIn('{{$guid}}') });",

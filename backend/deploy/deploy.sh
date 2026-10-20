@@ -7,11 +7,15 @@
 # Order: pull → migrate (one-shot, DDL credentials) → recreate the API →
 # wait for its healthcheck. A failed migration stops the deploy before the
 # running API is touched.
+#
+# Staging (/var/www/riung-staging) runs the same script with
+# RIUNG_COMPOSE_FILE=docker-compose.staging.yml RIUNG_CONTAINER=riung-staging-api.
 set -eu
 
 IMAGE="${1:?usage: deploy.sh <image>}"
 export RIUNG_IMAGE="$IMAGE"
-COMPOSE="docker compose -f docker-compose.prod.yml"
+COMPOSE="docker compose -f ${RIUNG_COMPOSE_FILE:-docker-compose.prod.yml}"
+CONTAINER="${RIUNG_CONTAINER:-riung-api}"
 
 # An image already on the host (e.g. loaded with `docker load` before the
 # first CI release, or a rollback tag) is used as is.
@@ -32,14 +36,14 @@ $COMPOSE up -d --no-deps riung-api
 echo "==> wait for healthy"
 i=0
 while [ "$i" -lt 30 ]; do
-  status="$(docker inspect -f '{{.State.Health.Status}}' riung-api 2>/dev/null || echo unknown)"
+  status="$(docker inspect -f '{{.State.Health.Status}}' "$CONTAINER" 2>/dev/null || echo unknown)"
   if [ "$status" = "healthy" ]; then
-    echo "riung-api healthy ($IMAGE)"
+    echo "$CONTAINER healthy ($IMAGE)"
     exit 0
   fi
   i=$((i + 1))
   sleep 2
 done
-echo "riung-api did not become healthy; recent logs:" >&2
-docker logs --tail 50 riung-api >&2
+echo "$CONTAINER did not become healthy; recent logs:" >&2
+docker logs --tail 50 "$CONTAINER" >&2
 exit 1

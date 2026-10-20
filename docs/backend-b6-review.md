@@ -59,23 +59,23 @@ Juga dicek: 948 baris log produksi tanpa token, email, atau private key; `govuln
 | `shared-postgres` tanpa TLS | diterima | trafik hanya di bridge Docker satu host |
 | App Check masih `monitor` | sesuai rencana | §4 |
 
-## 3. Alert
+## 3. Alarm & dashboard (diperbarui 2026-10-20)
 
-Aturan siap pakai: `backend/deploy/monitoring/grafana-alerting-riung.yml` — 12 aturan dari spec §6.6
-(error server, 5xx > 1%, p95 > 500 ms, API tidak menjawab healthcheck, ledger mismatch, job gagal, cron
-tidak jalan > 26 jam, pembelian ditolak/refund, lonjakan auth/App Check gagal, rate limit, batas akun baru,
-Admin API) dengan contact point Telegram sendiri (`riung-telegram`) dan `notification_settings` per aturan,
-jadi notification policy bersama tidak diubah.
+Konvensi `core-shared`: Grafana alerting kosong, aplikasi mengirim alarmnya sendiri ke Telegram. Riung
+mengikutinya (spec §6.6):
+- **Dari aplikasi** (`internal/alert`): setiap log `ERROR` (API dan job cron), `refund_applied`, dan pesan saat
+  API start — asinkron, dedupe 10 menit, maks 30/jam; token bot tidak pernah masuk pesan error.
+- **Watchdog** (`riung watchdog`, cron host tiap 2 menit, container sendiri): `/readyz` + `/healthz` publik,
+  5xx > 1% dan p95 > 500 ms dari Loki, job cron tanpa run sukses (26 jam / 2 jam), backup > 26 jam; alarm saat
+  terkonfirmasi, pengingat 6 jam, pesan pulih. Query LogQL diuji ke Loki produksi.
+- **Dashboard** (tanpa alert): Riung — Teknis (Loki) dan Riung — Bisnis (view `metrics`, role `riung_metrics`
+  hanya bisa membaca view agregat). 36 query panel diuji lewat API Grafana.
 
-Divalidasi di Grafana 11.6.1 + Loki 3.4 lokal: semua aturan ter-provision dan query-nya valid; dengan log
-contoh berformat riung, aturan error/ledger/job/refund menyala, 5xx & p95 masuk *pending*, healthcheck
-kembali normal, dan "cron tidak jalan" menyala bila `job_run` tidak ada. Temuan saat validasi: chat id
-Telegram lewat `$__env{}` berubah jadi angka dan **seluruh provisioning Grafana berhenti** — karena itu
-chat id ditulis langsung di file, dan file wajib diuji lokal dulu sebelum dipasang ke Grafana bersama.
+`backend/deploy/monitoring/grafana-alerting-riung.yml` (12 aturan, divalidasi di Grafana 11.6.1 + Loki 3.4
+lokal) tetap ada sebagai rujukan bila konvensi berubah. Catatan dari validasinya: chat id lewat `$__env{}`
+berubah jadi angka dan **seluruh provisioning Grafana berhenti** — file alerting wajib diuji lokal dulu.
 
-Belum dipasang di VPS: konvensi `core-shared` (`provisioning/alerting/README.md`) — alarm dikirim aplikasi
-ke Telegram, Grafana alerting sengaja kosong; riung butuh bot + chat Telegram. Langkah pasang di
-runbook langkah 8b.
+Celah: VPS atau Docker mati total tidak terdeteksi (watchdog di host yang sama) — TODO §A P2.
 
 Query bantu (Grafana → Explore → Loki):
 

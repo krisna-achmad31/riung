@@ -848,24 +848,19 @@ Jejak keuangan resmi tetap di DB (`coin_ledger`, `purchases`) — log hanya untu
 - Nginx `shared-nginx` mencatat IP asli di access log-nya sendiri (infrastruktur bersama) — ikut
   retensi yang sama.
 
-### 6.6 Alert (Grafana Alerting, dari LogQL)
+### 6.6 Alarm (Telegram, dari aplikasi — konvensi `core-shared`)
 
-| Alert | Kondisi |
+Grafana alerting sengaja kosong di VPS bersama: aplikasi mengirim alarmnya sendiri ke Telegram
+(`ALERT_TELEGRAM_BOT_TOKEN` / `ALERT_TELEGRAM_CHAT_ID`). Dua sumber:
+
+| Sumber | Alarm |
 |---|---|
-| Error server | `level="ERROR"` > 5 dalam 5 menit, atau 5xx > 1% request |
-| Latensi | p95 `durationMs` > 500 ms selama 10 menit |
-| Serangan auth | `auth_failed` + `appcheck_failed` > 100 dalam 5 menit |
-| Rate limit melonjak | `rate_limited` > 200 dalam 5 menit |
-| Pembelian | ada `purchase_rejected`, `refund_applied`, atau `rtdn` gagal diproses |
-| Keuangan | ada `ledger_mismatch` |
-| Job | `job_run` dengan `ok=false`; backup Postgres dipantau dari umur file dump terbaru (skrip cron, bukan log app) |
-| Admin | setiap `admin_setting_changed` (info ke tim) dan `admin_access_denied` (curiga) |
-| Pendaftaran | `signup_limited` > 20 dalam 1 jam (tanda CGNAT atau serangan) |
-| Container | `riung-api` restart / healthcheck gagal |
+| **Aplikasi** (`internal/alert`, handler `slog`) — `riung api` dan setiap job cron | semua log `ERROR` (dependency down, panic, error internal, `ledger_mismatch`, job `ok=false`, `command_error`), `refund_applied`, dan satu pesan 🟢 setiap API start (deploy atau restart setelah crash). Dikirim di latar belakang, dedupe per pesan 10 menit, maks 30/jam, tidak pernah menahan log |
+| **Watchdog** (`riung watchdog`, cron host tiap 2 menit, container sendiri) | `/readyz` atau `/healthz` publik gagal 2× berturut-turut; 5xx > 1% (≥ 5 error / 10 menit); p95 > 500 ms (≥ 50 request / 10 menit); job `cleanup`/`cleanup_anon`/`reconcile` tanpa run sukses 26 jam, `billing_sync` 2 jam; backup terbaru > 26 jam atau < 1 KB. Alarm sekali saat terkonfirmasi, pengingat tiap 6 jam, pesan ✅ saat pulih. Kalau container watchdog tidak bisa start, skrip host mengirim pesan cadangan dengan `curl` (maks 1/jam) |
 
-Implementasi: `backend/deploy/monitoring/grafana-alerting-riung.yml` (12 aturan, contact point Telegram
-`riung-telegram`, divalidasi di Grafana 11.6.1). Kanal: Telegram (konvensi `core-shared`), bukan email —
-SMTP Grafana tidak dikonfigurasi. Status pemasangan & query bantu: `docs/backend-b6-review.md` §3.
+Belum tercakup (butuh pemantau di luar VPS): VPS atau Docker mati total. Dashboard Grafana (teknis dari
+Loki, bisnis dari view `metrics`) hanya untuk dilihat, tanpa alert. `backend/deploy/monitoring/grafana-alerting-riung.yml`
+(12 aturan Grafana) disimpan sebagai rujukan, tidak dipasang.
 
 ---
 

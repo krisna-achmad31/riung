@@ -4,10 +4,11 @@
 |---|---|
 | `riung-api.postman_collection.json` | 55 request dalam 13 folder, urut seperti alur app (akun → latihan → billing Play & App Store → toko → Fokus → Aplikasi Beku → admin → hapus akun) |
 | `riung-local.postman_environment.json` | stack dev (`make dev-up`): token dev siap pakai, `devBilling=true` (token pembelian palsu dibuat otomatis) |
+| `riung-staging.postman_environment.json` | `https://riung-staging.e55techlab.com`: login & billing palsu seperti lokal; isi `stagingKey` (kunci staging dari admin). Folder 10 (Admin API) tidak tersedia di staging |
 | `riung-prod.postman_environment.json` | `https://riung.e55techlab.com`: isi `idToken` (ID token Firebase, berlaku 1 jam) dan `appCheckToken` bila ada; `coinToken`/`subToken` diisi `purchaseToken` asli dari app |
 | `generate.py` | sumber koleksi — ubah di sini lalu `python3 postman/generate.py postman` (jangan edit JSON manual) |
 
-**Import**: Postman → Import → pilih ketiga file JSON → pilih environment di pojok kanan atas.
+**Import**: Postman → Import → pilih semua file JSON → pilih environment di pojok kanan atas.
 
 Script koleksi otomatis menambah `X-App-Version`, `X-Platform`, `X-Firebase-AppCheck`, `Idempotency-Key`
 (baru setiap kirim), dan mengisi `{{now}}` / `{{today}}`. **2. Akun → Me** menyimpan `userId` dan
