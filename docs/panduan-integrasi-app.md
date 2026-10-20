@@ -207,7 +207,7 @@ koin membawa `wallet` terbaru — perbarui `WalletNotifier` dari situ, jangan me
 | Profil | `PATCH /v1/me/profile` | `displayName` (≤ 40 karakter), `avatarId` (`av1`–`av6`), `locale` (`id`/`en`), `persona` (`pelajar`/`mahasiswa`/`pekerja`/`lainnya`), `onboardingDone`, `tz` (IANA); kirim hanya field yang berubah |
 | Hasil asesmen ringkas | `PUT /v1/me/assessment` | `dominantSaboteurs` (1–7 id saboteur), `scores` (id saboteur → 0–100), `completedAt`. Jawaban & hasil detail **tetap di HP** |
 | Anonim → email/Google | `POST /v1/me/link` | setelah `linkWithCredential` di Firebase (uid sama, tanpa body); semua data anonim ikut |
-| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Bila `premium.autoRenewing` = true (masih ditagih), tampilkan peringatan dengan tombol ke `https://play.google.com/store/account/subscriptions?sku=<plan>&package=com.riung.riung` (iOS: `https://apps.apple.com/account/subscriptions`) sebelum tombol hapus — langganan tidak ikut terhapus dan tidak bisa dipindah ke akun baru |
+| Hapus akun | `DELETE /v1/me` | `204`; akun permanen harus login ≤ 5 menit (`recent_login_required`); server ikut menghapus user Firebase. Aman diulang; kalau jawaban pertama hilang dan ulangan dijawab `401`, akun sudah terhapus — lanjutkan logout. Bila `premium.autoRenewing` = true (masih ditagih), tampilkan peringatan dengan tombol ke `https://play.google.com/store/account/subscriptions?sku=<plan>&package=id.riung.riung` (iOS: `https://apps.apple.com/account/subscriptions`) sebelum tombol hapus — langganan tidak ikut terhapus dan tidak bisa dipindah ke akun baru |
 | Unduh data server | `GET /v1/me/export` | melengkapi `DataExportBuilder` lokal |
 | Backup PIN jurnal | `PUT/GET/DELETE /v1/me/journal-pin-backup`, `POST …/verify` | akun permanen; hash PIN dihitung di HP (`hash` 16–256, `salt` 8–256 karakter base64/hex). `GET` hanya mengembalikan `salt`; verifikasi → `{match, attemptsLeft}`, terkunci 1 jam setelah 10 gagal/hari |
 
@@ -441,8 +441,8 @@ if (const {'credited', 'already_credited', 'active', 'inactive'}.contains(r.stat
 - `409 purchase_invalid` → **jangan** `completePurchase`: transaksi milik akun Riung lain di Apple ID yang sama
   tetap tertunda dan terkredit saat akun pemiliknya login lagi. StoreKit mengirim ulang transaksi yang belum
   selesai setiap app dibuka — cukup verifikasi lagi.
-- Bundle id iOS **`id.riung.riung`** (Android tetap `com.riung.riung`): ganti `PRODUCT_BUNDLE_IDENTIFIER` di
-  Xcode dan pakai `GoogleService-Info.plist` dari app Firebase iOS dengan bundle id itu.
+- Bundle id iOS dan package Android sama: **`id.riung.riung`** (sejak 2026-10-20; app Firebase, `google-services.json`
+  dan `GoogleService-Info.plist` untuk id itu).
 - Produk di App Store Connect memakai id yang sama (`coin_pack_*` consumable, `premium_monthly|yearly`
   auto-renewable dalam **satu** subscription group, trial 7 hari sebagai *introductory offer*). Harga dan lama
   trial dibaca dari `ProductDetails`, seperti Android.

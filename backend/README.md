@@ -146,7 +146,7 @@ DATABASE_URL=postgres://riung_app:...@localhost:5432/riung ./bin/riung api
 | `DEV_AUTH` | `false` | token `dev:<uid>:<provider>`; hanya di `RIUNG_ENV=dev` |
 | `FOCUS_TICKET_KEY` | dev: turunan dev secret | seed Ed25519 32 byte (base64, `openssl rand -base64 32`) untuk tiket Fokus; wajib di prod |
 | `FOCUS_TICKET_KID` | `k1` | nama kunci tiket (ganti bersama key saat rotasi) |
-| `PLAY_PACKAGE_NAME` | kosong (billing mati, 503) | `com.riung.riung`; mengaktifkan billing |
+| `PLAY_PACKAGE_NAME` | kosong (billing mati, 503) | `id.riung.riung` (package Android sejak 2026-10-20); mengaktifkan billing |
 | `PLAY_CREDENTIALS_FILE` | `FIREBASE_CREDENTIALS_FILE` | service account yang diundang di Play Console |
 | `RTDN_AUDIENCE`, `RTDN_SERVICE_ACCOUNT` | — | wajib bila billing aktif: audience & service account push subscription Pub/Sub |
 | `DEV_BILLING` | `false` | Google Play & App Store palsu (`dev-coin:`/`dev-sub:`); hanya di `RIUNG_ENV=dev` |

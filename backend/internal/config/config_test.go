@@ -182,16 +182,16 @@ func TestBillingConfig(t *testing.T) {
 	if _, err := Load(env(map[string]string{"RIUNG_ENV": "prod", "DEV_BILLING": "true"})); err == nil || !strings.Contains(err.Error(), "DEV_BILLING") {
 		t.Fatalf("DEV_BILLING refused in prod: %v", err)
 	}
-	if _, err := Load(env(map[string]string{"PLAY_PACKAGE_NAME": "com.riung.riung", "FIREBASE_CREDENTIALS_FILE": "/x.json"})); err == nil || !strings.Contains(err.Error(), "RTDN_AUDIENCE") {
+	if _, err := Load(env(map[string]string{"PLAY_PACKAGE_NAME": "id.riung.riung", "FIREBASE_CREDENTIALS_FILE": "/x.json"})); err == nil || !strings.Contains(err.Error(), "RTDN_AUDIENCE") {
 		t.Fatalf("billing needs RTDN settings: %v", err)
 	}
-	c, err := Load(env(map[string]string{"PLAY_PACKAGE_NAME": "com.riung.riung", "FIREBASE_CREDENTIALS_FILE": "/x.json",
+	c, err := Load(env(map[string]string{"PLAY_PACKAGE_NAME": "id.riung.riung", "FIREBASE_CREDENTIALS_FILE": "/x.json",
 		"RTDN_AUDIENCE": "https://riung.e55techlab.com/v1/webhooks/google-play", "RTDN_SERVICE_ACCOUNT": "rtdn@riung.iam.gserviceaccount.com"}))
 	if err != nil || !c.BillingEnabled() || c.PlayCredentialsFile != "/x.json" {
 		t.Fatalf("valid billing config: %+v %v", c, err)
 	}
 	c, _ = Load(env(map[string]string{"DEV_BILLING": "true"}))
-	if !c.BillingEnabled() || c.PlayPackageName != "com.riung.riung" {
+	if !c.BillingEnabled() || c.PlayPackageName != "id.riung.riung" {
 		t.Fatalf("dev billing: %+v", c)
 	}
 }

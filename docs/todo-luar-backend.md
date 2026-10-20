@@ -97,10 +97,10 @@ Prioritas: **P0** = keamanan / wajib sebelum rilis · **P1** = wajib untuk cutov
       subscription group berisi `premium_monthly|yearly`, intro offer 7 hari, Family Sharing mati); sandbox tester;
       capability Push/Sign in with Apple/App Attest di App ID lalu buat ulang profil. Key, Server Notifications, dan
       `APPSTORE_*` sudah selesai (server aktif 2026-10-20).
-- [ ] **P1 (iOS) — Bundle id `id.riung.riung`** (Apple Developer, 2026-10-20): proyek Flutter masih
-      `com.riung.riung` → ganti `PRODUCT_BUNDLE_IDENTIFIER` di `riung/ios/Runner.xcodeproj` (Runner &
-      RunnerTests), daftarkan app iOS `id.riung.riung` di Firebase, ganti `GoogleService-Info.plist` dan secret CI
-      `GOOGLE_SERVICE_INFO_PLIST`. Server: `APPSTORE_BUNDLE_ID=id.riung.riung`. Android tetap `com.riung.riung`.
+- [x] **P1 — Package `id.riung.riung` (iOS & Android)** (tim app, `dev` 2026-10-20): bundle id, `applicationId`, app
+      Firebase, secret CI `GOOGLE_SERVICE_INFO_PLIST`, `GOOGLE_SERVICES_JSON`, `FIREBASE_APP_ID_ANDROID`. Saat Google Play
+      diaktifkan: `PLAY_PACKAGE_NAME=id.riung.riung` (listing Play baru — package lama tidak bisa diganti).
+- [x] **P1 (iOS) — Build otomatis ke TestFlight** (PR #2 → `dev`): build `1.0.3 (1013)` VALID 2026-10-20.
 - [ ] **P1 (iOS) — Uji sandbox App Store**: pastikan `appAccountToken` dari `applicationUserName` muncul di
       transaksi (kalau kosong, server menolak `purchase_invalid`), beli/refund/upgrade/batal di sandbox.
 - [ ] **P2 (iOS) — Riwayat refund Apple**: notifikasi `REFUND` yang terlewat (5 kali gagal) belum disusul job;

@@ -119,7 +119,7 @@ unduh key JSON, simpan sebagai `/var/www/riung/secrets/firebase-service-account.
 Langkah lengkap di sisi Apple (akun, App ID, produk, key, sandbox, App Review): `docs/panduan-apple-developer.md`.
 
 1. Apple Developer Program aktif (tim yang sama dengan sertifikat build iOS); App ID `id.riung.riung`
-   (bundle id iOS; Android tetap `com.riung.riung`) dengan capability *In-App Purchase* (dan *Sign in with Apple* bila dipakai).
+   (bundle id iOS, sama dengan package Android) dengan capability *In-App Purchase* (dan *Sign in with Apple* bila dipakai).
 2. App Store Connect → *Business*: perjanjian **Paid Apps**, data bank & pajak lengkap — tanpa ini produk
    tidak bisa dibeli, juga di sandbox.
 3. App Store Connect → app → *Monetization*: consumable `coin_pack_small|medium|large`; subscription group

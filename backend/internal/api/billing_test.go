@@ -157,7 +157,7 @@ func push(e *env, bearer, messageID string, notification map[string]any) resp {
 }
 
 func subNotification(token string, typ int) map[string]any {
-	return map[string]any{"version": "1.0", "packageName": "com.riung.riung", "eventTimeMillis": "1760000000000",
+	return map[string]any{"version": "1.0", "packageName": "id.riung.riung", "eventTimeMillis": "1760000000000",
 		"subscriptionNotification": map[string]any{"version": "1.0", "notificationType": typ, "purchaseToken": token}}
 }
 
@@ -246,7 +246,7 @@ func TestBillingWebhookRejectsBadPushes(t *testing.T) {
 	if r := push(e, "dev-pubsub", "msg-other", other); r.status != 204 || !strings.Contains(e.logs.String(), `"action":"other_package"`) {
 		t.Fatalf("other package: %d", r.status)
 	}
-	test := map[string]any{"packageName": "com.riung.riung", "testNotification": map[string]any{"version": "1.0"}}
+	test := map[string]any{"packageName": "id.riung.riung", "testNotification": map[string]any{"version": "1.0"}}
 	if r := push(e, "dev-pubsub", "msg-test", test); r.status != 204 {
 		t.Fatalf("test notification: %d", r.status)
 	}
@@ -275,7 +275,7 @@ func TestBillingRefundClawsBackAndRecordsDebt(t *testing.T) {
 	}
 
 	// Refund by RTDN: 30 coins remain to take back, 50 become debt.
-	voided := map[string]any{"packageName": "com.riung.riung", "eventTimeMillis": "1760000000000",
+	voided := map[string]any{"packageName": "id.riung.riung", "eventTimeMillis": "1760000000000",
 		"voidedPurchaseNotification": map[string]any{"purchaseToken": "tok-refund-small-1", "orderId": "GPA.9", "productType": 2, "refundType": 1}}
 	if r := push(e, "dev-pubsub", "msg-void-1", voided); r.status != 204 {
 		t.Fatalf("voided rtdn: %d %s", r.status, r.raw)

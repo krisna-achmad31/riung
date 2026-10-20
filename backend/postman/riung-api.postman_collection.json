@@ -1134,7 +1134,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "// Pub/Sub push body: base64 DeveloperNotification + messageId unik.",
-                  "const n = { version: '1.0', packageName: 'com.riung.riung', eventTimeMillis: String(Date.now()), testNotification: { version: '1.0' } };",
+                  "const n = { version: '1.0', packageName: 'id.riung.riung', eventTimeMillis: String(Date.now()), testNotification: { version: '1.0' } };",
                   "pm.variables.set('rtdnData', btoa(JSON.stringify(n)));",
                   "pm.variables.set('rtdnMessageId', String(Date.now()));"
                 ]

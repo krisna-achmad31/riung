@@ -19,12 +19,9 @@ menjawab `401` sampai rilis pertama — normal; notifikasi TEST sandbox sampai k
 | C1 Paid Apps, C4–C5 produk, C7 sandbox tester, D Firebase, F uji, G review | ⏳ belum dicek |
 
 Data app: bundle id iOS **`id.riung.riung`** (terdaftar di Apple Developer), Apple ID app **`6824618033`**, nama **Riung**, Team ID
-**`C75S43V9FY`** (dari `ios_development.cer`). Android tetap `com.riung.riung` di Play.
+**`C75S43V9FY`** (dari `ios_development.cer`). Package Android juga `id.riung.riung`.
 
-> **Perlu disamakan di app**: proyek Flutter masih `com.riung.riung` (`riung/ios/Runner.xcodeproj`,
-> `PRODUCT_BUNDLE_IDENTIFIER`, 3 konfigurasi; target tes `….RunnerTests`). Ganti ke `id.riung.riung`, lalu
-> daftarkan app iOS dengan bundle id ini di Firebase dan pakai `GoogleService-Info.plist` barunya (D1) —
-> plist lama untuk `com.riung.riung` membuat Firebase Auth/FCM/App Check di iOS tidak cocok.
+> Proyek Flutter sudah memakai `id.riung.riung` (tim app, `dev` 2026-10-20) beserta `GoogleService-Info.plist`-nya.
 
 ---
 
@@ -99,7 +96,7 @@ Data app: bundle id iOS **`id.riung.riung`** (terdaftar di Apple Developer), App
 ## D. Firebase (project `riung-5e979`)
 
 1. [ ] *Project settings → Add app → iOS* dengan bundle id `id.riung.riung` → unduh `GoogleService-Info.plist`, ganti
-   file di `riung/ios/Runner/` dan secret CI `GOOGLE_SERVICE_INFO_PLIST`. App iOS lama (`com.riung.riung`), bila
+   file di `riung/ios/Runner/` dan secret CI `GOOGLE_SERVICE_INFO_PLIST`. App lama `com.riung.riung` (iOS/Android), bila
    ada, bisa dihapus setelah build baru jalan.
 2. [ ] *Project settings → Cloud Messaging → Apple app configuration*: unggah **APNs key** (B2), Key ID, Team ID
    `C75S43V9FY`.

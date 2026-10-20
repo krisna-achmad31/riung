@@ -1,6 +1,11 @@
 # Plan — build iOS otomatis ke TestFlight
 *2026-10-20 · app Flutter `riung/` · bundle `id.riung.riung` · team `C75S43V9FY` · App Store Connect app `6824618033`*
 
+**Status 2026-10-20: berjalan.** PR #2 (`ci/ios-testflight` → `dev`) — build `1.0.3 (1013)` VALID di App Store
+Connect lewat CI. Berbeda dari rencana awal: tim app sudah meng-commit signing manual untuk Release
+(`Riung Production`) di proyek, dan workflow tetap menerapkan pengaturan yang sama saat build (aman bila proyek
+berubah). Penolakan pertama (ITMS-90683, `NSPhotoLibraryUsageDescription` untuk plugin `gal`) sudah diperbaiki tim.
+
 ## Tujuan
 
 Setiap push ke `main` (dan tombol *Run workflow*) menghasilkan build iOS **bertanda tangan** yang otomatis

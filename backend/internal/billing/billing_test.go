@@ -31,7 +31,7 @@ func TestLedgerKeyFitsColumn(t *testing.T) {
 }
 
 func TestDecodePush(t *testing.T) {
-	data := base64.StdEncoding.EncodeToString([]byte(`{"packageName":"com.riung.riung",
+	data := base64.StdEncoding.EncodeToString([]byte(`{"packageName":"id.riung.riung",
 		"subscriptionNotification":{"notificationType":2,"purchaseToken":"abc","subscriptionId":"premium_yearly"}}`))
 	var env PushEnvelope
 	env.Message.Data, env.Message.MessageID = data, "123"
@@ -98,7 +98,7 @@ func playStub(t *testing.T, routes map[string]func(w http.ResponseWriter)) *Goog
 		http.NotFound(w, r)
 	}))
 	t.Cleanup(srv.Close)
-	g, err := newGooglePublisher(context.Background(), "com.riung.riung", option.WithEndpoint(srv.URL), option.WithoutAuthentication())
+	g, err := newGooglePublisher(context.Background(), "id.riung.riung", option.WithEndpoint(srv.URL), option.WithoutAuthentication())
 	if err != nil {
 		t.Fatal(err)
 	}

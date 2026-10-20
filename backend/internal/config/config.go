@@ -268,7 +268,7 @@ func Load(getenv func(string) string) (Config, error) {
 		errs = append(errs, errors.New("DEV_BILLING is only allowed when RIUNG_ENV=dev"))
 	}
 	if c.DevBilling && c.PlayPackageName == "" {
-		c.PlayPackageName = "com.riung.riung"
+		c.PlayPackageName = "id.riung.riung"
 	}
 	if c.PlayPackageName != "" && !c.DevBilling {
 		if c.PlayCredentialsFile == "" {
@@ -290,7 +290,7 @@ func Load(getenv func(string) string) (Config, error) {
 		c.AppStoreAppAppleID = id
 	}
 	if c.DevBilling && c.AppStoreBundleID == "" {
-		c.AppStoreBundleID = "id.riung.riung" // iOS bundle id (Android package stays com.riung.riung)
+		c.AppStoreBundleID = "id.riung.riung" // same id as the Android package
 	}
 	if c.AppStoreBundleID != "" && !c.DevBilling &&
 		(c.AppStoreIssuerID == "" || c.AppStoreKeyID == "" || c.AppStorePrivateKeyFile == "") {

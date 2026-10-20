@@ -11,6 +11,11 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+### Diubah
+- Package Android berganti ke **`id.riung.riung`** (tim app, `dev` 2026-10-20), sama dengan bundle iOS: default
+  `PLAY_PACKAGE_NAME` di `DEV_BILLING`, contoh env, Postman (RTDN dev), tes, dan dokumen ikut diganti. Produksi
+  tidak berubah (Google Play masih mati); saat diaktifkan, `PLAY_PACKAGE_NAME=id.riung.riung`.
+
 ### Operasional
 - **Staging** `riung-staging.e55techlab.com` (runbook §H): `docker-compose.staging.yml` dengan Postgres sendiri,
   login & billing palsu, akses hanya dengan header `X-Riung-Staging-Key`; `deploy.sh` menerima
