@@ -48,7 +48,7 @@ notifikasi lokal).
 
 | Area | Pilihan | Catatan |
 |---|---|---|
-| Bahasa | Go 1.27 (toolchain `go1.27.2` di-pin di `go.mod` & CI) | |
+| Bahasa | Go 1.27 (toolchain `go1.27.3` di-pin di `go.mod` & CI) | |
 | Router | `net/http` stdlib (pattern routing Go 1.22+) + middleware kecil | minim dependensi |
 | DB | PostgreSQL 16 `shared-postgres` (stack `core-shared` di VPS), DB `riung` + role sendiri | tidak ikut di compose riung (§8); kode tidak memakai fitur khusus PG17 |
 | Driver/query | `pgx/v5`, query ditulis tangan di `internal/store` | semua parameterized, diuji integrasi ke PostgreSQL 16 (sqlc tidak dipakai: lebih sedikit tooling, tanpa CGO) |

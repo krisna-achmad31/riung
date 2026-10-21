@@ -11,6 +11,11 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+### Keamanan
+- Go **1.27.3** (CI, `Dockerfile`, `go.mod` toolchain): GO-2026-6809, `crypto/x509` tidak lagi memercayai
+  sertifikat perantara yang bocor. Terpakai di verifikasi JWS App Store (`appstore.Verifier.Decode`). Sebelumnya
+  `govulncheck` menggagalkan CI `db5de43`.
+
 ### Diperbaiki
 - **Insiden 2026-10-20 s.d. 21: sebagian traffic produksi masuk ke staging.** Service staging bernama `riung-api`,
   dan compose memasang nama service sebagai alias DNS di `vps-shared-net`. Akibatnya `riung-api` resolve ke dua

@@ -65,7 +65,7 @@ jobs:
           # Same toolchain as backend/Dockerfile (and go.mod "toolchain"): the
           # go.mod "go" line is only the minimum, and its .0 release carries
           # standard-library CVEs that govulncheck rightly reports.
-          go-version: "1.27.2"
+          go-version: "1.27.3"
           cache-dependency-path: backend/go.sum
 
       - name: Verify modules
