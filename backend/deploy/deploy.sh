@@ -30,8 +30,9 @@ echo "==> migrate"
 $COMPOSE --profile migrate up --no-deps --abort-on-container-exit --exit-code-from riung-migrate riung-migrate
 $COMPOSE --profile migrate rm -f riung-migrate >/dev/null
 
-echo "==> start riung-api"
-$COMPOSE up -d --no-deps riung-api
+# The API's service name equals its container name in both compose files.
+echo "==> start $CONTAINER"
+$COMPOSE up -d --no-deps "$CONTAINER"
 
 echo "==> wait for healthy"
 i=0

@@ -11,6 +11,16 @@ diubah di Flutter).
 
 ## [Belum dirilis]
 
+### Diperbaiki
+- **Insiden 2026-10-20 s.d. 21: sebagian traffic produksi masuk ke staging.** Service staging bernama `riung-api`,
+  dan compose memasang nama service sebagai alias DNS di `vps-shared-net`. Akibatnya `riung-api` resolve ke dua
+  container, dan nginx produksi membagi request bergiliran. Request yang jatuh ke staging (`DEV_AUTH`) ditolak
+  `401 unauthenticated` karena token Firebase; notifikasi App Store sandbox dan `/healthz` juga ikut terbagi.
+  Mitigasi 2026-10-21: staging disambung ulang ke `vps-shared-net` tanpa alias itu. Perbaikan permanen: service
+  staging diganti nama menjadi `riung-staging-api`, dan `deploy.sh` menjalankan service bernama `$RIUNG_CONTAINER`.
+  Penerapan di VPS: salin `deploy.sh` ke `/var/www/riung` dan `/var/www/riung-staging`, salin
+  `docker-compose.staging.yml`, `docker rm -f riung-staging-api`, lalu deploy staging.
+
 ### Diubah
 - Package Android berganti ke **`id.riung.riung`** (tim app, `dev` 2026-10-20), sama dengan bundle iOS: default
   `PLAY_PACKAGE_NAME` di `DEV_BILLING`, contoh env, Postman (RTDN dev), tes, dan dokumen ikut diganti. Produksi

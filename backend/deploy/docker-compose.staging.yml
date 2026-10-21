@@ -49,7 +49,10 @@ services:
     networks:
       - internal
 
-  riung-api:
+  # The service name must not be riung-api: compose adds it as a DNS alias on
+  # vps-shared-net, and production nginx would then send part of its traffic
+  # to staging (2026-10-21 incident).
+  riung-staging-api:
     <<: *hardening
     image: ${RIUNG_IMAGE:?set RIUNG_IMAGE, e.g. ghcr.io/krisna-achmad31/riung-api:<sha>}
     container_name: riung-staging-api

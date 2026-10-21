@@ -405,7 +405,8 @@ Server bersama untuk tim app dan uji rilis sebelum produksi (dibuat 2026-10-20):
 - **Postgres sendiri** (`riung-staging-postgres`, volume `riung-staging-pgdata`, hanya di jaringan
   `riung-staging-internal`): migrasi memberi hak ke nama role `riung_app`/`riung_migrator`, jadi staging tidak
   boleh berbagi server dengan produksi. Role dibuat dengan `sql/create-riung-db.sql` (superuser `postgres`).
-- `riung-staging-api` `172.19.0.18`, 192 MB, 0,5 CPU. Tanpa Admin API, tanpa cron, tanpa alarm, tidak dipantau
+- `riung-staging-api` `172.19.0.18` (nama service = nama container; **jangan** pernah menamai service staging
+  `riung-api`, karena alias DNS-nya di `vps-shared-net` membuat nginx produksi mengirim traffic ke staging), 192 MB, 0,5 CPU. Tanpa Admin API, tanpa cron, tanpa alarm, tidak dipantau
   watchdog. Log masuk Loki (retensi 7 hari).
 - Akses hanya dengan header `X-Riung-Staging-Key` (nginx; tanpa itu 404). Kunci: `/root/riung-staging.key` di VPS
   dan secret GitHub `RIUNG_STAGING_KEY`; nilainya hanya di config nginx VPS (dikecualikan dari git `core-shared`).
