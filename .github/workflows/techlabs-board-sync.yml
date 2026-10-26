@@ -1,0 +1,31 @@
+name: Techlabs Board Sync
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Optional full SHA to replay from this branch'
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: techlabs-board-sync-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sync referenced tasks
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TECHLABS_BOARD_SYNC: ${{ secrets.TECHLABS_BOARD_SYNC }}
+        run: node .github/scripts/techlabs-board-sync.cjs
