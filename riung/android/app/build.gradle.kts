@@ -44,12 +44,15 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "id.riung.riung"
-        // M7 Task 3: targetSdk 34, versionCode/Name mengikuti rilis pertama Play Store.
+        // M7 Task 3: targetSdk 34.
         // minSdk 26: syarat Health Connect (data tidur dari jam tangan).
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        // versionCode/versionName diambil dari `version: MAJOR.MINOR.PATCH+BUILD`
+        // di pubspec.yaml (lewat Flutter Gradle Plugin), bukan dipatok manual.
+        // +BUILD dipakai sebagai versionCode Play Store — lihat CHANGELOG.md.
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     signingConfigs {
