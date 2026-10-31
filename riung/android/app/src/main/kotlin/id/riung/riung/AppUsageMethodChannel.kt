@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Process
 import android.provider.Settings
+import androidx.core.graphics.drawable.toBitmap
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -23,6 +24,7 @@ import java.util.Calendar
 class AppUsageMethodChannel(private val context: Context, private val activity: android.app.Activity? = null) : MethodCallHandler {
     companion object {
         const val CHANNEL = "id.riung.riung/app_usage"
+        private const val ICON_DP = 48
     }
 
     private var channel: MethodChannel? = null
@@ -72,9 +74,30 @@ class AppUsageMethodChannel(private val context: Context, private val activity: 
                 activity?.moveTaskToBack(true)
                 result.success(null)
             }
+            "getInstalledApps" -> background(result) { ProtectedApps.installedApps(context) }
+            "getAppIcon" -> background(result) { appIcon(call.argument<String>("packageName") ?: "") }
             "isLockServiceRunning" -> result.success(isLockServiceRunning())
             else -> result.notImplemented()
         }
+    }
+
+    /** Membaca paket aplikasi bisa lambat, jadi tidak di thread utama. */
+    private fun background(result: Result, work: () -> Any?) {
+        Thread {
+            val value = try {
+                work()
+            } catch (_: Exception) {
+                null
+            }
+            android.os.Handler(android.os.Looper.getMainLooper()).post { result.success(value) }
+        }.start()
+    }
+
+    /** Ikon aplikasi sebagai PNG kecil, atau null kalau tidak ada. */
+    private fun appIcon(pkg: String): ByteArray? {
+        val size = (ICON_DP * context.resources.displayMetrics.density).toInt()
+        val bitmap = context.packageManager.getApplicationIcon(pkg).toBitmap(size, size)
+        return java.io.ByteArrayOutputStream().also { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }.toByteArray()
     }
 
     private fun hasUsageAccess(): Boolean {

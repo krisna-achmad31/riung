@@ -254,6 +254,10 @@ class AppBekuNotifier extends ChangeNotifier {
 
   Future<void> openUsageAccessSettings() => _usageService.openUsageAccessSettings();
 
+  /// Entri tampilan untuk package apa pun yang dibekukan.
+  AppBekuCatalogEntry entryFor(String packageName) =>
+      AppBekuCatalog.byPackage(packageName) ?? AppBekuCatalog.custom(packageName, _frozenApps[packageName]?.name ?? packageName);
+
   Future<void> setFrozenApp(AppBekuCatalogEntry entry, {required int limitMinutes, required bool enabled}) async {
     _frozenApps = {
       ..._frozenApps,
@@ -261,6 +265,7 @@ class AppBekuNotifier extends ChangeNotifier {
         packageName: entry.packageName,
         dailyLimitMinutes: limitMinutes,
         enabled: enabled,
+        name: entry.isCustom ? entry.name : null,
       ),
     };
     await _prefs.setFrozenAppsJson(_frozenApps.map((pkg, s) => MapEntry(pkg, s.toMap())));

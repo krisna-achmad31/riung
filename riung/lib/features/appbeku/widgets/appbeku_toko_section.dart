@@ -27,6 +27,7 @@ class AppBekuTokoSection extends StatelessWidget {
     if (enabled.length == 1) {
       packageName = enabled.first.packageName;
     } else {
+      final appBeku = AppScope.of(context).appBeku;
       final picked = await showModalBottomSheet<String>(
         context: context,
         builder: (sheetContext) => Padding(
@@ -40,8 +41,7 @@ class AppBekuTokoSection extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               for (final setting in enabled)
                 Builder(builder: (context) {
-                  final entry = AppBekuCatalog.byPackage(setting.packageName);
-                  if (entry == null) return const SizedBox.shrink();
+                  final entry = appBeku.entryFor(setting.packageName);
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: AppTile(entry: entry, size: 36),
@@ -65,10 +65,10 @@ class AppBekuTokoSection extends StatelessWidget {
     final scope = AppScope.of(context);
     final t = scope.language.strings;
     final wallet = scope.wallet;
-    final entry = AppBekuCatalog.byPackage(packageName);
+    final entry = scope.appBeku.entryFor(packageName);
     final charged = scope.appBeku.effectiveUnlockPrice(price);
     if (!_boleh(context, charged)) return;
-    final label = t.appbeku.itemMinutes(minutes, entry?.name);
+    final label = t.appbeku.itemMinutes(minutes, entry.name);
     final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: label, price: charged);
     if (!konfirmasi || !context.mounted) return;
     final result = await scope.appBeku.unlockMinutes(wallet: wallet, packageName: packageName, minutes: minutes, price: price);

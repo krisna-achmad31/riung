@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 
+import '../models/installed_app.dart';
+
 /// Jembatan ke `AppUsageMethodChannel.kt` — baca menit pemakaian aplikasi
 /// lain hari ini lewat UsageStatsManager Android, dan cek/buka izin
 /// "Akses data penggunaan". Lihat CLAUDE.md M6 Task 1 & catatan keamanan di
@@ -46,6 +48,30 @@ class AppUsageService {
       // Sama seperti openUsageAccessSettings: gagal diam-diam.
     } on MissingPluginException {
       // no-op
+    }
+  }
+
+  /// Aplikasi terpasang beserta alasan perlindungannya. Daftar ini hanya
+  /// dipakai di perangkat dan tidak pernah dikirim ke mana pun.
+  Future<List<InstalledApp>?> getInstalledApps() async {
+    try {
+      final raw = await _channel.invokeMethod<List<Object?>>('getInstalledApps');
+      return raw?.map((e) => InstalledApp.fromMap((e! as Map).cast<String, dynamic>())).toList();
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
+  /// Ikon asli aplikasi (PNG), atau null.
+  Future<Uint8List?> getAppIcon(String packageName) async {
+    try {
+      return await _channel.invokeMethod<Uint8List>('getAppIcon', {'packageName': packageName});
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
     }
   }
 

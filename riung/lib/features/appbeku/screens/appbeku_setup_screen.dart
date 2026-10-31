@@ -7,6 +7,7 @@ import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import 'appbeku_permission_screen.dart';
+import 'appbeku_picker_screen.dart';
 import '../widgets/app_tile.dart';
 
 const _tiers = [15, 30, 60];
@@ -25,13 +26,21 @@ class AppBekuSetupScreen extends StatefulWidget {
 
 class _AppBekuSetupScreenState extends State<AppBekuSetupScreen> {
   late Map<String, ({bool enabled, int limit})> _draft;
+  late List<AppBekuCatalogEntry> _apps;
 
   @override
   void initState() {
     super.initState();
-    final existing = AppScope.of(context).appBeku.frozenApps;
+    final appBeku = AppScope.of(context).appBeku;
+    final existing = appBeku.frozenApps;
+    // Aplikasi tambahan yang sudah dimatikan tidak ikut tampil lagi.
+    _apps = [
+      ...AppBekuCatalog.semua,
+      for (final setting in existing.values)
+        if (setting.enabled && AppBekuCatalog.byPackage(setting.packageName) == null) appBeku.entryFor(setting.packageName),
+    ];
     _draft = {
-      for (final app in AppBekuCatalog.semua)
+      for (final app in _apps)
         app.packageName: (
           enabled: existing[app.packageName]?.enabled ?? false,
           limit: existing[app.packageName]?.dailyLimitMinutes ?? 30,
@@ -39,9 +48,20 @@ class _AppBekuSetupScreenState extends State<AppBekuSetupScreen> {
     };
   }
 
+  Future<void> _tambah() async {
+    final picked = await Navigator.of(context).push<AppBekuCatalogEntry>(
+      MaterialPageRoute(builder: (_) => AppBekuPickerScreen(alreadyListed: _apps.map((a) => a.packageName).toSet())),
+    );
+    if (picked == null || !mounted) return;
+    setState(() {
+      _apps.add(picked);
+      _draft[picked.packageName] = (enabled: true, limit: 30);
+    });
+  }
+
   Future<void> _simpan() async {
     final appBeku = AppScope.of(context).appBeku;
-    for (final app in AppBekuCatalog.semua) {
+    for (final app in _apps) {
       final draft = _draft[app.packageName]!;
       await appBeku.setFrozenApp(app, limitMinutes: draft.limit, enabled: draft.enabled);
     }
@@ -83,7 +103,7 @@ class _AppBekuSetupScreenState extends State<AppBekuSetupScreen> {
                     const SizedBox(height: AppSpacing.md),
                     const _LockToggleCard(),
                     const SizedBox(height: AppSpacing.md),
-                    for (final app in AppBekuCatalog.semua) ...[
+                    for (final app in _apps) ...[
                       _AppRow(
                         entry: app,
                         enabled: _draft[app.packageName]!.enabled,
@@ -93,6 +113,12 @@ class _AppBekuSetupScreenState extends State<AppBekuSetupScreen> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                     ],
+                    OutlinedButton.icon(
+                      onPressed: _tambah,
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(t.addOtherApp),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
                       decoration: BoxDecoration(color: AppColors.primerLembut.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(18)),

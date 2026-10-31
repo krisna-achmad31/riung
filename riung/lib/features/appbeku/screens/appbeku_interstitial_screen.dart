@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/config/appbeku_catalog.dart';
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
@@ -80,7 +79,7 @@ class _AppBekuInterstitialScreenState extends State<AppBekuInterstitialScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.s.appbeku;
-    final entry = AppBekuCatalog.byPackage(packageName);
+    final entry = AppScope.of(context).appBeku.entryFor(packageName);
     final appBeku = AppScope.of(context).appBeku;
     final rc = AppScope.of(context).remoteConfig;
     final usage = appBeku.usageMinutesOf(packageName);
@@ -95,7 +94,6 @@ class _AppBekuInterstitialScreenState extends State<AppBekuInterstitialScreen> {
               padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.md),
               child: Column(
                 children: [
-                  if (entry != null)
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 6, 14, 6),
                       decoration: BoxDecoration(

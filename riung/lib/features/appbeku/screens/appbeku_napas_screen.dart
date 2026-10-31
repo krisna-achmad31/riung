@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/config/appbeku_catalog.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
@@ -104,7 +103,7 @@ class _AppBekuNapasScreenState extends State<AppBekuNapasScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     final t = context.s.appbeku;
-    final entry = AppBekuCatalog.byPackage(widget.packageName);
+    final entry = AppScope.of(context).appBeku.entryFor(widget.packageName);
     final faseOffset = switch (_fase) {
       _NapasFase.tarik => 0,
       _NapasFase.tahan => _fasePerCycle,
@@ -119,7 +118,7 @@ class _AppBekuNapasScreenState extends State<AppBekuNapasScreen> with SingleTick
           padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.xl),
           child: Column(
             children: [
-              Text(t.breatheHeader(entry?.name), style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.teksSekunder)),
+              Text(t.breatheHeader(entry.name), style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.teksSekunder)),
               Expanded(
                 child: Center(
                   child: Column(

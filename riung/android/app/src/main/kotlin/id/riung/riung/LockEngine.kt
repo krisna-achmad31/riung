@@ -25,7 +25,7 @@ class LockEngine(private val context: Context) {
     /** Package yang dipantau saat ini (kosong = kunci mati). */
     fun monitoredPackages(): Set<String> {
         val config = LockConfig.load(context) ?: return emptySet()
-        return if (config.enabled) config.entries.keys else emptySet()
+        return if (config.enabled) config.entries.keys.filter { ProtectedApps.reason(context, it) == null }.toSet() else emptySet()
     }
 
     /** Paksa hitung ulang di tick berikutnya (mis. konfigurasi berubah). */
@@ -59,7 +59,7 @@ class LockEngine(private val context: Context) {
         }
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(now))
         val limit = config.limitMinutes(fg, today)
-        if (limit == null) {
+        if (limit == null || ProtectedApps.reason(context, fg) != null) {
             pill.hide()
             return true
         }
