@@ -140,15 +140,10 @@ abstract final class AppTheme {
   }
 }
 
-/// Short slide with an opaque backdrop; no full-screen opacity layer.
-class _GlassPageTransitionsBuilder extends PageTransitionsBuilder {
+/// Geser khas iOS (halaman lama ikut bergeser pelan, usap dari tepi kiri untuk
+/// kembali) di atas latar buram, supaya halaman di bawahnya tidak tembus.
+class _GlassPageTransitionsBuilder extends CupertinoPageTransitionsBuilder {
   const _GlassPageTransitionsBuilder();
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 220);
-
-  @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 180);
 
   @override
   Widget buildTransitions<T>(
@@ -160,11 +155,6 @@ class _GlassPageTransitionsBuilder extends PageTransitionsBuilder {
   ) {
     final page = RiungGlassBackdrop(child: child);
     if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return page;
-    return SlideTransition(
-      position: animation
-          .drive(CurveTween(curve: Curves.easeOutCubic))
-          .drive(Tween(begin: const Offset(0, 0.02), end: Offset.zero)),
-      child: page,
-    );
+    return super.buildTransitions(route, context, animation, secondaryAnimation, page);
   }
 }
