@@ -32,6 +32,7 @@ abstract class AfirmasiStrings {
   // ── Bagikan ──
   String get shareTitle;
   String get shareNote;
+  String cardStyleName(String style);
   String get targetCopy;
   String get targetMore;
   String get saveAsImage;
@@ -98,6 +99,12 @@ class AfirmasiStringsId extends AfirmasiStrings {
 
   @override
   String get shareTitle => 'Bagikan kartu';
+  @override
+  String cardStyleName(String style) => switch (style) {
+        'mengintip' => 'Mengintip',
+        'catatan' => 'Catatan',
+        _ => 'Malam',
+      };
   @override
   String get shareNote => 'Bagikan kartunya tanpa membagikan isi jurnal atau datamu 🔒';
   @override
@@ -245,6 +252,12 @@ class AfirmasiStringsEn extends AfirmasiStrings {
 
   @override
   String get shareTitle => 'Share card';
+  @override
+  String cardStyleName(String style) => switch (style) {
+        'mengintip' => 'Peek',
+        'catatan' => 'Note',
+        _ => 'Night',
+      };
   @override
   String get shareNote => 'Share the card without sharing your journal or your data 🔒';
   @override

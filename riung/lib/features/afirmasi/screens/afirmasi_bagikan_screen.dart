@@ -6,7 +6,7 @@ import '../../../core/models/affirmation.dart';
 import '../../../core/services/card_image_exporter.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
-import '../widgets/afirmasi_glass_card.dart';
+import '../widgets/afirmasi_share_card.dart';
 
 /// Bagikan kartu afirmasi sebagai gambar — isi jurnal & data pribadi tidak
 /// pernah ikut terbagikan. Visual: `Glass — Afirmasi · Bagikan` di
@@ -24,6 +24,7 @@ class AfirmasiBagikanScreen extends StatefulWidget {
 class _AfirmasiBagikanScreenState extends State<AfirmasiBagikanScreen> {
   final GlobalKey _cardKey = GlobalKey();
   bool _busy = false;
+  AfirmasiShareStyle _style = AfirmasiShareStyle.mengintip;
 
   Future<void> _simpanGambar() async {
     if (_busy) return;
@@ -69,7 +70,6 @@ class _AfirmasiBagikanScreenState extends State<AfirmasiBagikanScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.s.afirmasi;
-    final monsterName = context.s.common.monsterName(widget.monsterId);
     final options = [
       (Icons.download_rounded, _busy ? context.s.common.memproses : t.saveAsImage, _simpanGambar),
       (Icons.copy_rounded, t.targetCopy, _salinTeks),
@@ -84,21 +84,22 @@ class _AfirmasiBagikanScreenState extends State<AfirmasiBagikanScreen> {
             const SizedBox(height: AppSpacing.lg),
             RepaintBoundary(
               key: _cardKey,
-              child: AfirmasiGlassCard(
-                tag: t.cardLabelMonster(monsterName),
-                monsterId: widget.monsterId,
-                monsterSize: 150,
-                tagOnWhite: true,
-                text: t.textOf(widget.card),
-                footer: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primer, shape: BoxShape.circle)),
-                    const SizedBox(width: 6),
-                    Text(t.cardBrand, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.teksSekunder)),
-                  ],
-                ),
-              ),
+              child: AfirmasiShareCard(style: _style, text: t.textOf(widget.card), monsterId: widget.monsterId, brand: t.cardBrand),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (final style in AfirmasiShareStyle.values)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ChoiceChip(
+                      label: Text(t.cardStyleName(style.name)),
+                      selected: _style == style,
+                      onSelected: (_) => setState(() => _style = style),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(t.shareNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.teksSekunder)),
