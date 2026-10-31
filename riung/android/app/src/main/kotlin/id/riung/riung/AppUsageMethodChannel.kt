@@ -133,13 +133,14 @@ class AppUsageMethodChannel(private val context: Context, private val activity: 
         val date = call.argument<String>("date") ?: ""
         val notifTitle = call.argument<String>("notifTitle") ?: "Aplikasi Beku"
         val notifBody = call.argument<String>("notifBody") ?: ""
+        val floatingPill = call.argument<Boolean>("floatingPill") ?: false
         @Suppress("UNCHECKED_CAST")
         val raw = call.argument<List<Map<String, Any>>>("entries") ?: emptyList()
         val entries = mutableMapOf<String, LockConfig.Entry>()
         for (e in raw) {
             entries[e["package"] as String] = LockConfig.Entry((e["base"] as Number).toInt(), (e["extra"] as Number).toInt())
         }
-        val config = LockConfig(enabled, date, entries, notifTitle, notifBody)
+        val config = LockConfig(enabled, date, entries, notifTitle, notifBody, floatingPill)
         LockConfig.save(context, config)
         // Penjaga utama = AccessibilityService (kalau sudah diaktifkan pengguna);
         // dia hanya perlu diberi tahu daftar package terbaru.

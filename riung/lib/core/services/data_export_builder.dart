@@ -89,6 +89,7 @@ class DataExportBuilder {
       },
       'appBeku': {
         'kunciAktif': prefs.appBekuLockEnabled,
+        'pilMelayangAktif': prefs.appBekuFloatingPill,
         'aplikasi': prefs.frozenAppsJson,
       },
       'pengaturan': {

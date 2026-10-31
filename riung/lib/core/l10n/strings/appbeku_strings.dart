@@ -29,6 +29,8 @@ abstract class AppbekuStrings {
   String get lockOnBody;
   String get lockOffBody;
   String get lockNeedsPermission;
+  String get floatingPillTitle;
+  String get floatingPillBody;
   String get grantPermission;
   String get accessibilityTitle;
   String get accessibilityHeadline;
@@ -173,6 +175,10 @@ class AppbekuStringsId extends AppbekuStrings {
   String get lockOffBody => 'Riung cuma mengingatkan, aplikasinya tetap bisa dibuka.';
   @override
   String get lockNeedsPermission => 'Kunci butuh izin Aksesibilitas Riung sebelum bisa aktif.';
+  @override
+  String get floatingPillTitle => 'Monster pengawas';
+  @override
+  String get floatingPillBody => 'Monster kecil melayang menunjukkan sisa waktu selama aplikasi beku terbuka.';
   @override
   String get grantPermission => 'Beri izin';
   @override
@@ -390,6 +396,10 @@ class AppbekuStringsEn extends AppbekuStrings {
   String get lockOffBody => 'Riung only reminds you, the app can still be opened.';
   @override
   String get lockNeedsPermission => "The lock needs Riung's Accessibility permission before it can be active.";
+  @override
+  String get floatingPillTitle => 'Monster pengawas';
+  @override
+  String get floatingPillBody => 'A small floating monster shows your remaining time while a frozen app is open.';
   @override
   String get grantPermission => 'Grant permission';
   @override

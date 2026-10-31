@@ -53,6 +53,7 @@ class LocalPrefsStore {
   static const _kFrozenAppsJson = 'riung_frozen_apps_json';
   static const _kAppBekuDailyJson = 'riung_appbeku_daily_json';
   static const _kAppBekuLockEnabled = 'riung_appbeku_lock_enabled';
+  static const _kAppBekuFloatingPill = 'riung_appbeku_floating_pill';
   static const _kPurchasedCoinsReserve = 'riung_purchased_coins_reserve';
   static const _kFreeFocusDate = 'riung_free_focus_date';
   static const _kFreeFocusUsed = 'riung_free_focus_used';
@@ -332,6 +333,9 @@ class LocalPrefsStore {
   /// Mode kunci Aplikasi Beku: aplikasi yang melewati batas benar-benar
   /// ditutup oleh Riung (bukan sekadar diingatkan). Default nyala — user
   /// bisa mematikannya di Pengaturan Aplikasi Beku kapan saja.
+  bool get appBekuFloatingPill => _prefs.getBool(_kAppBekuFloatingPill) ?? false;
+  Future<void> setAppBekuFloatingPill(bool value) => _prefs.setBool(_kAppBekuFloatingPill, value);
+
   bool get appBekuLockEnabled => _prefs.getBool(_kAppBekuLockEnabled) ?? true;
   Future<void> setAppBekuLockEnabled(bool value) =>
       _prefs.setBool(_kAppBekuLockEnabled, value);

@@ -58,6 +58,7 @@ class AppUsageService {
     required List<({String package, int base, int extra})> entries,
     required String notifTitle,
     required String notifBody,
+    required bool floatingPill,
   }) async {
     try {
       await _channel.invokeMethod('syncLockConfig', {
@@ -65,6 +66,7 @@ class AppUsageService {
         'date': date,
         'notifTitle': notifTitle,
         'notifBody': notifBody,
+        'floatingPill': floatingPill,
         'entries': [
           for (final e in entries) {'package': e.package, 'base': e.base, 'extra': e.extra},
         ],

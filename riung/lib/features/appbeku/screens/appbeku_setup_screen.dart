@@ -249,6 +249,24 @@ class _LockToggleCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(on ? t.lockOnBody : t.lockOffBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksSekunder)),
+              if (on) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(t.floatingPillTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 14)),
+                          const SizedBox(height: 2),
+                          Text(t.floatingPillBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksSekunder)),
+                        ],
+                      ),
+                    ),
+                    Switch(value: appBeku.floatingPill, onChanged: appBeku.setFloatingPill),
+                  ],
+                ),
+              ],
               if (missing) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Row(

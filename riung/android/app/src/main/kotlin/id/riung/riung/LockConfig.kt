@@ -19,6 +19,7 @@ class LockConfig(
     val entries: Map<String, Entry>,
     val notifTitle: String,
     val notifBody: String,
+    val floatingPill: Boolean = false,
 ) {
     class Entry(val baseMinutes: Int, val extraMinutes: Int)
 
@@ -33,6 +34,7 @@ class LockConfig(
         root.put("date", date)
         root.put("notifTitle", notifTitle)
         root.put("notifBody", notifBody)
+        root.put("floatingPill", floatingPill)
         val arr = JSONArray()
         for ((pkg, e) in entries) {
             arr.put(JSONObject().put("pkg", pkg).put("base", e.baseMinutes).put("extra", e.extraMinutes))
@@ -62,6 +64,7 @@ class LockConfig(
                     map,
                     root.optString("notifTitle", "Aplikasi Beku"),
                     root.optString("notifBody", ""),
+                    root.optBoolean("floatingPill", false),
                 )
             } catch (_: Exception) {
                 null
