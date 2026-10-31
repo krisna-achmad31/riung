@@ -165,8 +165,6 @@ abstract final class AppColors {
   };
 
   // Kartu bagikan afirmasi (frame `Kartu bagikan (opsi)`).
-  static const Color kartuBagikanKoralAwal = Color(0xFFFFD9CC);
-  static const Color kartuBagikanKoralAkhir = Color(0xFFF7A58F);
   static const Color kartuBagikanTeksKoral = Color(0xFF3B1F1A);
   static const Color kartuBagikanMintAwal = Color(0xFFE3ECE6);
   static const Color kartuBagikanMintAkhir = Color(0xFFF3E7DC);

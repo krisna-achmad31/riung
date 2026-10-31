@@ -805,6 +805,216 @@
       "id": "af_49",
       "teks": "Kritik di kepalaku boleh kudengar, tapi nggak harus kupercaya.",
       "target_saboteur": "hakim"
+    },
+    {
+      "id": "af_50",
+      "teks": "Mulai kecil tetap namanya mulai.",
+      "target_saboteur": "nanti"
+    },
+    {
+      "id": "af_51",
+      "teks": "Aku nggak perlu siap dulu untuk mencoba lima menit.",
+      "target_saboteur": "nanti"
+    },
+    {
+      "id": "af_52",
+      "teks": "Menunda bukan berarti aku malas. Mungkin aku cuma takut.",
+      "target_saboteur": "nanti"
+    },
+    {
+      "id": "af_53",
+      "teks": "Satu langkah hari ini lebih ringan dari semuanya besok.",
+      "target_saboteur": "nanti"
+    },
+    {
+      "id": "af_54",
+      "teks": "Hasil pertamaku boleh jelek. Itu cuma permulaan.",
+      "target_saboteur": "nanti"
+    },
+    {
+      "id": "af_55",
+      "teks": "Aku bisa mulai lagi, kapan pun, tanpa menghukum diri.",
+      "target_saboteur": "nanti"
+    },
+    {
+      "id": "af_56",
+      "teks": "Yang kukerjakan sedikit tetap lebih nyata dari rencana besar.",
+      "target_saboteur": "nanti"
+    },
+    {
+      "id": "af_57",
+      "teks": "Aku boleh berhenti sebelum layarnya berhenti.",
+      "target_saboteur": "gulir"
+    },
+    {
+      "id": "af_58",
+      "teks": "Yang kucari mungkin bukan di layar ini.",
+      "target_saboteur": "gulir"
+    },
+    {
+      "id": "af_59",
+      "teks": "Bosan itu aman. Aku bisa diam sebentar.",
+      "target_saboteur": "gulir"
+    },
+    {
+      "id": "af_60",
+      "teks": "Hidup orang lain nggak perlu kukejar malam ini.",
+      "target_saboteur": "gulir"
+    },
+    {
+      "id": "af_61",
+      "teks": "Perhatianku milikku, dan aku yang memilih ke mana.",
+      "target_saboteur": "gulir"
+    },
+    {
+      "id": "af_62",
+      "teks": "Menaruh HP sebentar bukan berarti ketinggalan.",
+      "target_saboteur": "gulir"
+    },
+    {
+      "id": "af_63",
+      "teks": "Satu napas tanpa layar sudah cukup untuk mulai.",
+      "target_saboteur": "gulir"
+    },
+    {
+      "id": "af_64",
+      "teks": "Hari ini sudah cukup, walau belum semuanya selesai.",
+      "target_saboteur": "begadang"
+    },
+    {
+      "id": "af_65",
+      "teks": "Malam ini aku boleh istirahat tanpa harus pantas dulu.",
+      "target_saboteur": "begadang"
+    },
+    {
+      "id": "af_66",
+      "teks": "Waktu untuk diriku bisa kucari besok, bukan cuma dari tidurku.",
+      "target_saboteur": "begadang"
+    },
+    {
+      "id": "af_67",
+      "teks": "Tidur bukan waktu yang hilang. Itu caraku merawat diri.",
+      "target_saboteur": "begadang"
+    },
+    {
+      "id": "af_68",
+      "teks": "Pikiran malam ini bisa menunggu sampai pagi.",
+      "target_saboteur": "begadang"
+    },
+    {
+      "id": "af_69",
+      "teks": "Aku lebih baik pada besok kalau aku tidur malam ini.",
+      "target_saboteur": "begadang"
+    },
+    {
+      "id": "af_70",
+      "teks": "Tubuhku sudah bekerja seharian. Aku izinkan dia pulang.",
+      "target_saboteur": "begadang"
+    },
+    {
+      "id": "af_71",
+      "teks": "Aku nggak harus disukai semua orang.",
+      "target_saboteur": "bunglon"
+    },
+    {
+      "id": "af_72",
+      "teks": "Pendapatku boleh beda, dan aku tetap diterima.",
+      "target_saboteur": "bunglon"
+    },
+    {
+      "id": "af_73",
+      "teks": "Berkata tidak bukan berarti aku jahat.",
+      "target_saboteur": "bunglon"
+    },
+    {
+      "id": "af_74",
+      "teks": "Aku nggak perlu berubah bentuk supaya layak ada di sini.",
+      "target_saboteur": "bunglon"
+    },
+    {
+      "id": "af_75",
+      "teks": "Orang yang tepat akan suka aku yang asli.",
+      "target_saboteur": "bunglon"
+    },
+    {
+      "id": "af_76",
+      "teks": "Pandangan orang tentangku bukan seluruh diriku.",
+      "target_saboteur": "bunglon"
+    },
+    {
+      "id": "af_77",
+      "teks": "Aku boleh tahu apa yang sebenarnya aku mau.",
+      "target_saboteur": "bunglon"
+    },
+    {
+      "id": "af_78",
+      "teks": "Keputusan yang cukup baik sudah cukup.",
+      "target_saboteur": "bimbang"
+    },
+    {
+      "id": "af_79",
+      "teks": "Aku boleh memilih tanpa tahu semua jawabannya.",
+      "target_saboteur": "bimbang"
+    },
+    {
+      "id": "af_80",
+      "teks": "Salah pilih bisa kuperbaiki. Nggak memilih juga pilihan.",
+      "target_saboteur": "bimbang"
+    },
+    {
+      "id": "af_81",
+      "teks": "Aku percaya pada diriku untuk menghadapi hasilnya.",
+      "target_saboteur": "bimbang"
+    },
+    {
+      "id": "af_82",
+      "teks": "Aku boleh mengambil jeda sebelum memutuskan.",
+      "target_saboteur": "bimbang"
+    },
+    {
+      "id": "af_83",
+      "teks": "Nggak semua pilihan harus sempurna atau selamanya.",
+      "target_saboteur": "bimbang"
+    },
+    {
+      "id": "af_84",
+      "teks": "Suara hatiku juga layak kudengar, bukan cuma suara orang.",
+      "target_saboteur": "bimbang"
+    },
+    {
+      "id": "af_85",
+      "teks": "Marahku boleh ada, tapi dia nggak harus menyetir.",
+      "target_saboteur": "bara"
+    },
+    {
+      "id": "af_86",
+      "teks": "Aku bisa berhenti sejenak sebelum menjawab.",
+      "target_saboteur": "bara"
+    },
+    {
+      "id": "af_87",
+      "teks": "Di balik marahku ada sesuatu yang perlu kudengar.",
+      "target_saboteur": "bara"
+    },
+    {
+      "id": "af_88",
+      "teks": "Aku bisa tegas tanpa harus menyakiti.",
+      "target_saboteur": "bara"
+    },
+    {
+      "id": "af_89",
+      "teks": "Tarik napas dulu. Kata-kataku akan tetap ada.",
+      "target_saboteur": "bara"
+    },
+    {
+      "id": "af_90",
+      "teks": "Merasa marah nggak membuatku orang jahat.",
+      "target_saboteur": "bara"
+    },
+    {
+      "id": "af_91",
+      "teks": "Baranya bisa mengecil pelan-pelan. Aku punya waktu.",
+      "target_saboteur": "bara"
     }
   ],
   "betterme_lessons": [

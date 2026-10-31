@@ -87,14 +87,15 @@ class _AfirmasiBagikanScreenState extends State<AfirmasiBagikanScreen> {
               child: AfirmasiShareCard(style: _style, text: t.textOf(widget.card), monsterId: widget.monsterId, brand: t.cardBrand),
             ),
             const SizedBox(height: AppSpacing.md),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Wrap(
+              alignment: WrapAlignment.center,
               children: [
                 for (final style in AfirmasiShareStyle.values)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: ChoiceChip(
                       label: Text(t.cardStyleName(style.name)),
+                      showCheckmark: false,
                       selected: _style == style,
                       onSelected: (_) => setState(() => _style = style),
                     ),

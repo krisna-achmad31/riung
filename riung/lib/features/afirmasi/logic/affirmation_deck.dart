@@ -1,4 +1,5 @@
 import '../../../core/models/affirmation.dart';
+import '../../monster/logic/habit_monsters.dart';
 
 /// Kumpulan kartu afirmasi per target monster (atau buatan sendiri).
 /// Dibangun dinamis dari [ContentRepository.getAffirmations] + afirmasi
@@ -13,6 +14,9 @@ class AffirmationDeck {
   final String id;
   final String? monsterId;
   final List<Affirmation> cards;
+
+  /// Deck Monster Kebiasaan (dari tes Kenali Dirimu) khusus Premium.
+  bool get isPremium => HabitMonsters.practices.containsKey(monsterId);
 }
 
 List<AffirmationDeck> buildAffirmationDecks({

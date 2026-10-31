@@ -87,9 +87,10 @@ class _MengintipLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final warna = AppColors.monsterLembut[monsterId] ?? AppColors.kabutSage;
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.kartuBagikanKoralAwal, AppColors.kartuBagikanKoralAkhir]),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color.lerp(warna, AppColors.permukaanPadat, 0.5)!, warna]),
       ),
       child: Stack(
         clipBehavior: Clip.hardEdge,
