@@ -430,7 +430,7 @@ class _RiungAppState extends State<RiungApp> {
             supportedLocales: [for (final language in AppLanguage.values) Locale(language.code)],
             localizationsDelegates: GlobalMaterialLocalizations.delegates,
             home: const SplashScreen(),
-            builder: (context, child) => RiungOfflineBanner(apiState: _apiState, child: child ?? const SizedBox.shrink()),
+            builder: (context, child) => RiungTapOrigin(child: RiungOfflineBanner(apiState: _apiState, child: child ?? const SizedBox.shrink())),
           ),
         ),
       ),
