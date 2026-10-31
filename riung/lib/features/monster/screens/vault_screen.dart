@@ -124,7 +124,7 @@ class _VaultScreenState extends State<VaultScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 6),
                   Text(
                     _tab == 0 &&
                             scope.auth.profile?.assessmentCompletedAt == null
