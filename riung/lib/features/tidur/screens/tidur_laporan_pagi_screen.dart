@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
@@ -36,7 +37,7 @@ class TidurLaporanPagiScreen extends StatelessWidget {
                         height: 170,
                         decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
                       ),
-                      const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 150, cosmetics: ['bantal_mini']),
+                      const RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 150, cosmetics: FeatureFlags.monsterCosmetics ? ['bantal_mini'] : []),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),

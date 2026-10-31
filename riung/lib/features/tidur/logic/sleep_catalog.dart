@@ -76,4 +76,3 @@ const List<Soundscape> soundscapes = [
   Soundscape(id: 'kipas', assetPath: AudioAssets.fan),
 ];
 
-const List<int> sleepTimerPresets = [30, 45, 60];

@@ -124,7 +124,7 @@ class HomeStringsId extends HomeStrings {
   @override
   String checkinPromptSub(int coins) => 'Check-in 1 menit · dapat $coins koin';
   @override
-  String get checkinStart => 'Mulai check-in';
+  String get checkinStart => 'Check-in';
   @override
   String get bossBadge => 'BOS';
   @override
@@ -313,7 +313,7 @@ class HomeStringsEn extends HomeStrings {
   @override
   String checkinPromptSub(int coins) => '1-minute check-in · earn $coins coins';
   @override
-  String get checkinStart => 'Start check-in';
+  String get checkinStart => 'Check-in';
   @override
   String get bossBadge => 'BOSS';
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:just_audio/just_audio.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
@@ -187,7 +188,7 @@ class _FeaturedStoryCard extends StatelessWidget {
             const Positioned(
               right: 6,
               top: 36,
-              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 156, cosmetics: ['bantal_mini']),
+              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 156, cosmetics: FeatureFlags.monsterCosmetics ? ['bantal_mini'] : []),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 22, 160, 20),
@@ -280,7 +281,7 @@ class _StoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final free = SleepCatalog.isStoryFree(story.id);
+    final free = SleepCatalog.isStoryFree(story.id) || (AppScope.of(context).auth.profile?.premiumNow ?? false);
     final t = context.s.tidur;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),

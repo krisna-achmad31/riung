@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/config/kenali_dirimu_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
@@ -59,7 +60,7 @@ class _HabitMonsterDetailScreenState extends State<HabitMonsterDetailScreen> {
             final isTamed = progress.state == MonsterState.tamed;
             final awake = KenaliProgress.isAwake(id);
             final shown = _preview ?? (isTamed ? MonsterVisualState.jinak : MonsterVisualState.liar);
-            final worn = shown == MonsterVisualState.jinak ? MonsterLoadout(scope.prefs).idsOf(id, scope.wallet.ownedCosmetics) : const <String>[];
+            final worn = FeatureFlags.monsterCosmetics && shown == MonsterVisualState.jinak ? MonsterLoadout(scope.prefs).idsOf(id, scope.wallet.ownedCosmetics) : const <String>[];
             final entry = KenaliDirimuConfig.quizForMonster(id);
             final wujud = [for (final trait in entry?.wujudOrder ?? const <String>[]) t.wujudName(id, trait)];
 
@@ -69,7 +70,7 @@ class _HabitMonsterDetailScreenState extends State<HabitMonsterDetailScreen> {
                 children: [
                   RiungGlassHeader(
                     title: '',
-                    trailing: isTamed ? RiungGlassIconButton(icon: Icons.checkroom_rounded, onTap: () => _push(LemariScreen(monsterId: id))) : null,
+                    trailing: FeatureFlags.monsterCosmetics && isTamed ? RiungGlassIconButton(icon: Icons.checkroom_rounded, onTap: () => _push(LemariScreen(monsterId: id))) : null,
                   ),
                   Expanded(
                     child: RiungBleedListView(

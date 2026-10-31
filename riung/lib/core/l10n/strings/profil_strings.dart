@@ -1,3 +1,5 @@
+import '../../config/feature_flags.dart';
+
 /// Teks fitur Profil: profil, pengaturan, bantuan krisis, ekspor/hapus akun,
 /// PIN jurnal, kalender latihan, kebijakan privasi, langganan, notifikasi.
 abstract class ProfilStrings {
@@ -206,7 +208,7 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get shopTitle => 'Toko';
   @override
-  String get shopSub => 'Sesi fokus, kosmetik, isi koin';
+  String get shopSub => FeatureFlags.monsterCosmetics ? 'Sesi fokus, kosmetik, isi koin' : 'Sesi fokus, isi koin';
   @override
   String get shopBadge => 'BARU';
   @override
@@ -540,7 +542,7 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get shopTitle => 'Shop';
   @override
-  String get shopSub => 'Focus sessions, cosmetics, top up coins';
+  String get shopSub => FeatureFlags.monsterCosmetics ? 'Focus sessions, cosmetics, top up coins' : 'Focus sessions, top up coins';
   @override
   String get shopBadge => 'NEW';
   @override

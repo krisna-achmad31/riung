@@ -66,12 +66,11 @@ void main() {
       expect(SleepCatalog.isStoryFree('nonexistent'), isFalse);
     });
 
-    test('Suasana suara & preset timer tidur', () {
+    test('Suasana suara tidur', () {
       expect(soundscapes.length, 3);
       final soundIds = soundscapes.map((s) => s.id).toList();
       expect(soundIds, containsAll(['hujan', 'ombak', 'kipas']));
 
-      expect(sleepTimerPresets, [30, 45, 60]);
     });
   });
 

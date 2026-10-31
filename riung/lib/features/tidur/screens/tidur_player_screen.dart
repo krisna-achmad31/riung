@@ -11,15 +11,13 @@ import '../widgets/sleeping_monster.dart';
 import '../logic/sleep_catalog.dart';
 import 'tidur_selesai_screen.dart';
 
-/// Pemutar malam — audio placeholder di-loop, layar dijaga tetap menyala
-/// (`WakelockPlus`, bukan mati sendiri di tengah cerita) sampai timer
-/// habis, lalu auto-stop & memudar. Implement persis
+/// Pemutar malam — layar dijaga tetap menyala (`WakelockPlus`, bukan mati
+/// sendiri di tengah cerita) sampai cerita selesai, lalu auto-stop & memudar. Implement persis
 /// `design/Tidur.dc.html` § Pemutar malam.
 class TidurPlayerScreen extends StatefulWidget {
-  const TidurPlayerScreen({super.key, required this.story, required this.timerMinutes});
+  const TidurPlayerScreen({super.key, required this.story});
 
   final SleepStory story;
-  final int timerMinutes;
 
   @override
   State<TidurPlayerScreen> createState() => _TidurPlayerScreenState();
@@ -27,9 +25,9 @@ class TidurPlayerScreen extends StatefulWidget {
 
 class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
   final _player = AudioPlayer();
-  late Duration _remaining = Duration(minutes: widget.timerMinutes);
-  Timer? _ticker;
   StreamSubscription<ProcessingState>? _completedSub;
+  StreamSubscription<Duration>? _positionSub;
+  Duration _position = Duration.zero;
   bool _finishing = false;
 
   @override
@@ -37,46 +35,34 @@ class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
     super.initState();
     WakelockPlus.enable();
     _startAudio();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
   }
 
   Future<void> _startAudio() async {
     try {
       await _player.setAsset(widget.story.assetPath);
       await _player.setVolume(0.7);
-      // Cerita diputar sekali; begitu selesai (atau timer habis) sesi ditutup.
+      // Cerita diputar sekali; begitu selesai sesi ditutup.
       _completedSub = _player.processingStateStream.listen((state) {
         if (state == ProcessingState.completed && !_finishing && mounted) {
           _finishing = true;
           _finish();
         }
       });
+      _positionSub = _player.positionStream.listen((position) {
+        if (mounted) setState(() => _position = position);
+      });
       unawaited(_player.play());
     } catch (_) {
-      // Audio gagal dimuat — timer & wakelock tetap jalan.
+      // Audio gagal dimuat — tidak ada yang akan menutup sesi, lepas wakelock.
+      await WakelockPlus.disable();
     }
-  }
-
-  void _tick() {
-    if (!mounted) return;
-    if (_remaining <= const Duration(seconds: 1)) {
-      if (!_finishing) {
-        _finishing = true;
-        _finish();
-      }
-      return;
-    }
-    setState(() => _remaining -= const Duration(seconds: 1));
   }
 
   Future<void> _finish() async {
-    _ticker?.cancel();
     await _player.stop();
     await WakelockPlus.disable();
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => TidurSelesaiScreen(story: widget.story)),
-    );
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => TidurSelesaiScreen(story: widget.story)));
   }
 
   void _togglePlayPause() {
@@ -90,8 +76,8 @@ class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
 
   @override
   void dispose() {
-    _ticker?.cancel();
     _completedSub?.cancel();
+    _positionSub?.cancel();
     _player.dispose();
     WakelockPlus.disable();
     super.dispose();
@@ -100,9 +86,9 @@ class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.s.tidur;
-    final total = Duration(minutes: widget.timerMinutes);
-    final progress = total.inSeconds == 0 ? 0.0 : 1 - (_remaining.inSeconds / total.inSeconds);
-    final elapsed = total - _remaining;
+    final total = _player.duration ?? Duration(minutes: widget.story.durationMinutes);
+    final elapsed = _position;
+    final progress = total.inMilliseconds == 0 ? 0.0 : (elapsed.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0);
     String fmt(Duration d) => '${d.inMinutes.toString().padLeft(2, '0')}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
 
     return Scaffold(
@@ -126,7 +112,10 @@ class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
                             children: [
                               const Icon(Icons.dark_mode_rounded, size: 14, color: AppNight.aksen),
                               const SizedBox(width: 6),
-                              Text(t.nightMode, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppNight.teks)),
+                              Text(
+                                t.nightMode,
+                                style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppNight.teks),
+                              ),
                             ],
                           ),
                         ),
@@ -141,22 +130,30 @@ class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
                     children: [
                       _BreathingMonster(monsterId: widget.story.targetMonsterId),
                       const SizedBox(height: AppSpacing.lg),
-                      Text(t.story(widget.story.id).title, textAlign: TextAlign.center, style: AppTextStyles.title.copyWith(fontSize: 22, color: AppNight.teks)),
+                      Text(
+                        t.story(widget.story.id).title,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.title.copyWith(fontSize: 22, color: AppNight.teks),
+                      ),
                       const SizedBox(height: 8),
-                      Text(t.playerSub(widget.story.reader, widget.timerMinutes), style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppNight.teksRedup)),
+                      Text(t.playerSub(widget.story.reader), style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppNight.teksRedup)),
                     ],
                   ),
                 ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
-                  child: LinearProgressIndicator(value: progress, minHeight: 4, backgroundColor: AppNight.pil, valueColor: const AlwaysStoppedAnimation(AppNight.aksen)),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
                   children: [
-                    Text(fmt(elapsed), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
-                    Text(fmt(total), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: LinearProgressIndicator(value: progress, minHeight: 4, backgroundColor: AppNight.pil, valueColor: const AlwaysStoppedAnimation(AppNight.aksen)),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(fmt(elapsed), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
+                        Text(fmt(total), style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppNight.teksRedup)),
+                      ],
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xl),
@@ -170,7 +167,11 @@ class _TidurPlayerScreenState extends State<TidurPlayerScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                Text(t.autoStop, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppNight.teksRedup)),
+                Text(
+                  t.autoStop,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppNight.teksRedup),
+                ),
                 const SizedBox(height: AppSpacing.md),
               ],
             ),
@@ -209,6 +210,9 @@ class _BreathingMonsterState extends State<_BreathingMonster> with SingleTickerP
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(scale: _scale, child: SleepingMonster(monsterId: widget.monsterId, size: 210, glow: 273));
+    return ScaleTransition(
+      scale: _scale,
+      child: SleepingMonster(monsterId: widget.monsterId, size: 210, glow: 273),
+    );
   }
 }

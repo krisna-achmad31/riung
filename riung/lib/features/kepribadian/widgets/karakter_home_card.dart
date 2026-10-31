@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
@@ -62,7 +63,7 @@ class _KarakterHomeCardState extends State<KarakterHomeCard> {
                   child: _CharacterTile(
                     test: test,
                     result: results[test],
-                    accessories: loadout.of(test),
+                    accessories: FeatureFlags.characterAccessories ? loadout.of(test) : const [],
                     onTap: () => _buka(results[test] != null ? KepribadianHasilScreen(result: results[test]!) : KepribadianQuizScreen(test: test)),
                   ),
                 ),

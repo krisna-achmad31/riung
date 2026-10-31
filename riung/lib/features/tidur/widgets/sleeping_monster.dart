@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 
@@ -27,7 +28,7 @@ class SleepingMonster extends StatelessWidget {
               gradient: RadialGradient(colors: [AppNight.cahayaKartu, AppNight.cahayaKartu.withValues(alpha: 0)]),
             ),
           ),
-          RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: size, cosmetics: const ['bantal_mini'], applyBossScale: false),
+          RiungMonster(monsterId: monsterId, state: MonsterVisualState.jinak, size: size, cosmetics: FeatureFlags.monsterCosmetics ? const ['bantal_mini'] : const [], applyBossScale: false),
         ],
       ),
     );

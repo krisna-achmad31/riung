@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/journal_entry.dart';
 import '../../../core/models/personality_result.dart';
@@ -156,7 +157,7 @@ class _TestCard extends StatelessWidget {
             alignment: Alignment.center,
             child: Opacity(
               opacity: done ? 1 : 0.55,
-              child: CharacterAvatar(spec: spec, size: 78, accessories: done ? AccessoryLoadout(AppScope.of(context).prefs).of(test) : const []),
+              child: CharacterAvatar(spec: spec, size: 78, accessories: FeatureFlags.characterAccessories && done ? AccessoryLoadout(AppScope.of(context).prefs).of(test) : const []),
             ),
           ),
           const SizedBox(width: 12),

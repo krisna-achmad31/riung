@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../core/config/economy.dart';
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/services/services.dart';
 import '../../../core/state/state.dart';
@@ -166,22 +167,24 @@ class _TokoScreenState extends State<TokoScreen> {
                   onTap: () => _buyStreakShield(rc.spendPelindungStreak),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                _SectionTitle(t.sectionMonster),
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 169 / 201,
-                  children: [
-                    // Kosmetik khas hanya dijual di Lemari monsternya sendiri.
-                    for (final cosmetic in tokoCosmetics.where((c) => !c.khas))
-                      _KosmetikCard(cosmetic: cosmetic, owned: scope.wallet.ownsCosmetic(cosmetic.id), onTap: () => _buyCosmetic(cosmetic)),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
+                if (FeatureFlags.monsterCosmetics) ...[
+                  _SectionTitle(t.sectionMonster),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 169 / 201,
+                    children: [
+                      // Kosmetik khas hanya dijual di Lemari monsternya sendiri.
+                      for (final cosmetic in tokoCosmetics.where((c) => !c.khas))
+                        _KosmetikCard(cosmetic: cosmetic, owned: scope.wallet.ownsCosmetic(cosmetic.id), onTap: () => _buyCosmetic(cosmetic)),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
                 const AppBekuTokoSection(),
                 const SizedBox(height: AppSpacing.lg),
                 _SectionTitle(t.sectionCoins),
