@@ -446,6 +446,7 @@ class BillingService {
         case PurchaseStatus.pending:
           _updatesController.add(BillingUpdate(productId: purchase.productID, status: BillingStatus.pending));
         case PurchaseStatus.error:
+          _logApiError('store ${purchase.productID}', purchase.error ?? 'unknown');
           _updatesController.add(BillingUpdate(
             productId: purchase.productID,
             status: BillingStatus.error,
@@ -490,6 +491,8 @@ class BillingService {
   void _logApiError(String what, Object error) {
     if (error is ApiException) {
       debugPrint('billing $what failed: ${error.status} ${error.code} requestId=${error.requestId}');
+    } else {
+      debugPrint('billing $what failed: $error');
     }
   }
 

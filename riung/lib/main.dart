@@ -207,7 +207,9 @@ class _RiungAppState extends State<RiungApp> {
         appCheckToken: (limited, force) async {
           if (kDebugMode && devToken.isNotEmpty) return 'dev';
           try {
-            final token = limited ? FirebaseAppCheck.instance.getLimitedUseToken() : FirebaseAppCheck.instance.getToken(force);
+            // `then<String?>`: tipe asli Future<String> menolak onTimeout yang
+            // mengembalikan null (TypeError saat runtime).
+            final token = limited ? FirebaseAppCheck.instance.getLimitedUseToken().then<String?>((t) => t) : FirebaseAppCheck.instance.getToken(force);
             return await token.timeout(const Duration(seconds: 3), onTimeout: () => null);
           } on FirebaseException {
             // App Check is currently in monitor mode. Enforcing backends

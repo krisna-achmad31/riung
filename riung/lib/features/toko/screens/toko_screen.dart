@@ -86,7 +86,8 @@ class _TokoScreenState extends State<TokoScreen> {
         return;
       }
       await AppScope.of(context).billing.buyCoinPack(product);
-    } catch (_) {
+    } catch (error) {
+      debugPrint('billing buyCoinPack failed: $error');
       if (!mounted) return;
       setState(() => _purchasingCoinPack = false);
       ScaffoldMessenger.of(context).showSnackBar(

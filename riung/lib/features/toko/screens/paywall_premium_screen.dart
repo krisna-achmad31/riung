@@ -114,7 +114,8 @@ class _PaywallPremiumScreenState extends State<PaywallPremiumScreen> {
     setState(() => _processing = true);
     try {
       await AppScope.of(context).billing.buyPremium(offer.purchase);
-    } catch (_) {
+    } catch (error) {
+      debugPrint('billing buyPremium failed: $error');
       if (!mounted) return;
       setState(() => _processing = false);
       ScaffoldMessenger.of(context).showSnackBar(
