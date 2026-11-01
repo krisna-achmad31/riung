@@ -331,7 +331,7 @@ class ProfilStringsId extends ProfilStrings {
 
   @override
   String get exportIntro =>
-      'Ringkasan datamu dalam format JSON. Isi jurnal nggak ikut karena tersimpan terenkripsi di perangkatmu.';
+      'Ringkasan datamu dalam format JSON. Isi jurnal nggak ikut karena tersimpan terenkripsi di perangkatmu. Data lainnya, termasuk hasil tes dan refleksimu, nggak terenkripsi di sini, jadi simpan di tempat yang aman dan jangan dibagikan.';
   @override
   String get exportCopy => 'Salin ke clipboard';
   @override
@@ -683,7 +683,7 @@ class ProfilStringsEn extends ProfilStrings {
 
   @override
   String get exportIntro =>
-      'A summary of your data in JSON format. Journal entries are not included because they are stored encrypted on your device.';
+      'A summary of your data in JSON format. Journal entries are not included because they are stored encrypted on your device. Everything else, including your test results and reflections, is not encrypted here, so keep it somewhere safe and do not share it.';
   @override
   String get exportCopy => 'Copy to clipboard';
   @override

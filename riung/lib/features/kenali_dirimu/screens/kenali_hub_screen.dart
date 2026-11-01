@@ -204,6 +204,7 @@ class _EntryRow extends StatelessWidget {
       title: t.entryTitle(entry.id),
       status: status,
       highlight: highlight,
+      locked: !(AppScope.of(context).auth.profile?.premiumNow ?? false) && KenaliResultRepository.instance.resultOf(entry.id) == null,
       onTap: () => KenaliNavigator.open(context, entry),
     );
   }
@@ -269,6 +270,7 @@ class _KepribadianRow extends StatelessWidget {
       },
       status: status,
       highlight: r != null,
+      locked: r == null && !(AppScope.of(context).auth.profile?.premiumNow ?? false),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => r == null ? KepribadianQuizScreen(test: test) : KepribadianHasilScreen(result: r)),
       ),
