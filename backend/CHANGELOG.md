@@ -15,6 +15,8 @@ diubah di Flutter).
 - Go **1.27.3** (CI, `Dockerfile`, `go.mod` toolchain): GO-2026-6809, `crypto/x509` tidak lagi memercayai
   sertifikat perantara yang bocor. Terpakai di verifikasi JWS App Store (`appstore.Verifier.Decode`). Sebelumnya
   `govulncheck` menggagalkan CI `db5de43`.
+- `go-jose` **4.1.6** (dependensi tidak langsung): CVE-2026-116587, DoS lewat parameter RSA buatan di JWK.
+  Trivy menghentikan deploy `8bbd74c`.
 
 ### Diperbaiki
 - **Insiden 2026-10-20 s.d. 21: sebagian traffic produksi masuk ke staging.** Service staging bernama `riung-api`,
