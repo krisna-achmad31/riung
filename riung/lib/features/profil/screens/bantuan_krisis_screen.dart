@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../logic/crisis_directory.dart';
 
 class _CrisisLine {
   const _CrisisLine({required this.name, required this.sub, required this.action, required this.icon, this.url, this.tel});
@@ -18,13 +19,32 @@ class _CrisisLine {
 /// Selalu bisa diakses dari Pengaturan, TIDAK PERNAH dilog analytics —
 /// lihat CLAUDE.md aturan #4 "layar krisis selalu bisa diakses & tidak
 /// dilog". Implement persis `design/Profil.dc.html` § "Bantuan krisis".
-class BantuanKrisisScreen extends StatelessWidget {
+class BantuanKrisisScreen extends StatefulWidget {
   const BantuanKrisisScreen({super.key});
+
+  @override
+  State<BantuanKrisisScreen> createState() => _BantuanKrisisScreenState();
+}
+
+class _BantuanKrisisScreenState extends State<BantuanKrisisScreen> {
+  /// Negara dari pengaturan perangkat, bukan bahasa app; null = di luar daftar.
+  String? _country = WidgetsBinding.instance.platformDispatcher.locale.countryCode;
+
+  Future<void> _gantiNegara() async {
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => const _CountrySheet(),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _country = picked);
+  }
 
   List<_CrisisLine> _lines(BuildContext context) {
     final t = context.s.profil;
+    if (_country != CrisisDirectory.indonesia) return const [];
     return [
-      _CrisisLine(name: 'SEJIWA', sub: t.sejiwaSub, action: t.actionCall, icon: Icons.phone_outlined, tel: '1198'),
+      _CrisisLine(name: 'SEJIWA', sub: t.sejiwaSub, action: t.actionCall, icon: Icons.phone_outlined, tel: '119,8'),
       _CrisisLine(name: 'Into The Light Indonesia', sub: t.intoTheLightSub, action: t.actionOpenSite, icon: Icons.language_rounded, url: 'https://intothelightid.org'),
       _CrisisLine(name: 'IPK Indonesia', sub: t.ipkSub, action: t.actionSearch, icon: Icons.search_rounded, url: 'https://ipkindonesia.or.id'),
     ];
@@ -37,6 +57,8 @@ class BantuanKrisisScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.s.profil;
+    final contact = CrisisDirectory.contacts[_country];
+    final isIndonesia = _country == CrisisDirectory.indonesia;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -68,6 +90,15 @@ class BantuanKrisisScreen extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                     Text(t.crisisIntro, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.55, fontWeight: FontWeight.w500, color: AppColors.teksUtama)),
                     const SizedBox(height: AppSpacing.md),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: _gantiNegara,
+                        icon: const Icon(Icons.public_rounded, size: 16, color: AppColors.primer),
+                        label: Text('${contact?.country ?? t.crisisOtherCountry} · ${t.crisisChangeCountry}', style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.primer)),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
@@ -78,24 +109,34 @@ class BantuanKrisisScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(t.crisisEmergencyLabel, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangatGelap, fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.5)),
+                          Text(isIndonesia ? t.crisisEmergencyLabel : t.crisisLineLabel, style: AppTextStyles.caption.copyWith(color: AppColors.aksenHangatGelap, fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.5)),
                           const SizedBox(height: 8),
-                          Text(t.crisisMinistry, style: AppTextStyles.title.copyWith(fontSize: 18)),
+                          Text(isIndonesia ? t.crisisMinistry : contact?.name ?? t.crisisFallbackTitle, style: AppTextStyles.title.copyWith(fontSize: 18)),
+                          if (contact == null) ...[
+                            const SizedBox(height: 8),
+                            Text(t.crisisFallbackBody, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5, color: AppColors.teksUtama)),
+                          ],
                           const SizedBox(height: AppSpacing.md),
                           Material(
                             color: AppColors.aksenHangatGelap,
                             shape: const StadiumBorder(),
                             child: InkWell(
                               customBorder: const StadiumBorder(),
-                              onTap: () => _telepon('1198'),
+                              onTap: () => contact == null ? _bukaUrl(CrisisDirectory.findAHelplineUrl) : _telepon(contact.tel),
                               child: SizedBox(
                                 height: 54,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.phone_outlined, size: 18, color: AppColors.diAtasTinta),
+                                    Icon(contact == null ? Icons.search_rounded : Icons.phone_outlined, size: 18, color: AppColors.diAtasTinta),
                                     const SizedBox(width: 8),
-                                    Text(t.crisisCallButton, style: AppTextStyles.buttonLabel.copyWith(fontSize: 16, color: AppColors.diAtasTinta)),
+                                    Flexible(
+                                      child: Text(
+                                        contact == null ? t.crisisFindHelpline : (isIndonesia ? t.crisisCallButton : t.crisisCallNumber(contact.number)),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyles.buttonLabel.copyWith(fontSize: 16, color: AppColors.diAtasTinta),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -125,6 +166,29 @@ class BantuanKrisisScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CountrySheet extends StatelessWidget {
+  const _CountrySheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.s.profil;
+    final entries = CrisisDirectory.contacts.entries.toList()..sort((a, b) => a.value.country.compareTo(b.value.country));
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.7),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final entry in entries)
+              ListTile(title: Text(entry.value.country), onTap: () => Navigator.of(context).pop(entry.key)),
+            ListTile(title: Text(t.crisisOtherCountry), onTap: () => Navigator.of(context).pop('')),
+          ],
         ),
       ),
     );

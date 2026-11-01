@@ -59,6 +59,13 @@ abstract class ProfilStrings {
   String get crisisMinistry;
   String get crisisCallButton;
   String get crisisPrivacyNote;
+  String get crisisLineLabel;
+  String crisisCallNumber(String number);
+  String get crisisChangeCountry;
+  String get crisisOtherCountry;
+  String get crisisFallbackTitle;
+  String get crisisFallbackBody;
+  String get crisisFindHelpline;
   String get sejiwaSub;
   String get intoTheLightSub;
   String get ipkSub;
@@ -275,6 +282,20 @@ class ProfilStringsId extends ProfilStrings {
   String get crisisEmergencyLabel => 'DARURAT · 24 JAM';
   @override
   String get crisisMinistry => 'Layanan Kesehatan Jiwa Kemenkes';
+  @override
+  String get crisisLineLabel => 'LAYANAN KRISIS';
+  @override
+  String crisisCallNumber(String number) => 'Telepon $number';
+  @override
+  String get crisisChangeCountry => 'Ganti negara';
+  @override
+  String get crisisOtherCountry => 'Negara lain';
+  @override
+  String get crisisFallbackTitle => 'Hubungi nomor darurat setempat';
+  @override
+  String get crisisFallbackBody => 'Kalau kamu dalam bahaya sekarang, telepon nomor darurat di negaramu, atau minta orang yang kamu percaya menemanimu.';
+  @override
+  String get crisisFindHelpline => 'Cari layanan di negaramu';
   @override
   String get crisisCallButton => 'Telepon 119 ext. 8';
   @override
@@ -609,6 +630,20 @@ class ProfilStringsEn extends ProfilStrings {
   String get crisisEmergencyLabel => 'EMERGENCY · 24 HOURS';
   @override
   String get crisisMinistry => 'Ministry of Health Mental Health Service';
+  @override
+  String get crisisLineLabel => 'CRISIS SERVICE';
+  @override
+  String crisisCallNumber(String number) => 'Call $number';
+  @override
+  String get crisisChangeCountry => 'Change country';
+  @override
+  String get crisisOtherCountry => 'Another country';
+  @override
+  String get crisisFallbackTitle => 'Call your local emergency number';
+  @override
+  String get crisisFallbackBody => 'If you are in danger right now, call the emergency number in your country, or ask someone you trust to stay with you.';
+  @override
+  String get crisisFindHelpline => 'Find a service in your country';
   @override
   String get crisisCallButton => 'Call 119 ext. 8';
   @override
