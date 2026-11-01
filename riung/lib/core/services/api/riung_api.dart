@@ -16,6 +16,13 @@ class ApiSnapshot {
   final Map<String, dynamic> raw;
   Wallet get wallet => Wallet.fromMap(jsonObject(raw['wallet']));
   String get billingAccountId => raw['billingAccountId'] as String? ?? '';
+
+  /// Padanan [billingAccountId] untuk App Store: UUID yang dikirim sebagai
+  /// StoreKit `appAccountToken` (`applicationUserName`).
+  String get appAccountToken =>
+      raw['appAccountToken'] as String? ??
+      jsonObject(raw['user'])['appAccountToken'] as String? ??
+      '';
   Map<String, dynamic> get today => jsonObject(raw['today']);
   Map<String, dynamic> get inventory => jsonObject(raw['inventory']);
 
@@ -159,10 +166,13 @@ class RiungApi {
     String? key,
     bool reportErrors = true,
   }) async {
+    // App Store verify/restore memakai satu Idempotency-Key per transaksi
+    // yang dipakai ulang saat retry; Play boleh key baru tiap panggilan.
     final mutation =
         method != 'GET' &&
         path != '/v1/activities/batch' &&
-        !path.startsWith('/v1/billing/');
+        (!path.startsWith('/v1/billing/') ||
+            path.startsWith('/v1/billing/appstore/'));
     final action =
         '${client.accountId?.call()}:$method:$path:${jsonEncode(body)}';
     final actionKey =
@@ -362,6 +372,33 @@ class RiungApi {
         'purchases': [
           for (final p in purchases)
             {'productId': p.productId, 'purchaseToken': p.purchaseToken},
+        ],
+      },
+    );
+  }
+
+  Future<BillingResult> verifyAppStore(
+    String productId,
+    String transactionId,
+  ) async => BillingResult(
+    await _send(
+      'POST',
+      '/v1/billing/appstore/verify',
+      limitedUse: true,
+      body: {'productId': productId, 'transactionId': transactionId},
+    ),
+  );
+  Future<Map<String, dynamic>> restoreAppStore(
+    List<({String productId, String transactionId})> purchases,
+  ) {
+    if (purchases.length > 20) throw ArgumentError('Maximum 20 purchases');
+    return _send(
+      'POST',
+      '/v1/billing/appstore/restore',
+      body: {
+        'purchases': [
+          for (final p in purchases)
+            {'productId': p.productId, 'transactionId': p.transactionId},
         ],
       },
     );

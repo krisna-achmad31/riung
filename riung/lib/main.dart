@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'core/config/firebase_config.dart';
 import 'core/l10n/l10n.dart';
@@ -25,6 +26,11 @@ import 'core/widgets/widgets.dart';
 import 'core/widgets/api_error_feedback.dart';
 import 'features/appbeku/screens/appbeku_interstitial_screen.dart';
 import 'features/launch/screens/splash_screen.dart';
+
+/// `X-App-Version`: versi build sebenarnya (`1.0.3+1016`), diisi di
+/// [main] dari PackageInfo. `RIUNG_APP_VERSION` hanya cadangan bila
+/// PackageInfo gagal (atau di test yang tidak lewat [main]).
+String _appVersion = const String.fromEnvironment('RIUNG_APP_VERSION', defaultValue: '1.0.0+1');
 
 /// Rute notifikasi lokal ke layar yang sesuai berdasarkan payload — dipakai
 /// baik saat notifikasi ditap selagi app berjalan/background
@@ -58,6 +64,12 @@ Future<void> main() async {
   // non-scroll overflow begitu HP diputar landscape.
   await SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await Firebase.initializeApp();
+  try {
+    final info = await PackageInfo.fromPlatform();
+    _appVersion = info.buildNumber.isEmpty ? info.version : '${info.version}+${info.buildNumber}';
+  } catch (_) {
+    // Tetap pakai cadangan RIUNG_APP_VERSION.
+  }
   await FirebaseAppCheck.instance.activate(
     providerAndroid: kDebugMode ? const AndroidDebugProvider() : const AndroidPlayIntegrityProvider(),
   );
@@ -171,7 +183,8 @@ class _RiungAppState extends State<RiungApp> {
     if (widget.userRepository == null && widget.walletFunctions == null) {
       const baseUrl = String.fromEnvironment('RIUNG_API_BASE_URL', defaultValue: 'https://riung.e55techlab.com');
       const devToken = String.fromEnvironment('RIUNG_DEV_TOKEN');
-      final api = RiungApi(ApiClient(baseUrl: baseUrl, appVersion: const String.fromEnvironment('RIUNG_APP_VERSION', defaultValue: '1.0.0+1'),
+      final api = RiungApi(ApiClient(baseUrl: baseUrl, appVersion: _appVersion,
+        platform: defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
         accountId: () => _authService.currentUid,
         onError: (error) {
           _apiState?.reportError(error);
