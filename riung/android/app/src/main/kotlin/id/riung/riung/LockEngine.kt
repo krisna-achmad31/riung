@@ -2,6 +2,7 @@ package id.riung.riung
 
 import android.content.Context
 import android.content.Intent
+import android.os.PowerManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -11,18 +12,20 @@ import java.util.Locale
  * (AccessibilityService = utama, foreground service = cadangan). Tiap [tick]
  * memeriksa aplikasi di depan lewat event UsageStats; kalau itu aplikasi
  * beku yang sudah melewati batas efektifnya hari ini, Riung dibuka di
- * depannya (layar jeda Flutter). TIDAK menggambar overlay apa pun.
+ * depannya (layar jeda Flutter). Selain pil informasi opsional
+ * ([FloatingWatchPill]) tidak menggambar overlay apa pun.
  */
 class LockEngine(private val context: Context) {
     private var snapshot: UsageCalculator.Snapshot? = null
     private var lastSnapshotAt = 0L
     private var lastEventCheckAt = 0L
     private var lastLaunchAt = 0L
+    private val pill = FloatingWatchPill(context)
 
     /** Package yang dipantau saat ini (kosong = kunci mati). */
     fun monitoredPackages(): Set<String> {
         val config = LockConfig.load(context) ?: return emptySet()
-        return if (config.enabled) config.entries.keys else emptySet()
+        return if (config.enabled) config.entries.keys.filter { ProtectedApps.reason(context, it) == null }.toSet() else emptySet()
     }
 
     /** Paksa hitung ulang di tick berikutnya (mis. konfigurasi berubah). */
@@ -30,10 +33,16 @@ class LockEngine(private val context: Context) {
         snapshot = null
     }
 
+    /** Lepas pil saat service berhenti. */
+    fun release() = pill.hide()
+
     /** @return false kalau kunci tidak aktif lagi (pemanggil boleh berhenti). */
     fun tick(): Boolean {
         val config = LockConfig.load(context)
-        if (config == null || !config.enabled || config.entries.isEmpty()) return false
+        if (config == null || !config.enabled || config.entries.isEmpty()) {
+            pill.hide()
+            return false
+        }
         val now = System.currentTimeMillis()
         var snap = snapshot
         val switched = snap != null && UsageCalculator.hasActivityEventsSince(context, lastEventCheckAt)
@@ -43,12 +52,25 @@ class LockEngine(private val context: Context) {
             snapshot = snap
             lastSnapshotAt = now
         }
-        val fg = snap.foregroundPackage ?: return true
-        if (fg == context.packageName) return true
+        val fg = snap.foregroundPackage
+        if (fg == null || fg == context.packageName) {
+            pill.hide()
+            return true
+        }
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(now))
-        val limit = config.limitMinutes(fg, today) ?: return true
-        val usedMinutes = (snap.millisAt(fg, now) / 60000L).toInt()
-        if (usedMinutes < limit) return true
+        val limit = config.limitMinutes(fg, today)
+        if (limit == null || ProtectedApps.reason(context, fg) != null) {
+            pill.hide()
+            return true
+        }
+        val usedMillis = snap.millisAt(fg, now)
+        val usedMinutes = (usedMillis / 60000L).toInt()
+        if (usedMinutes < limit) {
+            val interactive = (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
+            if (config.floatingPill && interactive) pill.show(limit * 60000L - usedMillis) else pill.hide()
+            return true
+        }
+        pill.hide()
         if (now - lastLaunchAt < RELAUNCH_MS) return true
         lastLaunchAt = now
         block(fg)

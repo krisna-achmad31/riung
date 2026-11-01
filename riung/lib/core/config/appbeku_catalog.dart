@@ -31,6 +31,9 @@ class AppBekuCatalogEntry {
 
   List<Color> get tileColors => [tileColor, tileColorEnd ?? tileColor];
 
+  /// Aplikasi pilihan pengguna, bukan bawaan katalog.
+  bool get isCustom => tile.isEmpty;
+
   /// Rata-rata pemakaian nasional (menit/hari) — cuma konteks di kartu, bukan
   /// data user; kalimatnya per bahasa (`AppbekuStrings.appUsageAverage`).
   /// Null untuk aplikasi yang tidak dibekukan (WhatsApp).
@@ -98,6 +101,15 @@ abstract final class AppBekuCatalog {
   static const List<AppBekuCatalogEntry> sosmed = [instagram, tiktok, youtube, x];
 
   static const List<AppBekuCatalogEntry> semua = [instagram, tiktok, youtube, x, mobileLegends];
+
+  /// Entri untuk aplikasi di luar katalog; ikon aslinya dimuat `AppTile`.
+  static AppBekuCatalogEntry custom(String packageName, String name) => AppBekuCatalogEntry(
+        packageName: packageName,
+        name: name,
+        tile: '',
+        tileColor: AppColors.appX,
+        icon: Icons.apps_rounded,
+      );
 
   static AppBekuCatalogEntry? byPackage(String packageName) {
     for (final entry in semua) {

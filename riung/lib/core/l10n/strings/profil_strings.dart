@@ -1,3 +1,5 @@
+import '../../config/feature_flags.dart';
+
 /// Teks fitur Profil: profil, pengaturan, bantuan krisis, ekspor/hapus akun,
 /// PIN jurnal, kalender latihan, kebijakan privasi, langganan, notifikasi.
 abstract class ProfilStrings {
@@ -57,6 +59,15 @@ abstract class ProfilStrings {
   String get crisisMinistry;
   String get crisisCallButton;
   String get crisisPrivacyNote;
+  String get crisisLineLabel;
+  String crisisCallNumber(String number);
+  String get crisisChangeCountry;
+  String get crisisPickCountry;
+  String get crisisSearchCountry;
+  String get crisisOtherCountry;
+  String get crisisFallbackTitle;
+  String get crisisFallbackBody;
+  String get crisisFindHelpline;
   String get sejiwaSub;
   String get intoTheLightSub;
   String get ipkSub;
@@ -206,7 +217,7 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get shopTitle => 'Toko';
   @override
-  String get shopSub => 'Sesi fokus, kosmetik, isi koin';
+  String get shopSub => FeatureFlags.monsterCosmetics ? 'Sesi fokus, kosmetik, isi koin' : 'Sesi fokus, isi koin';
   @override
   String get shopBadge => 'BARU';
   @override
@@ -274,6 +285,24 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get crisisMinistry => 'Layanan Kesehatan Jiwa Kemenkes';
   @override
+  String get crisisLineLabel => 'LAYANAN KRISIS';
+  @override
+  String crisisCallNumber(String number) => 'Telepon $number';
+  @override
+  String get crisisChangeCountry => 'Ganti';
+  @override
+  String get crisisPickCountry => 'Pilih negaramu';
+  @override
+  String get crisisSearchCountry => 'Cari negara';
+  @override
+  String get crisisOtherCountry => 'Negara lain';
+  @override
+  String get crisisFallbackTitle => 'Hubungi nomor darurat setempat';
+  @override
+  String get crisisFallbackBody => 'Kalau kamu dalam bahaya sekarang, telepon nomor darurat di negaramu, atau minta orang yang kamu percaya menemanimu.';
+  @override
+  String get crisisFindHelpline => 'Cari layanan di negaramu';
+  @override
   String get crisisCallButton => 'Telepon 119 ext. 8';
   @override
   String get crisisPrivacyNote =>
@@ -302,7 +331,7 @@ class ProfilStringsId extends ProfilStrings {
 
   @override
   String get exportIntro =>
-      'Ringkasan datamu dalam format JSON. Isi jurnal nggak ikut karena tersimpan terenkripsi di perangkatmu.';
+      'Ringkasan datamu dalam format JSON. Isi jurnal nggak ikut karena tersimpan terenkripsi di perangkatmu. Data lainnya, termasuk hasil tes dan refleksimu, nggak terenkripsi di sini, jadi simpan di tempat yang aman dan jangan dibagikan.';
   @override
   String get exportCopy => 'Salin ke clipboard';
   @override
@@ -540,7 +569,7 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get shopTitle => 'Shop';
   @override
-  String get shopSub => 'Focus sessions, cosmetics, top up coins';
+  String get shopSub => FeatureFlags.monsterCosmetics ? 'Focus sessions, cosmetics, top up coins' : 'Focus sessions, top up coins';
   @override
   String get shopBadge => 'NEW';
   @override
@@ -608,6 +637,24 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get crisisMinistry => 'Ministry of Health Mental Health Service';
   @override
+  String get crisisLineLabel => 'CRISIS SERVICE';
+  @override
+  String crisisCallNumber(String number) => 'Call $number';
+  @override
+  String get crisisChangeCountry => 'Change';
+  @override
+  String get crisisPickCountry => 'Choose your country';
+  @override
+  String get crisisSearchCountry => 'Search country';
+  @override
+  String get crisisOtherCountry => 'Another country';
+  @override
+  String get crisisFallbackTitle => 'Call your local emergency number';
+  @override
+  String get crisisFallbackBody => 'If you are in danger right now, call the emergency number in your country, or ask someone you trust to stay with you.';
+  @override
+  String get crisisFindHelpline => 'Find a service in your country';
+  @override
   String get crisisCallButton => 'Call 119 ext. 8';
   @override
   String get crisisPrivacyNote =>
@@ -636,7 +683,7 @@ class ProfilStringsEn extends ProfilStrings {
 
   @override
   String get exportIntro =>
-      'A summary of your data in JSON format. Journal entries are not included because they are stored encrypted on your device.';
+      'A summary of your data in JSON format. Journal entries are not included because they are stored encrypted on your device. Everything else, including your test results and reflections, is not encrypted here, so keep it somewhere safe and do not share it.';
   @override
   String get exportCopy => 'Copy to clipboard';
   @override

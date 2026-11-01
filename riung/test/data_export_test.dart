@@ -20,7 +20,7 @@ void main() {
     'riung_monster_progress_json', 'riung_user_profile_json',
     'riung_favorite_affirmation_ids', 'riung_custom_affirmations_json',
     'riung_ticket_balance', 'riung_owned_cosmetics', 'riung_prepaid_focus_sessions',
-    'riung_streak_shield_balance', 'riung_frozen_apps_json', 'riung_appbeku_lock_enabled',
+    'riung_streak_shield_balance', 'riung_frozen_apps_json', 'riung_appbeku_lock_enabled', 'riung_appbeku_floating_pill',
     'riung_notif_settings_json', 'riung_biometric_unlock_enabled',
     'riung_betterme_completed', 'riung_betterme_reflections_json',
     'riung_language_code', 'riung_sleep_sync_enabled', 'riung_afirmasi_reminder_time', 'riung_sleep_reminder_json',

@@ -124,7 +124,7 @@ class _VaultScreenState extends State<VaultScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 6),
                   Text(
                     _tab == 0 &&
                             scope.auth.profile?.assessmentCompletedAt == null
@@ -144,6 +144,7 @@ class _VaultScreenState extends State<VaultScreen> {
                 ],
               ),
             ),
+            const SizedBox(width: AppSpacing.md),
             TiketChip(count: scope.wallet.tickets),
             const SizedBox(width: 8),
             KoinChip(balance: scope.wallet.coins),

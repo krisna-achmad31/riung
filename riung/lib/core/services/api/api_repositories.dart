@@ -294,8 +294,11 @@ class ApiContentRepository implements ContentRepository {
   @override
   Future<List<Affirmation>> getAffirmations() async {
     final items = await _content('affirmations');
-    return items.isEmpty
-        ? fallback.getAffirmations()
-        : items.map(Affirmation.fromMap).toList();
+    final bundled = await fallback.getAffirmations();
+    if (items.isEmpty) return bundled;
+    // Kartu bawaan yang belum ada di server tetap tampil.
+    final remote = items.map(Affirmation.fromMap).toList();
+    final ids = remote.map((a) => a.id).toSet();
+    return [...remote, ...bundled.where((a) => !ids.contains(a.id))];
   }
 }

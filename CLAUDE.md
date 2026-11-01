@@ -48,5 +48,8 @@ lib/
 - Konversi tipe di satu tempat: `Timestamp`→`DateTime`, num→int, enum via `X.values.byName` dengan fallback aman untuk data lama.
 - UI hanya menerima model, tidak pernah `Map<String, dynamic>` mentah. Fungsi Cloud Functions juga dipanggil lewat service typed (request/response model), bukan map literal di layar.
 
+## Changelog & tugas backend
+Perubahan yang selesai dicatat di `CHANGELOG.md`. Pekerjaan yang dibutuhkan ada di `BACKEND_TASKS.md`, `MOBILE_TASKS.md`, dan `DESIGN_TASKS.md`: sebelum mengerjakan suatu bidang, baca file bidang itu dan ikuti aturannya. Saat pekerjaan butuh bidang lain, tambahkan tugas di file bidang tersebut.
+
 ## Definition of done (per layar)
 Sesuai .dc.html-nya (side-by-side check) · semua state ada (empty/loading/error/success/offline) · token & economy props only · copy persis · lolos di layar 360dp / HP RAM 2–4GB.

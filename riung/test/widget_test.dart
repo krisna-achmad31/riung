@@ -62,7 +62,7 @@ void main() {
     // pernah "diam" selama animasi itu masih berjalan) lalu auto-navigate
     // ke Onboarding (user dummy belum onboardingDone).
     await tester.pump(const Duration(seconds: 3));
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 50));
     }
 

@@ -29,6 +29,8 @@ abstract class AppbekuStrings {
   String get lockOnBody;
   String get lockOffBody;
   String get lockNeedsPermission;
+  String get floatingPillTitle;
+  String get floatingPillBody;
   String get grantPermission;
   String get accessibilityTitle;
   String get accessibilityHeadline;
@@ -99,6 +101,12 @@ abstract class AppbekuStrings {
   String get setupBody;
   String get dailyLimit;
   String get pickAtLeastOne;
+  String get addOtherApp;
+  String get pickAppTitle;
+  String get searchAppHint;
+  String get appsLoadFailed;
+  String get noAppsFound;
+  String protectedAppReason(String reason);
   String freezeCount(int count);
 
   // ── Toko: Buka Waktu Scroll ──
@@ -173,6 +181,10 @@ class AppbekuStringsId extends AppbekuStrings {
   String get lockOffBody => 'Riung cuma mengingatkan, aplikasinya tetap bisa dibuka.';
   @override
   String get lockNeedsPermission => 'Kunci butuh izin Aksesibilitas Riung sebelum bisa aktif.';
+  @override
+  String get floatingPillTitle => 'Monster pengawas';
+  @override
+  String get floatingPillBody => 'Monster kecil melayang menunjukkan sisa waktu selama aplikasi beku terbuka.';
   @override
   String get grantPermission => 'Beri izin';
   @override
@@ -297,6 +309,24 @@ class AppbekuStringsId extends AppbekuStrings {
   @override
   String get pickAtLeastOne => 'Pilih minimal satu aplikasi';
   @override
+  String get addOtherApp => 'Tambah aplikasi lain';
+  @override
+  String get pickAppTitle => 'Pilih aplikasi';
+  @override
+  String get searchAppHint => 'Cari aplikasi';
+  @override
+  String get appsLoadFailed => 'Daftar aplikasi belum bisa dibaca. Coba lagi nanti ya.';
+  @override
+  String get noAppsFound => 'Aplikasinya nggak ketemu.';
+  @override
+  String protectedAppReason(String reason) => switch (reason) {
+        'communication' => 'Jalur komunikasi, tetap terbuka',
+        'navigation' => 'Penunjuk jalan, tetap terbuka',
+        'finance' => 'Urusan keuangan, tetap terbuka',
+        'health' => 'Urusan kesehatan, tetap terbuka',
+        _ => 'Bagian penting HP, tetap terbuka',
+      };
+  @override
   String freezeCount(int count) => 'Bekukan $count aplikasi';
 
   @override
@@ -390,6 +420,10 @@ class AppbekuStringsEn extends AppbekuStrings {
   String get lockOffBody => 'Riung only reminds you, the app can still be opened.';
   @override
   String get lockNeedsPermission => "The lock needs Riung's Accessibility permission before it can be active.";
+  @override
+  String get floatingPillTitle => 'Monster pengawas';
+  @override
+  String get floatingPillBody => 'A small floating monster shows your remaining time while a frozen app is open.';
   @override
   String get grantPermission => 'Grant permission';
   @override
@@ -513,6 +547,24 @@ class AppbekuStringsEn extends AppbekuStrings {
   String get dailyLimit => 'Daily limit';
   @override
   String get pickAtLeastOne => 'Pick at least one app';
+  @override
+  String get addOtherApp => 'Add another app';
+  @override
+  String get pickAppTitle => 'Choose an app';
+  @override
+  String get searchAppHint => 'Search apps';
+  @override
+  String get appsLoadFailed => 'Couldn\'t read your app list. Please try again later.';
+  @override
+  String get noAppsFound => 'No apps found.';
+  @override
+  String protectedAppReason(String reason) => switch (reason) {
+        'communication' => 'Communication stays open',
+        'navigation' => 'Navigation stays open',
+        'finance' => 'Finances stay open',
+        'health' => 'Health stays open',
+        _ => 'Essential phone app stays open',
+      };
   @override
   String freezeCount(int count) => count == 1 ? 'Freeze 1 app' : 'Freeze $count apps';
 

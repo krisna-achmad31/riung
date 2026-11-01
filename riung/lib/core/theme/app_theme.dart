@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../widgets/riung_glass_backdrop.dart';
+import '../widgets/riung_tap_origin.dart';
 import 'app_colors.dart';
 import 'app_spacing.dart';
 import 'app_text_styles.dart';
@@ -140,15 +142,18 @@ abstract final class AppTheme {
   }
 }
 
-/// Short slide with an opaque backdrop; no full-screen opacity layer.
-class _GlassPageTransitionsBuilder extends PageTransitionsBuilder {
+/// Halaman membesar dari titik yang disentuh, seperti transisi zoom iOS.
+/// Usap dari tepi kiri tetap berfungsi: saat itu halaman digeser mengikuti jari.
+class _GlassPageTransitionsBuilder extends CupertinoPageTransitionsBuilder {
   const _GlassPageTransitionsBuilder();
 
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 220);
+  static final _origins = Expando<Offset>();
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 180);
+  Duration get transitionDuration => const Duration(milliseconds: 420);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 340);
 
   @override
   Widget buildTransitions<T>(
@@ -160,11 +165,68 @@ class _GlassPageTransitionsBuilder extends PageTransitionsBuilder {
   ) {
     final page = RiungGlassBackdrop(child: child);
     if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return page;
-    return SlideTransition(
-      position: animation
-          .drive(CurveTween(curve: Curves.easeOutCubic))
-          .drive(Tween(begin: const Offset(0, 0.02), end: Offset.zero)),
-      child: page,
+    final size = MediaQuery.sizeOf(context);
+    final origin = _origins[route] ??= RiungTapOrigin.recent ?? size.center(Offset.zero);
+    return super.buildTransitions(
+      route,
+      context,
+      _SwipeOnlyAnimation(route, animation),
+      const AlwaysStoppedAnimation(0),
+      _ZoomFromOrigin(route: route, animation: animation, origin: origin, size: size, child: page),
+    );
+  }
+}
+
+/// Menggerakkan geser Cupertino hanya selama usap kembali berlangsung.
+class _SwipeOnlyAnimation extends Animation<double> with AnimationWithParentMixin<double> {
+  _SwipeOnlyAnimation(this.route, this.parent);
+
+  final PageRoute<dynamic> route;
+
+  @override
+  final Animation<double> parent;
+
+  @override
+  double get value => route.popGestureInProgress ? parent.value : 1;
+}
+
+class _ZoomFromOrigin extends StatelessWidget {
+  const _ZoomFromOrigin({
+    required this.route,
+    required this.animation,
+    required this.origin,
+    required this.size,
+    required this.child,
+  });
+
+  final PageRoute<dynamic> route;
+  final Animation<double> animation;
+  final Offset origin;
+  final Size size;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutQuart, reverseCurve: Curves.easeInCubic);
+    final alignment = Alignment(origin.dx / size.width * 2 - 1, origin.dy / size.height * 2 - 1);
+    return AnimatedBuilder(
+      animation: curved,
+      child: child,
+      builder: (context, child) {
+        final t = route.popGestureInProgress ? 1.0 : curved.value;
+        return Opacity(
+          opacity: (t / 0.3).clamp(0.0, 1.0),
+          child: Transform.scale(
+            scale: 0.08 + 0.92 * t,
+            alignment: alignment,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32 * (1 - t)),
+              clipBehavior: t == 1 ? Clip.none : Clip.antiAlias,
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 }

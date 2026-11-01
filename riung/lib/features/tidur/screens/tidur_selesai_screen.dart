@@ -5,7 +5,7 @@ import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../logic/sleep_catalog.dart';
 
-/// Cerita tidur selesai / timer habis — audio & wakelock sudah berhenti,
+/// Cerita tidur selesai — audio & wakelock sudah berhenti,
 /// layar ini menutup sesi dengan tenang sebelum kembali.
 class TidurSelesaiScreen extends StatelessWidget {
   const TidurSelesaiScreen({super.key, required this.story});

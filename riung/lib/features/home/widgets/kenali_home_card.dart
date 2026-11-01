@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/config/kenali_dirimu_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/services/kenali_result_repository.dart';
+import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../kenali_dirimu/logic/kenali_content.dart';
@@ -58,7 +59,15 @@ class _KenaliHomeCardState extends State<KenaliHomeCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(t.homeKicker, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.teksRedup)),
+                      Row(
+                        children: [
+                          Text(t.homeKicker, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.teksRedup)),
+                          if (!(AppScope.of(context).auth.profile?.premiumNow ?? false)) ...[
+                            const SizedBox(width: 6),
+                            const Icon(Icons.lock_outline_rounded, size: 12, color: AppColors.teksRedup),
+                          ],
+                        ],
+                      ),
                       const SizedBox(height: 4),
                       Text(t.homeTitle, style: AppTextStyles.title.copyWith(fontSize: 16, height: 1.3, color: AppColors.teksUtama)),
                       if (minutes != null) ...[

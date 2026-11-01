@@ -13,6 +13,7 @@ import '../../kepribadian/widgets/character_avatar.dart';
 import '../logic/kenali_navigator.dart';
 import '../logic/kenali_progress.dart';
 import '../logic/kenali_scoring.dart';
+import '../../toko/screens/paywall_premium_screen.dart';
 
 /// Soal satu per layar (frame `Glass — Kenali Dirimu · Soal`): progres
 /// "8 dari 24", kicker judul tes, karakter pendamping, opsi dari JSON.
@@ -82,6 +83,7 @@ class _KenaliQuizScreenState extends State<KenaliQuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!(AppScope.of(context).auth.profile?.premiumNow ?? false)) return const PaywallPremiumScreen();
     final t = context.s.kenali;
     final q = _questions[_index];
     final selected = _answers[q.id];

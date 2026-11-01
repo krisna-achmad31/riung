@@ -76,6 +76,7 @@ class AppBekuNotifier extends ChangeNotifier {
   bool _hasUsageAccess = false;
   bool _hasAccessibilityAccess = false;
   bool _lockEnabled = true;
+  bool _floatingPill = false;
   int _breathTakenToday = 0;
   int _scrollCoinsToday = 0;
   int _paidUnlocksToday = 0;
@@ -91,6 +92,7 @@ class AppBekuNotifier extends ChangeNotifier {
   /// Pilihan user: kunci aplikasi yang melewati batas (true) atau cuma
   /// diingatkan (false).
   bool get lockEnabled => _lockEnabled;
+  bool get floatingPill => _floatingPill;
 
   /// Kunci dinyalakan & ada aplikasi beku, tapi izin mati (mis. Aksesibilitas
   /// otomatis dimatikan Android setelah Force Stop) — user perlu tahu.
@@ -142,6 +144,7 @@ class AppBekuNotifier extends ChangeNotifier {
     _hasUsageAccess = await _usageService.hasUsageAccess();
     _hasAccessibilityAccess = await _usageService.hasAccessibilityAccess();
     _lockEnabled = _prefs.appBekuLockEnabled;
+    _floatingPill = _prefs.appBekuFloatingPill;
     await _rolloverIfNewDay();
     await _syncLock();
 
@@ -216,6 +219,14 @@ class AppBekuNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Nyalakan/matikan pil melayang berisi sisa waktu aplikasi beku.
+  Future<void> setFloatingPill(bool value) async {
+    _floatingPill = value;
+    await _prefs.setAppBekuFloatingPill(value);
+    await _syncLock();
+    notifyListeners();
+  }
+
   /// Sinkron ulang konfigurasi ke service native (mis. saat bahasa berganti
   /// supaya teks notifikasinya ikut).
   Future<void> resyncLock() => _syncLock();
@@ -231,6 +242,7 @@ class AppBekuNotifier extends ChangeNotifier {
       ],
       notifTitle: text.title,
       notifBody: text.body,
+      floatingPill: _floatingPill,
     );
   }
 
@@ -242,6 +254,10 @@ class AppBekuNotifier extends ChangeNotifier {
 
   Future<void> openUsageAccessSettings() => _usageService.openUsageAccessSettings();
 
+  /// Entri tampilan untuk package apa pun yang dibekukan.
+  AppBekuCatalogEntry entryFor(String packageName) =>
+      AppBekuCatalog.byPackage(packageName) ?? AppBekuCatalog.custom(packageName, _frozenApps[packageName]?.name ?? packageName);
+
   Future<void> setFrozenApp(AppBekuCatalogEntry entry, {required int limitMinutes, required bool enabled}) async {
     _frozenApps = {
       ..._frozenApps,
@@ -249,6 +265,7 @@ class AppBekuNotifier extends ChangeNotifier {
         packageName: entry.packageName,
         dailyLimitMinutes: limitMinutes,
         enabled: enabled,
+        name: entry.isCustom ? entry.name : null,
       ),
     };
     await _prefs.setFrozenAppsJson(_frozenApps.map((pkg, s) => MapEntry(pkg, s.toMap())));

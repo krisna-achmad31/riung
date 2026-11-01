@@ -90,7 +90,7 @@ class _KalenderLatihanScreenState extends State<KalenderLatihanScreen> {
                               children: [
                                 Expanded(
                                   child: _StatBox(
-                                    leading: const RiungIcon3D(RiungIcon.streak, size: 28),
+                                    leading: const RiungIcon3D(RiungIcon.streak, size: 20),
                                     value: t.daysCount(scope.streak.current),
                                     label: t.streakNow,
                                   ),
@@ -229,10 +229,12 @@ class _StatBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (leading != null) ...[leading!, const SizedBox(height: 2)],
-          FittedBox(fit: BoxFit.scaleDown, child: Text(value, style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.2))),
+          Row(children: [
+            if (leading != null) ...[leading!, const SizedBox(width: 4)],
+            Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: Text(value, style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.2)))),
+          ]),
           const SizedBox(height: 2),
-          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 10, color: AppColors.teksSekunder)),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: AppTextStyles.caption.copyWith(fontSize: 10, color: AppColors.teksSekunder))),
         ],
       ),
     );

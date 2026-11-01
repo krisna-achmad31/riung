@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
@@ -76,7 +77,7 @@ class _SaboteurDetailScreenState extends State<SaboteurDetailScreen> {
             final progress = scope.monsterProgress.progressOf(saboteur.id) ?? MonsterProgress.initial(saboteur.id);
             final isTamed = progress.state == MonsterState.tamed;
             final shown = _preview ?? (isTamed ? MonsterVisualState.jinak : MonsterVisualState.liar);
-            final worn = shown == MonsterVisualState.jinak ? MonsterLoadout(scope.prefs).idsOf(saboteur.id, scope.wallet.ownedCosmetics) : const <String>[];
+            final worn = FeatureFlags.monsterCosmetics && shown == MonsterVisualState.jinak ? MonsterLoadout(scope.prefs).idsOf(saboteur.id, scope.wallet.ownedCosmetics) : const <String>[];
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
@@ -84,7 +85,7 @@ class _SaboteurDetailScreenState extends State<SaboteurDetailScreen> {
                 children: [
                   RiungGlassHeader(
                     title: '',
-                    trailing: isTamed
+                    trailing: FeatureFlags.monsterCosmetics && isTamed
                         ? RiungGlassIconButton(
                             icon: Icons.checkroom_rounded,
                             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => LemariScreen(monsterId: saboteur.id))),

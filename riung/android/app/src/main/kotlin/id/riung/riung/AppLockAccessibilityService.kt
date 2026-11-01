@@ -61,6 +61,7 @@ class AppLockAccessibilityService : AccessibilityService() {
 
     override fun onUnbind(intent: Intent?): Boolean {
         handler.removeCallbacks(tick)
+        engine.release()
         if (instance === this) instance = null
         return super.onUnbind(intent)
     }

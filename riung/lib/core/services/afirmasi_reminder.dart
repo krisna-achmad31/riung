@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show TimeOfDay;
 
 import '../l10n/strings/afirmasi_strings.dart';
 import '../l10n/strings/notif_strings.dart';
+import '../../features/monster/logic/habit_monsters.dart';
 import 'content_repository.dart';
 import 'local_notification_service.dart';
 import 'local_prefs_store.dart';
@@ -61,8 +62,9 @@ abstract final class AfirmasiReminder {
     final seeded = await content.getAffirmations();
     final custom = uid == null ? const [] : await users.getCustomAffirmations(uid);
     final favoriteIds = uid == null ? const <String>{} : await users.getFavoriteAffirmationIds(uid);
+    final free = seeded.where((a) => !HabitMonsters.practices.containsKey(a.targetSaboteur));
     final pool = [
-      ...seeded,
+      ...free,
       ...seeded.where((a) => favoriteIds.contains(a.id)),
       ...custom,
       ...custom,

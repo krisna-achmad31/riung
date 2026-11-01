@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/config/appbeku_catalog.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
@@ -39,7 +38,7 @@ class AppBekuPostBreathingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.s.appbeku;
-    final entry = AppBekuCatalog.byPackage(packageName);
+    final entry = AppScope.of(context).appBeku.entryFor(packageName);
     final rc = AppScope.of(context).remoteConfig;
     return Scaffold(
       body: SafeArea(
@@ -78,7 +77,7 @@ class AppBekuPostBreathingScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              RiungButton(label: t.closeApp(entry?.name), onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
+              RiungButton(label: t.closeApp(entry.name), onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
               const SizedBox(height: 10),
               PaidUnlockButton(
                 label: t.unlockShortCoins(AppScope.of(context).appBeku.effectiveUnlockPrice(rc.scrollUnlock10Menit)),

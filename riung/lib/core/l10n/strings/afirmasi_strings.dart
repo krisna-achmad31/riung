@@ -32,6 +32,7 @@ abstract class AfirmasiStrings {
   // ── Bagikan ──
   String get shareTitle;
   String get shareNote;
+  String cardStyleName(String style);
   String get targetCopy;
   String get targetMore;
   String get saveAsImage;
@@ -98,6 +99,12 @@ class AfirmasiStringsId extends AfirmasiStrings {
 
   @override
   String get shareTitle => 'Bagikan kartu';
+  @override
+  String cardStyleName(String style) => switch (style) {
+        'mengintip' => 'Mengintip',
+        'catatan' => 'Catatan',
+        _ => 'Malam',
+      };
   @override
   String get shareNote => 'Bagikan kartunya tanpa membagikan isi jurnal atau datamu 🔒';
   @override
@@ -212,6 +219,48 @@ class AfirmasiStringsEn extends AfirmasiStrings {
     'af_47': 'I am more than my worst mistake.',
     'af_48': 'I do not need to prove anything to be worthy of love.',
     'af_49': 'I can hear the critic in my head without believing it.',
+    'af_50': 'Starting small still counts as starting.',
+    'af_51': 'I do not need to feel ready to try for five minutes.',
+    'af_52': 'Putting things off does not make me lazy. Maybe I am just afraid.',
+    'af_53': 'One step today is lighter than everything tomorrow.',
+    'af_54': 'My first try can be bad. It is only the beginning.',
+    'af_55': 'I can begin again at any time, without punishing myself.',
+    'af_56': 'A little done is more real than a big plan.',
+    'af_57': 'I can stop before the screen does.',
+    'af_58': 'What I am looking for may not be on this screen.',
+    'af_59': 'Boredom is safe. I can sit with it for a while.',
+    'af_60': 'I do not need to chase other people\'s lives tonight.',
+    'af_61': 'My attention is mine, and I choose where it goes.',
+    'af_62': 'Putting my phone down does not mean missing out.',
+    'af_63': 'One breath without a screen is enough to begin.',
+    'af_64': 'Today was enough, even if not everything got done.',
+    'af_65': 'Tonight I can rest without having to earn it.',
+    'af_66': 'Time for myself does not have to come out of my sleep.',
+    'af_67': 'Sleep is not lost time. It is how I care for myself.',
+    'af_68': 'Tonight\'s thoughts can wait until morning.',
+    'af_69': 'I am kinder to tomorrow when I sleep tonight.',
+    'af_70': 'My body has worked all day. I let it come home.',
+    'af_71': 'I do not have to be liked by everyone.',
+    'af_72': 'My opinion can differ, and I still belong.',
+    'af_73': 'Saying no does not make me unkind.',
+    'af_74': 'I do not need to change shape to deserve being here.',
+    'af_75': 'The right people will like the real me.',
+    'af_76': 'What others think of me is not all of who I am.',
+    'af_77': 'I am allowed to know what I really want.',
+    'af_78': 'A good enough decision is enough.',
+    'af_79': 'I can choose without knowing every answer.',
+    'af_80': 'A wrong choice can be fixed. Not choosing is a choice too.',
+    'af_81': 'I trust myself to handle whatever comes of it.',
+    'af_82': 'I can take a pause before deciding.',
+    'af_83': 'Not every choice has to be perfect or forever.',
+    'af_84': 'My own voice deserves to be heard, not just everyone else\'s.',
+    'af_85': 'My anger can be here, but it does not have to drive.',
+    'af_86': 'I can pause for a moment before I answer.',
+    'af_87': 'Behind my anger is something I need to hear.',
+    'af_88': 'I can be firm without causing hurt.',
+    'af_89': 'Breathe first. My words will still be there.',
+    'af_90': 'Feeling angry does not make me a bad person.',
+    'af_91': 'The ember can cool slowly. I have time.',
   };
 
   @override
@@ -245,6 +294,12 @@ class AfirmasiStringsEn extends AfirmasiStrings {
 
   @override
   String get shareTitle => 'Share card';
+  @override
+  String cardStyleName(String style) => switch (style) {
+        'mengintip' => 'Peek',
+        'catatan' => 'Note',
+        _ => 'Night',
+      };
   @override
   String get shareNote => 'Share the card without sharing your journal or your data 🔒';
   @override

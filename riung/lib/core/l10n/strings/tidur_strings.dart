@@ -33,14 +33,13 @@ abstract class TidurStrings {
   String kicker(int minutes);
   String readBy(String reader);
   String get sourceNote;
-  String get timerTitle;
   String minutes(int minutes);
   String get playStory;
   String freeTierNote(int freeCount);
 
   // ── Pemutar ──
   String get nightMode;
-  String playerSub(String reader, int minutes);
+  String playerSub(String reader);
   String get autoStop;
 
   // ── Selesai ──
@@ -154,7 +153,6 @@ class TidurStringsId extends TidurStrings {
   @override
   String get sourceNote => 'Audio berbahasa Inggris · rekaman LibriVox, domain publik';
   @override
-  String get timerTitle => 'Timer layar mati';
   @override
   String minutes(int minutes) => '$minutes mnt';
   @override
@@ -165,7 +163,7 @@ class TidurStringsId extends TidurStrings {
   @override
   String get nightMode => 'Mode malam · layar redup';
   @override
-  String playerSub(String reader, int minutes) => '$reader · timer $minutes menit';
+  String playerSub(String reader) => reader;
   @override
   String get autoStop => 'Audio berhenti sendiri setelah cerita selesai. Selamat tidur 🌙';
 
@@ -304,7 +302,6 @@ class TidurStringsEn extends TidurStrings {
   @override
   String get sourceNote => 'LibriVox recording, public domain';
   @override
-  String get timerTitle => 'Screen-off timer';
   @override
   String minutes(int minutes) => '$minutes min';
   @override
@@ -315,7 +312,7 @@ class TidurStringsEn extends TidurStrings {
   @override
   String get nightMode => 'Night mode · dimmed screen';
   @override
-  String playerSub(String reader, int minutes) => '$reader · $minutes-minute timer';
+  String playerSub(String reader) => reader;
   @override
   String get autoStop => 'The audio stops on its own once the story ends. Good night 🌙';
 

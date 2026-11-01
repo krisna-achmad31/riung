@@ -1,3 +1,4 @@
+import '../../config/feature_flags.dart';
 import '../../services/billing_service.dart';
 
 /// Teks fitur Toko + paywall Premium (dipakai juga oleh paywall onboarding)
@@ -390,8 +391,9 @@ class TokoStringsId extends TokoStrings {
   @override
   List<String> get premiumBenefits => const [
         'Semua konten meditasi, tidur, jurnal CBT & Better Me',
+        'Semua tes & kuis Kenali Dirimu, plus 6 Monster Kebiasaan',
         '3 sesi Fokus gratis per hari',
-        'Semua gaya kartu karakter',
+        if (FeatureFlags.characterAccessories) 'Semua gaya kartu karakter',
         'Laporan bulanan + pola faktor ↔ suasana hati',
       ];
   @override
@@ -729,8 +731,9 @@ class TokoStringsEn extends TokoStrings {
   @override
   List<String> get premiumBenefits => const [
         'All meditation, sleep, CBT journal & Better Me content',
+        'All Know Yourself tests & quizzes, plus 6 Habit Monsters',
         '3 free Focus sessions a day',
-        'All character card styles',
+        if (FeatureFlags.characterAccessories) 'All character card styles',
         'Monthly report + factor ↔ mood patterns',
       ];
   @override

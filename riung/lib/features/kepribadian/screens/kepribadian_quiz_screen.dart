@@ -10,6 +10,7 @@ import '../logic/character_spec.dart';
 import '../logic/personality_config.dart';
 import '../logic/personality_scoring.dart';
 import 'kepribadian_hasil_screen.dart';
+import '../../toko/screens/paywall_premium_screen.dart';
 
 /// Satu tes, satu pertanyaan per layar dengan skala setuju 1..5. Jawaban
 /// terpilih langsung maju ke pertanyaan berikutnya; bisa kembali mengubah.
@@ -79,6 +80,7 @@ class _KepribadianQuizScreenState extends State<KepribadianQuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!(AppScope.of(context).auth.profile?.premiumNow ?? false)) return const PaywallPremiumScreen();
     final t = context.s.kepribadian;
     final q = _questions[_index];
     final selected = _answers[q.id];

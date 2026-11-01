@@ -26,6 +26,7 @@ class KenaliEntryRow extends StatelessWidget {
     required this.status,
     required this.onTap,
     this.highlight = false,
+    this.locked = false,
   });
 
   final Widget leading;
@@ -33,6 +34,9 @@ class KenaliEntryRow extends StatelessWidget {
   final String title;
   final String? status;
   final bool highlight;
+
+  /// Belum Premium dan belum punya hasil.
+  final bool locked;
   final VoidCallback onTap;
 
   @override
@@ -76,7 +80,7 @@ class KenaliEntryRow extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, color: AppColors.teksRedup),
+          Icon(locked ? Icons.lock_outline_rounded : Icons.chevron_right_rounded, size: locked ? 18 : null, color: AppColors.teksRedup),
         ],
       ),
     );

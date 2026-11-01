@@ -5,6 +5,7 @@ import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../toko/screens/paywall_premium_screen.dart';
 import '../logic/affirmation_deck.dart';
 import '../widgets/afirmasi_deck_tile.dart';
 import '../widgets/afirmasi_today_card.dart';
@@ -54,7 +55,13 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
     if (created == true) _load();
   }
 
+  bool get _premium => AppScope.of(context).auth.profile?.premiumNow ?? false;
+
   void _openDeck(AffirmationDeck deck) {
+    if (deck.isPremium && !_premium) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallPremiumScreen()));
+      return;
+    }
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => AfirmasiKartuScreen(deck: deck)));
   }
 
@@ -63,7 +70,7 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
   (AffirmationDeck, Affirmation)? _today(List<AffirmationDeck> decks) {
     final pool = [
       for (final d in decks)
-        if (d.monsterId != null)
+        if (d.monsterId != null && (!d.isPremium || _premium))
           for (final c in d.cards) (d, c),
     ];
     if (pool.isEmpty) return null;
@@ -158,6 +165,7 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
       monsterId: id,
       title: id == null ? t.customDeck : t.deckAgainst(context.s.common.monsterName(id)),
       meta: t.cards(deck.cards.length),
+      locked: deck.isPremium && !_premium,
       onTap: () => _openDeck(deck),
     );
   }

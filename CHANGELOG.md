@@ -1,14 +1,51 @@
 # Changelog — Riung
 
-Semua perubahan penting dicatat di sini. Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
+Daftar perubahan yang sudah selesai. Pekerjaan yang masih dibutuhkan ada di [`BACKEND_TASKS.md`](BACKEND_TASKS.md), [`MOBILE_TASKS.md`](MOBILE_TASKS.md), dan [`DESIGN_TASKS.md`](DESIGN_TASKS.md).
 
-**Aturan versi:** judul tiap rilis = `version` di [`riung/pubspec.yaml`](riung/pubspec.yaml) (`MAJOR.MINOR.PATCH+BUILD`). Setiap perubahan yang di-merge wajib:
-1. naikkan `version` di pubspec (PATCH untuk perbaikan, MINOR untuk fitur, `+BUILD` selalu naik 1 — dipakai sebagai `versionCode` Play Store);
-2. tambah entri baru di atas dengan versi yang sama, tanggal, committer, dan commit terkait.
+Format entri baru (paling baru di atas):
 
-Kategori: **Ditambahkan** (fitur baru) · **Diubah** · **Diperbaiki** · **Keamanan** · **Desain** (frame di `design/riung.pen`).
+```
+DD/MM/YYYY (VERSI)
+INISIAL
+1. ADD: fitur baru.
+2. UPDATE: perubahan pada yang sudah ada.
+3. FIX: perbaikan bug.
+```
 
----
+Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml`](riung/pubspec.yaml): PATCH untuk perbaikan, MINOR untuk fitur, dan `+BUILD` selalu naik 1.
+
+======
+
+01/11/2026 (1.0.5+9)
+AY
+1. ADD: Add six 3D portrait avatars to the profile, replacing monster avatars.
+2. UPDATE: Replace the app icon on Android and iOS with Si Hakim inside the glass circle.
+
+01/11/2026 (1.0.4+8)
+AY
+1. ADD: Add AppData for LIVE and DEV modes. Release builds always use LIVE.
+2. ADD: Add BACKEND_TASKS.md, MOBILE_TASKS.md and DESIGN_TASKS.md as shared task lists.
+3. ADD: Add App Store billing code from billing_v1.
+4. ADD: Require Premium for Know Yourself tests and quizzes, with lock labels before starting.
+5. UPDATE: Block screenshots on the data export screen on Android.
+6. UPDATE: Remove billing identifiers from data exports.
+7. ADD: Show crisis services by country, with search and an emergency fallback.
+8. FIX: Add spacing between the title and chips in the monster header.
+
+31/10/2026 (1.0.4+8)
+AY
+1. ADD: Add Premium affirmation decks for habit monsters, with cards matching the monster colour.
+2. ADD: Add three share card styles for affirmations.
+3. ADD: Add iOS-style page transitions, swipe back and zoom from the tap point.
+4. ADD: Let users choose their own apps in Aplikasi Beku, with essential paths protected.
+5. ADD: Add the floating guardian monster pill in Aplikasi Beku.
+6. UPDATE: Hide accessories and tidy the sleep, calendar and check-in screens.
+7. FIX: Match the native splash background to the light theme.
+8. FIX: Add spacing between the Monstermu title and subtitle.
+
+======
+
+Arsip format lama:
 
 ## [1.0.3+4] — 2026-10-20
 

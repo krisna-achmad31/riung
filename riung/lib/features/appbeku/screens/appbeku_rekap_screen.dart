@@ -62,7 +62,7 @@ class _AppBekuRekapScreenState extends State<AppBekuRekapScreen> {
                         const SizedBox(height: AppSpacing.md),
                         for (final setting in appBeku.enabledFrozenApps) ...[
                           _RecapBar(
-                            entry: AppBekuCatalog.byPackage(setting.packageName),
+                            entry: AppScope.of(context).appBeku.entryFor(setting.packageName),
                             used: appBeku.usageMinutesOf(setting.packageName),
                             limit: appBeku.effectiveLimitOf(setting.packageName),
                           ),

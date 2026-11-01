@@ -13,6 +13,7 @@ class AfirmasiDeckTile extends StatelessWidget {
     required this.title,
     required this.meta,
     required this.onTap,
+    this.locked = false,
   });
 
   /// null = deck "Buatanku sendiri".
@@ -20,6 +21,9 @@ class AfirmasiDeckTile extends StatelessWidget {
   final String title;
   final String meta;
   final VoidCallback onTap;
+
+  /// Deck Premium untuk pengguna gratis.
+  final bool locked;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +50,12 @@ class AfirmasiDeckTile extends StatelessWidget {
           const SizedBox(height: 10),
           Text(title, maxLines: 2, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, height: 1.25, color: AppColors.teksUtama)),
           const SizedBox(height: 4),
-          Text(meta, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder)),
+          Row(
+            children: [
+              Expanded(child: Text(meta, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksSekunder))),
+              if (locked) const Icon(Icons.lock_outline_rounded, size: 14, color: AppColors.teksSekunder),
+            ],
+          ),
         ],
       ),
     );

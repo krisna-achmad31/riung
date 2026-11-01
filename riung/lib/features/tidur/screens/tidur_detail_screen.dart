@@ -21,8 +21,6 @@ class TidurDetailScreen extends StatefulWidget {
 }
 
 class _TidurDetailScreenState extends State<TidurDetailScreen> {
-  int _timerMinutes = sleepTimerPresets.first;
-
   void _putar() {
     final scope = AppScope.of(context);
     final premiumActive = scope.auth.profile?.premiumNow ?? false;
@@ -40,7 +38,7 @@ class _TidurDetailScreenState extends State<TidurDetailScreen> {
     }
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => TidurPlayerScreen(story: widget.story, timerMinutes: _timerMinutes),
+        builder: (_) => TidurPlayerScreen(story: widget.story),
       ),
     );
   }
@@ -99,21 +97,6 @@ class _TidurDetailScreenState extends State<TidurDetailScreen> {
                             Expanded(child: Text(t.sourceNote, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppNight.teksSekunder))),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(t.timerTitle, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppNight.teksSekunder)),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          for (final minutes in sleepTimerPresets)
-                            RiungFilterChip(
-                              label: t.minutes(minutes),
-                              selected: minutes == _timerMinutes,
-                              night: true,
-                              onTap: () => setState(() => _timerMinutes = minutes),
-                            ),
-                        ],
                       ),
                     ],
                   ),

@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 
+import '../models/installed_app.dart';
+
 /// Jembatan ke `AppUsageMethodChannel.kt` — baca menit pemakaian aplikasi
 /// lain hari ini lewat UsageStatsManager Android, dan cek/buka izin
 /// "Akses data penggunaan". Lihat CLAUDE.md M6 Task 1 & catatan keamanan di
@@ -7,6 +9,16 @@ import 'package:flutter/services.dart';
 /// perangkat, cuma dipakai untuk gerbang lokal Aplikasi Beku.
 class AppUsageService {
   static const _channel = MethodChannel('id.riung.riung/app_usage');
+
+  /// Android memblokir screenshot & rekam layar selama aktif. iOS tidak punya
+  /// padanannya, jadi di sana panggilan ini tidak berpengaruh.
+  static Future<void> setScreenSecure(bool secure) async {
+    try {
+      await _channel.invokeMethod<void>('setScreenSecure', {'secure': secure});
+    } on MissingPluginException {
+      // iOS & tes.
+    }
+  }
 
   Future<bool> hasUsageAccess() async {
     try {
@@ -49,6 +61,30 @@ class AppUsageService {
     }
   }
 
+  /// Aplikasi terpasang beserta alasan perlindungannya. Daftar ini hanya
+  /// dipakai di perangkat dan tidak pernah dikirim ke mana pun.
+  Future<List<InstalledApp>?> getInstalledApps() async {
+    try {
+      final raw = await _channel.invokeMethod<List<Object?>>('getInstalledApps');
+      return raw?.map((e) => InstalledApp.fromMap((e! as Map).cast<String, dynamic>())).toList();
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
+  /// Ikon asli aplikasi (PNG), atau null.
+  Future<Uint8List?> getAppIcon(String packageName) async {
+    try {
+      return await _channel.invokeMethod<Uint8List>('getAppIcon', {'packageName': packageName});
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
   /// Dorong konfigurasi kunci ke service pemantau native. [entries] berisi
   /// batas dasar & menit ekstra hari ini per package; native mematikan
   /// dirinya sendiri kalau [enabled] false / izin belum ada.
@@ -58,6 +94,7 @@ class AppUsageService {
     required List<({String package, int base, int extra})> entries,
     required String notifTitle,
     required String notifBody,
+    required bool floatingPill,
   }) async {
     try {
       await _channel.invokeMethod('syncLockConfig', {
@@ -65,6 +102,7 @@ class AppUsageService {
         'date': date,
         'notifTitle': notifTitle,
         'notifBody': notifBody,
+        'floatingPill': floatingPill,
         'entries': [
           for (final e in entries) {'package': e.package, 'base': e.base, 'extra': e.extra},
         ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
@@ -63,8 +64,10 @@ class BillingUpdate {
   final String? detail;
 }
 
-/// Google Play purchases are verified by the backend before consumption or
-/// acknowledgement. Failed delivery remains recoverable through Play restore.
+/// Google Play & App Store purchases are verified by the backend before
+/// consumption, acknowledgement or StoreKit `finish()`. Failed delivery
+/// remains recoverable through restore (Play) or StoreKit re-delivering the
+/// unfinished transaction on the next launch (App Store).
 class BillingService {
   BillingService({
     required WalletFunctionsService walletFunctions,
@@ -75,20 +78,28 @@ class BillingService {
     this.onCoinsPurchased,
     InAppPurchase? iap,
     this.apiState,
+    bool? appStore,
   })  : _analytics = analytics,
         _isAnonymous = isAnonymous,
-        _iap = iap ?? InAppPurchase.instance;
+        _iap = iap ?? InAppPurchase.instance,
+        appStore = appStore ?? defaultTargetPlatform == TargetPlatform.iOS;
 
   final AnalyticsService _analytics;
   final bool Function() _isAnonymous;
   final InAppPurchase _iap;
   final ApiState? apiState;
 
+  /// true = StoreKit (iOS): akun lewat `appAccountToken`, verifikasi ke
+  /// `/v1/billing/appstore/*` dengan `transactionId`, selesai lewat
+  /// `completePurchase`. false = Google Play.
+  final bool appStore;
+
   /// Dipanggil setelah paket koin terverifikasi & dikreditkan — dipakai
   /// `WalletNotifier` untuk melacak koin beli vs koin hasil latihan.
   final void Function(int totalCoins)? onCoinsPurchased;
 
-  /// Batas token per panggilan `/v1/billing/restore`.
+  /// Batas pembelian per panggilan `/v1/billing/restore` &
+  /// `/v1/billing/appstore/restore`.
   static const restoreChunkSize = 20;
 
   static const allProductIds = {
@@ -109,7 +120,8 @@ class BillingService {
   Completer<RestoreOutcome>? _restoreWaiter;
 
   /// Langganan Premium yang terakhir terverifikasi di HP ini (dari restore
-  /// atau pembelian) — dipakai sebagai `oldPurchaseDetails` saat pindah plan.
+  /// atau pembelian) — dipakai sebagai `oldPurchaseDetails` saat pindah plan
+  /// (hanya Play; App Store mengganti plan dalam satu subscription group).
   GooglePlayPurchaseDetails? _activeSubscription;
   final Set<String> _consumed = {};
   final _updatesController = StreamController<BillingUpdate>.broadcast();
@@ -200,11 +212,24 @@ class BillingService {
     if (_isAnonymous()) {
       throw StateError('buyCoinPack dipanggil selagi masih anonim — pasang ensureAccountForPurchase() di UI pemanggil.');
     }
-    final account = (await apiState?.refresh())?.billingAccountId;
+    final account = _storeAccount(await apiState?.refresh());
+    final param = PurchaseParam(productDetails: product, applicationUserName: account);
+    // StoreKit menolak autoConsume: false; koin baru "terpakai" saat
+    // completePurchase setelah server mengkredit. Play wajib false supaya
+    // pembelian tidak di-consume sebelum diverifikasi.
+    final launched = appStore
+        ? await _iap.buyConsumable(purchaseParam: param)
+        : await _iap.buyConsumable(purchaseParam: param, autoConsume: false);
+    // Tanpa sheet toko tidak akan ada update di stream — UI harus tahu.
+    if (!launched) throw StateError('Store purchase flow not launched');
+  }
+
+  /// `appAccountToken` (App Store) atau `billingAccountId` (Play) dari
+  /// `GET /v1/me` — server menolak pembelian tanpa penanda akun ini.
+  String _storeAccount(ApiSnapshot? me) {
+    final account = appStore ? me?.appAccountToken : me?.billingAccountId;
     if (account == null || account.isEmpty) throw StateError('Server billing account required');
-    final launched = await _iap.buyConsumable(purchaseParam: PurchaseParam(productDetails: product, applicationUserName: account), autoConsume: false);
-    // Tanpa sheet Play tidak akan ada update di stream — UI harus tahu.
-    if (!launched) throw StateError('Google Play purchase flow not launched');
+    return account;
   }
 
   /// Beli atau pindah plan Premium. Bila server menyatakan akun ini sudah
@@ -216,10 +241,16 @@ class BillingService {
       throw StateError('buyPremium dipanggil selagi masih anonim — pasang ensureAccountForPurchase() di UI pemanggil.');
     }
     final me = await apiState?.refresh();
-    final account = me?.billingAccountId;
-    if (account == null || account.isEmpty) throw StateError('Server billing account required');
+    final account = _storeAccount(me);
     final activePlan = me!.activePremiumPlan;
     if (activePlan == product.id) throw StateError('Plan $activePlan sudah aktif');
+    if (appStore) {
+      // Bulanan ↔ tahunan di satu subscription group: App Store sendiri
+      // yang mengganti plan tanpa tagihan ganda.
+      final launched = await _iap.buyNonConsumable(purchaseParam: PurchaseParam(productDetails: product, applicationUserName: account));
+      if (!launched) throw StateError('App Store purchase flow not launched');
+      return;
+    }
     ChangeSubscriptionParam? change;
     if (activePlan != null) {
       if (_activeSubscription?.productID != activePlan) await restorePurchases();
@@ -237,7 +268,7 @@ class BillingService {
     if (!launched) throw StateError('Google Play purchase flow not launched');
   }
 
-  /// Tidak pernah throw. Selesai saat Play menjawab (termasuk daftar
+  /// Tidak pernah throw. Selesai saat toko menjawab (termasuk daftar
   /// kosong), saat Play melempar error, atau setelah [restoreTimeout].
   Future<RestoreOutcome> restorePurchases() async {
     final pending = _restoreWaiter;
@@ -272,11 +303,13 @@ class BillingService {
         final chunk = restored.skip(offset).take(restoreChunkSize).toList();
         for (var attempt = 0; attempt < 2; attempt++) {
           try {
-            final response = await apiState!.api.restore(chunk.map((p) => (productId: p.productID, purchaseToken: p.verificationData.serverVerificationData)).toList());
+            final response = appStore
+                ? await apiState!.api.restoreAppStore(chunk.map((p) => (productId: p.productID, transactionId: _purchaseKey(p))).toList())
+                : await apiState!.api.restore(chunk.map((p) => (productId: p.productID, purchaseToken: _purchaseKey(p))).toList());
             final results = response['results'] as List? ?? [];
             for (final (i, raw) in results.indexed) {
               final row = jsonObject(raw);
-              final purchase = _restoreRowPurchase(row, i, chunk, results.length);
+              final purchase = _restoreRowPurchase(row, i, chunk, results.length, appStore: appStore);
               if (purchase == null) continue;
               if (row['error'] != null) {
                 final code = jsonObject(row['error'])['code'];
@@ -286,12 +319,13 @@ class BillingService {
                 }
                 continue;
               }
-              restoredResults[purchase.verificationData.serverVerificationData] = BillingResult(row['result'] is Map ? jsonObject(row['result']) : row);
+              restoredResults[_purchaseKey(purchase)] = BillingResult(row['result'] is Map ? jsonObject(row['result']) : row);
             }
             break;
           } catch (error, stack) {
             if (attempt == 0 && error is ApiException && error.retryable) continue;
             _report(error, stack, 'billing_restore_failed');
+            _logApiError('restore', error);
             for (final p in chunk) {
               _updatesController.add(BillingUpdate(productId: p.productID, status: BillingStatus.error, errorKind: BillingErrorKind.deliveryFailed));
             }
@@ -324,15 +358,19 @@ class BillingService {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
           try {
-            if (purchase.status == PurchaseStatus.restored && !restoredResults.containsKey(purchase.verificationData.serverVerificationData)) continue;
-            final delivered = await _deliver(purchase, restoredResult: restoredResults[purchase.verificationData.serverVerificationData]);
+            if (purchase.status == PurchaseStatus.restored && !restoredResults.containsKey(_purchaseKey(purchase))) continue;
+            final delivered = await _deliver(purchase, restoredResult: restoredResults[_purchaseKey(purchase)]);
             if (!delivered) continue;
             deliveredCount++;
             if (purchase is GooglePlayPurchaseDetails && PremiumSku.values.any((s) => s.productId == purchase.productID)) {
               _activeSubscription = purchase;
             }
             _updatesController.add(BillingUpdate(productId: purchase.productID, status: BillingStatus.success));
-          } catch (e) {
+          } catch (error, stack) {
+            // Jangan ditelan: catat (termasuk requestId server) lalu tampilkan
+            // gagal. Transaksi tidak diselesaikan sehingga tetap bisa dipulihkan.
+            _report(error, stack, 'billing_verify_failed');
+            _logApiError('verify ${purchase.productID}', error);
             _updatesController.add(BillingUpdate(
               productId: purchase.productID,
               status: BillingStatus.error,
@@ -344,15 +382,27 @@ class BillingService {
     return (delivered: deliveredCount, otherAccount: otherAccount);
   }
 
-  /// Baris hasil `/v1/billing/restore` dicocokkan lewat `purchaseToken`
-  /// (server boleh menghilangkan/mengurutkan ulang baris). Indeks hanya
-  /// dipakai bila server tidak mengirim token DAN jumlah baris sama persis —
-  /// selain itu baris diabaikan (pembelian tetap tertunda di Play) daripada
-  /// ack/consume jatuh ke pembelian yang salah.
-  static PurchaseDetails? _restoreRowPurchase(Map<String, dynamic> row, int index, List<PurchaseDetails> chunk, int rowCount) {
-    final token = row['purchaseToken'] ?? jsonObject(row['result'])['purchaseToken'];
+  /// Penanda transaksi yang dikirim ke server: `purchaseToken` (Play) atau
+  /// `transactionId` StoreKit = `PurchaseDetails.purchaseID` (App Store).
+  String _purchaseKey(PurchaseDetails p) =>
+      appStore ? p.purchaseID ?? '' : p.verificationData.serverVerificationData;
+
+  void _logApiError(String what, Object error) {
+    if (error is ApiException) {
+      debugPrint('billing $what failed: ${error.status} ${error.code} requestId=${error.requestId}');
+    }
+  }
+
+  /// Baris hasil restore dicocokkan lewat `purchaseToken` (Play) atau
+  /// `transactionId` (App Store) — server boleh menghilangkan/mengurutkan
+  /// ulang baris. Indeks hanya dipakai bila server tidak mengirim penanda
+  /// DAN jumlah baris sama persis — selain itu baris diabaikan (pembelian
+  /// tetap tertunda di toko) daripada ack/consume jatuh ke pembelian yang salah.
+  static PurchaseDetails? _restoreRowPurchase(Map<String, dynamic> row, int index, List<PurchaseDetails> chunk, int rowCount, {bool appStore = false}) {
+    final field = appStore ? 'transactionId' : 'purchaseToken';
+    final token = row[field] ?? jsonObject(row['result'])[field];
     if (token is String && token.isNotEmpty) {
-      return chunk.where((p) => p.verificationData.serverVerificationData == token).firstOrNull;
+      return chunk.where((p) => (appStore ? p.purchaseID : p.verificationData.serverVerificationData) == token).firstOrNull;
     }
     return rowCount == chunk.length ? chunk[index] : null;
   }
@@ -360,9 +410,18 @@ class BillingService {
   Future<bool> _deliver(PurchaseDetails purchase, {BillingResult? restoredResult}) async {
     final state = apiState;
     if (state == null) throw StateError('Server verification required');
-    final result = restoredResult ?? await state.api.verifyPurchase(purchase.productID, purchase.verificationData.serverVerificationData);
+    final key = _purchaseKey(purchase);
+    if (key.isEmpty) throw StateError('Purchase without transaction id');
+    final result = restoredResult ??
+        (appStore ? await state.api.verifyAppStore(purchase.productID, key) : await state.api.verifyPurchase(purchase.productID, key));
     if (result.status == 'pending') return false;
-    if (result.consumableDelivered) {
+    if (appStore) {
+      // App Store: finish() hanya setelah server mengkredit/mencatat.
+      if (!result.consumableDelivered && !result.subscriptionVerified) {
+        throw const ApiException(502, 'invalid_response', 'Unknown billing status');
+      }
+      if (purchase.pendingCompletePurchase) await _iap.completePurchase(purchase);
+    } else if (result.consumableDelivered) {
       final token = purchase.verificationData.serverVerificationData;
       if (!_consumed.contains(token)) {
         final consumed = await _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>().consumePurchase(purchase);

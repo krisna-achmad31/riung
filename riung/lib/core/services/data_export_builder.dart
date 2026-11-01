@@ -28,7 +28,7 @@ class DataExportBuilder {
     final buatanSendiri = await userRepository.getCustomAffirmations(uid);
 
     return {
-      if (userRepository is ApiUserRepository) 'server': await (userRepository as ApiUserRepository).state.api.export(),
+      if (userRepository is ApiUserRepository) 'server': withoutInternalIds(await (userRepository as ApiUserRepository).state.api.export()),
       'profil': {
         'nama': profile.displayName,
         'bergabung': profile.createdAt.toIso8601String(),
@@ -89,6 +89,7 @@ class DataExportBuilder {
       },
       'appBeku': {
         'kunciAktif': prefs.appBekuLockEnabled,
+        'pilMelayangAktif': prefs.appBekuFloatingPill,
         'aplikasi': prefs.frozenAppsJson,
       },
       'pengaturan': {
@@ -101,6 +102,19 @@ class DataExportBuilder {
       'catatan': note,
     };
   }
+
+  /// Pengenal pembayaran internal tidak berguna bagi pengguna, dan ekspor ini
+  /// bisa tersalin ke mana saja.
+  static dynamic withoutInternalIds(dynamic value) => switch (value) {
+        Map<String, dynamic> map => {
+            for (final e in map.entries)
+              if (!_internalIds.contains(e.key)) e.key: withoutInternalIds(e.value),
+          },
+        List<dynamic> list => [for (final item in list) withoutInternalIds(item)],
+        _ => value,
+      };
+
+  static const _internalIds = {'billingAccountId', 'appAccountToken'};
 
   /// Hasil tes kepribadian + karakter yang dipakai (aksesori, gaya kartu).
   Map<String, dynamic> personalitySection() {

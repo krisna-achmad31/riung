@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/personality_result.dart';
 import '../../../core/services/card_image_exporter.dart';
@@ -35,7 +36,7 @@ class _KepribadianHasilScreenState extends State<KepribadianHasilScreen> {
   final GlobalKey _cardKey = GlobalKey();
   late CardStyle _style = CardStyle.fromId(AppScope.of(context).prefs.personalityCardStyle(widget.result.test));
   bool _busy = false;
-  late List<CharacterAccessory> _accessories = AccessoryLoadout(AppScope.of(context).prefs).of(widget.result.test);
+  late List<CharacterAccessory> _accessories = FeatureFlags.characterAccessories ? AccessoryLoadout(AppScope.of(context).prefs).of(widget.result.test) : const [];
   AccessorySlot _slot = AccessorySlot.head;
 
   ProfileText _text(KepribadianStrings t) {
@@ -220,86 +221,90 @@ class _KepribadianHasilScreenState extends State<KepribadianHasilScreen> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    Text(t.customizeTitle, style: AppTextStyles.title.copyWith(fontSize: 17)),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(t.customizeBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksSekunder)),
-                    const SizedBox(height: AppSpacing.md),
-                    RiungSegmentedTabs(
-                      labels: [for (final slot in AccessorySlot.values) t.slotName(slot)],
-                      index: AccessorySlot.values.indexOf(_slot),
-                      onChanged: (i) => setState(() => _slot = AccessorySlot.values[i]),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    ListenableBuilder(
-                      listenable: wallet,
-                      builder: (context, _) {
-                        final items = CharacterAccessory.catalogFor(result.test, _slot);
-                        Widget tile(CharacterAccessory a) => _AccessoryTile(
-                          accessory: a,
-                          spec: spec,
-                          exclusive: a.category != null,
-                          worn: _accessories.contains(a),
-                          owned: wallet.ownsCosmetic(a.cosmeticId),
-                          onTap: () => _pilihAksesori(a),
-                        );
-                        return Column(
+                    if (FeatureFlags.characterAccessories) ...[
+                      Text(t.customizeTitle, style: AppTextStyles.title.copyWith(fontSize: 17)),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(t.customizeBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksSekunder)),
+                      const SizedBox(height: AppSpacing.md),
+                      RiungSegmentedTabs(
+                        labels: [for (final slot in AccessorySlot.values) t.slotName(slot)],
+                        index: AccessorySlot.values.indexOf(_slot),
+                        onChanged: (i) => setState(() => _slot = AccessorySlot.values[i]),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      ListenableBuilder(
+                        listenable: wallet,
+                        builder: (context, _) {
+                          final items = CharacterAccessory.catalogFor(result.test, _slot);
+                          Widget tile(CharacterAccessory a) => _AccessoryTile(
+                            accessory: a,
+                            spec: spec,
+                            exclusive: a.category != null,
+                            worn: _accessories.contains(a),
+                            owned: wallet.ownsCosmetic(a.cosmeticId),
+                            onTap: () => _pilihAksesori(a),
+                          );
+                          return Column(
+                            children: [
+                              for (var i = 0; i < items.length; i += 2)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                  child: IntrinsicHeight(
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        Expanded(child: tile(items[i])),
+                                        const SizedBox(width: 12),
+                                        Expanded(child: i + 1 < items.length ? tile(items[i + 1]) : const SizedBox.shrink()),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                      ListenableBuilder(
+                        listenable: wallet,
+                        builder: (context, _) {
+                          final owned = wallet.ownedCosmetics;
+                          final bundles = [
+                            for (final b in AccessoryBundle.catalogFor(result.test))
+                              if (b.worthBuying(owned)) b,
+                          ];
+                          if (bundles.isEmpty) return const SizedBox.shrink();
+                          return AccessoryBundlesSection(bundles: bundles, owned: owned, onBuy: _pilihPaket);
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                    ],
+                    if (FeatureFlags.characterAccessories) ...[
+                      Text(t.stylesTitle, style: AppTextStyles.title.copyWith(fontSize: 17)),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(t.stylesBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksSekunder)),
+                      const SizedBox(height: AppSpacing.md),
+                      ListenableBuilder(
+                        listenable: wallet,
+                        builder: (context, _) => Row(
                           children: [
-                            for (var i = 0; i < items.length; i += 2)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                                child: IntrinsicHeight(
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Expanded(child: tile(items[i])),
-                                      const SizedBox(width: 12),
-                                      Expanded(child: i + 1 < items.length ? tile(items[i + 1]) : const SizedBox.shrink()),
-                                    ],
+                            for (final style in CardStyle.values)
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: _StyleChip(
+                                    style: style,
+                                    tint: spec.base,
+                                    selected: style == _style,
+                                    owned: style.isFree || premium || wallet.ownsCosmetic(style.cosmeticId),
+                                    onTap: () => _pilihGaya(style),
                                   ),
                                 ),
                               ),
                           ],
-                        );
-                      },
-                    ),
-                    ListenableBuilder(
-                      listenable: wallet,
-                      builder: (context, _) {
-                        final owned = wallet.ownedCosmetics;
-                        final bundles = [
-                          for (final b in AccessoryBundle.catalogFor(result.test))
-                            if (b.worthBuying(owned)) b,
-                        ];
-                        if (bundles.isEmpty) return const SizedBox.shrink();
-                        return AccessoryBundlesSection(bundles: bundles, owned: owned, onBuy: _pilihPaket);
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Text(t.stylesTitle, style: AppTextStyles.title.copyWith(fontSize: 17)),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(t.stylesBody, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksSekunder)),
-                    const SizedBox(height: AppSpacing.md),
-                    ListenableBuilder(
-                      listenable: wallet,
-                      builder: (context, _) => Row(
-                        children: [
-                          for (final style in CardStyle.values)
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                child: _StyleChip(
-                                  style: style,
-                                  tint: spec.base,
-                                  selected: style == _style,
-                                  owned: style.isFree || premium || wallet.ownsCosmetic(style.cosmeticId),
-                                  onTap: () => _pilihGaya(style),
-                                ),
-                              ),
-                            ),
-                        ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
+                      const SizedBox(height: AppSpacing.xl),
+                    ],
                     _Section(
                       title: t.strengthsTitle,
                       children: [

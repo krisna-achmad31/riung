@@ -163,4 +163,16 @@ abstract final class AppColors {
     'bimbang': monsterBimbang,
     'bara': monsterBara,
   };
+
+  // Kartu bagikan afirmasi (frame `Kartu bagikan (opsi)`).
+  static const Color kartuBagikanTeksKoral = Color(0xFF3B1F1A);
+  static const Color kartuBagikanMintAwal = Color(0xFFE3ECE6);
+  static const Color kartuBagikanMintAkhir = Color(0xFFF3E7DC);
+  static const Color kartuBagikanKertas = Color(0xFFFFF8E8);
+  static const Color kartuBagikanTeksTinta = Color(0xFF2B3A3A);
+  static const Color kartuBagikanMalamAwal = Color(0xFF1C2240);
+  static const Color kartuBagikanMalamAkhir = Color(0xFF3C3263);
+  static const Color kartuBagikanTeksMalam = Color(0xFFFBF3EA);
+  static const Color kartuBagikanCahaya = Color(0x66F7A58F);
+  static const Color kartuBagikanCahayaPudar = Color(0x00F7A58F);
 }

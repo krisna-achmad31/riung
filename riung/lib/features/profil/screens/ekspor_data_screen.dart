@@ -26,7 +26,14 @@ class _EksporDataScreenState extends State<EksporDataScreen> {
   @override
   void initState() {
     super.initState();
+    AppUsageService.setScreenSecure(true);
     _susun();
+  }
+
+  @override
+  void dispose() {
+    AppUsageService.setScreenSecure(false);
+    super.dispose();
   }
 
   Future<void> _susun() async {
