@@ -16,6 +16,11 @@ Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml
 
 ======
 
+01/11/2026 (1.0.5+9)
+AY
+1. ADD: Add six 3D portrait avatars to the profile, replacing monster avatars.
+2. UPDATE: Replace the app icon on Android and iOS with Si Hakim inside the glass circle.
+
 01/11/2026 (1.0.4+8)
 AY
 1. ADD: Add AppData for LIVE and DEV modes. Release builds always use LIVE.

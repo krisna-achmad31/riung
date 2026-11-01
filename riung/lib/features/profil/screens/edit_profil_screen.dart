@@ -145,7 +145,7 @@ class _AvatarOptionTile extends StatelessWidget {
           border: Border.all(color: selected ? AppColors.primer : AppColors.garis, width: selected ? 2.5 : AppGlass.edgeWidth),
         ),
         alignment: Alignment.center,
-        child: RiungMonster(monsterId: avatar.monsterId, state: MonsterVisualState.jinak, size: 76, applyBossScale: false),
+        child: ClipOval(child: Image.asset(avatar.asset, width: 72, height: 72, fit: BoxFit.cover, cacheWidth: 216)),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:riung/core/models/coin_transaction.dart';
@@ -8,21 +10,18 @@ import 'package:riung/features/profil/logic/avatar_catalog.dart';
 
 void main() {
   group('AvatarCatalog', () {
-    test('6 avatar terdaftar dengan monster yang valid', () {
+    test('6 avatar terdaftar dengan file gambar', () {
       expect(AvatarCatalog.all.length, 6);
-      const expectedMonsters = ['kabut', 'waswas', 'cermin', 'meronta', 'sempurna', 'mengelak'];
       for (var i = 0; i < 6; i++) {
         final av = AvatarCatalog.all[i];
         expect(av.id, 'av${i + 1}');
-        expect(av.monsterId, expectedMonsters[i]);
-        expect(av.colors.length, 2);
+        expect(File(av.asset).existsSync(), isTrue);
       }
     });
 
     test('byId menemukan avatar atau fallback ke av1', () {
       final av3 = AvatarCatalog.byId('av3');
       expect(av3.id, 'av3');
-      expect(av3.monsterId, 'cermin');
 
       final fallback = AvatarCatalog.byId('unknown_id');
       expect(fallback.id, 'av1');
