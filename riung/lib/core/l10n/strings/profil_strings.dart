@@ -62,6 +62,8 @@ abstract class ProfilStrings {
   String get crisisLineLabel;
   String crisisCallNumber(String number);
   String get crisisChangeCountry;
+  String get crisisPickCountry;
+  String get crisisSearchCountry;
   String get crisisOtherCountry;
   String get crisisFallbackTitle;
   String get crisisFallbackBody;
@@ -287,7 +289,11 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String crisisCallNumber(String number) => 'Telepon $number';
   @override
-  String get crisisChangeCountry => 'Ganti negara';
+  String get crisisChangeCountry => 'Ganti';
+  @override
+  String get crisisPickCountry => 'Pilih negaramu';
+  @override
+  String get crisisSearchCountry => 'Cari negara';
   @override
   String get crisisOtherCountry => 'Negara lain';
   @override
@@ -635,7 +641,11 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String crisisCallNumber(String number) => 'Call $number';
   @override
-  String get crisisChangeCountry => 'Change country';
+  String get crisisChangeCountry => 'Change';
+  @override
+  String get crisisPickCountry => 'Choose your country';
+  @override
+  String get crisisSearchCountry => 'Search country';
   @override
   String get crisisOtherCountry => 'Another country';
   @override

@@ -90,14 +90,7 @@ class _BantuanKrisisScreenState extends State<BantuanKrisisScreen> {
                     const SizedBox(height: AppSpacing.md),
                     Text(t.crisisIntro, style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.55, fontWeight: FontWeight.w500, color: AppColors.teksUtama)),
                     const SizedBox(height: AppSpacing.md),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: _gantiNegara,
-                        icon: const Icon(Icons.public_rounded, size: 16, color: AppColors.primer),
-                        label: Text('${contact?.country ?? t.crisisOtherCountry} · ${t.crisisChangeCountry}', style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.primer)),
-                      ),
-                    ),
+                    _CountrySelector(country: contact?.country ?? t.crisisOtherCountry, action: t.crisisChangeCountry, onTap: _gantiNegara),
                     const SizedBox(height: AppSpacing.sm),
                     Container(
                       padding: const EdgeInsets.all(18),
@@ -172,23 +165,89 @@ class _BantuanKrisisScreenState extends State<BantuanKrisisScreen> {
   }
 }
 
-class _CountrySheet extends StatelessWidget {
+/// Baris pemilih negara: bentuk kartu dan panah supaya jelas bisa ditap.
+class _CountrySelector extends StatelessWidget {
+  const _CountrySelector({required this.country, required this.action, required this.onTap});
+
+  final String country;
+  final String action;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: RiungGlassCard(
+          radius: 22,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              const Icon(Icons.public_rounded, size: 18, color: AppColors.primer),
+              const SizedBox(width: 10),
+              Expanded(child: Text(country, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.chipLabel.copyWith(fontSize: 14, color: AppColors.teksUtama))),
+              const SizedBox(width: 8),
+              Text(action, style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.primer)),
+              const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: AppColors.primer),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CountrySheet extends StatefulWidget {
   const _CountrySheet();
+
+  @override
+  State<_CountrySheet> createState() => _CountrySheetState();
+}
+
+class _CountrySheetState extends State<_CountrySheet> {
+  String _query = '';
 
   @override
   Widget build(BuildContext context) {
     final t = context.s.profil;
-    final entries = CrisisDirectory.contacts.entries.toList()..sort((a, b) => a.value.country.compareTo(b.value.country));
+    final entries = CrisisDirectory.contacts.entries.where((e) => CrisisDirectory.matches(e.key, _query)).toList()
+      ..sort((a, b) => a.value.country.compareTo(b.value.country));
+    final media = MediaQuery.of(context);
     return SafeArea(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.7),
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            for (final entry in entries)
-              ListTile(title: Text(entry.value.country), onTap: () => Navigator.of(context).pop(entry.key)),
-            ListTile(title: Text(t.crisisOtherCountry), onTap: () => Navigator.of(context).pop('')),
-          ],
+      child: Padding(
+        padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+        child: SizedBox(
+          height: media.size.height * 0.7,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.md),
+                child: Text(t.crisisPickCountry, style: AppTextStyles.subtitle.copyWith(fontSize: 18)),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                child: TextField(
+                  onChanged: (value) => setState(() => _query = value),
+                  decoration: InputDecoration(hintText: t.crisisSearchCountry, prefixIcon: const Icon(Icons.search_rounded)),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Expanded(
+                child: ListView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  children: [
+                    for (final entry in entries)
+                      ListTile(title: Text(entry.value.country), onTap: () => Navigator.of(context).pop(entry.key)),
+                    // Selalu ada, jadi pencarian tanpa hasil tetap punya jalan keluar.
+                    ListTile(title: Text(t.crisisOtherCountry), onTap: () => Navigator.of(context).pop('')),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

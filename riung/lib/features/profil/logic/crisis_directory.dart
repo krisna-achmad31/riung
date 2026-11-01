@@ -16,6 +16,31 @@ abstract final class CrisisDirectory {
   static const indonesia = 'ID';
   static const findAHelplineUrl = 'https://findahelpline.com';
 
+  /// Nama lain untuk pencarian (Indonesia/Inggris), di luar [CrisisContact.country].
+  static const Map<String, String> searchNames = {
+    'US': 'amerika serikat usa',
+    'GB': 'inggris britania uk england',
+    'NZ': 'selandia baru',
+    'IE': 'irlandia',
+    'PH': 'filipina',
+    'JP': 'jepang japan',
+    'KR': 'korea selatan south korea',
+    'DE': 'jerman germany',
+    'FR': 'prancis perancis',
+    'ES': 'spanyol spain',
+    'IT': 'italy',
+    'NL': 'belanda netherlands',
+    'BR': 'brazil',
+    'MX': 'meksiko mexico',
+    'SG': 'singapura',
+  };
+
+  static bool matches(String code, String query) {
+    final q = query.trim().toLowerCase();
+    final names = '${contacts[code]?.country ?? ''} ${searchNames[code] ?? ''}'.toLowerCase();
+    return names.contains(q);
+  }
+
   static const Map<String, CrisisContact> contacts = {
     indonesia: CrisisContact(country: 'Indonesia', name: 'Kemenkes', tel: '119,8', number: '119 ext. 8'),
     'US': CrisisContact(country: 'United States', name: '988 Suicide & Crisis Lifeline', tel: '988', number: '988'),
