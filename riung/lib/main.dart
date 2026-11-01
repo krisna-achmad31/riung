@@ -22,6 +22,7 @@ import 'core/services/services.dart';
 import 'core/services/sleep_reminder.dart';
 import 'core/state/state.dart';
 import 'core/theme/theme.dart';
+import 'core/config/app_data.dart';
 import 'core/widgets/widgets.dart';
 import 'core/widgets/api_error_feedback.dart';
 import 'features/appbeku/screens/appbeku_interstitial_screen.dart';
@@ -181,9 +182,8 @@ class _RiungAppState extends State<RiungApp> {
     _authService = widget.authService ?? FirebaseAuthService(googleServerClientId: googleServerClientId);
     widget.prefs.bindAccount(() => _authService.currentUid);
     if (widget.userRepository == null && widget.walletFunctions == null) {
-      const baseUrl = String.fromEnvironment('RIUNG_API_BASE_URL', defaultValue: 'https://riung.e55techlab.com');
       const devToken = String.fromEnvironment('RIUNG_DEV_TOKEN');
-      final api = RiungApi(ApiClient(baseUrl: baseUrl, appVersion: _appVersion,
+      final api = RiungApi(ApiClient(baseUrl: AppData.baseUrl, appVersion: _appVersion,
         platform: defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
         accountId: () => _authService.currentUid,
         onError: (error) {
