@@ -16,6 +16,17 @@ Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml
 
 ======
 
+01/11/2026 (1.1.0+10)
+AY
+1. ADD: Add App Store purchases for Premium and coin packs, with restore, trial eligibility and recovery of unfinished transactions.
+2. ADD: Add the Sign in with Apple button, hidden until Firebase and OAuth setup is done.
+3. UPDATE: Show App Store links and store names on iOS.
+4. UPDATE: Disable yearly daily coin claims during the trial.
+5. FIX: Read the wrapped verify response so purchases no longer stay pending.
+6. FIX: Fix the App Check limited-use token error that blocked purchase verification.
+7. FIX: Stop showing technical error toasts at launch before sign-in.
+8. FIX: Show the other-account message when a subscription belongs to another Riung account.
+
 01/11/2026 (1.0.5+9)
 AY
 1. ADD: Add six 3D portrait avatars to the profile, replacing monster avatars.

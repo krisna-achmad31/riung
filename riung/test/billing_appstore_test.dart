@@ -72,11 +72,12 @@ PurchaseDetails _tx(String product, String id, PurchaseStatus status) => Purchas
     )..pendingCompletePurchase = status == PurchaseStatus.purchased;
 
 class _Rig {
-  _Rig({this.premiumPlan, List<PurchaseDetails> unfinished = const [], Map<String, bool> eligible = const {}, this.verifyStatus = 200}) {
+  _Rig({this.premiumPlan, List<PurchaseDetails> unfinished = const [], Map<String, bool> eligible = const {}, this.verifyStatus = 200, this.verifyCode = 'verify_failed', bool anonymous = false}) {
     api = RiungApi(ApiClient(
       baseUrl: 'https://example.test',
       retryDelay: Duration.zero,
       token: (_) async => 'token',
+      onError: apiErrors.add,
       client: MockClient((r) async {
         requests.add(r.url.path);
         if (r.url.path == '/v1/me') {
@@ -93,7 +94,7 @@ class _Rig {
         final body = jsonDecode(r.body) as Map<String, dynamic>;
         bodies.add(body);
         if (r.url.path == '/v1/billing/appstore/verify') {
-          if (verifyStatus != 200) return http.Response('{"error":{"code":"verify_failed"}}', verifyStatus);
+          if (verifyStatus != 200) return http.Response(jsonEncode({'error': {'code': verifyCode}}), verifyStatus);
           final status = (body['productId'] as String).startsWith('premium') ? 'active' : 'credited';
           // Bentuk asli backend: hasil dibungkus `result`.
           return http.Response(jsonEncode({'result': {'productId': body['productId'], 'status': status}, 'wallet': {'coins': 80}}), 200);
@@ -114,7 +115,7 @@ class _Rig {
       userRepository: _Repo(),
       currentUid: () => 'u1',
       analytics: AnalyticsService(),
-      isAnonymous: () => false,
+      isAnonymous: () => anonymous,
       iap: store,
       apiState: state,
       store: StorePlatform.appStore,
@@ -125,6 +126,8 @@ class _Rig {
 
   final String? premiumPlan;
   final int verifyStatus;
+  final String verifyCode;
+  final apiErrors = <ApiException>[];
   bool meFails = false;
   final store = _StoreKit();
   final requests = <String>[];
@@ -197,6 +200,39 @@ void main() {
     expect(updates.map((u) => u.status), isNot(contains(BillingStatus.success)));
     expect(updates.last.status, BillingStatus.error);
     await sub.cancel();
+    await rig.dispose();
+  });
+
+  test('sesi anonim: transaksi tertunda tidak dikirim ke server dan tanpa toast', () async {
+    final rig = _Rig(anonymous: true, unfinished: [_tx('premium_monthly', '2000000444', PurchaseStatus.purchased)]);
+    await rig.billing.init();
+    await rig.billing.restorePurchases();
+    rig.store.stream.add([_tx('premium_monthly', '2000000445', PurchaseStatus.purchased)]);
+    await rig.settle();
+    expect(rig.requests, isNot(contains('/v1/billing/appstore/verify')));
+    expect(rig.store.completed, isEmpty);
+    expect(rig.apiErrors, isEmpty);
+    await rig.dispose();
+  });
+
+  test('langganan milik akun lain: tanpa toast otomatis, pesan akun lain, tidak di-finish', () async {
+    final rig = _Rig(verifyStatus: 409, verifyCode: 'purchase_invalid');
+    await rig.billing.init();
+    final updates = <BillingUpdate>[];
+    final sub = rig.billing.updates.listen(updates.add);
+    rig.store.stream.add([_tx('premium_monthly', '2000000555', PurchaseStatus.purchased)]);
+    await rig.settle();
+    expect(updates.last.errorKind, BillingErrorKind.otherAccount);
+    expect(rig.store.completed, isEmpty);
+    expect(rig.apiErrors, isEmpty);
+    await sub.cancel();
+    await rig.dispose();
+  });
+
+  test('restore: transaksi tertunda milik akun lain → otherAccount, bukan none', () async {
+    final rig = _Rig(verifyStatus: 409, verifyCode: 'purchase_invalid', unfinished: [_tx('premium_monthly', '2000000666', PurchaseStatus.purchased)]);
+    await rig.billing.init();
+    expect(await rig.billing.restorePurchases(), RestoreOutcome.otherAccount);
     await rig.dispose();
   });
 

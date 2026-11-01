@@ -351,26 +351,30 @@ class BillingService {
   Future<RestoreOutcome> restorePurchases() async {
     final pending = _restoreWaiter;
     if (pending != null) return pending.future;
-    final recovered = _store.isAppStore ? await _recoverUnfinished() : 0;
+    final recovered = _store.isAppStore ? await _recoverUnfinished() : _nothingDelivered;
     final outcome = await _restoreFromStore();
-    return recovered > 0 && outcome == RestoreOutcome.none ? RestoreOutcome.restored : outcome;
+    if (outcome != RestoreOutcome.none) return outcome;
+    if (recovered.delivered > 0) return RestoreOutcome.restored;
+    return recovered.otherAccount ? RestoreOutcome.otherAccount : outcome;
   }
 
-  Future<int> _recoverUnfinished() async {
+  static const _nothingDelivered = (delivered: 0, otherAccount: false);
+
+  Future<({int delivered, bool otherAccount})> _recoverUnfinished() async {
     final List<PurchaseDetails> unfinished;
     try {
       unfinished = await _unfinishedTransactions();
     } catch (error, stack) {
       _report(error, stack, 'billing_unfinished_failed');
-      return 0;
+      return _nothingDelivered;
     }
-    if (unfinished.isEmpty) return 0;
+    if (unfinished.isEmpty) return _nothingDelivered;
     final run = _processing.then((_) => _onPurchaseUpdate(unfinished));
     _processing = run.then((_) {}, onError: (Object error, StackTrace stack) => _report(error, stack, 'billing_unfinished_failed'));
     try {
-      return (await run).delivered;
+      return await run;
     } catch (_) {
-      return 0;
+      return _nothingDelivered;
     }
   }
 
@@ -394,7 +398,12 @@ class BillingService {
 
   /// Mengembalikan jumlah pembelian yang berhasil diverifikasi & diterima,
   /// dan apakah ada langganan yang ditolak karena milik akun Riung lain.
-  Future<({int delivered, bool otherAccount})> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
+  Future<({int delivered, bool otherAccount})> _onPurchaseUpdate(List<PurchaseDetails> incoming) async {
+    // Sesi anonim belum bisa diverifikasi server. Transaksinya tetap tertunda
+    // di toko dan diproses setelah user masuk.
+    final purchases = _isAnonymous()
+        ? incoming.where((p) => p.status != PurchaseStatus.purchased && p.status != PurchaseStatus.restored).toList()
+        : incoming;
     var deliveredCount = 0;
     var otherAccount = false;
     final restored = purchases.where((p) => p.status == PurchaseStatus.restored && _ref(p).isNotEmpty).toList();
@@ -477,10 +486,12 @@ class BillingService {
             // gagal. Transaksi tidak diselesaikan sehingga tetap bisa dipulihkan.
             _report(error, stack, 'billing_verify_failed');
             _logApiError('verify ${purchase.productID}', error);
+            final rejected = error is ApiException && error.code == 'purchase_invalid' && PremiumSku.values.any((s) => s.productId == purchase.productID);
+            otherAccount = otherAccount || rejected;
             _updatesController.add(BillingUpdate(
               productId: purchase.productID,
               status: BillingStatus.error,
-              errorKind: BillingErrorKind.deliveryFailed,
+              errorKind: rejected ? BillingErrorKind.otherAccount : BillingErrorKind.deliveryFailed,
             ));
           }
       }

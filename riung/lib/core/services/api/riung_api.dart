@@ -351,6 +351,9 @@ class RiungApi {
       query: {if (promptId.isNotEmpty) 'promptId': promptId},
     ),
   );
+  /// Panggilan billing bisa berjalan di latar (saat app dibuka), jadi tidak
+  /// memunculkan toast otomatis; layar pembelian memberi kabar lewat
+  /// `BillingService.updates`.
   Future<BillingResult> verifyPurchase(
     String productId,
     String purchaseToken,
@@ -359,6 +362,7 @@ class RiungApi {
       'POST',
       '/v1/billing/verify',
       limitedUse: true,
+      reportErrors: false,
       body: {'productId': productId, 'purchaseToken': purchaseToken},
     ),
   );
@@ -369,6 +373,7 @@ class RiungApi {
     return _send(
       'POST',
       '/v1/billing/restore',
+      reportErrors: false,
       body: {
         'purchases': [
           for (final p in purchases)
@@ -388,6 +393,7 @@ class RiungApi {
       'POST',
       '/v1/billing/appstore/verify',
       limitedUse: true,
+      reportErrors: false,
       body: {'productId': productId, 'transactionId': transactionId},
     ),
   );
@@ -400,6 +406,7 @@ class RiungApi {
     return _send(
       'POST',
       '/v1/billing/appstore/restore',
+      reportErrors: false,
       body: {
         'purchases': [
           for (final p in purchases)
