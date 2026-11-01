@@ -144,6 +144,7 @@ class _VaultScreenState extends State<VaultScreen> {
                 ],
               ),
             ),
+            const SizedBox(width: AppSpacing.md),
             TiketChip(count: scope.wallet.tickets),
             const SizedBox(width: 8),
             KoinChip(balance: scope.wallet.coins),
