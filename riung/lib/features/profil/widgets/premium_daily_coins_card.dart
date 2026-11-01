@@ -9,12 +9,14 @@ import '../../toko/screens/paywall_premium_screen.dart';
 
 /// Panel koin harian di layar Langganan. Pelanggan tahunan: tombol ambil
 /// [EconomyPremium.koinHarianTahunan] koin (sekali per hari, hari terlewat
-/// tidak menumpuk). Pelanggan bulanan: ajakan lembut ke paket tahunan
+/// tidak menumpuk), baru setelah pembayaran pertama — selama trial
+/// tombolnya nonaktif. Pelanggan bulanan: ajakan lembut ke paket tahunan
 /// ("bayar 10 bulan untuk 12") tanpa tekanan.
 class PremiumDailyCoinsCard extends StatelessWidget {
-  const PremiumDailyCoinsCard({super.key, required this.isAnnual});
+  const PremiumDailyCoinsCard({super.key, required this.isAnnual, this.inTrial = false});
 
   final bool isAnnual;
+  final bool inTrial;
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +29,18 @@ class PremiumDailyCoinsCard extends StatelessWidget {
           ? ListenableBuilder(
               listenable: wallet,
               builder: (context, _) {
-                final claimable = wallet.premiumDailyClaimable;
+                final claimable = !inTrial && wallet.premiumDailyClaimable;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _Atas(title: t.dailyCoinsTitle, body: t.dailyCoinsBody(EconomyPremium.koinHarianTahunan)),
                     const SizedBox(height: 10),
                     RiungButton(
-                      label: claimable ? t.claimDaily(EconomyPremium.koinHarianTahunan) : t.claimedToday,
+                      label: inTrial
+                          ? t.claimAfterTrial
+                          : claimable
+                              ? t.claimDaily(EconomyPremium.koinHarianTahunan)
+                              : t.claimedToday,
                       onPressed: claimable
                           ? () async {
                               final ok = await wallet.claimPremiumDaily();
@@ -45,7 +51,7 @@ class PremiumDailyCoinsCard extends StatelessWidget {
                           : null,
                     ),
                     const SizedBox(height: 10),
-                    Text(t.dailyCoinsNote, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
+                    Text(inTrial ? t.dailyCoinsAfterTrial : t.dailyCoinsNote, style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup)),
                   ],
                 );
               },

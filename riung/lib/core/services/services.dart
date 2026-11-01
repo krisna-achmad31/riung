@@ -28,5 +28,6 @@ export 'local_prefs_store.dart';
 export 'local_user_repository.dart';
 export 'local_wallet_functions_service.dart';
 export 'sleep_data_service.dart';
+export 'store_platform.dart';
 export 'user_repository.dart';
 export 'wallet_functions_service.dart';

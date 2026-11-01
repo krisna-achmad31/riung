@@ -180,6 +180,14 @@ class AuthNotifier extends ChangeNotifier {
   /// Masuk ke akun Google yang sudah ada.
   Future<String> masukGoogle() => _signInAndLoad(_authService.signInWithGoogle);
 
+  /// Daftar lewat Apple — upgrade sesi anonim saat ini, lihat
+  /// [_linkAndMigrate].
+  Future<String> daftarApple() =>
+      _linkAndMigrate(() => _authService.linkApple());
+
+  /// Masuk ke akun Apple yang sudah ada.
+  Future<String> masukApple() => _signInAndLoad(_authService.signInWithApple);
+
   Future<String> _signInAndLoad(Future<String> Function() signIn) async {
     final uid = await signIn();
     _uid = uid;
@@ -260,6 +268,9 @@ class AuthNotifier extends ChangeNotifier {
       _authService.sendPasswordResetEmail(email);
 
   Future<void> deleteAccount() => _authService.deleteAccount();
+
+  /// Lihat [AuthService.revokeAppleIfLinked].
+  Future<void> revokeAppleIfLinked() => _authService.revokeAppleIfLinked();
 
   @override
   void dispose() {

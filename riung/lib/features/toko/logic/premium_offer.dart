@@ -19,14 +19,16 @@ class PremiumOffer {
   final String recurringPrice;
 
   /// null = user ini tidak eligible trial (Play hanya mengembalikan offer
-  /// yang eligible, jadi trial yang tidak muncul berarti sudah pernah dipakai).
+  /// yang eligible, jadi trial yang tidak muncul berarti sudah pernah dipakai;
+  /// App Store dicek lewat `BillingService.appStoreTrialDays`).
   final int? trialDays;
 
   bool get hasTrial => trialDays != null;
 
   /// Map productId → offer terpilih. Utamakan offer bertrial; bila sama-sama
-  /// tanpa trial, pakai base plan (offerId null).
-  static Map<String, PremiumOffer> fromProducts(Iterable<ProductDetails> all) {
+  /// tanpa trial, pakai base plan (offerId null). [appStoreTrialDays]: lama
+  /// trial per produk App Store (satu harga per produk, tanpa offer terpisah).
+  static Map<String, PremiumOffer> fromProducts(Iterable<ProductDetails> all, {Map<String, int> appStoreTrialDays = const {}}) {
     final out = <String, PremiumOffer>{};
     final isBasePlan = <String, bool>{};
     for (final p in all) {
@@ -45,8 +47,8 @@ class PremiumOffer {
         );
         base = offer.offerId == null;
       } else {
-        // Bukan langganan Play Billing v5+ (mis. platform lain): satu harga.
-        candidate = PremiumOffer(purchase: p, recurringPrice: p.price, trialDays: null);
+        // Bukan langganan Play Billing v5+ (mis. App Store): satu harga.
+        candidate = PremiumOffer(purchase: p, recurringPrice: p.price, trialDays: appStoreTrialDays[p.id]);
         base = true;
       }
       final current = out[p.id];
@@ -61,9 +63,11 @@ class PremiumOffer {
     return out;
   }
 
-  /// Muat offer dari Play. Tidak pernah throw: Play gagal → map kosong.
-  static Future<Map<String, PremiumOffer>> load(BillingService billing) async =>
-      fromProducts((await billing.queryProducts()).productDetails);
+  /// Muat offer dari toko. Tidak pernah throw: toko gagal → map kosong.
+  static Future<Map<String, PremiumOffer>> load(BillingService billing) async {
+    final products = (await billing.queryProducts()).productDetails;
+    return fromProducts(products, appStoreTrialDays: await billing.appStoreTrialDays(products));
+  }
 
   /// Durasi ISO-8601 Play (P7D, P1W, P1M, P1Y) → hari.
   static int _days(String iso) {

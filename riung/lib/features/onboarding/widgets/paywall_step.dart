@@ -88,7 +88,11 @@ class _PaywallStepState extends State<PaywallStep> {
       }
       return;
     }
-    await AppScope.of(context).auth.refreshProfile();
+    try {
+      await AppScope.of(context).auth.refreshProfile();
+    } on ApiException {
+      // Pembelian sudah sukses; profil menyusul lewat snapshot server.
+    }
     if (!mounted) return;
     widget.onSelesai();
   }

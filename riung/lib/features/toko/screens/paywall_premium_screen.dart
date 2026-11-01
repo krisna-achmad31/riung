@@ -87,7 +87,11 @@ class _PaywallPremiumScreenState extends State<PaywallPremiumScreen> {
     }
     final wasRestoring = _restoring;
     _restoring = false;
-    await AppScope.of(context).auth.refreshProfile();
+    try {
+      await AppScope.of(context).auth.refreshProfile();
+    } on ApiException {
+      // Pembelian sudah sukses; profil menyusul lewat snapshot server.
+    }
     if (!mounted) return;
     if (wasRestoring) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const PembelianDipulihkanScreen()));

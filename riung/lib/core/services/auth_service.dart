@@ -37,7 +37,20 @@ abstract class AuthService {
   /// Sama seperti [signInWithEmailPassword] tapi lewat Google Sign-In.
   Future<String> signInWithGoogle();
 
+  /// Sama seperti [linkEmailPassword] tapi lewat Sign in with Apple (iOS).
+  Future<String> linkApple();
+
+  /// Sama seperti [signInWithEmailPassword] tapi lewat Sign in with Apple (iOS).
+  Future<String> signInWithApple();
+
   Future<void> sendPasswordResetEmail(String email);
+
+  /// Kalau akun ini tertaut Apple: minta user masuk ulang dengan Apple
+  /// (dapat authorization code baru) lalu cabut token Apple-nya — wajib
+  /// App Store 5.1.1(v) saat hapus akun. Tidak melakukan apa-apa untuk
+  /// akun tanpa Apple. Dipanggil SEBELUM data apa pun dihapus, supaya
+  /// batal/gagal di sini tidak meninggalkan akun setengah terhapus.
+  Future<void> revokeAppleIfLinked();
 
   /// Hapus akun Firebase Auth secara permanen. Data Firestore/lokal
   /// pengguna dibersihkan terpisah oleh pemanggil (lihat
@@ -61,6 +74,8 @@ enum AuthError {
   requiresRecentLogin,
   googleNoToken,
   googleUnavailable,
+  appleCredentialInUse,
+  appleUserMismatch,
   unknown,
 }
 
@@ -73,6 +88,15 @@ class AuthServiceException implements Exception {
 
   @override
   String toString() => 'AuthServiceException(${error.name}${code == null ? '' : ', $code'})';
+}
+
+/// User sendiri yang membatalkan alur masuk (mis. menutup pemilih akun
+/// Google / Apple). Bukan error — UI cukup kembali ke keadaan semula tanpa pesan.
+class AuthCanceledException implements Exception {
+  const AuthCanceledException();
+
+  @override
+  String toString() => 'AuthCanceledException';
 }
 
 /// Implementasi stub — "masuk" otomatis sebagai user dummy `u_001` dari
@@ -126,7 +150,16 @@ class StubAuthService implements AuthService {
   Future<String> signInWithGoogle() => signInAnonymously();
 
   @override
+  Future<String> linkApple() => signInAnonymously();
+
+  @override
+  Future<String> signInWithApple() => signInAnonymously();
+
+  @override
   Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
+  Future<void> revokeAppleIfLinked() async {}
 
   @override
   Future<void> deleteAccount() async {

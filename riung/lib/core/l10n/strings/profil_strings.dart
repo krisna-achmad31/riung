@@ -1,4 +1,8 @@
 import '../../config/feature_flags.dart';
+import '../../services/store_platform.dart';
+
+// Nama toko di copy langganan ikut platform (Google Play / App Store).
+String get _store => StorePlatform.current.label;
 
 /// Teks fitur Profil: profil, pengaturan, bantuan krisis, ekspor/hapus akun,
 /// PIN jurnal, kalender latihan, kebijakan privasi, langganan, notifikasi.
@@ -154,6 +158,8 @@ abstract class ProfilStrings {
   String claimDaily(int coins);
   String get claimedToday;
   String get dailyCoinsNote;
+  String get dailyCoinsAfterTrial;
+  String get claimAfterTrial;
   String claimedSnack(int coins);
   String get switchYearlyTitle;
   String switchYearlyBody(int paidMonths, int coins);
@@ -365,12 +371,12 @@ class ProfilStringsId extends ProfilStrings {
   String get deleteSubWarningTitle => 'Langganan Premium-mu masih aktif';
   @override
   String get deleteSubWarningBody =>
-      'Menghapus akun tidak menghentikan langganan Google Play. Tagihan tetap jalan sampai kamu membatalkannya sendiri di Google Play. Batalkan dulu di sana, baru hapus akun di sini.';
+      'Menghapus akun tidak menghentikan langganan $_store. Tagihan tetap jalan sampai kamu membatalkannya sendiri di $_store. Batalkan dulu di sana, baru hapus akun di sini.';
   @override
   String get deleteSubDialogNote =>
-      'Ingat: langganan Google Play-mu tidak ikut berhenti kalau akun dihapus.';
+      'Ingat: langganan $_store-mu tidak ikut berhenti kalau akun dihapus.';
   @override
-  String get deleteManagePlay => 'Kelola di Google Play';
+  String get deleteManagePlay => 'Kelola di $_store';
 
   @override
   String get pinChange => 'Ganti PIN';
@@ -454,17 +460,17 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get autoRenew => ' · diperpanjang otomatis';
   @override
-  String get statusRenewsSoon => 'Menunggu perpanjangan. Kalau gagal, cek metode pembayaranmu di Google Play.';
+  String get statusRenewsSoon => 'Menunggu perpanjangan. Kalau gagal, cek metode pembayaranmu di $_store.';
   @override
   String get expiredTitle => 'Langgananmu sudah berakhir';
   @override
-  String get expiredBody => 'Kalau kamu sudah memperpanjang di Google Play, ketuk Pulihkan pembelian. Semua catatan dan progresmu tetap aman.';
+  String get expiredBody => 'Kalau kamu sudah memperpanjang di $_store, ketuk Pulihkan pembelian. Semua catatan dan progresmu tetap aman.';
   @override
   String get restorePurchases => 'Pulihkan pembelian';
   @override
   String get subscribeAgain => 'Berlangganan lagi';
   @override
-  String get restoreChecking => 'Memeriksa pembelianmu di Google Play…';
+  String get restoreChecking => 'Memeriksa pembelianmu di $_store…';
   @override
   String get dailyCoinsTitle => 'Koin harian tahunan';
   @override
@@ -476,6 +482,10 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get dailyCoinsNote => 'Koin ini tidak bisa dipakai membuka waktu aplikasi beku.';
   @override
+  String get dailyCoinsAfterTrial => 'Koin harian mulai bisa diambil setelah masa trial berakhir dan pembayaran pertamamu selesai.';
+  @override
+  String get claimAfterTrial => 'Mulai setelah trial';
+  @override
   String claimedSnack(int coins) => '+$coins koin masuk. Sampai besok!';
   @override
   String get switchYearlyTitle => 'Lebih hemat dengan paket tahunan';
@@ -484,7 +494,7 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get switchYearly => 'Lihat paket tahunan';
   @override
-  String priceVia(String price, bool monthly) => '$price/${monthly ? 'bulan' : 'tahun'} via Google Play';
+  String priceVia(String price, bool monthly) => '$price/${monthly ? 'bulan' : 'tahun'} via $_store';
   @override
   String get whatYouGet => 'YANG KAMU DAPAT';
   @override
@@ -717,12 +727,12 @@ class ProfilStringsEn extends ProfilStrings {
   String get deleteSubWarningTitle => 'Your Premium subscription is still active';
   @override
   String get deleteSubWarningBody =>
-      'Deleting your account does not stop your Google Play subscription. You will keep being charged until you cancel it yourself in Google Play. Cancel it there first, then delete your account here.';
+      'Deleting your account does not stop your $_store subscription. You will keep being charged until you cancel it yourself in $_store. Cancel it there first, then delete your account here.';
   @override
   String get deleteSubDialogNote =>
-      'Remember: your Google Play subscription does not stop when your account is deleted.';
+      'Remember: your $_store subscription does not stop when your account is deleted.';
   @override
-  String get deleteManagePlay => 'Manage in Google Play';
+  String get deleteManagePlay => 'Manage in $_store';
 
   @override
   String get pinChange => 'Change PIN';
@@ -806,17 +816,17 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get autoRenew => ' · renews automatically';
   @override
-  String get statusRenewsSoon => 'Waiting for renewal. If it fails, check your payment method in Google Play.';
+  String get statusRenewsSoon => 'Waiting for renewal. If it fails, check your payment method in $_store.';
   @override
   String get expiredTitle => 'Your subscription has ended';
   @override
-  String get expiredBody => 'If you already renewed in Google Play, tap Restore purchases. All your notes and progress stay safe.';
+  String get expiredBody => 'If you already renewed in $_store, tap Restore purchases. All your notes and progress stay safe.';
   @override
   String get restorePurchases => 'Restore purchases';
   @override
   String get subscribeAgain => 'Subscribe again';
   @override
-  String get restoreChecking => 'Checking your purchases on Google Play…';
+  String get restoreChecking => 'Checking your purchases on $_store…';
   @override
   String get dailyCoinsTitle => 'Yearly daily coins';
   @override
@@ -828,6 +838,10 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get dailyCoinsNote => 'These coins cannot be used to unlock frozen-app time.';
   @override
+  String get dailyCoinsAfterTrial => 'Daily coins become available once your trial ends and your first payment goes through.';
+  @override
+  String get claimAfterTrial => 'Starts after trial';
+  @override
   String claimedSnack(int coins) => '+$coins coins added. See you tomorrow!';
   @override
   String get switchYearlyTitle => 'Save more with the yearly plan';
@@ -836,7 +850,7 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get switchYearly => 'See the yearly plan';
   @override
-  String priceVia(String price, bool monthly) => '$price/${monthly ? 'month' : 'year'} via Google Play';
+  String priceVia(String price, bool monthly) => '$price/${monthly ? 'month' : 'year'} via $_store';
   @override
   String get whatYouGet => 'WHAT YOU GET';
   @override

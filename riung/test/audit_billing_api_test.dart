@@ -7,6 +7,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -502,6 +503,18 @@ void main() {
       expect(seen.headers['X-Platform'], 'android');
       expect(seen.headers['Idempotency-Key'], isNotEmpty);
       expect(seen.headers['Content-Type'], startsWith('application/json'));
+    });
+
+    test('X-Platform ikut platform HP (iPhone → ios)', () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      late http.Request seen;
+      final c = client((r) {
+        seen = r;
+        return _json({'data': {'ok': true}});
+      });
+      await c.request('GET', '/v1/me');
+      expect(seen.headers['X-Platform'], 'ios');
     });
 
     test('400 validasi: tidak di-retry, kode & requestId diteruskan', () async {

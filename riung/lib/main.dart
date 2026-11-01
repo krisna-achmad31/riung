@@ -188,6 +188,10 @@ class _RiungAppState extends State<RiungApp> {
         accountId: () => _authService.currentUid,
         onError: (error) {
           _apiState?.reportError(error);
+          // Sesi anonim tidak punya akun untuk "masuk kembali" — pesan itu
+          // hanya membingungkan (mis. tepat setelah Keluar). Kegagalan
+          // pemuatan awal sudah ditangani layar Splash (tombol Coba lagi).
+          if (error.status == 401 && _authService.isAnonymous) return;
           final context = AppNavigator.key.currentContext;
           if (context != null && context.mounted && !error.retryable) showApiError(context, error);
         },

@@ -5,10 +5,10 @@ import '../auth_service.dart';
 
 /// Implementasi [AuthService] sungguhan lewat Firebase Auth — anonim untuk
 /// pra-signup (dipakai sepanjang onboarding), lalu di-link ke email+password
-/// atau Google saat user resmi mendaftar di layar Daftar (uid & data yang
+/// atau Google/Apple saat user resmi mendaftar di layar Daftar (uid & data yang
 /// sudah terkumpul selama onboarding tetap sama, cuma "diklaim" jadi akun
 /// permanen). Lihat `docs/setup-firebase.md` untuk cara mengaktifkan
-/// provider Email/Password & Google di Firebase Console.
+/// provider Email/Password, Google & Apple di Firebase Console.
 class FirebaseAuthService implements AuthService {
   FirebaseAuthService({FirebaseAuth? auth, GoogleSignIn? googleSignIn, required String googleServerClientId})
       : _auth = auth ?? FirebaseAuth.instance,
@@ -60,7 +60,15 @@ class FirebaseAuthService implements AuthService {
 
   Future<AuthCredential> _googleCredential() async {
     await _ensureGoogleInitialized();
-    final account = await _googleSignIn.authenticate();
+    final GoogleSignInAccount account;
+    try {
+      account = await _googleSignIn.authenticate();
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        throw const AuthCanceledException();
+      }
+      throw AuthServiceException(AuthError.unknown, code: e.code.name);
+    }
     final idToken = account.authentication.idToken;
     if (idToken == null) {
       throw const AuthServiceException(AuthError.googleNoToken);
@@ -113,6 +121,55 @@ class FirebaseAuthService implements AuthService {
       final result = await _auth.signInWithCredential(credential);
       return result.user!.uid;
     } on FirebaseAuthException catch (e) {
+      throw _toException(e);
+    }
+  }
+
+  /// Sign in with Apple lewat alur native Firebase (`ASAuthorizationController`
+  /// di iOS) — tidak butuh package tambahan. Minta email & nama supaya
+  /// [currentEmail] terisi (bisa alamat relay privat Apple).
+  AppleAuthProvider get _appleProvider => AppleAuthProvider()
+    ..addScope('email')
+    ..addScope('name');
+
+  /// Sama seperti [_linkOrSignIn] tapi untuk provider berbasis alur
+  /// (Apple), yang tidak menghasilkan [AuthCredential] di muka.
+  Future<String> _appleFlow({required bool link}) async {
+    final user = _auth.currentUser;
+    try {
+      final result = link && user != null && user.isAnonymous
+          ? await user.linkWithProvider(_appleProvider)
+          : await _auth.signInWithProvider(_appleProvider);
+      return result.user!.uid;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'canceled') throw const AuthCanceledException();
+      if (e.code == 'credential-already-in-use') {
+        throw const AuthServiceException(AuthError.appleCredentialInUse);
+      }
+      throw _toException(e);
+    }
+  }
+
+  @override
+  Future<String> linkApple() => _appleFlow(link: true);
+
+  @override
+  Future<String> signInWithApple() => _appleFlow(link: false);
+
+  @override
+  Future<void> revokeAppleIfLinked() async {
+    final user = _auth.currentUser;
+    if (user == null || !user.providerData.any((p) => p.providerId == AppleAuthProvider.PROVIDER_ID)) return;
+    try {
+      // Authorization code Apple cuma berlaku sekali & ±5 menit, jadi harus
+      // dari login ulang saat ini juga, bukan disimpan dari login awal.
+      final result = await user.reauthenticateWithProvider(_appleProvider);
+      final code = result.additionalUserInfo?.authorizationCode;
+      if (code == null) throw const AuthServiceException(AuthError.unknown, code: 'apple-no-authorization-code');
+      await _auth.revokeTokenWithAuthorizationCode(code);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'canceled') throw const AuthCanceledException();
+      if (e.code == 'user-mismatch') throw const AuthServiceException(AuthError.appleUserMismatch);
       throw _toException(e);
     }
   }

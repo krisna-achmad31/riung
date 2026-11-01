@@ -1,5 +1,12 @@
 import '../../config/feature_flags.dart';
 import '../../services/billing_service.dart';
+import '../../services/store_platform.dart';
+
+// Nama toko di copy pembelian ikut platform (Google Play / App Store).
+String get _store => StorePlatform.current.label;
+String get _storeApp => StorePlatform.current.appLabel;
+String get _storeShort => StorePlatform.current.shortLabel;
+bool get _ios => StorePlatform.current.isAppStore;
 
 /// Teks fitur Toko + paywall Premium (dipakai juga oleh paywall onboarding)
 /// + gate akun sebelum pembelian uang asli.
@@ -241,7 +248,7 @@ class TokoStringsId extends TokoStrings {
   @override
   String get coinsAdded => 'Koin berhasil ditambahkan.';
   @override
-  String get packUnavailable => 'Paket ini belum tersedia di Play Store. Coba lagi nanti.';
+  String get packUnavailable => 'Paket ini belum tersedia di $_storeApp. Coba lagi nanti.';
   @override
   String get shieldReady => 'Pelindung streak siap dipakai.';
   @override
@@ -268,7 +275,7 @@ class TokoStringsId extends TokoStrings {
   @override
   String coinsPrice(int price) => '$price koin';
   @override
-  String get priceOnPlayShort => 'Harga di Play';
+  String get priceOnPlayShort => 'Harga di $_storeShort';
   @override
   String lemariTitle(String monster) => 'Lemari $monster';
   @override
@@ -419,13 +426,13 @@ class TokoStringsId extends TokoStrings {
   @override
   String get terms => 'Ketentuan';
   @override
-  String get planUnavailable => 'Paket belum tersedia di Play Store. Coba lagi nanti.';
+  String get planUnavailable => 'Paket belum tersedia di $_storeApp. Coba lagi nanti.';
   @override
   String get subscribeNow => 'Langganan sekarang';
   @override
   String get activePlan => 'Paket aktif';
   @override
-  String get priceOnPlay => 'Harga tampil di Google Play';
+  String get priceOnPlay => 'Harga tampil di $_store';
   @override
   String get pendingPayment => 'Pembayaranmu sedang menunggu. Premium aktif otomatis begitu lunas.';
   @override
@@ -442,7 +449,7 @@ class TokoStringsId extends TokoStrings {
   @override
   String onboardingSub(int days) => 'Coba gratis $days hari, batalkan kapan saja';
   @override
-  String get onboardingSubNoTrial => 'Batalkan kapan saja lewat Google Play';
+  String get onboardingSubNoTrial => 'Batalkan kapan saja lewat $_store';
   @override
   List<String> get onboardingBenefits => const [
         'Semua meditasi, cerita tidur & jurnal tanpa batas',
@@ -469,10 +476,10 @@ class TokoStringsId extends TokoStrings {
   String termsTrial(int days) =>
       'Coba gratis $days hari, lalu berlangganan otomatis sesuai paket yang kamu pilih kalau tidak dibatalkan sebelum masa coba habis.';
   @override
-  String get termsPlay => 'Pembayaran dan perpanjangan diproses lewat akun Google Play kamu.';
+  String get termsPlay => 'Pembayaran dan perpanjangan diproses lewat ${_ios ? 'Apple ID' : 'akun $_store'} kamu.';
   @override
   String get termsCancel =>
-      'Batalkan kapan saja lewat Google Play (menu Langganan) paling lambat 24 jam sebelum periode berakhir. Premium tetap aktif sampai akhir periode.';
+      'Batalkan kapan saja lewat $_store (menu Langganan) paling lambat 24 jam sebelum periode berakhir. Premium tetap aktif sampai akhir periode.';
   @override
   String get termsFree => 'Fitur inti (check-in, jurnal, monster) tetap gratis selamanya.';
   @override
@@ -581,7 +588,7 @@ class TokoStringsEn extends TokoStrings {
   @override
   String get coinsAdded => 'Coins added successfully.';
   @override
-  String get packUnavailable => 'This pack is not available on the Play Store yet. Please try again later.';
+  String get packUnavailable => 'This pack is not available on the $_storeApp yet. Please try again later.';
   @override
   String get shieldReady => 'Streak shield is ready to use.';
   @override
@@ -608,7 +615,7 @@ class TokoStringsEn extends TokoStrings {
   @override
   String coinsPrice(int price) => '$price coins';
   @override
-  String get priceOnPlayShort => 'Price on Play';
+  String get priceOnPlayShort => 'Price on $_storeShort';
   @override
   String lemariTitle(String monster) => "$monster's wardrobe";
   @override
@@ -759,13 +766,13 @@ class TokoStringsEn extends TokoStrings {
   @override
   String get terms => 'Terms';
   @override
-  String get planUnavailable => 'This plan is not available on the Play Store yet. Please try again later.';
+  String get planUnavailable => 'This plan is not available on the $_storeApp yet. Please try again later.';
   @override
   String get subscribeNow => 'Subscribe now';
   @override
   String get activePlan => 'Current plan';
   @override
-  String get priceOnPlay => 'Price shown on Google Play';
+  String get priceOnPlay => 'Price shown on $_store';
   @override
   String get pendingPayment => 'Your payment is pending. Premium turns on automatically once it is paid.';
   @override
@@ -782,7 +789,7 @@ class TokoStringsEn extends TokoStrings {
   @override
   String onboardingSub(int days) => 'Try free for $days days, cancel anytime';
   @override
-  String get onboardingSubNoTrial => 'Cancel anytime on Google Play';
+  String get onboardingSubNoTrial => 'Cancel anytime on $_store';
   @override
   List<String> get onboardingBenefits => const [
         'All meditations, sleep stories & journals, unlimited',
@@ -809,10 +816,10 @@ class TokoStringsEn extends TokoStrings {
   String termsTrial(int days) =>
       'Free for $days days, then it renews automatically on the plan you chose unless you cancel before the trial ends.';
   @override
-  String get termsPlay => 'Payments and renewals are processed through your Google Play account.';
+  String get termsPlay => 'Payments and renewals are processed through your ${_ios ? 'Apple ID' : '$_store account'}.';
   @override
   String get termsCancel =>
-      'Cancel anytime in Google Play (Subscriptions menu) at least 24 hours before the period ends. Premium stays active until the end of the period.';
+      'Cancel anytime in $_store (Subscriptions menu) at least 24 hours before the period ends. Premium stays active until the end of the period.';
   @override
   String get termsFree => 'Core features (check-in, journal, monsters) stay free forever.';
   @override
