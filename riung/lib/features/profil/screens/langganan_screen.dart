@@ -39,11 +39,7 @@ class _LanggananScreenState extends State<LanggananScreen> {
   }
 
   Future<void> _kelolaLangganan(String? productId) async {
-    final uri = Uri.parse(
-      'https://play.google.com/store/account/subscriptions'
-      '${productId != null ? '?sku=$productId&package=id.riung.riung' : ''}',
-    );
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await launchUrl(StorePlatform.current.manageSubscriptionsUri(productId), mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -96,7 +92,7 @@ class _LanggananScreenState extends State<LanggananScreen> {
                           warning: status == PremiumStatus.renewsSoon ? t.statusRenewsSoon : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        PremiumDailyCoinsCard(isAnnual: profile.isAnnual),
+                        PremiumDailyCoinsCard(isAnnual: profile.isAnnual, inTrial: profile.premiumInTrial),
                         const SizedBox(height: AppSpacing.md),
                         RiungGlassCard(
                           radius: 26,

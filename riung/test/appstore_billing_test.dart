@@ -91,7 +91,8 @@ class _Rig {
       isAnonymous: () => false,
       iap: store,
       apiState: state,
-      appStore: true,
+      store: StorePlatform.appStore,
+      unfinishedTransactions: () async => const [],
     );
   }
   final store = _StoreKit();
@@ -114,6 +115,13 @@ class _Rig {
 }
 
 http.Response _json(Object body, [int status = 200]) => http.Response(jsonEncode(body), status);
+
+/// Bentuk asli jawaban `POST /v1/billing/appstore/verify` (spec §3.9).
+http.Response _verified(String status) => _json({
+      'result': {'status': status},
+      'wallet': {'coins': 80},
+      'premium': {'status': 'none'},
+    });
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -140,7 +148,7 @@ void main() {
   });
 
   test('purchased → appstore/verify {productId, transactionId} + Idempotency-Key + X-Platform ios → complete', () async {
-    final rig = _Rig((r) => _json({'status': 'credited'}));
+    final rig = _Rig((r) => _verified('credited'));
     final updates = await rig.run(() async => rig.store.stream.add([_transaction('coin_pack_small', PurchaseStatus.purchased)]));
     final verify = rig.at('/v1/billing/appstore/verify').single;
     expect(jsonDecode(verify.body), {'productId': 'coin_pack_small', 'transactionId': '2000000123'});
@@ -153,7 +161,7 @@ void main() {
 
   for (final status in ['already_credited', 'active', 'inactive']) {
     test('status $status → completePurchase', () async {
-      final rig = _Rig((r) => _json({'status': status}));
+      final rig = _Rig((r) => _verified(status));
       await rig.run(() async => rig.store.stream.add([_transaction('premium_monthly', PurchaseStatus.purchased)]));
       expect(rig.store.completed, 1);
     });
@@ -174,14 +182,14 @@ void main() {
   });
 
   test('status pending → tidak di-complete', () async {
-    final rig = _Rig((r) => _json({'status': 'pending'}));
+    final rig = _Rig((r) => _verified('pending'));
     await rig.run(() async => rig.store.stream.add([_transaction('coin_pack_small', PurchaseStatus.purchased)]));
     expect(rig.store.completed, 0);
   });
 
   test('Idempotency-Key sama untuk transaksi yang sama saat dikirim ulang StoreKit', () async {
     var fail = true;
-    final rig = _Rig((r) => fail ? _json({'error': {'code': 'internal'}}, 500) : _json({'status': 'credited'}));
+    final rig = _Rig((r) => fail ? _json({'error': {'code': 'internal'}}, 500) : _verified('credited'));
     await rig.run(() async => rig.store.stream.add([_transaction('coin_pack_small', PurchaseStatus.purchased)]));
     expect(rig.store.completed, 0);
     fail = false;

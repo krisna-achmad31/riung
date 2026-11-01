@@ -58,7 +58,16 @@ class _FakeAuthService implements AuthService {
   Future<String> signInWithGoogle() async => _uid;
 
   @override
+  Future<String> linkApple() => linkGoogle();
+
+  @override
+  Future<String> signInWithApple() async => _uid;
+
+  @override
   Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
+  Future<void> revokeAppleIfLinked() async {}
 
   @override
   Future<void> deleteAccount() async {}

@@ -17,6 +17,7 @@ class UserProfile {
     required this.premiumActive,
     this.premiumPlan,
     this.premiumRenewsAt,
+    this.premiumInTrial = false,
     required this.streakCurrent,
     required this.streakLongest,
     this.lastCheckinDate,
@@ -59,6 +60,7 @@ class UserProfile {
       premiumActive: premium[fPremiumActive] as bool? ?? false,
       premiumPlan: premium[fPremiumPlan] as String?,
       premiumRenewsAt: parseDate(premium[fPremiumRenewsAt]),
+      premiumInTrial: premium[fPremiumInTrial] as bool? ?? false,
       streakCurrent: parseInt(streak[fStreakCurrent]),
       streakLongest: parseInt(streak[fStreakLongest]),
       lastCheckinDate: parseDate(streak[fLastCheckinDate]),
@@ -86,6 +88,7 @@ class UserProfile {
   static const fPremiumActive = 'active';
   static const fPremiumPlan = 'plan';
   static const fPremiumRenewsAt = 'renewsAt';
+  static const fPremiumInTrial = 'inTrial';
 
   // Field di dalam streak.
   static const fStreakCurrent = 'current';
@@ -126,6 +129,10 @@ class UserProfile {
   final String? premiumPlan;
   final DateTime? premiumRenewsAt;
 
+  /// Masih di masa trial gratis (belum ada pembayaran pertama). Diisi server;
+  /// koin harian tahunan baru bisa diambil setelah ini false.
+  final bool premiumInTrial;
+
   final int streakCurrent;
   final int streakLongest;
   final DateTime? lastCheckinDate;
@@ -147,6 +154,7 @@ class UserProfile {
           fPremiumActive: premiumActive,
           fPremiumPlan: premiumPlan,
           fPremiumRenewsAt: premiumRenewsAt?.toIso8601String(),
+          fPremiumInTrial: premiumInTrial,
         },
         kStreak: {
           fStreakCurrent: streakCurrent,
@@ -169,6 +177,7 @@ class UserProfile {
     bool? premiumActive,
     String? premiumPlan,
     DateTime? premiumRenewsAt,
+    bool? premiumInTrial,
     int? streakCurrent,
     int? streakLongest,
     DateTime? lastCheckinDate,
@@ -187,6 +196,7 @@ class UserProfile {
       premiumActive: premiumActive ?? this.premiumActive,
       premiumPlan: premiumPlan ?? this.premiumPlan,
       premiumRenewsAt: premiumRenewsAt ?? this.premiumRenewsAt,
+      premiumInTrial: premiumInTrial ?? this.premiumInTrial,
       streakCurrent: streakCurrent ?? this.streakCurrent,
       streakLongest: streakLongest ?? this.streakLongest,
       lastCheckinDate: lastCheckinDate ?? this.lastCheckinDate,

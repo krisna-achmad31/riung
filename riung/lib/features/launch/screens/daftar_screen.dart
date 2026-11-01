@@ -5,6 +5,7 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../widgets/apple_sign_in_button.dart';
 import '../widgets/auth_divider.dart';
 import '../widgets/auth_footer_link.dart';
 import '../widgets/auth_text_field.dart';
@@ -15,7 +16,7 @@ import '../widgets/launch_hero.dart';
 
 /// Buat akun — email, kata sandi, nama. Upgrade sesi anonim (dari
 /// onboarding) jadi akun permanen lewat [AuthNotifier.daftarEmailPassword]
-/// atau [AuthNotifier.daftarGoogle]. Implement persis
+/// atau [AuthNotifier.daftarGoogle] / [AuthNotifier.daftarApple]. Implement persis
 /// `design/Launch.dc.html` § Daftar.
 class DaftarScreen extends StatefulWidget {
   const DaftarScreen({super.key, this.isPurchaseGate = false});
@@ -100,14 +101,18 @@ class _DaftarScreenState extends State<DaftarScreen> {
     }
   }
 
-  Future<void> _daftarGoogle() async {
+  /// Daftar lewat Google/Apple — [daftar] = `scope.auth.daftarGoogle` /
+  /// `daftarApple`.
+  Future<void> _daftarSosial(Future<String> Function(AuthNotifier auth) daftar) async {
     setState(() => _submitting = true);
     try {
       final scope = AppScope.of(context);
-      await scope.auth.daftarGoogle();
+      await daftar(scope.auth);
       if (!mounted) return;
       _tampilkanPeringatanMigrasiJikaAda(scope);
       _lanjutSetelahDaftar();
+    } on AuthCanceledException {
+      // User menutup pemilih akun — tetap di layar ini tanpa pesan.
     } on AuthServiceException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.s.launch.authError(e.error, e.code))));
@@ -124,6 +129,11 @@ class _DaftarScreenState extends State<DaftarScreen> {
         child: RiungBleedListView(
           padding: const EdgeInsets.fromLTRB(24, AppSpacing.sm, 24, AppSpacing.lg),
           children: [
+            if (Navigator.of(context).canPop())
+              Align(
+                alignment: Alignment.centerLeft,
+                child: RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop(), semanticLabel: MaterialLocalizations.of(context).backButtonTooltip),
+              ),
             const LaunchHero(left: 'sempurna', center: 'waswas', right: 'cermin', height: 170, centerSize: 140, sideSize: 110),
             const SizedBox(height: AppSpacing.md),
             Text(t.createAccount, style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.2)),
@@ -154,11 +164,17 @@ class _DaftarScreenState extends State<DaftarScreen> {
             const SizedBox(height: AppSpacing.md),
             const AuthDivider(),
             const SizedBox(height: AppSpacing.md),
-            GoogleSignInButton(onPressed: _submitting ? null : _daftarGoogle),
+            GoogleSignInButton(onPressed: _submitting ? null : () => _daftarSosial((auth) => auth.daftarGoogle())),
+            if (AppleSignInButton.isSupported) ...[
+              const SizedBox(height: AppSpacing.sm),
+              AppleSignInButton(onPressed: _submitting ? null : () => _daftarSosial((auth) => auth.daftarApple())),
+            ],
             AuthFooterLink(
               text: t.hasAccount,
               actionLabel: t.signIn,
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MasukScreen())),
+              // Ganti, bukan tumpuk: bolak-balik Daftar ↔ Masuk tetap satu
+              // halaman, jadi kembali langsung ke layar asal (mis. Pengaturan).
+              onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MasukScreen())),
             ),
           ],
         ),

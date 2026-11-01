@@ -37,8 +37,10 @@ class AnalyticsService {
 
   Future<void> paywallView({required String source}) => _log('paywall_view', {'source': source});
 
-  Future<void> purchase({required String productId, required num valueIdr, String currency = 'IDR'}) =>
-      _log('purchase', {'product_id': productId, 'value': valueIdr, 'currency': currency});
+  /// [value] dalam [currency] toko (harga lokal user, mis. 4.99 USD), bukan
+  /// selalu Rupiah.
+  Future<void> purchase({required String productId, required num value, required String currency}) =>
+      _log('purchase', {'product_id': productId, 'value': value, 'currency': currency});
 
   Future<void> focusStart({required int durationMinutes}) =>
       _log('focus_start', {'duration_minutes': durationMinutes});

@@ -8,6 +8,7 @@ import '../../../core/widgets/widgets.dart';
 import '../../../core/widgets/api_error_feedback.dart';
 import 'splash_screen.dart';
 import '../../../core/services/api/api_client.dart';
+import '../widgets/apple_sign_in_button.dart';
 import '../widgets/auth_divider.dart';
 import '../widgets/auth_footer_link.dart';
 import '../widgets/auth_text_field.dart';
@@ -68,10 +69,13 @@ class _MasukScreenState extends State<MasukScreen> {
     }
   }
 
-  Future<void> _masukGoogle() async {
+  /// Masuk lewat Google/Apple — [masuk] = `auth.masukGoogle` / `masukApple`.
+  Future<void> _masukSosial(
+    Future<String> Function(AuthNotifier auth) masuk,
+  ) async {
     setState(() => _submitting = true);
     try {
-      await AppScope.of(context).auth.masukGoogle();
+      await masuk(AppScope.of(context).auth);
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const SplashScreen()),
@@ -79,6 +83,8 @@ class _MasukScreenState extends State<MasukScreen> {
       );
     } on ApiException catch (e) {
       if (mounted) showApiError(context, e);
+    } on AuthCanceledException {
+      // User menutup pemilih akun — tetap di layar ini tanpa pesan.
     } on AuthServiceException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -102,6 +108,17 @@ class _MasukScreenState extends State<MasukScreen> {
             AppSpacing.lg,
           ),
           children: [
+            if (Navigator.of(context).canPop())
+              Align(
+                alignment: Alignment.centerLeft,
+                child: RiungGlassIconButton(
+                  icon: Icons.chevron_left_rounded,
+                  onTap: () => Navigator.of(context).maybePop(),
+                  semanticLabel: MaterialLocalizations.of(
+                    context,
+                  ).backButtonTooltip,
+                ),
+              ),
             const LaunchHero(
               left: 'meronta',
               center: 'hakim',
@@ -171,13 +188,26 @@ class _MasukScreenState extends State<MasukScreen> {
             const SizedBox(height: 14),
             const AuthDivider(),
             const SizedBox(height: 14),
-            GoogleSignInButton(onPressed: _submitting ? null : _masukGoogle),
+            GoogleSignInButton(
+              onPressed: _submitting
+                  ? null
+                  : () => _masukSosial((auth) => auth.masukGoogle()),
+            ),
+            if (AppleSignInButton.isSupported) ...[
+              const SizedBox(height: AppSpacing.sm),
+              AppleSignInButton(
+                onPressed: _submitting
+                    ? null
+                    : () => _masukSosial((auth) => auth.masukApple()),
+              ),
+            ],
             AuthFooterLink(
               text: t.noAccount,
               actionLabel: t.signUp,
-              onTap: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const DaftarScreen())),
+              // Ganti, bukan tumpuk — lihat footer DaftarScreen.
+              onTap: () => Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const DaftarScreen()),
+              ),
             ),
           ],
         ),

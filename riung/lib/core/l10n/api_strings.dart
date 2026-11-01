@@ -1,7 +1,12 @@
+import '../services/store_platform.dart';
+
 /// Server messages are debug-only; product copy is selected by error code.
-String deleteSubscriptionWarning(bool english) => english
-    ? 'Deleting your account does not cancel your Google Play subscription. Cancel it in Google Play before continuing.'
-    : 'Menghapus akun tidak membatalkan langganan Google Play. Batalkan langganan di Google Play sebelum melanjutkan.';
+String deleteSubscriptionWarning(bool english) {
+  final store = StorePlatform.current.label;
+  return english
+      ? 'Deleting your account does not cancel your $store subscription. Cancel it in $store before continuing.'
+      : 'Menghapus akun tidak membatalkan langganan $store. Batalkan langganan di $store sebelum melanjutkan.';
+}
 String pendingSyncText(bool english) =>
     english ? 'Exercises waiting to sync' : 'Latihan menunggu sinkron';
 String practiceCappedText(bool english) => english

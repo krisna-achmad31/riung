@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 
@@ -47,13 +48,14 @@ class ApiClient {
     this.appCheckToken,
     http.Client? client,
     this.appVersion = '1.0.0',
-    this.platform = 'android',
+    String? platform,
     this.timeout = const Duration(seconds: 15),
     this.onError,
     this.retryDelay = const Duration(milliseconds: 500),
     this.accountId,
     bool allowPrivateHttp = false,
   }) : baseUri = Uri.parse(baseUrl),
+       platform = platform ?? currentPlatform,
        _client = client ?? http.Client() {
     final octets = baseUri.host.split('.').map(int.tryParse).toList();
     final privateIp =
@@ -84,6 +86,11 @@ class ApiClient {
   final http.Client _client;
   final String appVersion;
   final String platform;
+
+  /// Nilai `X-Platform` untuk HP ini. Ikut [defaultTargetPlatform], jadi test
+  /// bisa menggantinya lewat `debugDefaultTargetPlatformOverride`.
+  static String get currentPlatform =>
+      defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android';
   final Duration timeout;
   final Duration retryDelay;
   final void Function(ApiException)? onError;
@@ -130,6 +137,7 @@ class ApiClient {
         );
       } on ApiException catch (e) {
         if (!e.retryable || attempt >= maxRetries.clamp(0, maxRetryLimit)) {
+          debugPrint('API $method $path gagal: $e');
           if (reportErrors) onError?.call(e);
           rethrow;
         }

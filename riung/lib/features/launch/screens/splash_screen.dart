@@ -54,14 +54,15 @@ class _SplashScreenState extends State<SplashScreen>
       ]);
       if (!mounted) return;
       final profile = results[1];
+      // Tentukan tujuan selagi context masih aktif — builder route baru
+      // dijalankan setelah splash dilepas, jadi jangan baca context di sana.
+      final next =
+          profile.onboardingDone ||
+              AppScope.of(context).prefs.hasSeenIntroduction(profile.uid)
+          ? const RootShellScreen()
+          : const OnboardingFlowScreen();
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) =>
-              (profile.onboardingDone ||
-                  AppScope.of(context).prefs.hasSeenIntroduction(profile.uid))
-              ? const RootShellScreen()
-              : const OnboardingFlowScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => next),
       );
     } catch (_) {
       if (!mounted) return;

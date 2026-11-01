@@ -80,6 +80,20 @@ Firebase Console → **Authentication → Sign-in method**, aktifkan:
   keystore lain (beda SHA), butuh langkah tambahan supaya Google
   Sign-In tidak patah khusus di rilis. Lihat `docs/release-signing.md`
   § Langkah 7.
+- **Apple** — dipakai tombol "Lanjutkan dengan Apple" (hanya tampil di
+  iOS). Aktifkan provider **Apple** di Authentication → Sign-in method;
+  untuk alur native iOS kolom Services ID/OAuth boleh dikosongkan. App ID
+  `id.riung.riung` di Apple Developer harus punya capability **Sign in
+  with Apple** (entitlement `com.apple.developer.applesignin` sudah ada di
+  `ios/Runner/Runner.entitlements`). Profil "Riung Development" belum
+  punya capability ini, jadi di build lokal tombolnya gagal — tes lewat
+  build TestFlight.
+  Tombol masih disembunyikan lewat `appleSignInEnabled` di
+  `lib/core/config/firebase_config.dart` — nyalakan setelah langkah di
+  atas DAN **OAuth code flow configuration** (Team ID, Key ID, isi file
+  `.p8` dari key Sign in with Apple) terisi. Tanpa itu, hapus akun untuk
+  pengguna Apple gagal di langkah pencabutan token
+  (`revokeTokenWithAuthorizationCode`).
 
 ## 3. Firestore
 

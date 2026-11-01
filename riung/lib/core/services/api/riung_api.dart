@@ -17,12 +17,10 @@ class ApiSnapshot {
   Wallet get wallet => Wallet.fromMap(jsonObject(raw['wallet']));
   String get billingAccountId => raw['billingAccountId'] as String? ?? '';
 
-  /// Padanan [billingAccountId] untuk App Store: UUID yang dikirim sebagai
-  /// StoreKit `appAccountToken` (`applicationUserName`).
-  String get appAccountToken =>
-      raw['appAccountToken'] as String? ??
-      jsonObject(raw['user'])['appAccountToken'] as String? ??
-      '';
+  /// Padanan [billingAccountId] untuk iOS: UUID per akun yang dikirim sebagai
+  /// StoreKit `appAccountToken` (spec backend §3.9b). StoreKit membuang nilai
+  /// yang bukan UUID, jadi jangan diganti dengan [billingAccountId].
+  String get appAccountToken => raw['appAccountToken'] as String? ?? jsonObject(raw['user'])['appAccountToken'] as String? ?? '';
   Map<String, dynamic> get today => jsonObject(raw['today']);
   Map<String, dynamic> get inventory => jsonObject(raw['inventory']);
 
@@ -103,7 +101,10 @@ class FocusTicket {
 }
 
 class BillingResult {
-  BillingResult(this.raw);
+  /// Menerima objek `result` langsung (baris restore) maupun respons utuh
+  /// `verify` (`{result, wallet, premium}`, spec §3.9).
+  BillingResult(Map<String, dynamic> response)
+    : raw = response['result'] is Map ? jsonObject(response['result']) : response;
   final Map<String, dynamic> raw;
   String get status => raw['status'] as String? ?? 'pending';
   bool get consumableDelivered =>
@@ -350,6 +351,9 @@ class RiungApi {
       query: {if (promptId.isNotEmpty) 'promptId': promptId},
     ),
   );
+  /// Panggilan billing bisa berjalan di latar (saat app dibuka), jadi tidak
+  /// memunculkan toast otomatis; layar pembelian memberi kabar lewat
+  /// `BillingService.updates`.
   Future<BillingResult> verifyPurchase(
     String productId,
     String purchaseToken,
@@ -358,6 +362,7 @@ class RiungApi {
       'POST',
       '/v1/billing/verify',
       limitedUse: true,
+      reportErrors: false,
       body: {'productId': productId, 'purchaseToken': purchaseToken},
     ),
   );
@@ -368,6 +373,7 @@ class RiungApi {
     return _send(
       'POST',
       '/v1/billing/restore',
+      reportErrors: false,
       body: {
         'purchases': [
           for (final p in purchases)
@@ -377,7 +383,9 @@ class RiungApi {
     );
   }
 
-  Future<BillingResult> verifyAppStore(
+  /// `transactionId` = id transaksi StoreKit (`PurchaseDetails.purchaseID`);
+  /// server mengambil transaksinya sendiri dari App Store Server API (§3.9b).
+  Future<BillingResult> verifyAppStorePurchase(
     String productId,
     String transactionId,
   ) async => BillingResult(
@@ -385,9 +393,12 @@ class RiungApi {
       'POST',
       '/v1/billing/appstore/verify',
       limitedUse: true,
+      reportErrors: false,
       body: {'productId': productId, 'transactionId': transactionId},
     ),
   );
+
+  /// Baris jawaban dicocokkan lewat `transactionId`, bukan urutan.
   Future<Map<String, dynamic>> restoreAppStore(
     List<({String productId, String transactionId})> purchases,
   ) {
@@ -395,6 +406,7 @@ class RiungApi {
     return _send(
       'POST',
       '/v1/billing/appstore/restore',
+      reportErrors: false,
       body: {
         'purchases': [
           for (final p in purchases)

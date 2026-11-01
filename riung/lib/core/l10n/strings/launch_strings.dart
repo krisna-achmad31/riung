@@ -16,6 +16,7 @@ abstract class LaunchStrings {
   String get passwordLabel;
   String get orDivider;
   String get continueWithGoogle;
+  String get continueWithApple;
   String get signIn;
   String get signUp;
   String get hasAccount;
@@ -75,6 +76,8 @@ class LaunchStringsId extends LaunchStrings {
   String get orDivider => 'atau';
   @override
   String get continueWithGoogle => 'Lanjutkan dengan Google';
+  @override
+  String get continueWithApple => 'Lanjutkan dengan Apple';
   @override
   String get signIn => 'Masuk';
   @override
@@ -156,6 +159,10 @@ class LaunchStringsId extends LaunchStrings {
         return 'Google Sign-In tidak mengembalikan token. Coba lagi.';
       case AuthError.googleUnavailable:
         return 'Masuk dengan Google belum bisa dipakai di build ini. Coba pakai email dulu ya.';
+      case AuthError.appleCredentialInUse:
+        return 'Akun Apple ini udah dipakai buat akun lain.';
+      case AuthError.appleUserMismatch:
+        return 'Pakai Apple ID yang sama dengan akun ini, ya.';
       case AuthError.unknown:
         return 'Ada yang salah, coba lagi ya${code == null ? '' : ' ($code)'}.';
     }
@@ -182,6 +189,8 @@ class LaunchStringsEn extends LaunchStrings {
   String get orDivider => 'or';
   @override
   String get continueWithGoogle => 'Continue with Google';
+  @override
+  String get continueWithApple => 'Continue with Apple';
   @override
   String get signIn => 'Sign in';
   @override
@@ -264,6 +273,10 @@ class LaunchStringsEn extends LaunchStrings {
         return 'Google Sign-In did not return a token. Please try again.';
       case AuthError.googleUnavailable:
         return 'Sign in with Google is not available in this build. Please use email for now.';
+      case AuthError.appleCredentialInUse:
+        return 'This Apple account is already used by another account.';
+      case AuthError.appleUserMismatch:
+        return 'Please use the same Apple ID as this account.';
       case AuthError.unknown:
         return 'Something went wrong, please try again${code == null ? '' : ' ($code)'}.';
     }

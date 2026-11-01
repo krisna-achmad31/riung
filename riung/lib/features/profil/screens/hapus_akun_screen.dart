@@ -65,6 +65,8 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
     setState(() => _menghapus = true);
     final scope = AppScope.of(context);
     try {
+      // Paling awal: kalau user batal di lembar Apple, belum ada yang terhapus.
+      await scope.auth.revokeAppleIfLinked();
       final uid = scope.auth.uid;
       if (uid != null) {
         await scope.userRepository.deleteCloudData(uid);
@@ -82,6 +84,10 @@ class _HapusAkunScreenState extends State<HapusAkunScreen> {
       if (!mounted) return;
       setState(() => _menghapus = false);
       showApiError(context, e);
+      return;
+    } on AuthCanceledException {
+      // User menutup lembar Apple — batal hapus, tetap di layar ini.
+      if (mounted) setState(() => _menghapus = false);
       return;
     } on AuthServiceException catch (e) {
       if (!mounted) return;
@@ -274,12 +280,7 @@ class _LanggananPlayWarning extends StatelessWidget {
 
   // Pola sama dengan `_kelolaLangganan` di langganan_screen.dart.
   Future<void> _kelolaDiPlay() async {
-    final productId = premiumPlan;
-    final uri = Uri.parse(
-      'https://play.google.com/store/account/subscriptions'
-      '${productId != null ? '?sku=$productId&package=id.riung.riung' : ''}',
-    );
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await launchUrl(StorePlatform.current.manageSubscriptionsUri(premiumPlan), mode: LaunchMode.externalApplication);
   }
 
   @override

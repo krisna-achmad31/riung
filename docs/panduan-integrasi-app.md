@@ -40,7 +40,7 @@ Authorization	Bearer <ID token> dari FirebaseAuth.instance.currentUser!.getIdTok
 X-Firebase-AppCheck	FirebaseAppCheck.instance.getToken()	semua /v1/* kecuali /v1/waitlist; limited-use (getLimitedUseToken(), satu token per request) untuk POST/v1/billing/verify, DELETE/v1/me, POST/v1/me/journal-pin-backup/verify
 Idempotency-Key	UUID v4 (const Uuid().v4(), paket uuid sudah ada)	semua POST/PUT/PATCH/DELETE yang mengubah data, kecuali DELETE/v1/me dan verifikasi PIN; tanpa key → 400
 X-App-Version	versi app (1.0.0+1 dari pubspec.yaml)	semua — app di bawah minAppVersion dijawab 426
-X-Platform	android	semua
+X-Platform	android atau ios (sesuai platform HP)	semua
 Content-Type	application/json	request ber-body
 
 Idempotency-Key — satu UUID baru per aksi pengguna, dibuat sekali lalu dipakai ulang untuk setiap percobaan ulang aksi itu:
@@ -245,6 +245,8 @@ bundel : {"bundleId":"santai","expectedPrice":35}
     Buka menit secara lokal sesuai grants. Jalur napas gratis tetap lokal dan tidak pernah dibatasi.
 
 Koin harian Premium tahunan — POST/v1/premium/daily-coins (akun permanen, 1×/hari, +2 ke koin beli).
+
+    **Tidak selama trial.** Koin harian baru boleh diberikan setelah pembayaran pertama langganan tahunan. Selama masa trial gratis server menolak dengan 403 `premium_trial_period`, dan GET/v1/me mengirim `premium.inTrial: true` supaya app menonaktifkan tombolnya. Sumber status trial: App Store — transaksi terakhir dengan `offerType = 1` (introductory) dan `offerDiscountType = FREE_TRIAL`, atau notifikasi `DID_RENEW` pertama yang belum ada; Google Play — `subscriptionsv2` dengan `lineItems[].offerPhase.freeTrial`. Begitu perpanjangan pertama berhasil, `inTrial` menjadi false.
 
 Akses jurnal — GET/v1/journal/access?promptId= → canWrite, reason (daily_limit, premium_required), status tiap prompt. Saat offline pakai hitungan lokal sebagai cadangan.
 11Pembelian Google Play (
