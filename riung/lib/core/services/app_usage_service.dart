@@ -10,6 +10,16 @@ import '../models/installed_app.dart';
 class AppUsageService {
   static const _channel = MethodChannel('id.riung.riung/app_usage');
 
+  /// Android memblokir screenshot & rekam layar selama aktif. iOS tidak punya
+  /// padanannya, jadi di sana panggilan ini tidak berpengaruh.
+  static Future<void> setScreenSecure(bool secure) async {
+    try {
+      await _channel.invokeMethod<void>('setScreenSecure', {'secure': secure});
+    } on MissingPluginException {
+      // iOS & tes.
+    }
+  }
+
   Future<bool> hasUsageAccess() async {
     try {
       return await _channel.invokeMethod<bool>('hasUsageAccess') ?? false;

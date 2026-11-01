@@ -226,7 +226,7 @@ class _HabitCard extends StatelessWidget {
                 onTap: () => KenaliNavigator.openById(context, entry.id),
                 child: Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: Text(t.startArrow(monsterId), style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primer)),
+                  child: Text(!(AppScope.of(context).auth.profile?.premiumNow ?? false) ? t.unlockPremium : t.startArrow(monsterId), style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primer)),
                 ),
               ),
           ],

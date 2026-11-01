@@ -42,6 +42,14 @@ class AppUsageMethodChannel(private val context: Context, private val activity: 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "hasUsageAccess" -> result.success(hasUsageAccess())
+            "setScreenSecure" -> {
+                if (call.argument<Boolean>("secure") == true) {
+                    activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                } else {
+                    activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                }
+                result.success(null)
+            }
             "openUsageAccessSettings" -> {
                 openUsageAccessSettings()
                 result.success(null)

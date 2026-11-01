@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/config/kenali_dirimu_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/kenali_test.dart';
+import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../widgets/kenali_note_card.dart';
@@ -87,7 +88,7 @@ class KenaliIntroScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              SizedBox(width: double.infinity, child: RiungButton(label: t.startButton(entry.section), onPressed: () => _mulai(context))),
+              SizedBox(width: double.infinity, child: RiungButton(label: !(AppScope.of(context).auth.profile?.premiumNow ?? false) ? t.unlockPremium : t.startButton(entry.section), onPressed: () => _mulai(context))),
             ],
           ),
         ),

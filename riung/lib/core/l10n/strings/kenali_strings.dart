@@ -127,6 +127,7 @@ abstract class KenaliStrings {
   String get noneAwakeBody;
   String get asleepDetailBody;
   String get takeQuiz;
+  String get unlockPremium;
 
   // ── Peta latihan kebiasaan ──────────────────────────────────────────
   String stageTitle(String monsterName);
@@ -672,6 +673,8 @@ class KenaliStringsId extends KenaliStrings {
   String get asleepDetailBody => 'Monster ini masih tidur. Dia bangun kalau jawaban kuismu menunjukkan polanya.';
   @override
   String get takeQuiz => 'Ikuti kuisnya';
+  @override
+  String get unlockPremium => 'Buka dengan Premium';
 
   @override
   String stageTitle(String monsterName) => 'Peta latihan $monsterName';
@@ -1027,6 +1030,8 @@ class KenaliStringsEn extends KenaliStrings {
   String get asleepDetailBody => 'This monster is still asleep. It wakes if your quiz answers show the pattern.';
   @override
   String get takeQuiz => 'Take the quiz';
+  @override
+  String get unlockPremium => 'Unlock with Premium';
 
   @override
   String stageTitle(String monsterName) => "$monsterName's practice map";
