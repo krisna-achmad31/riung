@@ -16,6 +16,10 @@ Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml
 
 ======
 
+13/11/2026 (1.2.1+12)
+AY
+1. UPDATE: Update the Riung design source in design/riung.pen.
+
 13/11/2026 (1.2.0+11)
 AY
 1. ADD: Back up and restore encrypted journal files without signing in. Warn guests with journal entries before signing in to another account.
