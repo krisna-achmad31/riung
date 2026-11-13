@@ -21,7 +21,7 @@ abstract class MonsterStrings {
   // ── Brankas ──
   String get loadError;
   String get vaultTitle;
-  String vaultSub(int tamed);
+  String vaultSub(int tamed, int total);
   String get bossBadge;
   String get hakimBlurb;
   String progressToTamed(int percent);
@@ -91,7 +91,7 @@ class MonsterStringsId extends MonsterStrings {
   @override
   String get vaultTitle => 'Monstermu';
   @override
-  String vaultSub(int tamed) => '$tamed dari 7 sudah jinak';
+  String vaultSub(int tamed, int total) => '$tamed dari $total sudah jinak';
   @override
   String get bossBadge => 'BOS';
   @override
@@ -274,7 +274,7 @@ class MonsterStringsEn extends MonsterStrings {
   @override
   String get vaultTitle => 'Your monsters';
   @override
-  String vaultSub(int tamed) => '$tamed of 7 already tamed';
+  String vaultSub(int tamed, int total) => '$tamed of $total tamed';
   @override
   String get bossBadge => 'BOSS';
   @override

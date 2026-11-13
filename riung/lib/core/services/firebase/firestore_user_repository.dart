@@ -127,6 +127,13 @@ class FirestoreUserRepository implements UserRepository {
   Future<List<JournalEntry>> getJournalEntries(String uid) => _local.getJournalEntries(uid);
 
   @override
+  Future<int> journalEntryCount(String uid) => _local.journalEntryCount(uid);
+
+  @override
+  Future<int> restoreJournalEntries(String uid, List<JournalEntry> entries) =>
+      _local.restoreJournalEntries(uid, entries);
+
+  @override
   Future<JournalEntry> saveJournalEntry(String uid, JournalEntry entry) => _local.saveJournalEntry(uid, entry);
 
   @override

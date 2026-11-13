@@ -11,7 +11,9 @@ import 'meditasi_search_screen.dart';
 /// Perpustakaan meditasi. Implement persis `design/Meditasi.dc.html`
 /// § Perpustakaan meditasi.
 class MeditasiListScreen extends StatefulWidget {
-  const MeditasiListScreen({super.key});
+  const MeditasiListScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   State<MeditasiListScreen> createState() => _MeditasiListScreenState();
@@ -65,10 +67,9 @@ class _MeditasiListScreenState extends State<MeditasiListScreen> {
           children: [
             Row(
               children: [
-                // Cuma tampil kalau layar ini di-push (mis. dari kartu
-                // cepat di Beranda) — sebagai tab Jelajah, Navigator.canPop
-                // == false, jadi tidak ada back ganda.
-                if (Navigator.canPop(context)) ...[
+                // Tampilkan kembali saat dibuka sebagai layar sendiri,
+                // misalnya dari kartu cepat di Beranda.
+                if (!widget.embedded && Navigator.canPop(context)) ...[
                   RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
                   const SizedBox(width: AppSpacing.md),
                 ],

@@ -16,7 +16,9 @@ import 'afirmasi_pengingat_screen.dart';
 /// Koleksi deck afirmasi. Alur & copy: `design/Afirmasi.dc.html` § Koleksi
 /// afirmasi; visual: `Glass — Afirmasi · Kategori` di `design/riung.pen`.
 class AfirmasiKategoriScreen extends StatefulWidget {
-  const AfirmasiKategoriScreen({super.key});
+  const AfirmasiKategoriScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   State<AfirmasiKategoriScreen> createState() => _AfirmasiKategoriScreenState();
@@ -83,7 +85,7 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
   Widget build(BuildContext context) {
     final decks = _decks;
     final t = context.s.afirmasi;
-    final canPop = Navigator.canPop(context);
+    final showBack = !widget.embedded && Navigator.canPop(context);
     final today = decks == null ? null : _today(decks);
     final ready = decks ?? const <AffirmationDeck>[];
     return Scaffold(
@@ -96,33 +98,38 @@ class _AfirmasiKategoriScreenState extends State<AfirmasiKategoriScreen> {
                 bleed: 0,
                 padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
                 children: [
-                  SizedBox(
-                    height: 44,
-                    child: Row(
-                      children: [
-                        if (canPop)
-                          RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop())
-                        else
-                          const SizedBox(width: 44),
-                        Expanded(
-                          child: Text(
-                            t.title,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.title.copyWith(fontSize: 17, color: AppColors.teksUtama),
-                          ),
-                        ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (showBack) ...[
                         RiungGlassIconButton(
-                          icon: Icons.notifications_none_rounded,
-                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AfirmasiPengingatScreen())),
+                          icon: Icons.chevron_left_rounded,
+                          onTap: () => Navigator.of(context).maybePop(),
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        RiungGlassIconButton(icon: Icons.add_rounded, onTap: _openBuat),
+                        const SizedBox(width: AppSpacing.md),
                       ],
-                    ),
+                      Expanded(
+                        child: Text(
+                          t.title,
+                          style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2),
+                        ),
+                      ),
+                      RiungGlassIconButton(
+                        icon: Icons.notifications_none_rounded,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const AfirmasiPengingatScreen()),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      RiungGlassIconButton(icon: Icons.add_rounded, onTap: _openBuat),
+                    ],
                   ),
-                  const SizedBox(height: 14),
-                  Text(t.subtitle, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 4),
+                  Text(
+                    t.subtitle,
+                    style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.teksSekunder),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
                   if (today != null) ...[
                     AfirmasiTodayCard(
                       eyebrow: t.cardScreenTitle,

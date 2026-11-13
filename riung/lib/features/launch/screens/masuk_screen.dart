@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n.dart';
+import '../../../core/l10n/strings/journal_backup_strings.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../../core/widgets/api_error_feedback.dart';
+import '../../jurnal/screens/jurnal_backup_screen.dart';
 import 'splash_screen.dart';
 import '../../../core/services/api/api_client.dart';
 import '../widgets/apple_sign_in_button.dart';
@@ -39,6 +41,74 @@ class _MasukScreenState extends State<MasukScreen> {
     super.dispose();
   }
 
+  Future<bool> _protectGuestJournal() async {
+    final scope = AppScope.of(context);
+    final uid = scope.auth.uid;
+    if (!scope.auth.isAnonymous || uid == null) return true;
+    final t = context.s.journalBackup;
+    final int count;
+    try {
+      count = await scope.userRepository.journalEntryCount(uid);
+    } catch (_) {
+      if (mounted) setState(() => _formError = t.journalCheckFailed);
+      return false;
+    }
+    if (!mounted || scope.auth.uid != uid) return false;
+    if (count == 0) return true;
+
+    final cancel = context.s.common.batal;
+    final choice = await showDialog<_GuestJournalChoice>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(t.signInTitle),
+        content: Text(t.signInBody(count)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(cancel),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, _GuestJournalChoice.signIn),
+            child: Text(t.continueSignIn),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, _GuestJournalChoice.backup),
+            child: Text(t.backUpFirst),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || scope.auth.uid != uid) return false;
+    if (choice == _GuestJournalChoice.signIn) return true;
+    if (choice != _GuestJournalChoice.backup) return false;
+
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => const JurnalBackupScreen(returnAfterBackup: true),
+      ),
+    );
+    if (!mounted || saved != true || scope.auth.uid != uid) return false;
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(t.saved),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(t.continueSignIn),
+          ),
+        ],
+      ),
+    );
+    return mounted && scope.auth.uid == uid && proceed == true;
+  }
+
   Future<void> _submit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -51,6 +121,7 @@ class _MasukScreenState extends State<MasukScreen> {
       _submitting = true;
     });
     try {
+      if (!await _protectGuestJournal() || !mounted) return;
       await AppScope.of(
         context,
       ).auth.masukEmailPassword(email: email, password: password);
@@ -73,8 +144,12 @@ class _MasukScreenState extends State<MasukScreen> {
   Future<void> _masukSosial(
     Future<String> Function(AuthNotifier auth) masuk,
   ) async {
-    setState(() => _submitting = true);
+    setState(() {
+      _formError = null;
+      _submitting = true;
+    });
     try {
+      if (!await _protectGuestJournal() || !mounted) return;
       await masuk(AppScope.of(context).auth);
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
@@ -215,3 +290,5 @@ class _MasukScreenState extends State<MasukScreen> {
     );
   }
 }
+
+enum _GuestJournalChoice { backup, signIn }

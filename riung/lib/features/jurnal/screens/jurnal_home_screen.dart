@@ -3,12 +3,14 @@ import 'package:intl/intl.dart';
 
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
+import '../../../core/l10n/strings/journal_backup_strings.dart';
 import '../../../core/models/journal_entry.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../logic/journal_prompts.dart';
 import 'jurnal_detail_screen.dart';
+import 'jurnal_backup_screen.dart';
 import 'jurnal_pin_recover_screen.dart';
 import 'jurnal_pin_setup_screen.dart';
 import 'jurnal_pin_unlock_screen.dart';
@@ -17,7 +19,9 @@ import 'jurnal_prompt_screen.dart';
 /// Gate PIN + daftar entri jurnal. Implement persis `design/Jurnal.dc.html`
 /// § Daftar jurnal & § Jurnal kosong.
 class JurnalHomeScreen extends StatefulWidget {
-  const JurnalHomeScreen({super.key});
+  const JurnalHomeScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   State<JurnalHomeScreen> createState() => _JurnalHomeScreenState();
@@ -76,23 +80,29 @@ class _JurnalHomeScreenState extends State<JurnalHomeScreen> {
         _unlocked = true;
         _checking = false;
       });
-    } else if (Navigator.canPop(context)) {
+    } else if (!widget.embedded && Navigator.canPop(context)) {
       // Dibuka sebagai layar sendiri: batal berarti kembali.
       Navigator.of(context).maybePop();
     } else {
-      // Tab Jurnal di dalam Jelajah: tidak ada layar untuk dikembalikan (pop
-      // di sini menutup aplikasi), jadi tetap di tab dengan tombol buka ulang.
+      // Di tab Jurnal, batal tetap menampilkan tombol buka ulang.
       setState(() => _checking = false);
     }
   }
 
   Future<void> _loadEntries() async {
     final scope = AppScope.of(context);
-    final uid = scope.auth.profile?.uid;
+    final uid = scope.auth.uid;
     if (uid == null) return;
     final entries = await scope.userRepository.getJournalEntries(uid);
     if (!mounted) return;
     setState(() => _entries = entries);
+  }
+
+  Future<void> _bukaCadangan() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const JurnalBackupScreen()),
+    );
+    if (mounted) await _loadEntries();
   }
 
   Future<void> _mulaiEntriBaru() async {
@@ -148,7 +158,12 @@ class _JurnalHomeScreenState extends State<JurnalHomeScreen> {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: _JurnalBeranda(entries: _entries, onTulis: _mulaiEntriBaru),
+        child: _JurnalBeranda(
+          entries: _entries,
+          onTulis: _mulaiEntriBaru,
+          onCadangan: _bukaCadangan,
+          showBack: !widget.embedded && Navigator.canPop(context),
+        ),
       ),
     );
   }
@@ -188,21 +203,32 @@ class _JurnalTerkunci extends StatelessWidget {
 /// Beranda jurnal (frame `Glass — Jurnal`): judul + jumlah entri, kartu
 /// "Tulis bebas" berikon jurnal 3D, dua panduan CBT, lalu entri terakhir.
 class _JurnalBeranda extends StatelessWidget {
-  const _JurnalBeranda({required this.entries, required this.onTulis});
+  const _JurnalBeranda({
+    required this.entries,
+    required this.onTulis,
+    required this.onCadangan,
+    required this.showBack,
+  });
 
   final List<JournalEntry> entries;
   final VoidCallback onTulis;
+  final VoidCallback onCadangan;
+  final bool showBack;
 
   @override
   Widget build(BuildContext context) {
     final t = context.s.jurnal;
+    final backup = context.s.journalBackup;
+    final scope = AppScope.of(context);
+    final uid = scope.auth.uid;
+    final lastBackup = uid == null ? null : scope.prefs.journalBackupSavedAt(uid);
     return ListView(
       padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (Navigator.canPop(context)) ...[
+            if (showBack) ...[
               RiungGlassIconButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).maybePop()),
               const SizedBox(width: AppSpacing.md),
             ],
@@ -226,6 +252,19 @@ class _JurnalBeranda extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         _TulisCard(onTap: onTulis),
+        const SizedBox(height: AppSpacing.lg),
+        RiungMenuGroup(
+          children: [
+            RiungMenuRow(
+              leading: RiungMenuRow.iconBox(Icons.save_alt_rounded),
+              title: backup.title,
+              subtitle: lastBackup == null
+                  ? (entries.isEmpty ? backup.localOnly : backup.localUnbacked)
+                  : backup.lastSaved(DateFormat.yMMMd(context.s.dateLocale).format(lastBackup)),
+              onTap: onCadangan,
+            ),
+          ],
+        ),
         const SizedBox(height: AppSpacing.lg),
         Text(t.orCbtGuide, style: AppTextStyles.title.copyWith(fontSize: 17)),
         const SizedBox(height: AppSpacing.md),
@@ -296,12 +335,13 @@ class _TulisCard extends StatelessWidget {
           border: Border.all(color: AppColors.garis, width: AppGlass.edgeWidth),
           boxShadow: AppGlass.shadow,
         ),
-        child: Stack(
+        padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 12, 18),
+        child: Row(
           children: [
-            const Positioned(right: 10, top: 20, child: RiungIcon3D(RiungIcon.jurnal, size: 150)),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 150, 18),
+            Expanded(
+              flex: 3,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(t.freeWriteKicker, style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: AppColors.sekunder)),
@@ -311,19 +351,30 @@ class _TulisCard extends StatelessWidget {
                   Text(t.freeWriteBody, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksSekunder)),
                   const SizedBox(height: 14),
                   Container(
-                    height: 38,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    constraints: const BoxConstraints(minHeight: 38),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(color: AppColors.tinta, borderRadius: BorderRadius.circular(AppRadius.pill)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.edit_rounded, size: 14, color: AppColors.diAtasTinta),
-                        const SizedBox(width: 6),
-                        Text(t.writeCta(EconomyEarn.jurnal), style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.diAtasTinta)),
+                        const SizedBox(width: 9),
+                        Flexible(
+                          child: Text(t.writeCta(EconomyEarn.jurnal), style: AppTextStyles.chipLabel.copyWith(fontSize: 13, color: AppColors.diAtasTinta)),
+                        ),
                       ],
                     ),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            const Expanded(
+              flex: 2,
+              child: FractionalTranslation(
+                // Aset jurnal punya lebih banyak ruang transparan di kanan.
+                translation: Offset(0.11, 0),
+                child: RiungIcon3D(RiungIcon.jurnal, size: 150),
               ),
             ),
           ],

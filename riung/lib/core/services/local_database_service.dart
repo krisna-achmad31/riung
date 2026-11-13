@@ -25,28 +25,28 @@ class LocalDatabaseService {
     final path = p.join(dbPath, 'riung.db');
     final db = await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) await _createOutbox(db);
         if (oldVersion < 3) {
           await db.execute('ALTER TABLE journal_entries ADD COLUMN user_id TEXT');
           await db.execute('ALTER TABLE checkin_history ADD COLUMN user_id TEXT');
         }
+        if (oldVersion < 4) {
+          await db.execute('ALTER TABLE journal_entries RENAME TO journal_entries_v3');
+          await _createJournalEntries(db);
+          await db.execute('''
+            INSERT INTO journal_entries
+              (id, user_id, date, prompt_id, text_encrypted, mood, tags, created_at)
+            SELECT id, user_id, date, prompt_id, text_encrypted, mood, tags, created_at
+            FROM journal_entries_v3
+          ''');
+          await db.execute('DROP TABLE journal_entries_v3');
+        }
       },
       onCreate: (db, version) async {
         await _createOutbox(db);
-        await db.execute('''
-          CREATE TABLE journal_entries (
-            id TEXT PRIMARY KEY,
-            user_id TEXT,
-            date TEXT NOT NULL,
-            prompt_id TEXT,
-            text_encrypted TEXT NOT NULL,
-            mood TEXT,
-            tags TEXT,
-            created_at TEXT NOT NULL
-          )
-        ''');
+        await _createJournalEntries(db);
         await db.execute('''
           CREATE TABLE checkin_history (
             id TEXT PRIMARY KEY,
@@ -64,6 +64,44 @@ class LocalDatabaseService {
     );
     _db = db;
     return db;
+  }
+
+  Future<void> _createJournalEntries(Database db) => db.execute('''
+    CREATE TABLE journal_entries (
+      id TEXT NOT NULL,
+      user_id TEXT,
+      date TEXT NOT NULL,
+      prompt_id TEXT,
+      text_encrypted TEXT NOT NULL,
+      mood TEXT,
+      tags TEXT,
+      created_at TEXT NOT NULL,
+      PRIMARY KEY (user_id, id)
+    )
+  ''');
+
+  Future<int> restoreJournalRows(String uid, List<Map<String, Object?>> rows) async {
+    final db = await _database;
+    return db.transaction((txn) async {
+      final before = await _journalEntryCount(txn, uid);
+      for (final row in rows) {
+        await txn.insert(
+          'journal_entries',
+          {...row, 'user_id': uid},
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+      return await _journalEntryCount(txn, uid) - before;
+    });
+  }
+
+  Future<int> journalEntryCount(String uid) async =>
+      _journalEntryCount(await _database, uid);
+
+  Future<int> _journalEntryCount(DatabaseExecutor executor, String uid) async {
+    return Sqflite.firstIntValue(await executor.rawQuery(
+      'SELECT COUNT(*) FROM journal_entries WHERE user_id = ?', [uid],
+    ))!;
   }
 
   Future<void> insertJournalEntry(String uid, Map<String, Object?> row) async {

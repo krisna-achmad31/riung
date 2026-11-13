@@ -13,7 +13,9 @@ import 'tidur_pengingat_screen.dart';
 
 /// Beranda tidur. Implement persis `design/Tidur.dc.html` § Beranda tidur.
 class TidurListScreen extends StatefulWidget {
-  const TidurListScreen({super.key});
+  const TidurListScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   State<TidurListScreen> createState() => _TidurListScreenState();
@@ -73,7 +75,7 @@ class _TidurListScreenState extends State<TidurListScreen> {
             children: [
               Row(
                 children: [
-                  if (Navigator.canPop(context)) ...[
+                  if (!widget.embedded && Navigator.canPop(context)) ...[
                     RiungGlassIconButton(icon: Icons.chevron_left_rounded, night: true, onTap: () => Navigator.of(context).maybePop()),
                     const SizedBox(width: AppSpacing.md),
                   ],

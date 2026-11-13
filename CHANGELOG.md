@@ -16,6 +16,15 @@ Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml
 
 ======
 
+13/11/2026 (1.2.0+11)
+AY
+1. ADD: Back up and restore encrypted journal files without signing in. Warn guests with journal entries before signing in to another account.
+2. ADD: Open the sleep reminder schedule from Notifications and enter a bedtime directly. Adjust the time in five-minute steps with the plus and minus buttons.
+3. UPDATE: Open Sign In from the Email setting and use the official Google logo on authentication buttons.
+4. UPDATE: Align the Affirmations header with the other Explore tabs and improve spacing in the journal banner.
+5. FIX: Share and save affirmation cards on a 9:16 canvas with margins to reduce cropping in Stories.
+6. FIX: Hide back buttons in Explore tabs, synchronize the sleep reminder toggle, and use a consistent progress subtitle across monster tabs.
+
 01/11/2026 (1.1.0+10)
 AY
 1. ADD: Add App Store purchases for Premium and coin packs, with restore, trial eligibility and recovery of unfinished transactions.

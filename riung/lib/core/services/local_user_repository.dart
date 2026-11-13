@@ -160,17 +160,27 @@ class LocalUserRepository implements UserRepository {
 
   @override
   Future<JournalEntry> saveJournalEntry(String uid, JournalEntry entry) async {
-    final encryptedText = await _crypto.encryptText(uid, entry.text);
-    await _db.insertJournalEntry(uid, {
+    await _db.insertJournalEntry(uid, await _journalRow(uid, entry));
+    return entry;
+  }
+
+  Future<Map<String, Object?>> _journalRow(String uid, JournalEntry entry) async => {
       'id': entry.entryId,
       'date': entry.createdAt.toIso8601String().split('T').first,
       'prompt_id': entry.promptId,
-      'text_encrypted': encryptedText,
+      'text_encrypted': await _crypto.encryptText(uid, entry.text),
       'mood': entry.mood,
       'tags': jsonEncode(entry.tags),
       'created_at': entry.createdAt.toIso8601String(),
-    });
-    return entry;
+    };
+
+  @override
+  Future<int> journalEntryCount(String uid) => _db.journalEntryCount(uid);
+
+  @override
+  Future<int> restoreJournalEntries(String uid, List<JournalEntry> entries) async {
+    final rows = [for (final entry in entries) await _journalRow(uid, entry)];
+    return _db.restoreJournalRows(uid, rows);
   }
 
   @override

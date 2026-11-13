@@ -18,6 +18,11 @@ abstract class UserRepository {
   Future<List<CheckIn>> getCheckIns(String uid);
   Future<List<JournalEntry>> getJournalEntries(String uid);
 
+  Future<int> journalEntryCount(String uid);
+
+  /// Gabungkan entri dengan ID yang sama tanpa menimpa entri tujuan.
+  Future<int> restoreJournalEntries(String uid, List<JournalEntry> entries);
+
   /// Menyimpan sub-map profile/premium/streak/assessment (bukan wallet —
   /// itu hanya lewat [WalletFunctionsService], lihat CLAUDE.md aturan #5).
   Future<void> saveUserProfile(UserProfile profile);

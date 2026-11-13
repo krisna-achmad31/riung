@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n.dart';
+import '../../../core/l10n/strings/journal_backup_strings.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../appbeku/screens/appbeku_rekap_screen.dart';
-import '../../launch/screens/daftar_screen.dart';
+import '../../jurnal/screens/jurnal_backup_screen.dart';
+import '../../launch/screens/masuk_screen.dart';
 import '../../launch/screens/splash_screen.dart';
 import 'bantuan_krisis_screen.dart';
 import 'edit_profil_screen.dart';
@@ -70,7 +72,7 @@ class PengaturanScreen extends StatelessWidget {
                               subtitle: tertaut ? email : t.emailNotLinked,
                               onTap: () {
                                 if (!tertaut) {
-                                  buka(const DaftarScreen());
+                                  buka(const MasukScreen());
                                 } else {
                                   // Sudah tertaut — belum ada layar "kelola akun"
                                   // di desain, jadi cukup konfirmasi supaya tap
@@ -83,6 +85,12 @@ class PengaturanScreen extends StatelessWidget {
                         ),
                         RiungMenuRow(leading: RiungMenuRow.iconBox(Icons.face_retouching_natural_rounded), title: t.changeNameAvatar, onTap: () => buka(const EditProfilScreen())),
                         RiungMenuRow(leading: RiungMenuRow.iconBox(Icons.lock_outline_rounded), title: t.journalLock, onTap: () => buka(const JurnalPinSettingScreen())),
+                        RiungMenuRow(
+                          leading: RiungMenuRow.iconBox(Icons.save_alt_rounded),
+                          title: context.s.journalBackup.title,
+                          subtitle: context.s.journalBackup.localOnly,
+                          onTap: () => buka(const JurnalBackupScreen()),
+                        ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
