@@ -80542,7 +80542,7 @@
             {
               "type": "frame",
               "id": "r4pZjT",
-              "name": "Icon C — Riung gathering (CHOSEN) 512",
+              "name": "Icon C — Riung gathering (lama)",
               "clip": true,
               "width": 512,
               "height": 512,
@@ -81705,6 +81705,178 @@
                       ]
                     }
                   ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ve0JD",
+          "name": "Icon D — Si Hakim close-up",
+          "clip": true,
+          "width": 512,
+          "height": 512,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated-139.png",
+            "mode": "cover"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "L1hhr",
+          "name": "Icon E — Si Hakim dalam lingkaran (CHOSEN)",
+          "clip": true,
+          "width": 512,
+          "height": 512,
+          "fill": {
+            "type": "mesh_gradient",
+            "enabled": true,
+            "columns": 3,
+            "rows": 3,
+            "colors": [
+              "#8E86C8",
+              "#9C95D0",
+              "#7FA3C9",
+              "#A497CF",
+              "#B7B9DE",
+              "#86ABBE",
+              "#E8A58A",
+              "#9DB8A8",
+              "#3E6B63"
+            ],
+            "points": [
+              [
+                0,
+                0
+              ],
+              [
+                0.5,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0.5,
+                0.5
+              ],
+              [
+                1,
+                0.5
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "Fuwro",
+              "x": 46,
+              "y": 46,
+              "name": "Halo",
+              "fill": "#FFFFFF00",
+              "width": 420,
+              "height": 420,
+              "stroke": "#FFFFFF66",
+              "strokeWidth": 3
+            },
+            {
+              "type": "ellipse",
+              "id": "u7mcw",
+              "x": 86,
+              "y": 86,
+              "name": "Orb",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FFFFFFB3",
+                    "position": 0
+                  },
+                  {
+                    "color": "#FFFFFF33",
+                    "position": 1
+                  }
+                ],
+                "center": {
+                  "x": 0.38,
+                  "y": 0.28
+                }
+              },
+              "width": 340,
+              "height": 340,
+              "stroke": "#FFFFFFF2",
+              "strokeWidth": 3,
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 20
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#1F2A2C33",
+                  "offset": {
+                    "x": 0,
+                    "y": 24
+                  },
+                  "blur": 48
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "P6EXA",
+              "x": 86,
+              "y": 86,
+              "name": "Si Hakim (klip lingkaran)",
+              "clip": true,
+              "width": 340,
+              "height": 340,
+              "cornerRadius": 170,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "r0ADf",
+                  "x": -45,
+                  "y": -50,
+                  "name": "Si Hakim",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "generated.webp",
+                    "mode": "cover"
+                  },
+                  "width": 430,
+                  "height": 430
                 }
               ]
             }
@@ -181837,6 +182009,273 @@
               "type": "ref",
               "ref": "Y21dYx",
               "name": "Lencana Pro"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "C6mmXe",
+      "x": 15220,
+      "y": 0,
+      "name": "Glass — Afirmasi · Kartu bagikan (opsi)",
+      "width": 1300,
+      "height": 640,
+      "fill": "#F6F1EC",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "VlfTi",
+          "x": 50,
+          "y": 60,
+          "name": "Opsi A · Mengintip",
+          "clip": true,
+          "width": 360,
+          "height": 520,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 160,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#FFD9CC",
+                "position": 0
+              },
+              {
+                "color": "#F7A58F",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 36,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "zkSTA",
+              "x": 28,
+              "y": 44,
+              "name": "Quote",
+              "fill": "#3B1F1A",
+              "content": "Aku tidak harus\nsempurna untuk\nberharga.",
+              "lineHeight": 1.12,
+              "fontFamily": "Plus Jakarta Sans",
+              "fontSize": 38,
+              "fontWeight": "800"
+            },
+            {
+              "id": "L3MHUJ",
+              "type": "ref",
+              "ref": "sys9h",
+              "name": "Monster",
+              "x": 92,
+              "y": 230,
+              "width": 400,
+              "height": 400
+            },
+            {
+              "type": "text",
+              "id": "A192K",
+              "x": 28,
+              "y": 476,
+              "name": "Via",
+              "fill": "#3B1F1A",
+              "content": "riung",
+              "fontFamily": "Plus Jakarta Sans",
+              "fontSize": 17,
+              "fontWeight": "800"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GIday",
+          "x": 470,
+          "y": 60,
+          "name": "Opsi B · Catatan tempel",
+          "clip": true,
+          "width": 360,
+          "height": 520,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#E3ECE6",
+                "position": 0
+              },
+              {
+                "color": "#F3E7DC",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 36,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "GzEJM",
+              "x": 34,
+              "y": 60,
+              "name": "Catatan",
+              "rotation": -3.0000000000000004,
+              "width": 286,
+              "height": 250,
+              "fill": "#FFF8E8",
+              "cornerRadius": 10,
+              "layout": "vertical",
+              "padding": 26,
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Nb59Y",
+                  "name": "Quote",
+                  "fill": "#2B3A3A",
+                  "content": "Aku tidak harus\nsempurna untuk\nberharga.",
+                  "lineHeight": 1.05,
+                  "fontFamily": "Caveat",
+                  "fontSize": 44,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "id": "T0wGc",
+              "type": "ref",
+              "ref": "sys9h",
+              "name": "Monster",
+              "x": 170,
+              "y": 290,
+              "width": 190,
+              "height": 190
+            },
+            {
+              "type": "text",
+              "id": "RqXz3",
+              "x": 28,
+              "y": 476,
+              "name": "Via",
+              "fill": "#2B3A3A",
+              "content": "riung",
+              "fontFamily": "Plus Jakarta Sans",
+              "fontSize": 17,
+              "fontWeight": "800"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "SDcYk",
+          "x": 890,
+          "y": 60,
+          "name": "Opsi C · Malam",
+          "clip": true,
+          "width": 360,
+          "height": 520,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#1C2240",
+                "position": 0
+              },
+              {
+                "color": "#3C3263",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 36,
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "dj4SG",
+              "x": 40,
+              "y": 240,
+              "name": "Cahaya",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#F7A58F66",
+                    "position": 0
+                  },
+                  {
+                    "color": "#F7A58F00",
+                    "position": 1
+                  }
+                ]
+              },
+              "width": 280,
+              "height": 280
+            },
+            {
+              "id": "O1vLEZ",
+              "type": "ref",
+              "ref": "sys9h",
+              "name": "Monster",
+              "x": 90,
+              "y": 260,
+              "width": 180,
+              "height": 180
+            },
+            {
+              "type": "text",
+              "id": "brNju",
+              "x": 28,
+              "y": 56,
+              "name": "Quote",
+              "fill": "#FBF3EA",
+              "textGrowth": "fixed-width",
+              "width": 304,
+              "content": "Aku tidak harus\nsempurna untuk\nberharga.",
+              "lineHeight": 1.18,
+              "textAlign": "center",
+              "fontFamily": "Plus Jakarta Sans",
+              "fontSize": 34,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "l5rmT",
+              "x": 28,
+              "y": 476,
+              "name": "Via",
+              "fill": "#FBF3EA",
+              "textGrowth": "fixed-width",
+              "width": 304,
+              "content": "riung",
+              "textAlign": "center",
+              "fontFamily": "Plus Jakarta Sans",
+              "fontSize": 17,
+              "fontWeight": "800"
             }
           ]
         }
