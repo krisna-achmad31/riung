@@ -26,12 +26,22 @@ class _AfirmasiBagikanScreenState extends State<AfirmasiBagikanScreen> {
   bool _busy = false;
   AfirmasiShareStyle _style = AfirmasiShareStyle.mengintip;
 
+  Future<Uint8List?> _captureStory() => CardImageExporter.capture(
+    _cardKey,
+    storyBackground: switch (_style) {
+      AfirmasiShareStyle.mengintip =>
+        AppColors.monsterLembut[widget.monsterId] ?? AppColors.kabutSage,
+      AfirmasiShareStyle.catatan => AppColors.kartuBagikanMintAkhir,
+      AfirmasiShareStyle.malam => AppColors.kartuBagikanMalamAkhir,
+    },
+  );
+
   Future<void> _simpanGambar() async {
     if (_busy) return;
     setState(() => _busy = true);
     final t = context.s.afirmasi;
     try {
-      final bytes = await CardImageExporter.capture(_cardKey);
+      final bytes = await _captureStory();
       if (bytes == null) throw Exception('render gagal');
       await CardImageExporter.saveToGallery(bytes, namePrefix: 'riung_afirmasi');
       if (!mounted) return;
@@ -49,7 +59,7 @@ class _AfirmasiBagikanScreenState extends State<AfirmasiBagikanScreen> {
     setState(() => _busy = true);
     final t = context.s.afirmasi;
     try {
-      final bytes = await CardImageExporter.capture(_cardKey);
+      final bytes = await _captureStory();
       if (bytes == null) throw Exception('render gagal');
       await CardImageExporter.share(bytes, namePrefix: 'riung_afirmasi', text: t.shareText(t.textOf(widget.card)));
     } catch (_) {

@@ -58,6 +58,7 @@ abstract class TidurStrings {
   String get reminderTitle;
   String get reminderIntro;
   String get targetKicker;
+  String get editTargetTime;
   String adjustMinutes(int delta);
   String remindBefore(int minutes);
   String get activeDays;
@@ -192,6 +193,8 @@ class TidurStringsId extends TidurStrings {
   String get reminderIntro => 'Riung bakal ngingetin kamu pelan-pelan, sekali aja, tanpa nada bersalah kalau kamu lewatkan.';
   @override
   String get targetKicker => 'TARGET MULAI TIDUR';
+  @override
+  String get editTargetTime => 'Ketuk jam untuk mengedit';
   @override
   String adjustMinutes(int delta) => '${delta > 0 ? '+' : ''}$delta mnt';
   @override
@@ -341,6 +344,8 @@ class TidurStringsEn extends TidurStrings {
   String get reminderIntro => 'Riung will remind you gently, just once, with no guilt if you miss it.';
   @override
   String get targetKicker => 'BEDTIME TARGET';
+  @override
+  String get editTargetTime => 'Tap the time to edit';
   @override
   String adjustMinutes(int delta) => '${delta > 0 ? '+' : ''}$delta min';
   @override

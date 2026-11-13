@@ -111,8 +111,6 @@ abstract class KenaliStrings {
   // ── Brankas: tab Pikiran / Kebiasaan ────────────────────────────────
   String tabPikiran(int n);
   String tabKebiasaan(int n);
-  String pikiranSub(int tamed, int totalMonsters);
-  String habitSub(int awake, int total, int tamed);
   String spotlightKicker(int percent);
   String wokeFrom(String monsterId);
   String spotlightProgress(int percent, int done, int total);
@@ -642,10 +640,6 @@ class KenaliStringsId extends KenaliStrings {
   @override
   String tabKebiasaan(int n) => 'Kebiasaan · $n';
   @override
-  String pikiranSub(int tamed, int totalMonsters) => '$tamed dari 7 sudah jinak · $totalMonsters monster';
-  @override
-  String habitSub(int awake, int total, int tamed) => '$awake dari $total sudah bangun · $tamed jinak';
-  @override
   String spotlightKicker(int percent) => 'BARU BANGUN · $percent%';
   @override
   String wokeFrom(String monsterId) => 'Bangun dari ${quizName(monsterId)}.';
@@ -998,10 +992,6 @@ class KenaliStringsEn extends KenaliStrings {
   String tabPikiran(int n) => 'Thoughts · $n';
   @override
   String tabKebiasaan(int n) => 'Habits · $n';
-  @override
-  String pikiranSub(int tamed, int totalMonsters) => '$tamed of 7 tamed · $totalMonsters monsters';
-  @override
-  String habitSub(int awake, int total, int tamed) => '$awake of $total awake · $tamed tamed';
   @override
   String spotlightKicker(int percent) => 'JUST WOKE · $percent%';
   @override

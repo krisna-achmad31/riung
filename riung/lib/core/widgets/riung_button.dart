@@ -28,7 +28,8 @@ class RiungButton extends StatelessWidget {
     required this.onPressed,
     this.variant = RiungButtonVariant.primary,
     this.icon,
-  });
+    this.leading,
+  }) : assert(icon == null || leading == null);
 
   final String label;
   final VoidCallback? onPressed;
@@ -36,6 +37,9 @@ class RiungButton extends StatelessWidget {
 
   /// Ikon opsional di kiri label.
   final IconData? icon;
+
+  /// Widget opsional di kiri label, sebagai alternatif [icon].
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -94,8 +98,8 @@ class RiungButton extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (icon != null) ...[
-                      Icon(icon, size: 18, color: textColor),
+                    if (leading != null || icon != null) ...[
+                      leading ?? Icon(icon, size: 18, color: textColor),
                       const SizedBox(width: 8),
                     ],
                     Flexible(

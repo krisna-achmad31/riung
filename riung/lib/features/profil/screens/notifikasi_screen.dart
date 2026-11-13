@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/services/afirmasi_reminder.dart';
 import '../../../core/services/services.dart';
+import '../../../core/services/sleep_reminder.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../tidur/screens/tidur_pengingat_screen.dart';
+
+const _sleepKey = 'pengingat_tidur';
 
 class _NotifSetting {
   const _NotifSetting(this.key, this.defaultOn);
@@ -16,7 +20,7 @@ class _NotifSetting {
 const _settings = [
   _NotifSetting('checkin_pagi', true),
   _NotifSetting('afirmasi_harian', true),
-  _NotifSetting('pengingat_tidur', true),
+  _NotifSetting(_sleepKey, false),
   _NotifSetting('tiket_serangan', false),
   _NotifSetting('kabar_riung', false),
 ];
@@ -27,8 +31,6 @@ const _settings = [
       return (t.notifCheckinTitle, t.notifCheckinSub);
     case 'afirmasi_harian':
       return (t.notifAffirmationTitle, t.notifAffirmationSub);
-    case 'pengingat_tidur':
-      return (t.notifSleepTitle, t.notifSleepSub);
     case 'tiket_serangan':
       return (t.notifTicketTitle, t.notifTicketSub);
     default:
@@ -49,18 +51,22 @@ class NotifikasiScreen extends StatefulWidget {
 
 class _NotifikasiScreenState extends State<NotifikasiScreen> {
   late Map<String, bool> _state;
+  bool _updatingSleep = false;
 
   @override
   void initState() {
     super.initState();
     final saved = AppScope.of(context).prefs.notifSettingsJson;
-    _state = {for (final s in _settings) s.key: saved[s.key] as bool? ?? s.defaultOn};
+    _state = {
+      for (final s in _settings)
+        if (s.key != _sleepKey) s.key: saved[s.key] as bool? ?? s.defaultOn,
+    };
   }
 
   void _ubah(String key, bool value) {
     setState(() => _state[key] = value);
-    AppScope.of(context).prefs.setNotifSettingsJson(_state);
     final scope = AppScope.of(context);
+    scope.prefs.setNotifSettingsJson({...scope.prefs.notifSettingsJson, ..._state});
     if (key == 'afirmasi_harian') {
       AfirmasiReminder.refresh(
         prefs: scope.prefs,
@@ -84,9 +90,43 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
     }
   }
 
+  Future<void> _openSleepSchedule() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const TidurPengingatScreen()),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _toggleSleep(bool enabled) async {
+    final scope = AppScope.of(context);
+    final settings = scope.prefs.sleepReminder;
+    if (enabled && settings.days.isEmpty) {
+      await _openSleepSchedule();
+      return;
+    }
+
+    setState(() => _updatingSleep = true);
+    try {
+      await scope.prefs.setSleepReminder(settings.copyWith(enabled: enabled));
+      await SleepReminder.refresh(
+        prefs: scope.prefs,
+        strings: scope.language.strings.notif,
+        userName: scope.auth.profile?.displayName,
+      );
+    } finally {
+      if (mounted) setState(() => _updatingSleep = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.s.profil;
+    final sleep = AppScope.of(context).prefs.sleepReminder;
+    final sleepEnabled = sleep.enabled && sleep.days.isNotEmpty;
+    final sleepTime = TimeOfDay(
+      hour: sleep.notifyMinutes ~/ 60,
+      minute: sleep.notifyMinutes % 60,
+    );
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -101,15 +141,29 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
                     RiungMenuGroup(
                       children: [
                         for (final setting in _settings)
-                          RiungMenuRow(
-                            leading: RiungIcon3D(_iconFor(setting.key), size: 38),
-                            title: _textFor(t, setting.key).$1,
-                            subtitle: _textFor(t, setting.key).$2,
-                            trailing: Switch(
-                              value: _state[setting.key] ?? setting.defaultOn,
-                              onChanged: (v) => _ubah(setting.key, v),
+                          if (setting.key == _sleepKey)
+                            RiungMenuRow(
+                              leading: const RiungIcon3D(RiungIcon.tidur, size: 38),
+                              title: t.notifSleepTitle,
+                              subtitle: t.notifSleepSchedule(
+                                sleepEnabled ? sleepTime.format(context) : null,
+                              ),
+                              onTap: _updatingSleep ? null : _openSleepSchedule,
+                              trailing: Switch(
+                                value: sleepEnabled,
+                                onChanged: _updatingSleep ? null : _toggleSleep,
+                              ),
+                            )
+                          else
+                            RiungMenuRow(
+                              leading: RiungIcon3D(_iconFor(setting.key), size: 38),
+                              title: _textFor(t, setting.key).$1,
+                              subtitle: _textFor(t, setting.key).$2,
+                              trailing: Switch(
+                                value: _state[setting.key] ?? setting.defaultOn,
+                                onChanged: (v) => _ubah(setting.key, v),
+                              ),
                             ),
-                          ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -143,7 +197,6 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
 RiungIcon _iconFor(String key) => switch (key) {
       'checkin_pagi' => RiungIcon.checkin,
       'afirmasi_harian' => RiungIcon.afirmasi,
-      'pengingat_tidur' => RiungIcon.tidur,
       'tiket_serangan' => RiungIcon.tiket,
       _ => RiungIcon.beranda,
     };

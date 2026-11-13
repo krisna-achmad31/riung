@@ -175,6 +175,12 @@ class LocalPrefsStore {
       _prefs.setString(_kLanguageCode, value);
 
   String? get userId => _prefs.getString(_kUserId);
+  DateTime? journalBackupSavedAt(String uid) => DateTime.tryParse(
+    _prefs.getString('riung_journal_backup_saved_at_$uid') ?? '',
+  );
+
+  Future<bool> setJournalBackupSavedAt(String uid, DateTime value) =>
+      _prefs.setString('riung_journal_backup_saved_at_$uid', value.toIso8601String());
   Future<void> setUserId(String value) => _prefs.setString(_kUserId, value);
 
   bool get onboardingDone => _prefs.getBool(_u(_kOnboardingDone)) ?? false;

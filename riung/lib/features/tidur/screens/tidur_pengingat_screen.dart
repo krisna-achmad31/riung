@@ -19,6 +19,8 @@ class TidurPengingatScreen extends StatefulWidget {
 }
 
 class _TidurPengingatScreenState extends State<TidurPengingatScreen> {
+  static const _stepMinutes = 5;
+
   late int _targetMinutes;
   late bool _aktif;
   late Set<int> _activeDays;
@@ -36,6 +38,23 @@ class _TidurPengingatScreenState extends State<TidurPengingatScreen> {
 
   void _adjust(int minutes) {
     setState(() => _targetMinutes = (_targetMinutes + minutes + 1440) % 1440);
+  }
+
+  Future<void> _editTargetTime() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: _targetMinutes ~/ 60,
+        minute: _targetMinutes % 60,
+      ),
+      initialEntryMode: TimePickerEntryMode.input,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (!mounted || time == null) return;
+    setState(() => _targetMinutes = time.hour * 60 + time.minute);
   }
 
   Future<void> _simpan() async {
@@ -82,13 +101,41 @@ class _TidurPengingatScreenState extends State<TidurPengingatScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                RiungGlassIconButton(icon: Icons.remove_rounded, night: true, semanticLabel: t.adjustMinutes(-15), onTap: () => _adjust(-15)),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: Text(time, style: AppTextStyles.display.copyWith(fontSize: 52, height: 1.15, color: AppNight.teks)),
+                                RiungGlassIconButton(
+                                  icon: Icons.remove_rounded,
+                                  night: true,
+                                  semanticLabel: t.adjustMinutes(-_stepMinutes),
+                                  onTap: () => _adjust(-_stepMinutes),
                                 ),
-                                RiungGlassIconButton(icon: Icons.add_rounded, night: true, semanticLabel: t.adjustMinutes(15), onTap: () => _adjust(15)),
+                                Flexible(
+                                  child: TextButton(
+                                    onPressed: _editTargetTime,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        time,
+                                        style: AppTextStyles.display.copyWith(
+                                          fontSize: 52,
+                                          height: 1.15,
+                                          color: AppNight.teks,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                RiungGlassIconButton(
+                                  icon: Icons.add_rounded,
+                                  night: true,
+                                  semanticLabel: t.adjustMinutes(_stepMinutes),
+                                  onTap: () => _adjust(_stepMinutes),
+                                ),
                               ],
+                            ),
+                            Text(
+                              t.editTargetTime,
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppNight.teksSekunder,
+                              ),
                             ),
                           ],
                         ),

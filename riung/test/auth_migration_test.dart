@@ -145,6 +145,10 @@ class _FakeUserRepository implements UserRepository {
   @override
   Future<List<JournalEntry>> getJournalEntries(String uid) async => const [];
   @override
+  Future<int> journalEntryCount(String uid) async => 0;
+  @override
+  Future<int> restoreJournalEntries(String uid, List<JournalEntry> entries) async => 0;
+  @override
   Future<JournalEntry> saveJournalEntry(String uid, JournalEntry entry) async => entry;
   @override
   Future<int> journalEntryCountForDate(String uid, DateTime date) async => 0;

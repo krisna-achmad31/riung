@@ -13,6 +13,20 @@ import 'package:riung/main.dart';
 import 'package:riung/core/models/user_profile.dart';
 import 'package:riung/features/onboarding/widgets/question_step.dart';
 import 'package:riung/features/onboarding/widgets/assessment_pending_card.dart';
+import 'package:riung/features/launch/screens/masuk_screen.dart';
+import 'package:riung/features/jurnal/screens/jurnal_backup_screen.dart';
+import 'package:riung/core/services/jurnal_pin_service.dart';
+
+class _GuestJournalRepository extends LocalUserRepository {
+  _GuestJournalRepository({
+    required super.prefs,
+    required super.db,
+    required super.crypto,
+  });
+
+  @override
+  Future<int> journalEntryCount(String uid) async => uid == 'guest' ? 2 : 0;
+}
 
 class _Auth implements AuthService {
   _Auth(this.uid);
@@ -52,6 +66,144 @@ class _Auth implements AuthService {
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('backup labels stay visible and password requires four types', (tester) async {
+    tester.view.physicalSize = const Size(430, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    Future<void> pumpDialog() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    SharedPreferences.setMockInitialValues({});
+    await JurnalPinService().setPin('guest', '123456');
+    final prefs = await LocalPrefsStore.init();
+    final repository = _GuestJournalRepository(
+      prefs: prefs,
+      db: LocalDatabaseService(),
+      crypto: JournalCryptoService(),
+    );
+    final service = _Auth('guest');
+    addTearDown(service.changes.close);
+    await tester.pumpWidget(
+      RiungApp(
+        prefs: prefs,
+        remoteConfig: RemoteConfigService(),
+        authService: service,
+        userRepository: repository,
+        contentRepository: StubContentRepository(),
+        walletFunctions: LocalWalletFunctionsService(
+          prefs: prefs,
+          userRepository: repository,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    final navigator = tester.state<NavigatorState>(find.byType(Navigator).first);
+    navigator.push(MaterialPageRoute<void>(builder: (_) => const JurnalBackupScreen()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Buat cadangan'));
+    await pumpDialog();
+    for (final digit in '123456'.split('')) {
+      await tester.tap(find.text(digit));
+      await tester.pump();
+    }
+    await pumpDialog();
+    expect(find.text('Kata sandi cadangan'), findsOneWidget);
+    expect(find.text('Ulangi kata sandi'), findsOneWidget);
+    final fields = find.byType(TextField);
+    final decorations = tester.widgetList<TextField>(fields).map((field) => field.decoration);
+    expect(decorations.map((decoration) => decoration?.enabledBorder),
+        everyElement(isA<OutlineInputBorder>()));
+    expect(tester.getBottomLeft(find.text('Kata sandi cadangan')).dy,
+        lessThan(tester.getTopLeft(fields.first).dy));
+    expect(tester.getBottomLeft(find.text('Ulangi kata sandi')).dy,
+        lessThan(tester.getTopLeft(fields.last).dy));
+    await tester.tap(find.byTooltip('Tampilkan kata sandi').first);
+    await tester.pump();
+    expect(tester.widget<TextField>(fields.first).obscureText, isFalse);
+    expect(tester.widget<TextField>(fields.last).obscureText, isTrue);
+    await tester.tap(find.byTooltip('Sembunyikan kata sandi'));
+    await tester.pump();
+    expect(tester.widget<TextField>(fields.first).obscureText, isTrue);
+
+    await tester.enterText(fields.first, 'Aa1!');
+    await tester.enterText(fields.last, 'Aa1!');
+    await tester.tap(find.text('Lanjut'));
+    await pumpDialog();
+    expect(find.text('Gunakan minimal 6 karakter.'), findsOneWidget);
+
+    await tester.enterText(fields.first, 'Abc123');
+    await tester.enterText(fields.last, 'Abc123');
+    await tester.tap(find.text('Lanjut'));
+    await pumpDialog();
+    expect(find.text('Sertakan huruf kecil, huruf besar, angka, dan simbol.'), findsOneWidget);
+
+    await tester.enterText(fields.first, 'Aa1!bc');
+    await tester.tap(find.text('Lanjut'));
+    await pumpDialog();
+    expect(find.text('Kata sandinya berbeda.'), findsOneWidget);
+    expect(find.text('Gunakan minimal 6 karakter.'), findsNothing);
+  });
+  testWidgets('guest can cancel or explicitly continue signing in', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await LocalPrefsStore.init();
+    final repository = _GuestJournalRepository(
+      prefs: prefs,
+      db: LocalDatabaseService(),
+      crypto: JournalCryptoService(),
+    );
+    final service = _Auth('guest');
+    addTearDown(service.changes.close);
+    await tester.pumpWidget(
+      RiungApp(
+        prefs: prefs,
+        remoteConfig: RemoteConfigService(),
+        authService: service,
+        userRepository: repository,
+        contentRepository: StubContentRepository(),
+        walletFunctions: LocalWalletFunctionsService(
+          prefs: prefs,
+          userRepository: repository,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    final navigator = tester.state<NavigatorState>(find.byType(Navigator).first);
+    navigator.push(MaterialPageRoute<void>(builder: (_) => const MasukScreen()));
+    await tester.pumpAndSettle();
+
+    final google = find.text('Lanjutkan dengan Google');
+    await tester.scrollUntilVisible(
+      google,
+      120,
+      scrollable: find.descendant(
+        of: find.byType(MasukScreen),
+        matching: find.byType(Scrollable),
+      ).first,
+    );
+    await tester.tap(google);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Ada 2 entri jurnal tamu'), findsOneWidget);
+    expect(find.text('Cadangkan dulu'), findsOneWidget);
+    expect(service.uid, 'guest');
+
+    await tester.tap(find.text('Batal'));
+    await tester.pumpAndSettle();
+    expect(service.uid, 'guest');
+    expect(find.byType(MasukScreen), findsOneWidget);
+
+    await tester.tap(google);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Lanjut masuk'));
+    await tester.pumpAndSettle();
+    expect(service.uid, 'account');
+  });
   testWidgets(
     'signed-in account with no onboarding shows setup, not a sign-in prompt',
     (tester) async {

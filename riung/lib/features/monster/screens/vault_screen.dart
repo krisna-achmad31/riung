@@ -9,7 +9,6 @@ import '../../../core/widgets/widgets.dart';
 import '../../betterme/screens/betterme_home_screen.dart';
 import '../../minigame/screens/minigame_intro_screen.dart';
 import '../../kenali_dirimu/logic/kenali_progress.dart';
-import '../logic/habit_monsters.dart';
 import '../widgets/habit_vault_tab.dart';
 import 'hakim_detail_screen.dart';
 import 'saboteur_detail_screen.dart';
@@ -81,11 +80,11 @@ class _VaultScreenState extends State<VaultScreen> {
     final k = context.s.kenali;
     final pikiranCount = saboteurs.length;
     final habitCount = KenaliDirimuConfig.habitMonsters.length;
-    final tamedPikiran = scope.monsterProgress.all.values
+    final tamedPikiran = saboteurs
         .where(
-          (m) =>
-              m.state == MonsterState.tamed &&
-              !HabitMonsters.isHabit(m.saboteurId),
+          (monster) =>
+              scope.monsterProgress.progressOf(monster.id)?.state ==
+              MonsterState.tamed,
         )
         .length;
 
@@ -109,39 +108,17 @@ class _VaultScreenState extends State<VaultScreen> {
               const SizedBox(width: AppSpacing.md),
             ],
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      t.vaultTitle,
-                      maxLines: 1,
-                      style: AppTextStyles.display.copyWith(
-                        fontSize: 30,
-                        height: 1.2,
-                      ),
-                    ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  t.vaultTitle,
+                  maxLines: 1,
+                  style: AppTextStyles.display.copyWith(
+                    fontSize: 30,
+                    height: 1.2,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _tab == 0 &&
-                            scope.auth.profile?.assessmentCompletedAt == null
-                        ? context.s.onboarding.pendingTitle
-                        : _tab == 0
-                        ? k.pikiranSub(tamedPikiran, pikiranCount + habitCount)
-                        : k.habitSub(
-                            _awakeHabits,
-                            habitCount,
-                            _tamedHabits(scope),
-                          ),
-                    style: AppTextStyles.caption.copyWith(
-                      fontSize: 13,
-                      color: AppColors.teksSekunder,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.md),
@@ -149,6 +126,16 @@ class _VaultScreenState extends State<VaultScreen> {
             const SizedBox(width: 8),
             KoinChip(balance: scope.wallet.coins),
           ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _tab == 0
+              ? t.vaultSub(tamedPikiran, pikiranCount)
+              : t.vaultSub(_tamedHabits(scope), habitCount),
+          style: AppTextStyles.caption.copyWith(
+            fontSize: 13,
+            color: AppColors.teksSekunder,
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         RiungSegmentedTabs(
@@ -202,9 +189,6 @@ class _VaultScreenState extends State<VaultScreen> {
       ],
     );
   }
-
-  int get _awakeHabits =>
-      KenaliDirimuConfig.habitMonsters.where(KenaliProgress.isAwake).length;
 
   int _tamedHabits(AppScope scope) => KenaliDirimuConfig.habitMonsters
       .where(

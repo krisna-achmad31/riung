@@ -181,7 +181,7 @@ abstract class ProfilStrings {
   String get notifAffirmationTitle;
   String get notifAffirmationSub;
   String get notifSleepTitle;
-  String get notifSleepSub;
+  String notifSleepSchedule(String? time);
   String get notifTicketTitle;
   String get notifTicketSub;
   String get notifNewsTitle;
@@ -252,7 +252,7 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get emailTitle => 'Email';
   @override
-  String get emailNotLinked => 'Belum terhubung, ketuk buat daftar';
+  String get emailNotLinked => 'Belum terhubung, ketuk untuk masuk';
   @override
   String alreadySignedIn(String email) => 'Kamu sudah masuk dengan $email';
   @override
@@ -532,7 +532,8 @@ class ProfilStringsId extends ProfilStrings {
   @override
   String get notifSleepTitle => 'Pengingat tidur';
   @override
-  String get notifSleepSub => '30 menit sebelum jam tidurmu';
+  String notifSleepSchedule(String? time) =>
+      time == null ? 'Atur jam dan hari' : '$time · Atur jam dan hari';
   @override
   String get notifTicketTitle => 'Tiket serangan';
   @override
@@ -608,7 +609,7 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get emailTitle => 'Email';
   @override
-  String get emailNotLinked => 'Not linked yet, tap to sign up';
+  String get emailNotLinked => 'Not linked yet, tap to sign in';
   @override
   String alreadySignedIn(String email) => 'You are already signed in as $email';
   @override
@@ -888,7 +889,8 @@ class ProfilStringsEn extends ProfilStrings {
   @override
   String get notifSleepTitle => 'Sleep reminder';
   @override
-  String get notifSleepSub => '30 minutes before your bedtime';
+  String notifSleepSchedule(String? time) =>
+      time == null ? 'Set time and days' : '$time · Set time and days';
   @override
   String get notifTicketTitle => 'Attack ticket';
   @override

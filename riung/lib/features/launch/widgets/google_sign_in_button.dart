@@ -17,7 +17,12 @@ class GoogleSignInButton extends StatelessWidget {
     return RiungButton(
       label: context.s.launch.continueWithGoogle,
       variant: RiungButtonVariant.secondary,
-      icon: Icons.g_mobiledata_rounded,
+      leading: Image.asset(
+        'assets/icons/google_g.png',
+        width: 18,
+        height: 18,
+        excludeFromSemantics: true,
+      ),
       onPressed: onPressed,
     );
   }

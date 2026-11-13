@@ -11,7 +11,7 @@ import '../../tidur/screens/tidur_list_screen.dart';
 /// Tab "Jelajah" — pusat 4 latihan pilihan (Meditasi/Tidur/Jurnal/Afirmasi)
 /// di balik satu TabBar, supaya semuanya bisa dicapai dari navigasi bawah
 /// (M4: "navbar bottom harus terhubung penuh"). Layar M3 di bawahnya dipakai
-/// apa adanya sebagai isi tiap tab.
+/// sebagai isi tiap tab tanpa tombol kembali di header.
 class JelajahScreen extends StatefulWidget {
   const JelajahScreen({super.key});
 
@@ -54,7 +54,12 @@ class _JelajahScreenState extends State<JelajahScreen> with SingleTickerProvider
               Expanded(
                 child: TabBarView(
                   controller: _controller,
-                  children: const [MeditasiListScreen(), TidurListScreen(), JurnalHomeScreen(), AfirmasiKategoriScreen()],
+                  children: const [
+                    MeditasiListScreen(embedded: true),
+                    TidurListScreen(embedded: true),
+                    JurnalHomeScreen(embedded: true),
+                    AfirmasiKategoriScreen(embedded: true),
+                  ],
                 ),
               ),
             ],
