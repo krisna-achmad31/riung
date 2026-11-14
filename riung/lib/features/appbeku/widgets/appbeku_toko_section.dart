@@ -5,6 +5,8 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../../core/config/economy.dart';
+import '../../checkin/screens/checkin_mood_screen.dart';
 import '../../toko/screens/koin_kurang_screen.dart';
 import '../../toko/widgets/koin_price_pill.dart';
 import '../../toko/widgets/konfirmasi_pembelian_sheet.dart';
@@ -69,7 +71,7 @@ class AppBekuTokoSection extends StatelessWidget {
     final charged = scope.appBeku.effectiveUnlockPrice(price);
     if (!_boleh(context, charged)) return;
     final label = t.appbeku.itemMinutes(minutes, entry.name);
-    final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: label, price: charged);
+    final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: label, price: charged, cooldownSeconds: EconomyScroll.unlockCooldownSeconds);
     if (!konfirmasi || !context.mounted) return;
     final result = await scope.appBeku.unlockMinutes(wallet: wallet, packageName: packageName, minutes: minutes, price: price);
     if (!context.mounted) return;
@@ -91,7 +93,15 @@ class AppBekuTokoSection extends StatelessWidget {
       return false;
     }
     if (scope.wallet.earnedCoins < charged) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.appbeku.notEnoughEarnedCoins)));
+      // Koin total cukup tapi sebagian koin beli (tidak boleh dipakai di
+      // sini) — tetap tawarkan latihan dulu, bukan jalan buntu.
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(t.appbeku.notEnoughEarnedCoins),
+        action: SnackBarAction(
+          label: t.toko.startCheckin(scope.remoteConfig.earnCheckinHarian),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CheckInMoodScreen())),
+        ),
+      ));
       return false;
     }
     return true;
@@ -122,7 +132,7 @@ class AppBekuTokoSection extends StatelessWidget {
     final wallet = scope.wallet;
     final charged = scope.appBeku.effectiveUnlockPrice(price);
     if (!_boleh(context, charged)) return;
-    final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: t.appbeku.itemRelaxed, price: charged);
+    final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: t.appbeku.itemRelaxed, price: charged, cooldownSeconds: EconomyScroll.unlockCooldownSeconds);
     if (!konfirmasi || !context.mounted) return;
     final result = await scope.appBeku.unlockBundle(wallet: wallet, bundleId: 'santai', price: price);
     if (!context.mounted) return;
@@ -146,7 +156,7 @@ class AppBekuTokoSection extends StatelessWidget {
     final wallet = scope.wallet;
     final charged = scope.appBeku.effectiveUnlockPrice(price);
     if (!_boleh(context, charged)) return;
-    final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: t.appbeku.itemAllSocial, price: charged);
+    final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: t.appbeku.itemAllSocial, price: charged, cooldownSeconds: EconomyScroll.unlockCooldownSeconds);
     if (!konfirmasi || !context.mounted) return;
     final result = await scope.appBeku.unlockBundle(wallet: wallet, bundleId: 'sosmed', price: price, appIds: sosmedAktif.map((a) => a.packageName).toList());
     if (!context.mounted) return;

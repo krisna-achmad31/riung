@@ -9,6 +9,7 @@ import '../../home/screens/root_shell_screen.dart';
 import '../../jurnal/screens/jurnal_home_screen.dart';
 import '../../meditasi/logic/meditation_catalog.dart';
 import '../../meditasi/screens/meditasi_detail_screen.dart';
+import '../../profil/widgets/bantuan_krisis_link.dart';
 import '../logic/checkin_draft.dart';
 
 /// Hasil check-in — perayaan hangat + saran. Implement persis
@@ -98,6 +99,7 @@ class CheckInHasilScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               RiungButton(label: t.startMyDay, onPressed: () => _mulaiHariku(context)),
+              const BantuanKrisisLink(),
             ],
           ),
         ),

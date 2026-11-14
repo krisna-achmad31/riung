@@ -4,7 +4,9 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
-import '../widgets/paid_unlock_button.dart';
+import '../../../core/config/economy.dart';
+import '../../checkin/screens/checkin_mood_screen.dart';
+import '../widgets/cooldown_paid_unlock_button.dart';
 
 /// Setelah napas selesai, tanpa rasa bersalah apa pun jawabannya.
 /// Implement persis `design/AppBeku.dc.html` § "Setelah napas".
@@ -28,9 +30,19 @@ class AppBekuPostBreathingScreen extends StatelessWidget {
       Navigator.of(context).popUntil((r) => r.isFirst);
       if (fromLock) await scope.appBeku.moveToBack();
     } else {
-      final t = scope.language.strings.appbeku;
+      final s = scope.language.strings;
+      final kurang = result == UnlockResult.notEnoughEarnedCoins;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result == UnlockResult.dailyCapReached ? t.unlockCapReached : t.notEnoughEarnedCoins)),
+        SnackBar(
+          content: Text(kurang ? s.appbeku.notEnoughEarnedCoins : s.appbeku.unlockCapReached),
+          // Garis etis: koin kurang selalu menawarkan latihan dulu.
+          action: kurang
+              ? SnackBarAction(
+                  label: s.toko.startCheckin(scope.remoteConfig.earnCheckinHarian),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CheckInMoodScreen())),
+                )
+              : null,
+        ),
       );
     }
   }
@@ -38,7 +50,8 @@ class AppBekuPostBreathingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.s.appbeku;
-    final entry = AppScope.of(context).appBeku.entryFor(packageName);
+    final appBeku = AppScope.of(context).appBeku;
+    final entry = appBeku.entryFor(packageName);
     final rc = AppScope.of(context).remoteConfig;
     return Scaffold(
       body: SafeArea(
@@ -77,12 +90,27 @@ class AppBekuPostBreathingScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              RiungButton(label: t.closeApp(entry.name), onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
-              const SizedBox(height: 10),
-              PaidUnlockButton(
-                label: t.unlockShortCoins(AppScope.of(context).appBeku.effectiveUnlockPrice(rc.scrollUnlock10Menit)),
-                onTap: () => _bukaLagi(context),
+              RiungButton(
+                label: t.closeApp(entry.name),
+                onPressed: () async {
+                  Navigator.of(context).popUntil((r) => r.isFirst);
+                  if (fromLock) await appBeku.moveToBack();
+                },
               ),
+              const SizedBox(height: 10),
+              if (appBeku.paidUnlockCapReached)
+                Text(t.unlockCapReached, textAlign: TextAlign.center, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.5, color: AppColors.teksSekunder))
+              else ...[
+                CooldownPaidUnlockButton(
+                  label: t.unlockShortCoins(appBeku.effectiveUnlockPrice(rc.scrollUnlock10Menit)),
+                  onTap: () => _bukaLagi(context),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  t.unlocksLeftToday((EconomyScroll.maxPaidUnlocksPerDay - appBeku.paidUnlocksToday).clamp(0, EconomyScroll.maxPaidUnlocksPerDay)),
+                  style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.teksRedup),
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               Text(t.noWrongAnswer, style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.teksRedup)),
             ],

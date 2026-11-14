@@ -16,6 +16,12 @@ Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml
 
 ======
 
+14/11/2026 (1.2.2+13)
+AY
+1. FIX: Aplikasi Beku — tombol buka-berbayar di layar "Setelah napas" dan sheet konfirmasi Toko § Buka Waktu Scroll kini menunggu jeda 60 dtk, menahan ketuk-ganda, dan menampilkan sisa jatah/batas harian.
+2. FIX: Aplikasi Beku — koin latihan kurang (koin beli cukup) kini menawarkan check-in, bukan jalan buntu; "Tutup aplikasi" dari layar kunci benar-benar keluar dari aplikasi.
+3. ADD: Tautan "Butuh bantuan sekarang" ke layar krisis di hasil check-in dan simpan jurnal.
+
 13/11/2026 (1.2.1+12)
 AY
 1. UPDATE: Update the Riung design source in design/riung.pen.

@@ -4,6 +4,7 @@ import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../profil/widgets/bantuan_krisis_link.dart';
 import '../logic/journal_prompts.dart';
 
 /// Entri tersimpan — ringkasan reward. Implement persis
@@ -73,6 +74,7 @@ class JurnalSimpanScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               RiungButton(label: t.backToJournal, onPressed: () => Navigator.of(context).pop(true)),
+              const BantuanKrisisLink(),
             ],
           ),
         ),

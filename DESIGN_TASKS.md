@@ -27,4 +27,10 @@ Format tugas baru:
 
 ---
 
-Belum ada tugas.
+## DES-001 — Tautan bantuan krisis di check-in & jurnal
+- **Status:** TODO
+- **Prioritas:** P1
+- **Diminta:** 14/11/2026 (AY, QA)
+- **Latar belakang:** Aturan etis: layar krisis selalu bisa diakses. Kode sudah menambah tautan teks "Butuh bantuan sekarang" (`BantuanKrisisLink`) di bawah tombol utama Hasil check-in dan Simpan jurnal, tapi belum ada di desain.
+- **Kriteria selesai:** frame `Glass — Checkin · Hasil` dan `Glass — Jurnal · Simpan` memuat tautan krisis (posisi, ikon, warna); putuskan perlu juga di Beranda atau tidak.
+- **Hasil:** -
