@@ -7,6 +7,7 @@ import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../monster/screens/monster_tamed_celebration_screen.dart';
+import 'minigame_daily_cap_screen.dart';
 import 'minigame_intro_screen.dart';
 
 /// Serangan berhasil. Implement persis `design/Monster.dc.html` § Menang.
@@ -90,10 +91,17 @@ class MinigameWinScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              RiungButton(
-                label: t.attackAgain,
-                onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: saboteur))),
-              ),
+              // Tiket 0 / batas harian: arahkan ke layar tiket habis, bukan "coba lagi".
+              if (scope.wallet.tickets > 0 && !scope.wallet.dailyFightCapReached)
+                RiungButton(
+                  label: t.attackAgain,
+                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: saboteur))),
+                )
+              else
+                RiungButton(
+                  label: t.capTitle,
+                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MinigameDailyCapScreen())),
+                ),
               const SizedBox(height: 10),
               RiungButton(
                 label: t.enoughBack,

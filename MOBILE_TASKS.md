@@ -64,3 +64,57 @@ Format tugas baru:
 - **Terhambat oleh:** BE-003 di `BACKEND_TASKS.md`.
 - **Kriteria selesai:** pembelian koin, langganan, dan pulihkan pembelian lolos di sandbox iPhone.
 - **Commit/PR:** -
+
+## MOB-005 — Konsistenkan gerbang Premium BetterMe, Kenali, Kepribadian
+
+- **Status:** TODO
+- **Prioritas:** P1
+- **Diminta:** 15/11/2026 (QA)
+- **Latar belakang:** BetterMe: level_intro/sesi_detail/sesi_content tanpa cek Premium; saboteur_detail:49 & hakim_detail:175 selalu push level 1. Kenali: hub tampil terbuka untuk hasil lama, quiz paywall; retake pushReplacement → hasil hilang. Kepribadian: tile terkunci tetap push quiz (hub:35).
+- **Kriteria selesai:** Semua pintu masuk konten Premium memakai satu cek; user gratis tidak masuk konten Premium lewat jalur samping; retake tidak menghapus hasil.
+- **Commit/PR:** -
+
+## MOB-006 — Sambungkan layar yatim Home & Tidur
+
+- **Status:** TODO
+- **Prioritas:** P2
+- **Diminta:** 15/11/2026 (QA)
+- **Latar belakang:** `beranda_tiket_serangan_screen.dart` & `tidur_laporan_pagi_screen.dart` ada di desain tapi tak pernah dibuka; `tryTonightStory` cuma maybePop.
+- **Kriteria selesai:** Kedua layar terjangkau sesuai alur `.dc.html`, atau dihapus bila desain berubah.
+- **Commit/PR:** -
+
+## MOB-007 — Tombol Unduh & state offline meditasi/tidur
+
+- **Status:** TODO
+- **Prioritas:** P2
+- **Diminta:** 15/11/2026 (QA)
+- **Latar belakang:** Unduh (`meditasi_detail:71`, `tidur_detail:66`) cuma snackbar; error audio ditelan dan timer tetap jalan (`meditasi_player:54`, `tidur_player:55`).
+- **Kriteria selesai:** Unduh nyata atau tombol disembunyikan; layar "Meditasi offline" tampil saat audio gagal.
+- **Commit/PR:** -
+
+## MOB-008 — Rapikan navigasi pasca-sesi
+
+- **Status:** TODO
+- **Prioritas:** P2
+- **Diminta:** 15/11/2026 (QA)
+- **Latar belakang:** `meditasi_selesai:91` Ulangi balik ke Detail; `betterme_sesi_selesai:83` pop ganda; `betterme_milestone:106` popUntil(isFirst); `minigame_daily_cap:66` cara dapat tiket tak bisa ditap; `koin_kurang:120` pushReplacement hilangkan result; `focus_mode_entry:47` tanpa back.
+- **Kriteria selesai:** Tiap tombol mendarat di layar yang benar tanpa asumsi stack.
+- **Commit/PR:** -
+
+## MOB-009 — Error state & busy guard yang tersisa
+
+- **Status:** TODO
+- **Prioritas:** P2
+- **Diminta:** 15/11/2026 (QA)
+- **Latar belakang:** `lemari_screen:50` simpan loadout tanpa try/busy; pengingat afirmasi/tidur `_simpan` tanpa error; favorit afirmasi tanpa rollback; `laporan_screen:55` gagal Health Connect menimpa laporan; LOW lain di `docs/qa-report-2026-11.md`.
+- **Kriteria selesai:** Semua aksi tulis punya busy guard & pesan error; tes widget untuk yang P2.
+- **Commit/PR:** -
+
+## MOB-010 — Sapaan check-in saat nama kosong & hex literal
+
+- **Status:** TODO
+- **Prioritas:** P2
+- **Diminta:** 15/11/2026 (QA)
+- **Latar belakang:** "Pagi, . Gimana…" untuk user tanpa nama (D3). Hex literal di `rate_us_step.dart:144-150,242`, `card_background_painter.dart:23`.
+- **Kriteria selesai:** Sapaan tanpa nama terbaca wajar; warna dari `core/theme`.
+- **Commit/PR:** -

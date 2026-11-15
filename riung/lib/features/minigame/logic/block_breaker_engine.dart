@@ -29,7 +29,9 @@ class BlockBreakerEngine {
   /// [startSpeedBonus] menaikkan kecepatan awal bola (dipakai untuk menala
   /// level kesulitan bos Si Waswas — lihat `WaswasBossType.speedBonus`).
   /// 0 = perilaku lama, tidak berubah untuk saboteur lain.
-  BlockBreakerEngine({double height = defaultHeight, this.startSpeedBonus = 0}) : height = height.clamp(minHeight, maxHeight) {
+  BlockBreakerEngine({double height = defaultHeight, this.startSpeedBonus = 0, double startHp = 100})
+      : height = height.clamp(minHeight, maxHeight),
+        bossHp = startHp.clamp(1, 100).toDouble() {
     _buildBlocks();
     _resetBall();
   }
@@ -71,7 +73,8 @@ class BlockBreakerEngine {
   bool launched = false;
 
   int lives = MinigameConfig.lives;
-  double bossHp = 100;
+  /// Mulai dari sisa kekuatan monster (100 − progres), bukan selalu 100.
+  double bossHp;
   int blocksBroken = 0;
   int bodyHits = 0;
   double timeLeft = MinigameConfig.sessionSeconds.toDouble();

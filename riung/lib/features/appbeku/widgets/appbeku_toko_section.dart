@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/api_error_feedback.dart';
+import '../../../core/services/api/api_client.dart';
 import '../../../core/config/appbeku_catalog.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
@@ -33,7 +35,7 @@ class AppBekuTokoSection extends StatelessWidget {
       final picked = await showModalBottomSheet<String>(
         context: context,
         builder: (sheetContext) => Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 26),
+          padding: EdgeInsets.fromLTRB(24, 12, 24, 26 + MediaQuery.paddingOf(sheetContext).bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -73,7 +75,14 @@ class AppBekuTokoSection extends StatelessWidget {
     final label = t.appbeku.itemMinutes(minutes, entry.name);
     final konfirmasi = await showKonfirmasiPembelianSheet(context, itemLabel: label, price: charged, cooldownSeconds: EconomyScroll.unlockCooldownSeconds);
     if (!konfirmasi || !context.mounted) return;
-    final result = await scope.appBeku.unlockMinutes(wallet: wallet, packageName: packageName, minutes: minutes, price: price);
+    final UnlockResult result;
+    try {
+      result = await scope.appBeku.unlockMinutes(wallet: wallet, packageName: packageName, minutes: minutes, price: price);
+    } on ApiException catch (e) {
+      // Offline/server error: jangan biarkan tak tertangani.
+      if (context.mounted) showApiError(context, e);
+      return;
+    }
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_pesan(t.appbeku, result))));
   }

@@ -4,6 +4,8 @@ import '../../../core/config/input_limits.dart';
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/models/check_in.dart';
+import '../../../core/services/api/api_client.dart';
+import '../../../core/widgets/api_error_feedback.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
@@ -45,7 +47,9 @@ class _CheckInNoteScreenState extends State<CheckInNoteScreen> {
 
     final scope = AppScope.of(context);
     final uid = scope.auth.uid;
-    if (uid != null) {
+    try {
+      // Tanpa uid tidak ada yang tersimpan — jangan tampilkan hasil palsu.
+      if (uid == null) throw StateError('no uid');
       await scope.userRepository.saveCheckIn(
         uid,
         CheckIn(
@@ -59,6 +63,15 @@ class _CheckInNoteScreenState extends State<CheckInNoteScreen> {
       await scope.wallet.earn(amount: EconomyEarn.checkinHarian, reason: 'daily_checkin');
       await scope.wallet.addTickets(1);
       await scope.analytics.checkinDone(mood: widget.draft.moodId ?? '');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      if (e is ApiException) {
+        showApiError(context, e);
+      } else {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(context.s.common.loadFailed)));
+      }
+      return;
     }
 
     if (!mounted) return;

@@ -58,7 +58,8 @@ class _BlockBreakerScreenState extends State<BlockBreakerScreen> with SingleTick
     final media = MediaQuery.of(context);
     final scale = (media.size.width - 2 * AppSpacing.xl) / BlockBreakerEngine.width;
     final availableHeight = media.size.height - media.padding.vertical - 200;
-    _engine = BlockBreakerEngine(height: availableHeight / scale, startSpeedBonus: widget.startSpeedBonus);
+    final progress = AppScope.of(context).monsterProgress.progressOf(widget.saboteur.id)?.progress ?? 0;
+    _engine = BlockBreakerEngine(height: availableHeight / scale, startSpeedBonus: widget.startSpeedBonus, startHp: (100 - progress).toDouble());
     _engineReady = true;
   }
 

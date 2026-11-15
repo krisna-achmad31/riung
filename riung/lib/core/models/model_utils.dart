@@ -6,13 +6,13 @@ import 'package:flutter/painting.dart';
 DateTime? parseDate(Object? value) {
   if (value == null) return null;
   if (value is DateTime) return value;
-  if (value is String) return DateTime.tryParse(value);
+  if (value is String) return DateTime.tryParse(value)?.toLocal();
   // Dukung objek mirip Firestore Timestamp ({seconds, nanoseconds}) tanpa
   // bergantung pada package cloud_firestore (belum disambungkan sampai M5).
   if (value is Map) {
     final seconds = value['seconds'] ?? value['_seconds'];
     if (seconds is int) {
-      return DateTime.fromMillisecondsSinceEpoch(seconds * 1000, isUtc: true);
+      return DateTime.fromMillisecondsSinceEpoch(seconds * 1000, isUtc: true).toLocal();
     }
   }
   return null;

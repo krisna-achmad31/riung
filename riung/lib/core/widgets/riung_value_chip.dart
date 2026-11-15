@@ -18,11 +18,12 @@ class RiungValueChip extends StatelessWidget {
       decoration: AppGlass.card(radius: 22),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (leading != null) ...[
-            SizedBox(width: 30, height: 30, child: leading),
-            const SizedBox(height: 2),
-          ],
+          // Slot ikon selalu dipesan supaya angka & label sejajar antar chip
+          // (chip tanpa ikon tidak naik sendiri).
+          SizedBox(width: 30, height: 30, child: leading),
+          const SizedBox(height: 2),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(value, maxLines: 1, style: AppTextStyles.title.copyWith(fontSize: 18, height: 1.2, color: AppColors.teksUtama)),

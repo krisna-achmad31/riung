@@ -15,7 +15,7 @@ Future<void> showBahasaSheet(BuildContext context) {
     builder: (sheetContext) => ListenableBuilder(
       listenable: notifier,
       builder: (context, _) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 26),
+        padding: EdgeInsets.fromLTRB(24, 12, 24, 26 + MediaQuery.paddingOf(context).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

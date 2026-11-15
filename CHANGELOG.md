@@ -16,6 +16,23 @@ Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml
 
 ======
 
+15/11/2026 (1.2.3+14)
+AY
+1. FIX: check-in tidak lagi tampil sukses saat belum tersimpan (tanpa akun/gagal simpan) — tampil pesan & bisa coba lagi; back dari Hasil ke Beranda, bukan submit ulang.
+2. FIX: ketuk-ganda di buka-waktu Aplikasi Beku & mulai minigame tidak memotong koin/tiket dua kali.
+3. FIX: sesi Fokus offline menambah progres ke monster yang benar, bukan selalu Si Waswas.
+4. FIX: layar krisis memilih negara dari SIM (HP berbahasa Inggris di Indonesia kini tampil layanan Indonesia); tidak crash bila layanan tanpa telepon/tautan.
+5. FIX: buka-waktu saat offline menampilkan pesan error, bukan error tak tertangani.
+6. FIX: Langganan tidak loading selamanya bila harga Play gagal dimuat; versi app di Pengaturan dibaca dari build.
+7. FIX: tombol "Mulai fokus" di tab Fokus dipaku di atas navbar (dulu tertutup navbar sampai di-scroll); label "gratis hari ini" hanya untuk sesi 25 menit, durasi lain menampilkan harga koin.
+8. FIX: HP bos di minigame mulai dari sisa kekuatan monster (100 − progres), bukan selalu 100%.
+9. FIX: tombol "Mulai serangan" / "Coba lagi" / "Serang lagi" saat tiket 0 atau batas harian diganti "Tiket harianmu habis"; "Kembali ke Vault" kini membuka tab Monster.
+10. FIX: histori koin menampilkan jam lokal (bukan UTC) dan label sumber dari API (Check-in harian, Entri jurnal, Misi harian, …).
+11. FIX: sapaan check-in & label saran mengikuti jam (pagi/siang/sore/malam).
+12. FIX: chip nilai tanpa ikon (mis. "−2%") kini sejajar dengan chip berikon.
+13. FIX: sheet bahasa & pilih aplikasi Aplikasi Beku memberi ruang navbar sistem 3-tombol.
+14. UPDATE: transisi ke halaman Tidur (dan tab Tidur di Jelajah) meredup perlahan.
+
 14/11/2026 (1.2.2+13)
 AY
 1. FIX: Aplikasi Beku — tombol buka-berbayar di layar "Setelah napas" dan sheet konfirmasi Toko § Buka Waktu Scroll kini menunggu jeda 60 dtk, menahan ketuk-ganda, dan menampilkan sisa jatah/batas harian.

@@ -3,7 +3,8 @@ abstract class CheckinStrings {
   const CheckinStrings();
 
   // ── Langkah 1: mood ──
-  String moodTitle(String name);
+  /// [hour] = jam lokal (0–23) supaya sapaan cocok waktu (pagi/siang/sore/malam).
+  String moodTitle(String name, int hour);
   String get moodSub;
   String get moodHint;
   String get skipToday;
@@ -27,7 +28,7 @@ abstract class CheckinStrings {
   String get resultTitle;
   String get coinsLabel;
   String get daysInARow;
-  String get suggestionsLabel;
+  String suggestionsLabel(int hour);
   String get suggestionPauseTitle;
   String get suggestionPauseSub;
   String get suggestionCbtTitle;
@@ -46,8 +47,12 @@ abstract class CheckinStrings {
 class CheckinStringsId extends CheckinStrings {
   const CheckinStringsId();
 
+  String _waktu(int h) => h >= 4 && h < 11 ? 'pagi' : h < 15 && h >= 11 ? 'siang' : h < 18 && h >= 15 ? 'sore' : 'malam';
   @override
-  String moodTitle(String name) => 'Pagi, $name. Gimana rasanya hari ini?';
+  String moodTitle(String name, int hour) {
+    final w = _waktu(hour);
+    return '${w[0].toUpperCase()}${w.substring(1)}, $name. Gimana rasanya hari ini?';
+  }
   @override
   String get moodSub => 'Jawaban apa pun nggak ada yang salah.';
   @override
@@ -125,7 +130,7 @@ class CheckinStringsId extends CheckinStrings {
   @override
   String get daysInARow => 'hari beruntun';
   @override
-  String get suggestionsLabel => 'SARAN BUAT PAGIMU';
+  String suggestionsLabel(int hour) => 'SARAN BUAT ${_waktu(hour).toUpperCase()}MU';
   @override
   String get suggestionPauseTitle => 'Jeda di Tengah Kerja';
   @override
@@ -155,8 +160,12 @@ class CheckinStringsId extends CheckinStrings {
 class CheckinStringsEn extends CheckinStrings {
   const CheckinStringsEn();
 
+  String _part(int h) => h >= 4 && h < 12 ? 'morning' : h >= 12 && h < 18 ? 'afternoon' : 'evening';
   @override
-  String moodTitle(String name) => 'Morning, $name. How does today feel?';
+  String moodTitle(String name, int hour) {
+    final p = _part(hour);
+    return '${p[0].toUpperCase()}${p.substring(1)}, $name. How does today feel?';
+  }
   @override
   String get moodSub => 'There are no wrong answers.';
   @override
@@ -234,7 +243,7 @@ class CheckinStringsEn extends CheckinStrings {
   @override
   String get daysInARow => 'days in a row';
   @override
-  String get suggestionsLabel => 'SUGGESTIONS FOR YOUR MORNING';
+  String suggestionsLabel(int hour) => 'SUGGESTIONS FOR YOUR ${_part(hour).toUpperCase()}';
   @override
   String get suggestionPauseTitle => 'Break in the Middle of Work';
   @override

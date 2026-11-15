@@ -26,6 +26,10 @@ import 'jelajah_screen.dart';
 class RootShellScreen extends StatefulWidget {
   const RootShellScreen({super.key});
 
+  /// Layar di atas shell bisa minta pindah tab sebelum `popUntil(isFirst)`,
+  /// mis. "Kembali ke Vault" dari layar tiket habis.
+  static final ValueNotifier<RiungNavTab?> requestTab = ValueNotifier(null);
+
   @override
   State<RootShellScreen> createState() => _RootShellScreenState();
 }
@@ -38,11 +42,20 @@ class _RootShellScreenState extends State<RootShellScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    RootShellScreen.requestTab.addListener(_onRequestTab);
     WidgetsBinding.instance.addPostFrameCallback((_) => _cekBatasAppBeku());
+  }
+
+  void _onRequestTab() {
+    final tab = RootShellScreen.requestTab.value;
+    if (tab == null) return;
+    RootShellScreen.requestTab.value = null;
+    if (mounted && tab != _tab) setState(() => _tab = tab);
   }
 
   @override
   void dispose() {
+    RootShellScreen.requestTab.removeListener(_onRequestTab);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

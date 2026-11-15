@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/widgets.dart';
 import '../../../core/config/kenali_dirimu_config.dart';
 import '../../afirmasi/screens/afirmasi_kategori_screen.dart';
 import '../../appbeku/screens/appbeku_setup_screen.dart';
@@ -23,5 +24,6 @@ Future<void> openKenaliFeature(BuildContext context, KenaliFeature feature) {
     KenaliFeature.afirmasi => const AfirmasiKategoriScreen(),
     KenaliFeature.laporan => const LaporanScreen(),
   };
+  if (feature == KenaliFeature.tidur) return Navigator.of(context).push(DimToNightRoute<void>(builder: (_) => screen));
   return Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
 }

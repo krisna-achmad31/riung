@@ -4,6 +4,7 @@ import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../home/screens/root_shell_screen.dart';
 
 /// Tiket/serangan harian habis. Bukan layar di `design/Monster.dc.html`
 /// (yang cuma menyebut batasnya lewat teks kecil di layar Intro), tapi
@@ -73,7 +74,11 @@ class MinigameDailyCapScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              RiungButton(label: t.capBack, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
+              RiungButton(label: t.capBack, variant: RiungButtonVariant.secondary, onPressed: () {
+                  RootShellScreen.requestTab.value = RiungNavTab.monster;
+                  Navigator.of(context).popUntil((r) => r.isFirst);
+                },
+              ),
             ],
           ),
         ),

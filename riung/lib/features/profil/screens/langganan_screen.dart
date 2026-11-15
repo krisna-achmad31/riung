@@ -33,7 +33,8 @@ class _LanggananScreenState extends State<LanggananScreen> {
   @override
   void initState() {
     super.initState();
-    PremiumOffer.load(AppScope.of(context).billing).then((offers) {
+    // Gagal muat dari Play → kosong (tampil "harga di Play"), bukan loading selamanya.
+    PremiumOffer.load(AppScope.of(context).billing).catchError((_) => <String, PremiumOffer>{}).then((offers) {
       if (mounted) setState(() => _offers = offers);
     });
   }

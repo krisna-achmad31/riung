@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/api_error_feedback.dart';
+import '../../../core/services/api/api_client.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
@@ -19,12 +21,19 @@ class AppBekuPostBreathingScreen extends StatelessWidget {
   Future<void> _bukaLagi(BuildContext context) async {
     final scope = AppScope.of(context);
     final rc = scope.remoteConfig;
-    final result = await scope.appBeku.unlockMinutes(
+    final UnlockResult result;
+    try {
+      result = await scope.appBeku.unlockMinutes(
       wallet: scope.wallet,
       packageName: packageName,
       minutes: 10,
       price: rc.scrollUnlock10Menit,
     );
+    } on ApiException catch (e) {
+      // Offline/server error: jangan biarkan tak tertangani.
+      if (context.mounted) showApiError(context, e);
+      return;
+    }
     if (!context.mounted) return;
     if (result == UnlockResult.ok) {
       Navigator.of(context).popUntil((r) => r.isFirst);

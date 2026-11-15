@@ -20,10 +20,7 @@ class CheckInHasilScreen extends StatelessWidget {
   final CheckInDraft draft;
 
   void _mulaiHariku(BuildContext context) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const RootShellScreen()),
-      (route) => false,
-    );
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const RootShellScreen()), (route) => false);
   }
 
   @override
@@ -32,75 +29,75 @@ class CheckInHasilScreen extends StatelessWidget {
     final t = context.s.checkin;
     final showHakimInsight = draft.factorIds.contains('kerjaan') && draft.factorIds.contains('takut_gagal');
 
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
-          child: Column(
-            children: [
-              Expanded(
-                child: RiungBleedListView(
-                  children: [
-                    const _Sparkles(),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(t.resultTitle, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.15)),
-                    const SizedBox(height: AppSpacing.lg),
-                    ListenableBuilder(
-                      listenable: scope.streak,
-                      builder: (context, _) => Row(
-                        children: [
-                          Expanded(
-                            child: RiungStatTile(
-                              leading: const RiungIcon3D(RiungIcon.koin, size: 44),
-                              value: '+${EconomyEarn.checkinHarian}',
-                              label: t.coinsLabel,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: RiungStatTile(
-                              leading: const RiungIcon3D(RiungIcon.streak, size: 44),
-                              value: '${scope.streak.current}',
-                              label: t.daysInARow,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(t.suggestionsLabel.toUpperCase(), style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.teksRedup)),
-                    const SizedBox(height: AppSpacing.md),
-                    _SuggestionRow(
-                      leading: const RiungIcon3D(RiungIcon.meditasi, size: 50),
-                      title: t.suggestionPauseTitle,
-                      subtitle: t.suggestionPauseSub,
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => MeditasiDetailScreen(session: MeditationCatalog.byId('jeda_kerja'))),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    _SuggestionRow(
-                      leading: const RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 50, applyBossScale: false),
-                      title: t.suggestionCbtTitle,
-                      subtitle: t.suggestionCbtSub,
-                      // Lewat JurnalHomeScreen supaya gerbang PIN jurnal tetap berlaku.
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const JurnalHomeScreen())),
-                    ),
-                    if (showHakimInsight) ...[
+    // Back = Mulai hariku: jangan kembali ke Faktor lalu submit ulang.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _mulaiHariku(context);
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+            child: Column(
+              children: [
+                Expanded(
+                  child: RiungBleedListView(
+                    children: [
+                      const _Sparkles(),
                       const SizedBox(height: AppSpacing.md),
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: AppGlass.card(radius: 22, color: AppColors.sekunderLembut.withValues(alpha: 0.7), shadowed: false),
-                        child: Text(t.resultHakimInsight, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksUtama)),
+                      Text(t.resultTitle, style: AppTextStyles.display.copyWith(fontSize: 26, height: 1.15)),
+                      const SizedBox(height: AppSpacing.lg),
+                      ListenableBuilder(
+                        listenable: scope.streak,
+                        builder: (context, _) => Row(
+                          children: [
+                            Expanded(
+                              child: RiungStatTile(leading: const RiungIcon3D(RiungIcon.koin, size: 44), value: '+${EconomyEarn.checkinHarian}', label: t.coinsLabel),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: RiungStatTile(leading: const RiungIcon3D(RiungIcon.streak, size: 44), value: '${scope.streak.current}', label: t.daysInARow),
+                            ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        t.suggestionsLabel(DateTime.now().hour).toUpperCase(),
+                        style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.teksRedup),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _SuggestionRow(
+                        leading: const RiungIcon3D(RiungIcon.meditasi, size: 50),
+                        title: t.suggestionPauseTitle,
+                        subtitle: t.suggestionPauseSub,
+                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MeditasiDetailScreen(session: MeditationCatalog.byId('jeda_kerja')))),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _SuggestionRow(
+                        leading: const RiungMonster(monsterId: 'hakim', state: MonsterVisualState.jinak, size: 50, applyBossScale: false),
+                        title: t.suggestionCbtTitle,
+                        subtitle: t.suggestionCbtSub,
+                        // Lewat JurnalHomeScreen supaya gerbang PIN jurnal tetap berlaku.
+                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const JurnalHomeScreen())),
+                      ),
+                      if (showHakimInsight) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: AppGlass.card(radius: 22, color: AppColors.sekunderLembut.withValues(alpha: 0.7), shadowed: false),
+                          child: Text(t.resultHakimInsight, style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.45, color: AppColors.teksUtama)),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              RiungButton(label: t.startMyDay, onPressed: () => _mulaiHariku(context)),
-              const BantuanKrisisLink(),
-            ],
+                const SizedBox(height: AppSpacing.md),
+                RiungButton(label: t.startMyDay, onPressed: () => _mulaiHariku(context)),
+                const BantuanKrisisLink(),
+              ],
+            ),
           ),
         ),
       ),
@@ -127,10 +124,17 @@ class _Sparkles extends StatelessWidget {
               child: Container(
                 width: 220,
                 height: 220,
-                decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)])),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(colors: [AppColors.garis, AppColors.garis.withValues(alpha: 0)]),
+                ),
               ),
             ),
-            const Positioned(left: 80, top: 14, child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 190)),
+            const Positioned(
+              left: 80,
+              top: 14,
+              child: RiungMonster(monsterId: 'kabut', state: MonsterVisualState.jinak, size: 190),
+            ),
             Positioned(left: 60, top: 40, child: spark(20)),
             Positioned(left: 280, top: 50, child: spark(16)),
             Positioned(left: 290, top: 170, child: spark(18)),

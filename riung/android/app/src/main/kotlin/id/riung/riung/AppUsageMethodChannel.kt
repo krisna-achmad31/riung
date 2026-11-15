@@ -42,6 +42,12 @@ class AppUsageMethodChannel(private val context: Context, private val activity: 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "hasUsageAccess" -> result.success(hasUsageAccess())
+            "simCountry" -> {
+                // Negara SIM/jaringan untuk default layar krisis (bukan locale HP).
+                val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as? android.telephony.TelephonyManager
+                val iso = tm?.simCountryIso?.takeIf { it.isNotBlank() } ?: tm?.networkCountryIso?.takeIf { it.isNotBlank() }
+                result.success(iso?.uppercase())
+            }
             "setScreenSecure" -> {
                 if (call.argument<Boolean>("secure") == true) {
                     activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)

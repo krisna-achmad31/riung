@@ -45,7 +45,7 @@ class _CheckInMoodScreenState extends State<CheckInMoodScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.md),
                 children: [
-                  Text(t.moodTitle(userName), style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.15)),
+                  Text(t.moodTitle(userName, DateTime.now().hour), style: AppTextStyles.display.copyWith(fontSize: 28, height: 1.15)),
                   const SizedBox(height: 8),
                   Text(t.moodSub, style: AppTextStyles.body.copyWith(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.teksSekunder)),
                   const SizedBox(height: AppSpacing.xl),

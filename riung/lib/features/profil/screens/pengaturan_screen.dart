@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/l10n/strings/journal_backup_strings.dart';
@@ -166,9 +167,7 @@ class PengaturanScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Center(
-                      child: Text('Riung v1.0.0', style: AppTextStyles.caption.copyWith(fontSize: 10, color: AppColors.teksRedup)),
-                    ),
+                    const Center(child: _AppVersionText()),
                   ],
                 ),
               ),
@@ -177,5 +176,30 @@ class PengaturanScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Versi build sebenarnya dari PackageInfo (bukan angka tertulis).
+class _AppVersionText extends StatefulWidget {
+  const _AppVersionText();
+
+  @override
+  State<_AppVersionText> createState() => _AppVersionTextState();
+}
+
+class _AppVersionTextState extends State<_AppVersionText> {
+  String _version = '';
+
+  @override
+  void initState() {
+    super.initState();
+    PackageInfo.fromPlatform().then((info) {
+      if (mounted) setState(() => _version = info.version);
+    }).catchError((_) {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(_version.isEmpty ? 'Riung' : 'Riung v$_version', style: AppTextStyles.caption.copyWith(fontSize: 10, color: AppColors.teksRedup));
   }
 }

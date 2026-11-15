@@ -79,7 +79,7 @@ class _QuickActionCard extends StatelessWidget {
     return RiungGlassCard(
       radius: 24,
       padding: const EdgeInsets.fromLTRB(6, 10, 6, 12),
-      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: action.builder)),
+      onTap: () => Navigator.of(context).push(action.icon == RiungIcon.tidur ? DimToNightRoute<void>(builder: action.builder) : MaterialPageRoute<void>(builder: action.builder)),
       child: Column(
         children: [
           RiungIcon3D(action.icon, size: 52),

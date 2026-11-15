@@ -6,6 +6,7 @@ import '../../../core/models/models.dart';
 import '../../../core/state/state.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
+import 'minigame_daily_cap_screen.dart';
 import 'minigame_intro_screen.dart';
 
 /// Kalah — tetap suportif, tetap dapat progres. Implement persis
@@ -77,10 +78,17 @@ class MinigameLoseScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              RiungButton(
-                label: t.tryAgain,
-                onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: saboteur))),
-              ),
+              // Tiket 0 / batas harian: arahkan ke layar tiket habis, bukan "coba lagi".
+              if (scope.wallet.tickets > 0 && !scope.wallet.dailyFightCapReached)
+                RiungButton(
+                  label: t.tryAgain,
+                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MinigameIntroScreen(saboteur: saboteur))),
+                )
+              else
+                RiungButton(
+                  label: t.capTitle,
+                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MinigameDailyCapScreen())),
+                ),
               const SizedBox(height: 10),
               RiungButton(label: context.s.common.nantiSaja, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(context).maybePop()),
             ],

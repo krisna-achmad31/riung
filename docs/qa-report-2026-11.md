@@ -72,3 +72,56 @@ Scope: audit statis (tanpa device). Fase 2 (E2E Infinix) belum jalan. Temuan Fas
 
 ## Next
 Fase 2 di Infinix setelah Clubby: verifikasi E1–E5 + HIGH di device, lalu fix.
+
+## Fase 2 — Infinix (15/11, debug 1.2.2+13) — sebagian
+Bukti: `device_snap/qa/`.
+
+| # | Sev | Temuan | Repro |
+|---|---|---|---|
+| D1 | BUKAN BUG | Jurnal sempat terbuka saat uji awal karena pemilik HP menyentuh sensor sidik jari (dikonfirmasi user 15/11). Uji ulang 4× dengan log: jurnal tetap terkunci. Ditutup | — |
+| D2 | MED | Layar krisis default **United States / 988** untuk user Indonesia: negara diambil dari locale HP (`en-US`), bukan SIM (`id`) — `bantuan_krisis_screen.dart:31` | HP berbahasa Inggris, SIM Indonesia |
+| D3 | LOW | Sapaan check-in "Pagi, . Gimana rasanya hari ini?" — nama kosong tidak ditangani | User anonim tanpa nama |
+
+Terverifikasi OK: check-in penuh (mood → faktor → catatan → hasil), +5 koin & streak 1; tautan krisis di Hasil check-in (E5) membuka layar krisis & back kembali ke Hasil.
+
+Belum diuji di device: E1/E2 (saldo 9 < harga 15; layar "Setelah napas" butuh pemicu kunci), E5 di Simpan jurnal (butuh sidik jari pemilik), flow lain Fase 2.
+
+## Perbaikan pra-rilis (15/11, 1.2.3+14)
+FIXED: check-in tanpa uid/gagal simpan (pesan + coba lagi), back dari Hasil → Beranda; ketuk-ganda interstitial AppBeku & mulai minigame; `sesi_selesai` offline pakai `saboteurId`; D2 negara krisis dari SIM (`AppUsageService.simCountry`); `line.url!`; buka-waktu offline → `showApiError`; Langganan gagal muat → fallback; versi app dari PackageInfo; 2 warning analyze. `jurnal_backup_screen` masuk `loaderAllowed` (memuat hanya saat tombol diketuk).
+Sisa → `MOBILE_TASKS.md` MOB-005…MOB-010.
+
+## Fase 2b — E2E install bersih (15/11 malam, debug 1.2.3+14, data app dihapus)
+Bukti: `device_snap/qa/e2e_*.png`. PIN jurnal uji di HP: 135790.
+
+Lolos: sambutan 3 hlm → asesmen 17 soal → cerita → nama → 4 fakta → hasil monster → paywall → versi gratis → Beranda; check-in +5 & streak 1; back dari Hasil → Beranda; buat PIN jurnal + entri +4; misi harian +3 (sekali); 4 serangan memotong tiket 4→0, layar "Tiket harianmu habis"; koin kurang di Fokus menawarkan latihan dulu; transisi meredup ke Tidur (Beranda & tab Jelajah).
+
+| # | Sev | Temuan | Lokasi/catatan |
+|---|---|---|---|
+| T1 | HIGH | Mode server: tiket = `fightsRemainingToday` (4) — user baru langsung 4 serangan tanpa latihan; check-in/jurnal tidak menambah tiket. Aturan "1 gratis + maks 3 dari latihan" tidak berlaku. Teks "1 gratis + 3 latihan" dihitung, bukan nyata | `wallet_notifier.dart:50,257,270`; server tidak punya saldo tiket → BACKEND |
+| F1 | HIGH | Tab Fokus: tombol "Mulai fokus" tertutup navbar bawah saat pesan koin-kurang muncul (y 2214–2376 vs nav 2202–2370) | `focus_mode_entry_screen` mode tab |
+| F2 | MED | Label tombol "Mulai fokus 45 menit • gratis hari ini" — gratis hanya 25 mnt; 45 = 40 koin | focus entry |
+| G1 | MED | HP Si Hakim selalu 100% di awal game walau tiap kalah tertulis "−2%" (4×) | minigame |
+| G2 | MED | "Coba lagi (1 tiket)" & "Mulai serangan" tetap aktif di 0 tiket (baru ditolak setelah ditekan) | minigame lose/intro |
+| G3 | LOW | "Kembali ke Vault" di layar tiket habis mendarat di Beranda | `minigame_daily_cap_screen` |
+| K1 | MED | Histori koin: jam UTC (12.52 padahal 19.52 WIB); semua label "Koin masuk", bukan sumbernya | `koin_histori_screen` |
+| C1 | LOW | Check-in jam 19:50 menyapa "Pagi, Tester" & "SARAN BUAT PAGIMU" | checkin mood/hasil |
+| O1 | LOW | Opsi berkutip asesmen (soal 9, 13) tanpa label aksesibilitas | onboarding question |
+| O2 | INFO | "Isi nanti" di soal Cerita = jeda seluruh asesmen; Beranda lalu bilang "belum selesai" walau 17/17 dijawab. Cerita wajib | by design? |
+| O3 | INFO | Paywall: harga "tampil di Google Play" + Coba lagi — wajar untuk APK debug sideload; cek di build Play internal |
+| J1 | LOW | Beranda jurnal "Tulis bebas" membuka layar pilih yang menampilkan "Tulis bebas" lagi (2 ketuk) | jurnal |
+
+Belum diuji: login/daftar/masuk akun, meditasi +3 (sesi penuh), menang game +8, jinak +50, streak hari ke-2, pelindung streak, Toko/kosmetik, Aplikasi Beku di device, billing nyata.
+
+### Perbaikan fase 2b (15/11/2026)
+
+| ID | Status | Verifikasi |
+|---|---|---|
+| F1 | ✅ | Tombol "Mulai fokus" dipaku di bawah, y 1914–2076 di atas navbar app (2130) dengan navbar sistem 3-tombol aktif — tanpa scroll |
+| F2 | ✅ | 45 menit → "Mulai fokus 45 menit • 40 koin"; jatah gratis offline juga hanya untuk 25 menit |
+| G1 | ⚠️ kode | HP bos mulai dari 100 − progres; belum diuji main (tiket 0 di HP uji) |
+| G2 | ✅ | Intro tiket 0 → tombol "Tiket harianmu habis"; layar kalah/menang juga |
+| G3 | ✅ | "Kembali ke Vault" mendarat di tab Monster |
+| K1 | ✅ | Histori: "Misi harian · 20.04", "Entri jurnal · 19.53", "Check-in harian · 19.52" (jam lokal) |
+| C1 | ⚠️ kode | Sapaan & label saran ikut jam; check-in hari ini sudah dipakai, belum diuji di HP |
+| Chip | ✅ | Chip "−5%" sejajar dengan chip berikon (intro serangan) |
+| Navbar sistem | ✅ | Diuji dengan overlay `navbar.threebutton`: navbar app, tombol intro & Fokus di atas navbar sistem; sheet bahasa & pilih aplikasi diberi padding inset |

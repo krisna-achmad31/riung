@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/services/app_usage_service.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/widgets.dart';
@@ -28,7 +29,18 @@ class BantuanKrisisScreen extends StatefulWidget {
 
 class _BantuanKrisisScreenState extends State<BantuanKrisisScreen> {
   /// Negara dari pengaturan perangkat, bukan bahasa app; null = di luar daftar.
+  /// Diganti negara SIM begitu tersedia (HP berbahasa Inggris ≠ di AS).
   String? _country = WidgetsBinding.instance.platformDispatcher.locale.countryCode;
+  bool _picked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AppUsageService.simCountry().then((sim) {
+      if (sim == null || _picked || !mounted) return;
+      setState(() => _country = sim);
+    });
+  }
 
   Future<void> _gantiNegara() async {
     final picked = await showModalBottomSheet<String>(
@@ -37,7 +49,10 @@ class _BantuanKrisisScreenState extends State<BantuanKrisisScreen> {
       builder: (_) => const _CountrySheet(),
     );
     if (picked == null || !mounted) return;
-    setState(() => _country = picked);
+    setState(() {
+      _picked = true;
+      _country = picked;
+    });
   }
 
   List<_CrisisLine> _lines(BuildContext context) {
@@ -140,7 +155,14 @@ class _BantuanKrisisScreenState extends State<BantuanKrisisScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     for (final line in _lines(context)) ...[
-                      _CrisisRow(line: line, onTap: () => line.tel != null ? _telepon(line.tel!) : _bukaUrl(line.url!)),
+                      _CrisisRow(line: line, onTap: () {
+                        final tel = line.tel, url = line.url;
+                        if (tel != null) {
+                          _telepon(tel);
+                        } else if (url != null) {
+                          _bukaUrl(url);
+                        }
+                      }),
                       const SizedBox(height: AppSpacing.md),
                     ],
                     Container(
