@@ -16,6 +16,10 @@ Setiap perubahan yang di-merge wajib menaikkan `version` di [`riung/pubspec.yaml
 
 ======
 
+15/11/2026 (1.2.4+15)
+AY
+1. FIX: CI build Android gagal karena Flutter stable terbaru (3.50.0) minta Gradle 9.3.1 — versi Flutter di job Android dikunci ke 3.44.8, sama dengan job iOS.
+
 15/11/2026 (1.2.3+14)
 AY
 1. FIX: check-in tidak lagi tampil sukses saat belum tersimpan (tanpa akun/gagal simpan) — tampil pesan & bisa coba lagi; back dari Hasil ke Beranda, bukan submit ulang.
