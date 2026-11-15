@@ -192,7 +192,29 @@ const Map<String, RiungIcon> _reasonPrefixIcon = {
   'misi_harian': RiungIcon.streak,
 };
 
-_TransactionInfo _infoForReason(HomeStrings t, String reason, bool isEarn) {
+/// Alias `reason` dari API Riung (`/v1/wallet/transactions`: `checkin`,
+/// `journal`, `mission`, …) ke kunci [_reasonPrefixIcon] di atas.
+const Map<String, String> _apiReasonAlias = {
+  'checkin': 'daily_checkin',
+  'journal': 'jurnal',
+  'mission': 'misi_harian',
+  'meditation': 'meditasi',
+  'minigame': 'minigame_win',
+  'tamed': 'monster_tamed',
+  'monster': 'monster_tamed',
+  'focus': 'focus_',
+  'shield': 'streak_shield',
+  'unlock': 'scroll_unlock',
+};
+
+_TransactionInfo _infoForReason(HomeStrings t, String rawReason, bool isEarn) {
+  var reason = rawReason;
+  for (final alias in _apiReasonAlias.entries) {
+    if (rawReason.startsWith(alias.key)) {
+      reason = alias.value;
+      break;
+    }
+  }
   for (final entry in _reasonPrefixIcon.entries) {
     if (reason.startsWith(entry.key)) return _TransactionInfo(_labelOfReason(t, entry.key), entry.value);
   }

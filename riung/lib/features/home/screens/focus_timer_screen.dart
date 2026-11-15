@@ -65,7 +65,8 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
     // Sesi prabayar dari Toko dipakai duluan (jalan offline seperti tiket
     // serangan) — baru kalau habis, potong koin langsung per sesi.
     // Sesi gratis harian dulu: progres monster tidak boleh bergantung pada koin.
-    final pakaiGratis = await wallet.consumeFreeFocusSession(premium: AppScope.of(context).auth.profile?.premiumNow ?? false);
+    // Jatah gratis hanya untuk sesi termurah (25 menit), sama dengan label di layar pilih durasi.
+    final pakaiGratis = widget.priceCoins <= EconomySpend.fokus25Menit && await wallet.consumeFreeFocusSession(premium: AppScope.of(context).auth.profile?.premiumNow ?? false);
     final pakaiPrabayar = !pakaiGratis && await wallet.consumePrepaidFocusSession();
     final berhasil = pakaiGratis || pakaiPrabayar ||
         await wallet.spend(amount: widget.priceCoins, reason: 'focus_${widget.duration.inMinutes}min');

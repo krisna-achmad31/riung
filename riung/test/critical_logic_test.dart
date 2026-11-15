@@ -223,8 +223,11 @@ void main() {
       final d = DateTime(2026, 10, 17);
       expect(parseDate(d), d);
       expect(parseDate('2026-10-17T08:00:00.000'), DateTime(2026, 10, 17, 8));
-      expect(parseDate({'seconds': 0}), DateTime.fromMillisecondsSinceEpoch(0, isUtc: true));
-      expect(parseDate({'_seconds': 60}), DateTime.fromMillisecondsSinceEpoch(60000, isUtc: true));
+      // Selalu jam lokal (histori koin dulu tampil jam UTC).
+      expect(parseDate({'seconds': 0}), DateTime.fromMillisecondsSinceEpoch(0));
+      expect(parseDate({'_seconds': 60}), DateTime.fromMillisecondsSinceEpoch(60000));
+      expect(parseDate('2026-10-17T08:00:00.000Z'), DateTime.utc(2026, 10, 17, 8).toLocal());
+      expect(parseDate('2026-10-17T08:00:00.000Z')!.isUtc, isFalse);
       expect(parseDate('bukan tanggal'), isNull);
       expect(parseDate(42), isNull);
       expect(parseDate(null), isNull);

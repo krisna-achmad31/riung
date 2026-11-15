@@ -16,11 +16,7 @@ class _DurationOption {
   int get priceCoins => ApiConfigStore.instance.value('spend', 'focus$minutes', _priceCoins);
 }
 
-const _durations = [
-  _DurationOption(25, EconomySpend.fokus25Menit),
-  _DurationOption(45, EconomySpend.fokus45Menit),
-  _DurationOption(60, EconomySpend.fokus60Menit),
-];
+const _durations = [_DurationOption(25, EconomySpend.fokus25Menit), _DurationOption(45, EconomySpend.fokus45Menit), _DurationOption(60, EconomySpend.fokus60Menit)];
 
 /// Pintu masuk tab "Fokus" — pilih durasi sebelum sesi jalan. Bukan bagian
 /// dari `design/Home.dc.html` (yang langsung lompat dari kartu "Mode Fokus"
@@ -51,96 +47,113 @@ class _FocusModeEntryScreenState extends State<FocusModeEntryScreen> {
           listenable: scope.wallet,
           builder: (context, _) {
             final adaGratis = scope.wallet.freeFocusAvailable(premium: profile?.premiumNow ?? false);
+            // Jatah gratis hanya untuk durasi pertama (25 menit) — sama dengan kartu durasi.
+            final gratisIni = adaGratis && _selected == 0;
             final adaSesiPrabayar = scope.wallet.prepaidFocusSessions > 0;
             final state = scope.wallet.apiState;
             final cachedForDuration = state?.cachedFocusDurations.contains(option.minutes) ?? false;
             final serverFree = scope.wallet.serverFreeFocusLeft > 0;
-            final cukupKoin = cachedForDuration || (adaGratis && (state == null || serverFree)) || adaSesiPrabayar || scope.wallet.coins >= option.priceCoins;
-            return ListView(
-              padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.xxl + MediaQuery.paddingOf(context).bottom),
+            final cukupKoin = cachedForDuration || (gratisIni && (state == null || serverFree)) || adaSesiPrabayar || scope.wallet.coins >= option.priceCoins;
+            // Tombol mulai dipaku di bawah (di atas navbar app & navbar sistem),
+            // bukan di ujung list — dulu tertutup navbar sampai di-scroll.
+            return Column(
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.md),
+                    children: [
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(t.title, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2)),
-                          const SizedBox(height: 4),
-                          Text(t.subtitle, style: AppTextStyles.caption.copyWith(fontSize: 13, height: 1.4, color: AppColors.teksSekunder)),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.title, style: AppTextStyles.display.copyWith(fontSize: 30, height: 1.2)),
+                                const SizedBox(height: 4),
+                                Text(t.subtitle, style: AppTextStyles.caption.copyWith(fontSize: 13, height: 1.4, color: AppColors.teksSekunder)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          KoinChip(balance: scope.wallet.coins),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    KoinChip(balance: scope.wallet.coins),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                FocusRing(monsterId: monsterId, time: '${option.minutes}:00', unit: t.minutesUnit, progress: 0.78),
-                const SizedBox(height: AppSpacing.lg),
-                Row(
-                  children: [
-                    for (var i = 0; i < _durations.length; i++) ...[
-                      if (i > 0) const SizedBox(width: 10),
-                      Expanded(
-                        child: _DurationCard(
-                          minutes: _durations[i].minutes,
-                          price: i == 0 && adaGratis ? t.freeToday : t.coinsPrice(_durations[i].priceCoins),
-                          free: i == 0 && adaGratis,
-                          selected: _selected == i,
-                          onTap: () => setState(() => _selected = i),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _InfoPill(icon: Icons.wifi_off_rounded, label: t.worksOffline),
-                    _InfoPill(icon: Icons.confirmation_number_outlined, label: t.attackTickets(scope.wallet.tickets)),
-                    if (adaSesiPrabayar) _InfoPill(icon: Icons.local_activity_outlined, label: t.prepaidSessions(scope.wallet.prepaidFocusSessions)),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: AppGlass.card(radius: 22, color: AppColors.kabutSage.withValues(alpha: 0.5), shadowed: false),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.air_rounded, size: 18, color: AppColors.primer),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          t.companionNote(context.s.common.monsterName(monsterId)),
-                          style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.primer),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                if (!cukupKoin)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: Text(t.notEnoughCoins, style: AppTextStyles.caption.copyWith(color: AppColors.error, fontSize: 12, height: 1.5)),
-                  ),
-                RiungButton(
-                  label: adaGratis
-                      ? t.startFree(option.minutes)
-                      : adaSesiPrabayar
-                          ? t.startPrepaid(option.minutes)
-                          : t.startPaid(option.minutes, option.priceCoins),
-                  onPressed: cukupKoin
-                      ? () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => FocusTimerScreen(duration: Duration(minutes: option.minutes), priceCoins: option.priceCoins),
+                      const SizedBox(height: AppSpacing.lg),
+                      FocusRing(monsterId: monsterId, time: '${option.minutes}:00', unit: t.minutesUnit, progress: 0.78),
+                      const SizedBox(height: AppSpacing.lg),
+                      Row(
+                        children: [
+                          for (var i = 0; i < _durations.length; i++) ...[
+                            if (i > 0) const SizedBox(width: 10),
+                            Expanded(
+                              child: _DurationCard(
+                                minutes: _durations[i].minutes,
+                                price: i == 0 && adaGratis ? t.freeToday : t.coinsPrice(_durations[i].priceCoins),
+                                free: i == 0 && adaGratis,
+                                selected: _selected == i,
+                                onTap: () => setState(() => _selected = i),
+                              ),
                             ),
-                          )
-                      : null,
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _InfoPill(icon: Icons.wifi_off_rounded, label: t.worksOffline),
+                          _InfoPill(icon: Icons.confirmation_number_outlined, label: t.attackTickets(scope.wallet.tickets)),
+                          if (adaSesiPrabayar) _InfoPill(icon: Icons.local_activity_outlined, label: t.prepaidSessions(scope.wallet.prepaidFocusSessions)),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: AppGlass.card(radius: 22, color: AppColors.kabutSage.withValues(alpha: 0.5), shadowed: false),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.air_rounded, size: 18, color: AppColors.primer),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(t.companionNote(context.s.common.monsterName(monsterId)), style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.4, color: AppColors.primer)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.md + MediaQuery.paddingOf(context).bottom),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!cukupKoin)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: Text(t.notEnoughCoins, style: AppTextStyles.caption.copyWith(color: AppColors.error, fontSize: 12, height: 1.5)),
+                        ),
+                      RiungButton(
+                        label: gratisIni
+                            ? t.startFree(option.minutes)
+                            : adaSesiPrabayar
+                            ? t.startPrepaid(option.minutes)
+                            : t.startPaid(option.minutes, option.priceCoins),
+                        onPressed: cukupKoin
+                            ? () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => FocusTimerScreen(
+                                    duration: Duration(minutes: option.minutes),
+                                    priceCoins: option.priceCoins,
+                                  ),
+                                ),
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -161,13 +174,20 @@ class _InfoPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(color: AppColors.kartu, borderRadius: BorderRadius.circular(AppRadius.pill), border: Border.all(color: AppColors.garis)),
+      decoration: BoxDecoration(
+        color: AppColors.kartu,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: AppColors.garis),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: AppColors.teksSekunder),
           const SizedBox(width: 6),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksSekunder)),
+          Text(
+            label,
+            style: AppTextStyles.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.teksSekunder),
+          ),
         ],
       ),
     );

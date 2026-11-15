@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n.dart';
@@ -14,6 +16,7 @@ Future<bool> showKonfirmasiPembelianSheet(
   BuildContext context, {
   required String itemLabel,
   required int price,
+  int cooldownSeconds = 0,
 }) async {
   final wallet = AppScope.of(context).wallet;
   final result = await showModalBottomSheet<bool>(
@@ -63,7 +66,7 @@ Future<bool> showKonfirmasiPembelianSheet(
                 style: AppTextStyles.caption.copyWith(fontSize: 11, color: AppColors.teksRedup),
               ),
               const SizedBox(height: AppSpacing.lg),
-              RiungButton(label: context.s.toko.confirmYes, onPressed: () => Navigator.of(sheetContext).pop(true)),
+              _TombolKonfirmasi(cooldownSeconds: cooldownSeconds, onConfirm: () => Navigator.of(sheetContext).pop(true)),
               const SizedBox(height: 10),
               RiungButton(label: context.s.common.batal, variant: RiungButtonVariant.secondary, onPressed: () => Navigator.of(sheetContext).pop(false)),
             ],
@@ -73,6 +76,50 @@ Future<bool> showKonfirmasiPembelianSheet(
     ),
   );
   return result ?? false;
+}
+
+/// Tombol "ya, beli". Dengan [cooldownSeconds] > 0 tombol baru aktif setelah
+/// jeda (buka-waktu Aplikasi Beku, `EconomyScroll.unlockCooldownSeconds`).
+class _TombolKonfirmasi extends StatefulWidget {
+  const _TombolKonfirmasi({required this.cooldownSeconds, required this.onConfirm});
+
+  final int cooldownSeconds;
+  final VoidCallback onConfirm;
+
+  @override
+  State<_TombolKonfirmasi> createState() => _TombolKonfirmasiState();
+}
+
+class _TombolKonfirmasiState extends State<_TombolKonfirmasi> {
+  late int _sisa = widget.cooldownSeconds;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_sisa > 0) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted) return;
+        setState(() => _sisa = (_sisa - 1).clamp(0, widget.cooldownSeconds));
+        if (_sisa == 0) _timer?.cancel();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final waiting = _sisa > 0;
+    return RiungButton(
+      label: waiting ? context.s.appbeku.waitSeconds(_sisa) : context.s.toko.confirmYes,
+      onPressed: waiting ? null : widget.onConfirm,
+    );
+  }
 }
 
 class _Baris extends StatelessWidget {

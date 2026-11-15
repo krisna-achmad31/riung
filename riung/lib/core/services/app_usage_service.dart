@@ -20,6 +20,17 @@ class AppUsageService {
     }
   }
 
+  /// Kode negara ISO (huruf besar) dari SIM, lalu jaringan; null bila tak ada.
+  static Future<String?> simCountry() async {
+    try {
+      return await _channel.invokeMethod<String>('simCountry');
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
   Future<bool> hasUsageAccess() async {
     try {
       return await _channel.invokeMethod<bool>('hasUsageAccess') ?? false;

@@ -17,6 +17,8 @@ import 'waswas_reaction_screen.dart';
 /// diganti latihan napas berirama (lihat catatan di
 /// `lib/features/minigame/screens/block_breaker_screen.dart`), tapi
 /// struktur & reward layar ini tetap sama persis desain.
+bool _starting = false;
+
 class MinigameIntroScreen extends StatelessWidget {
   const MinigameIntroScreen({super.key, required this.saboteur});
 
@@ -33,6 +35,17 @@ class MinigameIntroScreen extends StatelessWidget {
   }
 
   Future<void> _mulai(BuildContext context) async {
+    // Pengaman ketuk-ganda: tiket tidak terpakai dua kali.
+    if (_starting) return;
+    _starting = true;
+    try {
+      await _mulaiInner(context);
+    } finally {
+      _starting = false;
+    }
+  }
+
+  Future<void> _mulaiInner(BuildContext context) async {
     final scope = AppScope.of(context);
     final berhasil = await scope.wallet.useTicket();
     if (!context.mounted) return;
@@ -142,7 +155,9 @@ class MinigameIntroScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   RiungButton(
-                    label: t.startAttack,
+                    // Tiket 0 / batas harian: jangan tawarkan "Mulai serangan".
+                    label: bisaMulai ? t.startAttack : t.capTitle,
+                    variant: bisaMulai ? RiungButtonVariant.primary : RiungButtonVariant.secondary,
                     onPressed: bisaMulai
                         ? () => _mulai(context)
                         : () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MinigameDailyCapScreen())),

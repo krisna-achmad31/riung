@@ -39,7 +39,7 @@ class _SesiSelesaiScreenState extends State<SesiSelesaiScreen> {
         return;
       }
       AppScope.of(context).monsterProgress.tambahProgres(
-            saboteurId: 'waswas',
+            saboteurId: widget.saboteurId,
             delta: EconomyEarn.fokusProgressPercent,
           );
       AppScope.of(context).analytics.focusComplete(durationMinutes: widget.duration.inMinutes);

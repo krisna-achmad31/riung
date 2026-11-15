@@ -29,6 +29,7 @@ void main() {
   const loaderAllowed = {
     'lib/features/afirmasi/screens/afirmasi_buat_screen.dart', // tag monster opsional
     'lib/features/afirmasi/screens/afirmasi_kartu_screen.dart', // tanda favorit opsional
+    'lib/features/jurnal/screens/jurnal_backup_screen.dart', // baca jurnal saat tombol cadangkan diketuk
     'lib/features/home/screens/kartu_pemain_screen.dart', // satu angka statistik ("…")
     'lib/features/kenali_dirimu/screens/kenali_hasil_screen.dart', // tap "lihat monster"
     'lib/features/kepribadian/screens/kepribadian_hub_screen.dart', // tap "muat pola"

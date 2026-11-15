@@ -28,12 +28,12 @@ class FirestoreContentRepository implements ContentRepository {
     try {
       final snap = await _firestore.collection('content').doc('saboteurs').get();
       final items = (snap.data()?['items'] as List?)?.cast<Map<String, dynamic>>();
-      if (items == null || items.isEmpty) return _fallback.getSaboteurs();
+      if (items == null || items.isEmpty) return await _fallback.getSaboteurs();
       final saboteurs = items.map(Saboteur.fromMap).toList();
       _saboteurCache = saboteurs;
       return saboteurs;
     } catch (_) {
-      return _fallback.getSaboteurs();
+      return await _fallback.getSaboteurs();
     }
   }
 
@@ -44,7 +44,7 @@ class FirestoreContentRepository implements ContentRepository {
     try {
       final snap = await _firestore.collection('content').doc('affirmations').get();
       final items = (snap.data()?['items'] as List?)?.cast<Map<String, dynamic>>();
-      if (items == null || items.isEmpty) return _fallback.getAffirmations();
+      if (items == null || items.isEmpty) return await _fallback.getAffirmations();
       // Gabung dengan seed bawaan per id, supaya kartu yang baru ditambah
       // di aplikasi tetap muncul walau dokumen Firestore belum diperbarui.
       final remote = items.map(Affirmation.fromMap).toList();

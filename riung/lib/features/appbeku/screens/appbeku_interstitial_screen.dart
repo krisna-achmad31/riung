@@ -3,6 +3,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/api_error_feedback.dart';
+import '../../../core/services/api/api_client.dart';
 import '../../../core/config/economy.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/state/state.dart';
@@ -55,15 +57,35 @@ class _AppBekuInterstitialScreenState extends State<AppBekuInterstitialScreen> {
     super.dispose();
   }
 
+  bool _busy = false;
+
   Future<void> _bukaLagi(BuildContext context) async {
+    // Pengaman ketuk-ganda: koin tidak terpotong dua kali.
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await _bukaLagiInner(context);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _bukaLagiInner(BuildContext context) async {
     final scope = AppScope.of(context);
     final rc = scope.remoteConfig;
-    final result = await scope.appBeku.unlockMinutes(
+    final UnlockResult result;
+    try {
+      result = await scope.appBeku.unlockMinutes(
       wallet: scope.wallet,
       packageName: packageName,
       minutes: 10,
       price: rc.scrollUnlock10Menit,
     );
+    } on ApiException catch (e) {
+      // Offline/server error: jangan biarkan tak tertangani.
+      if (context.mounted) showApiError(context, e);
+      return;
+    }
     if (!context.mounted) return;
     if (result == UnlockResult.ok) {
       Navigator.of(context).maybePop();
@@ -154,7 +176,7 @@ class _AppBekuInterstitialScreenState extends State<AppBekuInterstitialScreen> {
                         else ...[
                           PaidUnlockButton(
                             label: _cooldown > 0 ? t.waitSeconds(_cooldown) : t.unlockMoreCoins(appBeku.effectiveUnlockPrice(rc.scrollUnlock10Menit)),
-                            onTap: _cooldown > 0 ? null : () => _bukaLagi(context),
+                            onTap: _cooldown > 0 || _busy ? null : () => _bukaLagi(context),
                           ),
                           const SizedBox(height: 10),
                           Center(
