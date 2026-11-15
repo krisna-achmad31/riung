@@ -52,6 +52,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          # Dikunci (sama dengan job iOS): stable terbaru bisa minta Gradle lebih baru dari wrapper proyek.
+          flutter-version: '3.44.8'
           channel: 'stable'
           cache: true
 
